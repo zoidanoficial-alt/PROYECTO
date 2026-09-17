@@ -91,6 +91,39 @@ script:
 Si no configuras nada, las alertas igual se imprimen en consola y se
 guardan en `alerts.log`.
 
+#### Paso a paso para Telegram
+
+1. Abre Telegram y busca **@BotFather**. Mándale `/newbot`, dale un nombre
+   y un username (debe terminar en `bot`, p. ej. `casandra_bmv_bot`).
+   BotFather te regresa un token con forma `123456789:AAExxxxxxxxxxxxxxx`.
+   Guárdalo — es secreto, no lo subas al repo ni lo compartas.
+2. Mándale cualquier mensaje a tu bot recién creado (así Telegram sabe que
+   quieres hablar con él).
+3. Consigue tu `chat_id`: en el navegador visita
+   `https://api.telegram.org/bot<TU_TOKEN>/getUpdates` (con tu token en
+   vez de `<TU_TOKEN>`) y busca el campo `"chat":{"id": ...}` en la
+   respuesta. Si prefieres no hacerlo a mano, mándale un mensaje a
+   [@userinfobot](https://t.me/userinfobot) y te da tu ID directamente.
+4. Exporta las variables de entorno antes de correr el script:
+
+   ```bash
+   export TELEGRAM_BOT_TOKEN="123456789:AAExxxxxxxxxxxxxxx"
+   export TELEGRAM_CHAT_ID="tu_chat_id"
+   ```
+
+5. Manda un mensaje de prueba sin esperar a que el mercado se estire:
+
+   ```bash
+   python -m cassandra_bmv.run --config tickers.yaml --test-notify
+   ```
+
+   Si todo está bien configurado, te debe llegar un mensaje de Casandra
+   confirmando la conexión. Si quieres que la alerta persista entre
+   sesiones/reinicios, agrega esas dos variables a tu `~/.bashrc`, a un
+   archivo `.env` que cargues antes de correr el script, o al crontab
+   (con `TELEGRAM_BOT_TOKEN=... TELEGRAM_CHAT_ID=...` en la misma línea
+   del cron job).
+
 ## Solución de problemas
 
 Si `fetch.py` falla con errores de conexión hacia `*.finance.yahoo.com`,

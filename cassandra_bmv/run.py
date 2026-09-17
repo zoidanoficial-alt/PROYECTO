@@ -77,6 +77,30 @@ def run_once(config: AppConfig, state_path: str, dry_run: bool = False) -> int:
     return alerts_sent
 
 
+def send_test_notification(config: AppConfig) -> int:
+    """Manda un mensaje de prueba por todos los canales configurados.
+
+    Sirve para confirmar que Telegram/Discord/archivo están bien conectados
+    sin tener que esperar a que una emisora realmente se estire.
+    """
+    notifiers = build_notifiers(config.notify)
+    if not notifiers:
+        print(
+            "[WARN] No hay notificadores configurados (revisa 'notify' en tu YAML "
+            "y las variables de entorno correspondientes)."
+        )
+        return 1
+
+    message = (
+        "[CASANDRA] Prueba de conexión\n\n"
+        "Todavía no veo nada estirado. Sólo confirmo que, cuando lo vea, "
+        "vas a poder escucharme por este canal."
+    )
+    dispatch(notifiers, message)
+    print(f"[INFO] Mensaje de prueba enviado a {len(notifiers)} canal(es).")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Alertas de valuación estirada en la BMV, en tono de Casandra."
@@ -92,10 +116,18 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="Si se da, corre en bucle cada N segundos en vez de una sola vez",
     )
+    parser.add_argument(
+        "--test-notify",
+        action="store_true",
+        help="Manda un mensaje de prueba por los canales configurados y termina",
+    )
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
     state_path = args.state or config.state_file
+
+    if args.test_notify:
+        return send_test_notification(config)
 
     if args.loop_interval:
         while True:
