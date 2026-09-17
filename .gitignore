@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Estado y logs generados en tiempo de ejecución
+state.json
+alerts.log
+cron.log
+
+# Configuración personal (usa tickers.example.yaml como plantilla)
+tickers.yaml

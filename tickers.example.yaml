@@ -1,0 +1,43 @@
+# Copia este archivo a tickers.yaml y ajústalo a tu gusto.
+# Los símbolos son de la BMV; se les agrega automáticamente el sufijo ".MX"
+# que usa Yahoo Finance si no lo traen ya.
+
+tickers:
+  - symbol: AMXL
+    name: "América Móvil"
+  - symbol: WALMEX
+    name: "Walmart de México"
+  - symbol: GFNORTEO
+    name: "Grupo Financiero Banorte"
+    pe_normal_range: [9, 15]
+  - symbol: FEMSAUBD
+    name: "FEMSA"
+  - symbol: GMEXICOB
+    name: "Grupo México"
+  - symbol: CEMEXCPO
+    name: "CEMEX"
+    pe_normal_range: [10, 25]
+  - symbol: BIMBOA
+    name: "Grupo Bimbo"
+  - symbol: KIMBERA
+    name: "Kimberly-Clark de México"
+
+thresholds:
+  # Puntaje combinado (precio vs. tendencia + sobreprecio de múltiplos) a
+  # partir del cual se considera que algo "se estiró".
+  stretch_score: 1.5
+  sma_window_short: 50
+  sma_window_long: 200
+  lookback_days: 400
+  default_pe_normal_range: [8, 20]
+  default_pb_normal_range: [1.0, 3.5]
+
+notify:
+  console: true
+  file_log: alerts.log
+  # Variables de entorno opcionales para notificaciones externas.
+  discord_webhook_env: DISCORD_WEBHOOK_URL
+  telegram_bot_token_env: TELEGRAM_BOT_TOKEN
+  telegram_chat_id_env: TELEGRAM_CHAT_ID
+
+state_file: state.json
