@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import random
 
+from .analysis import QuantReport
 from .multiples import StretchResult
 from .state import StreakInfo
 
@@ -173,3 +174,77 @@ def build_vindication_message(
     body = rng.choice(_VINDICATION).format(**ctx)
     header = f"[CASANDRA] {name} ({ticker}) — la profecía se cumplió"
     return f"{header}\n\n{body}"
+
+
+def _fmt_pct(value: float | None, decimals: int = 1) -> str:
+    return f"{value:+.{decimals}f}%" if value is not None else "s/d"
+
+
+def _fmt_num(value: float | None, decimals: int = 2, suffix: str = "") -> str:
+    return f"{value:.{decimals}f}{suffix}" if value is not None else "s/d"
+
+
+def _fmt_market_cap(value: float | None) -> str:
+    if value is None:
+        return "s/d"
+    if value >= 1e12:
+        return f"{value / 1e12:.2f}T"
+    if value >= 1e9:
+        return f"{value / 1e9:.2f}B"
+    if value >= 1e6:
+        return f"{value / 1e6:.2f}M"
+    return f"{value:.0f}"
+
+
+def build_report_message(report: QuantReport, ticker_display_name: str = "") -> str:
+    """Reporte cuantitativo completo: tendencia, momentum, valuación y riesgo.
+
+    A diferencia de `build_alert_message`, este mensaje se manda siempre
+    (no solo cuando algo está estirado), así que el tono es informativo,
+    no de alarma.
+    """
+    name = ticker_display_name or report.ticker
+    r = report.returns_pct
+
+    rsi_txt = _fmt_num(report.rsi14, 1)
+    rsi_zone = ""
+    if report.rsi14 is not None:
+        if report.rsi14 >= 70:
+            rsi_zone = " (sobrecompra)"
+        elif report.rsi14 <= 30:
+            rsi_zone = " (sobreventa)"
+
+    lines = [
+        f"[CASANDRA] Reporte cuantitativo — {name} ({report.ticker})",
+        "",
+        f"Precio: {report.price:.2f}",
+        "",
+        "Tendencia",
+        f"  SMA20: {_fmt_num(report.sma20)} | SMA50: {_fmt_num(report.sma50)} | "
+        f"SMA200: {_fmt_num(report.sma200)}",
+        f"  Estructura: {report.trend_label}",
+    ]
+    if report.cross_signal:
+        lines.append(f"  Señal de cruce: {report.cross_signal}")
+    lines.append(f"  RSI(14): {rsi_txt}{rsi_zone}")
+
+    lines += [
+        "",
+        "Momentum",
+        f"  1 día: {_fmt_pct(r.get('1d'))}  |  1 semana: {_fmt_pct(r.get('1w'))}  |  "
+        f"1 mes: {_fmt_pct(r.get('1m'))}",
+        f"  6 meses: {_fmt_pct(r.get('6m'))}  |  1 año: {_fmt_pct(r.get('1y'))}",
+        "",
+        "Valuación",
+        f"  P/U (trailing): {_fmt_num(report.trailing_pe, 1, 'x')}  |  "
+        f"P/U (forward): {_fmt_num(report.forward_pe, 1, 'x')}",
+        f"  P/VL: {_fmt_num(report.price_to_book, 2, 'x')}  |  "
+        f"Dividendo: {_fmt_num(report.dividend_yield_pct, 2, '%')}",
+        f"  Cap. de mercado: {_fmt_market_cap(report.market_cap)}",
+        "",
+        "Riesgo",
+        f"  Volatilidad anualizada (21d): {_fmt_num(report.volatility_annualized_pct, 1, '%')}",
+        f"  Drawdown vs máximo 52 sem: {_fmt_num(report.drawdown_52w_pct, 1, '%')}",
+        f"  Puntaje de estiramiento: {report.stretch_score:.2f}",
+    ]
+    return "\n".join(lines)

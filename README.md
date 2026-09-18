@@ -29,9 +29,14 @@ mensaje. Cuando la valuación por fin corrige, hay un mensaje final de
    la longitud de la racha: la primera vez es apenas un presentimiento;
    después de muchos ciclos sin corrección, Casandra ya está gritando en
    mayúsculas.
-5. **`notify.py`** manda el mensaje por consola, a un archivo de log y,
+5. **`analysis.py`** arma un reporte cuantitativo completo por emisora:
+   tendencia (SMA20/50/200, cruce dorado/de la muerte, RSI), momentum
+   (retornos a 1 día, 1 semana, 1 mes, 6 meses, 1 año), valuación (P/U,
+   P/VL, dividendo, capitalización) y riesgo (volatilidad anualizada,
+   drawdown vs. máximo de 52 semanas).
+6. **`notify.py`** manda el mensaje por consola, a un archivo de log y,
    opcionalmente, a Discord o Telegram vía variables de entorno.
-6. **`run.py`** amarra todo y guarda el estado para la siguiente corrida.
+7. **`run.py`** amarra todo y guarda el estado para la siguiente corrida.
 
 ## Instalación
 
@@ -66,6 +71,27 @@ consola):
 ```bash
 python -m cassandra_bmv.run --config tickers.yaml --dry-run
 ```
+
+### Reporte cuantitativo (tendencia, momentum, valuación, riesgo)
+
+A diferencia de la corrida normal (que solo avisa cuando algo está
+"estirado"), `--report` manda un reporte completo de cada emisora sin
+importar su estado:
+
+```bash
+python -m cassandra_bmv.run --config tickers.yaml --report
+```
+
+Incluye: estructura de tendencia (SMA20/50/200, cruce dorado/de la
+muerte, RSI14), retornos a 1 día/1 semana/1 mes/6 meses/1 año, múltiplos
+de valuación (P/U trailing y forward, P/VL, dividendo, capitalización) y
+métricas de riesgo (volatilidad anualizada, drawdown vs. máximo de 52
+semanas).
+
+Si quieres recibirlo periódicamente (por ejemplo, una vez al día) sin
+mezclarlo con las alertas de estiramiento de cada 30 minutos, crea una
+segunda tarea programada/cron que corra el mismo comando pero con
+`--report` en vez de sin flags.
 
 ### Correrlo por cron
 

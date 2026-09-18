@@ -14,12 +14,13 @@ import sys
 import time
 from datetime import datetime, timezone
 
+from .analysis import compute_quant_report
 from .config import AppConfig, load_config
 from .fetch import fetch_ticker_data
 from .multiples import compute_stretch
 from .notify import build_notifiers, dispatch
 from .state import load_state, save_state, update_state
-from .voice import build_alert_message, build_vindication_message
+from .voice import build_alert_message, build_report_message, build_vindication_message
 
 
 def run_once(config: AppConfig, state_path: str, dry_run: bool = False) -> int:
@@ -77,6 +78,48 @@ def run_once(config: AppConfig, state_path: str, dry_run: bool = False) -> int:
     return alerts_sent
 
 
+def run_report(config: AppConfig, dry_run: bool = False) -> int:
+    """Manda un reporte cuantitativo completo (tendencia, momentum, valuación,
+    riesgo) por cada emisora, sin importar si está estirada o no.
+    """
+    notifiers = [] if dry_run else build_notifiers(config.notify)
+    reports_sent = 0
+
+    for ticker_cfg in config.tickers:
+        try:
+            close_prices, info = fetch_ticker_data(
+                ticker_cfg.symbol, config.thresholds.lookback_days
+            )
+        except Exception as exc:
+            print(f"[ERROR] {ticker_cfg.symbol}: no se pudo obtener datos ({exc})")
+            continue
+
+        pe_range = ticker_cfg.pe_normal_range or config.thresholds.default_pe_normal_range
+        pb_range = ticker_cfg.pb_normal_range or config.thresholds.default_pb_normal_range
+
+        try:
+            stretch = compute_stretch(
+                ticker=ticker_cfg.symbol,
+                close_prices=close_prices,
+                info=info,
+                pe_normal_range=pe_range,
+                pb_normal_range=pb_range,
+                sma_window_short=config.thresholds.sma_window_short,
+                sma_window_long=config.thresholds.sma_window_long,
+            )
+            report = compute_quant_report(ticker_cfg.symbol, close_prices, info, stretch)
+        except Exception as exc:
+            print(f"[ERROR] {ticker_cfg.symbol}: no se pudo calcular el reporte ({exc})")
+            continue
+
+        message = build_report_message(report, ticker_cfg.name)
+        print(f"[INFO] {ticker_cfg.symbol}: reporte generado")
+        dispatch(notifiers, message)
+        reports_sent += 1
+
+    return reports_sent
+
+
 def send_test_notification(config: AppConfig) -> int:
     """Manda un mensaje de prueba por todos los canales configurados.
 
@@ -121,6 +164,14 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Manda un mensaje de prueba por los canales configurados y termina",
     )
+    parser.add_argument(
+        "--report",
+        action="store_true",
+        help=(
+            "Manda un reporte cuantitativo (tendencia, momentum, valuación, riesgo) "
+            "de cada emisora, sin importar si está estirada, y termina"
+        ),
+    )
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
@@ -128,6 +179,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.test_notify:
         return send_test_notification(config)
+
+    if args.report:
+        run_report(config, dry_run=args.dry_run)
+        return 0
 
     if args.loop_interval:
         while True:
