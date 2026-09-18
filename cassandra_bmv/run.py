@@ -26,6 +26,7 @@ from .voice import (
     build_alert_message,
     build_report_message,
     build_verdict_message,
+    build_verdict_summary_message,
     build_vindication_message,
 )
 
@@ -140,6 +141,7 @@ def run_verdict(config: AppConfig, dry_run: bool = False) -> int:
     """
     notifiers = [] if dry_run else build_notifiers(config.notify)
     verdicts_sent = 0
+    collected: list[tuple] = []
 
     for ticker_cfg in config.tickers:
         data = _fetch_and_stretch(ticker_cfg, config)
@@ -159,6 +161,12 @@ def run_verdict(config: AppConfig, dry_run: bool = False) -> int:
         print(f"[INFO] {ticker_cfg.symbol}: veredicto {verdict.label}")
         dispatch(notifiers, message)
         verdicts_sent += 1
+        collected.append((verdict, ticker_cfg.name or ticker_cfg.symbol))
+
+    if collected:
+        summary = build_verdict_summary_message(collected)
+        dispatch(notifiers, summary)
+        print("[INFO] Resumen de veredictos enviado")
 
     return verdicts_sent
 

@@ -2,9 +2,11 @@ import random
 
 from cassandra_bmv.multiples import StretchResult
 from cassandra_bmv.state import StreakInfo
+from cassandra_bmv.verdict import ValueVerdict
 from cassandra_bmv.voice import (
     _tier_for_streak,
     build_alert_message,
+    build_verdict_summary_message,
     build_vindication_message,
 )
 
@@ -80,3 +82,37 @@ def test_vindication_message_mentions_streak_and_ticker():
     msg = build_vindication_message("AAA.MX", streak, "Empresa Ejemplo", rng=random.Random(2))
     assert "AAA.MX" in msg
     assert "la profecía se cumplió" in msg
+
+
+def _verdict(ticker, label, score):
+    return ValueVerdict(
+        ticker=ticker,
+        label=label,
+        overall_score=score,
+        valuation_score=score,
+        quality_score=score,
+        fcf_yield_score=score,
+        stretch_penalty=0.0,
+        notes=[],
+        insufficient_data=score is None,
+    )
+
+
+def test_verdict_summary_groups_by_label_and_sorts_by_score():
+    verdicts = [
+        (_verdict("AAA.MX", "MANTENER / vigilar", 55), "Empresa A"),
+        (_verdict("BBB.MX", "COMPRA (valor atractivo)", 80), "Empresa B"),
+        (_verdict("CCC.MX", "COMPRA (valor atractivo)", 90), "Empresa C"),
+        (_verdict("DDD.MX", "EVITAR por ahora", 20), "Empresa D"),
+        (_verdict("EEE.MX", "SIN DATOS SUFICIENTES", None), "Empresa E"),
+    ]
+    msg = build_verdict_summary_message(verdicts)
+
+    assert "5 emisoras analizadas" in msg
+    assert "COMPRA (valor atractivo):" in msg
+    assert "EVITAR por ahora:" in msg
+    assert "SIN DATOS SUFICIENTES:" in msg
+    # dentro de COMPRA, la de mayor puntaje (Empresa C, 90) debe salir primero
+    idx_c = msg.index("Empresa C")
+    idx_b = msg.index("Empresa B")
+    assert idx_c < idx_b

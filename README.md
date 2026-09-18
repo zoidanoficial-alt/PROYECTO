@@ -125,6 +125,25 @@ componente, para que tú decidas con el contexto completo.
 > veces vienen incompletos, así que trátalo como punto de partida para
 > tu propio análisis, no como la última palabra.
 
+Al final de la corrida (después de mandar el veredicto detallado de cada
+emisora) se manda un **mensaje resumen** agrupando todas las emisoras por
+etiqueta y ordenadas de mayor a menor puntaje dentro de cada grupo, para
+ver de un vistazo qué comprarías y qué no:
+
+```
+[RESUMEN VALUE] 8 emisoras analizadas
+
+COMPRA (valor atractivo):
+  - Banorte (GFNORTEO.MX) — 91/100
+  - Walmex (WALMEX.MX) — 82/100
+
+MANTENER / vigilar:
+  - América Móvil (AMXL.MX) — 58/100
+
+EVITAR por ahora:
+  - CEMEX (CEMEXCPO.MX) — 22/100
+```
+
 ### Correrlo por cron
 
 En vez de `--loop-interval`, normalmente es más robusto dejar que `cron`

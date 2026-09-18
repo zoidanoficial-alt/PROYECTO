@@ -298,3 +298,40 @@ def build_verdict_message(verdict: ValueVerdict, ticker_display_name: str = "") 
         "de compra/venta — es un punto de partida para que tú decidas.",
     ]
     return "\n".join(lines)
+
+
+def build_verdict_summary_message(
+    verdicts: list[tuple[ValueVerdict, str]],
+) -> str:
+    """Resumen final agrupando todas las emisoras por veredicto.
+
+    `verdicts` es una lista de (ValueVerdict, nombre_para_mostrar).
+    """
+    groups: dict[str, list[tuple[ValueVerdict, str]]] = {
+        "COMPRA (valor atractivo)": [],
+        "MANTENER / vigilar": [],
+        "EVITAR por ahora": [],
+        "SIN DATOS SUFICIENTES": [],
+    }
+    for verdict, name in verdicts:
+        groups.setdefault(verdict.label, []).append((verdict, name))
+
+    for bucket in groups.values():
+        bucket.sort(key=lambda pair: pair[0].overall_score or -1, reverse=True)
+
+    lines = [f"[RESUMEN VALUE] {len(verdicts)} emisoras analizadas", ""]
+
+    for label, bucket in groups.items():
+        if not bucket:
+            continue
+        lines.append(f"{label}:")
+        for verdict, name in bucket:
+            score_txt = f"{verdict.overall_score:.0f}/100" if verdict.overall_score is not None else "s/d"
+            lines.append(f"  - {name} ({verdict.ticker}) — {score_txt}")
+        lines.append("")
+
+    lines.append(
+        "Heurística cuantitativa personal inspirada en value investing, NO es "
+        "asesoría financiera. Úsalo como punto de partida, no como la decisión final."
+    )
+    return "\n".join(lines)
