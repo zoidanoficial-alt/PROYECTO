@@ -12,15 +12,65 @@ from __future__ import annotations
 import argparse
 import sys
 import time
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 from .analysis import compute_quant_report
-from .config import AppConfig, load_config
+from .config import AppConfig, TickerConfig, load_config
 from .fetch import fetch_ticker_data
-from .multiples import compute_stretch
+from .multiples import StretchResult, compute_stretch
 from .notify import build_notifiers, dispatch
 from .state import load_state, save_state, update_state
-from .voice import build_alert_message, build_report_message, build_vindication_message
+from .verdict import compute_value_verdict
+from .voice import (
+    build_alert_message,
+    build_report_message,
+    build_verdict_message,
+    build_vindication_message,
+)
+
+
+@dataclass
+class TickerData:
+    close_prices: object
+    info: dict
+    stretch: StretchResult
+    pe_range: tuple[float, float]
+    pb_range: tuple[float, float]
+
+
+def _fetch_and_stretch(ticker_cfg: TickerConfig, config: AppConfig) -> TickerData | None:
+    """Trae precios/fundamentales y calcula el puntaje de estiramiento.
+
+    Devuelve None (habiendo ya impreso el error) si algo falla, para que el
+    llamador simplemente pueda hacer `continue`.
+    """
+    try:
+        close_prices, info = fetch_ticker_data(
+            ticker_cfg.symbol, config.thresholds.lookback_days
+        )
+    except Exception as exc:
+        print(f"[ERROR] {ticker_cfg.symbol}: no se pudo obtener datos ({exc})")
+        return None
+
+    pe_range = ticker_cfg.pe_normal_range or config.thresholds.default_pe_normal_range
+    pb_range = ticker_cfg.pb_normal_range or config.thresholds.default_pb_normal_range
+
+    try:
+        stretch = compute_stretch(
+            ticker=ticker_cfg.symbol,
+            close_prices=close_prices,
+            info=info,
+            pe_normal_range=pe_range,
+            pb_normal_range=pb_range,
+            sma_window_short=config.thresholds.sma_window_short,
+            sma_window_long=config.thresholds.sma_window_long,
+        )
+    except Exception as exc:
+        print(f"[ERROR] {ticker_cfg.symbol}: no se pudo calcular el estiramiento ({exc})")
+        return None
+
+    return TickerData(close_prices, info, stretch, pe_range, pb_range)
 
 
 def run_once(config: AppConfig, state_path: str, dry_run: bool = False) -> int:
@@ -30,30 +80,10 @@ def run_once(config: AppConfig, state_path: str, dry_run: bool = False) -> int:
     alerts_sent = 0
 
     for ticker_cfg in config.tickers:
-        try:
-            close_prices, info = fetch_ticker_data(
-                ticker_cfg.symbol, config.thresholds.lookback_days
-            )
-        except Exception as exc:
-            print(f"[ERROR] {ticker_cfg.symbol}: no se pudo obtener datos ({exc})")
+        data = _fetch_and_stretch(ticker_cfg, config)
+        if data is None:
             continue
-
-        pe_range = ticker_cfg.pe_normal_range or config.thresholds.default_pe_normal_range
-        pb_range = ticker_cfg.pb_normal_range or config.thresholds.default_pb_normal_range
-
-        try:
-            result = compute_stretch(
-                ticker=ticker_cfg.symbol,
-                close_prices=close_prices,
-                info=info,
-                pe_normal_range=pe_range,
-                pb_normal_range=pb_range,
-                sma_window_short=config.thresholds.sma_window_short,
-                sma_window_long=config.thresholds.sma_window_long,
-            )
-        except Exception as exc:
-            print(f"[ERROR] {ticker_cfg.symbol}: no se pudo calcular el estiramiento ({exc})")
-            continue
+        result = data.stretch
 
         triggered = result.stretch_score >= config.thresholds.stretch_score
         streak = update_state(state, ticker_cfg.symbol, triggered, result.stretch_score, now)
@@ -86,28 +116,12 @@ def run_report(config: AppConfig, dry_run: bool = False) -> int:
     reports_sent = 0
 
     for ticker_cfg in config.tickers:
-        try:
-            close_prices, info = fetch_ticker_data(
-                ticker_cfg.symbol, config.thresholds.lookback_days
-            )
-        except Exception as exc:
-            print(f"[ERROR] {ticker_cfg.symbol}: no se pudo obtener datos ({exc})")
+        data = _fetch_and_stretch(ticker_cfg, config)
+        if data is None:
             continue
 
-        pe_range = ticker_cfg.pe_normal_range or config.thresholds.default_pe_normal_range
-        pb_range = ticker_cfg.pb_normal_range or config.thresholds.default_pb_normal_range
-
         try:
-            stretch = compute_stretch(
-                ticker=ticker_cfg.symbol,
-                close_prices=close_prices,
-                info=info,
-                pe_normal_range=pe_range,
-                pb_normal_range=pb_range,
-                sma_window_short=config.thresholds.sma_window_short,
-                sma_window_long=config.thresholds.sma_window_long,
-            )
-            report = compute_quant_report(ticker_cfg.symbol, close_prices, info, stretch)
+            report = compute_quant_report(ticker_cfg.symbol, data.close_prices, data.info, data.stretch)
         except Exception as exc:
             print(f"[ERROR] {ticker_cfg.symbol}: no se pudo calcular el reporte ({exc})")
             continue
@@ -118,6 +132,35 @@ def run_report(config: AppConfig, dry_run: bool = False) -> int:
         reports_sent += 1
 
     return reports_sent
+
+
+def run_verdict(config: AppConfig, dry_run: bool = False) -> int:
+    """Manda un veredicto tipo "value investing" (COMPRA/MANTENER/EVITAR)
+    por cada emisora, con el desglose de por qué.
+    """
+    notifiers = [] if dry_run else build_notifiers(config.notify)
+    verdicts_sent = 0
+
+    for ticker_cfg in config.tickers:
+        data = _fetch_and_stretch(ticker_cfg, config)
+        if data is None:
+            continue
+
+        try:
+            report = compute_quant_report(ticker_cfg.symbol, data.close_prices, data.info, data.stretch)
+            verdict = compute_value_verdict(
+                ticker_cfg.symbol, report, data.stretch, data.info, data.pe_range, data.pb_range
+            )
+        except Exception as exc:
+            print(f"[ERROR] {ticker_cfg.symbol}: no se pudo calcular el veredicto ({exc})")
+            continue
+
+        message = build_verdict_message(verdict, ticker_cfg.name)
+        print(f"[INFO] {ticker_cfg.symbol}: veredicto {verdict.label}")
+        dispatch(notifiers, message)
+        verdicts_sent += 1
+
+    return verdicts_sent
 
 
 def send_test_notification(config: AppConfig) -> int:
@@ -172,6 +215,14 @@ def main(argv: list[str] | None = None) -> int:
             "de cada emisora, sin importar si está estirada, y termina"
         ),
     )
+    parser.add_argument(
+        "--verdict",
+        action="store_true",
+        help=(
+            "Manda un veredicto tipo value investing (COMPRA/MANTENER/EVITAR) "
+            "por cada emisora, con el desglose de por qué, y termina"
+        ),
+    )
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
@@ -182,6 +233,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.report:
         run_report(config, dry_run=args.dry_run)
+        return 0
+
+    if args.verdict:
+        run_verdict(config, dry_run=args.dry_run)
         return 0
 
     if args.loop_interval:

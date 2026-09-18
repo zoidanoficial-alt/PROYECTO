@@ -15,6 +15,7 @@ import random
 from .analysis import QuantReport
 from .multiples import StretchResult
 from .state import StreakInfo
+from .verdict import ValueVerdict
 
 # Umbrales de racha (en ciclos consecutivos de ejecución) que definen el
 # nivel de drama. Entre más larga la racha, más tiempo lleva el mercado
@@ -246,5 +247,54 @@ def build_report_message(report: QuantReport, ticker_display_name: str = "") -> 
         f"  Volatilidad anualizada (21d): {_fmt_num(report.volatility_annualized_pct, 1, '%')}",
         f"  Drawdown vs máximo 52 sem: {_fmt_num(report.drawdown_52w_pct, 1, '%')}",
         f"  Puntaje de estiramiento: {report.stretch_score:.2f}",
+    ]
+    return "\n".join(lines)
+
+
+def build_verdict_message(verdict: ValueVerdict, ticker_display_name: str = "") -> str:
+    """Veredicto tipo "value investing": COMPRA / MANTENER / EVITAR.
+
+    No es Casandra (no hay drama ni mitología acá) y no es Warren Buffett
+    hablando: es un puntaje cuantitativo inspirado en los principios que
+    suele usar el value investing (barato en relación a su rango normal,
+    negocio rentable con poca deuda, y castigo si ya está muy estirado).
+    """
+    name = ticker_display_name or verdict.ticker
+    header = f"[VEREDICTO VALUE] {name} ({verdict.ticker}) — {verdict.label}"
+
+    lines = [header, ""]
+
+    if verdict.insufficient_data:
+        lines.append(
+            "No hay suficientes datos fundamentales (P/U, P/VL, ROE, margen, deuda) "
+            "para esta emisora en Yahoo Finance como para dar un puntaje confiable."
+        )
+    else:
+        lines.append(f"Puntaje compuesto: {verdict.overall_score:.0f}/100")
+        lines.append("")
+        lines.append(
+            f"  Valuación (¿está barata?): {_fmt_num(verdict.valuation_score, 0)}/100"
+        )
+        lines.append(
+            f"  Calidad del negocio (rentabilidad y deuda): "
+            f"{_fmt_num(verdict.quality_score, 0)}/100"
+        )
+        lines.append(
+            f"  Generación de efectivo: {_fmt_num(verdict.fcf_yield_score, 0)}/100"
+        )
+        if verdict.stretch_penalty > 1:
+            lines.append(f"  Penalización por estiramiento: -{verdict.stretch_penalty:.0f} pts")
+
+    if verdict.notes:
+        lines.append("")
+        lines.append("Detalle:")
+        lines += [f"  - {note}" for note in verdict.notes]
+
+    lines += [
+        "",
+        "Esto es una heurística cuantitativa personal inspirada en principios de "
+        "value investing (margen de seguridad, calidad del negocio, no perseguir "
+        "precios ya inflados). NO es asesoría financiera ni una recomendación real "
+        "de compra/venta — es un punto de partida para que tú decidas.",
     ]
     return "\n".join(lines)

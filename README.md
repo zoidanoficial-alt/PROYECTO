@@ -93,6 +93,38 @@ mezclarlo con las alertas de estiramiento de cada 30 minutos, crea una
 segunda tarea programada/cron que corra el mismo comando pero con
 `--report` en vez de sin flags.
 
+### Veredicto tipo "value investing" (COMPRA / MANTENER / EVITAR)
+
+```bash
+python -m cassandra_bmv.run --config tickers.yaml --verdict
+```
+
+Traduce a un puntaje 0-100 los principios que suele usar el value
+investing:
+
+- **Valuación (45%):** qué tan barata está la emisora dentro de su propio
+  rango "normal" de P/U y P/VL (entre más cerca del piso del rango, más
+  puntos).
+- **Calidad del negocio (40%):** ROE, margen neto y nivel de
+  deuda/capital, usando los datos fundamentales que expone Yahoo Finance.
+- **Generación de efectivo (15%):** rendimiento de flujo de efectivo
+  libre sobre capitalización de mercado.
+- **Penalización por estiramiento:** si el puntaje de estiramiento
+  (`multiples.py`) es alto, se restan puntos — comprar algo que ya corrió
+  mucho reduce el margen de seguridad, sin importar qué tan buena sea la
+  empresa.
+
+Con eso arma una etiqueta (`COMPRA (valor atractivo)`, `MANTENER /
+vigilar`, `EVITAR por ahora`, o `SIN DATOS SUFICIENTES` si a Yahoo
+Finance le faltan los fundamentales de esa emisora) y el desglose de cada
+componente, para que tú decidas con el contexto completo.
+
+> **Importante:** esto no es Warren Buffett ni asesoría financiera real —
+> es una heurística cuantitativa personal inspirada en esos principios.
+> Los datos fundamentales de Yahoo Finance para emisoras de la BMV a
+> veces vienen incompletos, así que trátalo como punto de partida para
+> tu propio análisis, no como la última palabra.
+
 ### Correrlo por cron
 
 En vez de `--loop-interval`, normalmente es más robusto dejar que `cron`
