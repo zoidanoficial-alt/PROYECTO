@@ -11,3 +11,10 @@ cron.log
 
 # Configuración personal (usa tickers.example.yaml como plantilla)
 tickers.yaml
+
+# Scripts locales con tokens/credenciales (p. ej. para Task Scheduler/cron)
+run_cassandra*.ps1
+run_cassandra*.sh
+*.local.ps1
+*.local.sh
+.env
