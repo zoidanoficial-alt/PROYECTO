@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tu primer paso · Tiempo de Gracia</title>
+<meta name="description" content="¿Es tu primera vez? Déjanos tus datos y te ayudamos a dar tu primer paso en la Iglesia Cristiana Tiempo de Gracia, Naucalpan.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Tu primer paso · Tiempo de Gracia">
+<meta property="og:description" content="¿Es tu primera vez? Déjanos tus datos y te ayudamos a dar tu primer paso en la Iglesia Cristiana Tiempo de Gracia, Naucalpan.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: título gigante en cinta que se desplaza, texto de bienvenida con píldora en movimiento y foto redondeada a la derecha. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #b9690f;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 10px 12px; border-radius: 8px; }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+/* Título en movimiento: ocupa todo el ancho de la pantalla */
+.title-marquee { margin-inline: -20px; overflow: hidden; padding-block: 28px 36px; }
+.title-track { display: flex; width: max-content; animation: slide 26s linear infinite; }
+.title-group { display: flex; align-items: center; flex: none; gap: 0.35em; padding-inline-end: 0.35em; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; font-size: clamp(56px, 12vw, 168px); line-height: 1; letter-spacing: -0.03em; white-space: nowrap; color: var(--fg); }
+.title-group i { display: inline-block; width: 0.9em; height: 0.07em; background: var(--fg); }
+@keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+.welcome { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding-block: 16px 24px; }
+.welcome .text { min-width: 0; }
+.lead { font-size: clamp(20px, 2.4vw, 26px); line-height: 1.5; max-width: 34em; }
+.lead em { font-style: normal; color: var(--amber); }
+.pill-marq { display: block; width: min(100%, 300px); margin-top: 28px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--blue) 70%, var(--bg)); color: #fff; text-decoration: none; padding-block: 16px; }
+:root[data-theme="dark"] .pill-marq { color: #0d1020; background: var(--blue); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill-marq { color: #0d1020; background: var(--blue); } }
+.pill-track { display: flex; width: max-content; animation: slide 9s linear infinite; }
+.pill-track span { flex: none; font-size: 20px; font-weight: 500; padding-inline: 14px; white-space: nowrap; }
+.pill-marq:hover .pill-track, .pill-marq:focus-visible .pill-track, .title-marquee:hover .title-track { animation-play-state: paused; }
+
+.media { position: relative; margin: 0; border-radius: 32px; overflow: hidden; aspect-ratio: 5 / 4.6; background: var(--screen); min-width: 0; }
+.media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.badge { position: absolute; top: 14px; left: 14px; width: 68px; height: 68px; border-radius: 50%; background: #0b0b0f; color: #fff; display: grid; place-content: center; text-align: center; font: 700 11px/1.1 var(--font-display); letter-spacing: -0.01em; padding: 8px; box-shadow: 0 0 0 3px rgba(255,255,255,0.7); }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px 40px; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--line); }
+.facts dt { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.facts dd { margin: 6px 0 0; font-size: 20px; overflow-wrap: anywhere; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; margin-top: 32px; }
+.btn:hover { filter: brightness(1.08); }
+
+/* Formulario */
+.signup { margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+.signup h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 10px; text-wrap: balance; }
+.signup .intro { color: var(--muted); max-width: 52ch; margin-bottom: 30px; }
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 16px; }
+.field { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 17px; color: var(--muted); }
+.field label b { color: var(--magenta); font-weight: 600; }
+.control { width: 100%; font: 400 17px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; padding: 14px 16px; min-height: 52px; }
+textarea.control { min-height: 130px; resize: vertical; }
+.control::placeholder { color: color-mix(in srgb, var(--fg) 50%, transparent); }
+.control:focus-visible, .tel:focus-within { outline: 3px solid var(--amber); outline-offset: 2px; }
+.sel { position: relative; }
+.sel select { appearance: none; -webkit-appearance: none; padding-inline-end: 46px; cursor: pointer; }
+.sel::after { content: ""; position: absolute; right: 18px; top: 50%; margin-top: -3px; border: 6px solid transparent; border-top-color: var(--fg); border-bottom: 0; pointer-events: none; }
+.tel { display: flex; align-items: center; min-height: 52px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; }
+.tel .cc { display: inline-flex; align-items: center; gap: 8px; padding-inline: 16px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tel .control { border: 0; background: transparent; min-height: 50px; padding-inline-start: 4px; outline: none; font-variant-numeric: tabular-nums; }
+.form .actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.form .btn { margin-top: 0; cursor: pointer; }
+.form .btn.ghost { background: transparent; color: var(--blue); }
+.result { grid-column: 1 / -1; padding: 22px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 14px; }
+.result h3 { margin: 0; font: 700 22px var(--font-display); letter-spacing: -0.01em; }
+.result pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 15px/1.55 var(--font-body); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.result .row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+@media (max-width: 760px) {
+  .form { grid-template-columns: 1fr; }
+  .welcome { grid-template-columns: 1fr; gap: 32px; }
+  .top-links { margin-inline-start: 0; width: 100%; }
+}
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+@media (prefers-reduced-motion: reduce) {
+  .title-track, .pill-track { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <div class="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="#registro">Déjanos tus datos</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="series.html">Series</a>
+      <a class="back" href="eventos.html">Eventos</a>
+      <a class="pill" href="index.html#ubicacion">Cómo llegar</a>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="title-marquee" aria-label="Tu primer paso">
+      <span class="title-track" aria-hidden="true">
+        <span class="title-group"><span>Tu primer</span><i></i><span>paso</span><i></i></span>
+        <span class="title-group"><span>Tu primer</span><i></i><span>paso</span><i></i></span>
+        <span class="title-group"><span>Tu primer</span><i></i><span>paso</span><i></i></span>
+        <span class="title-group"><span>Tu primer</span><i></i><span>paso</span><i></i></span>
+      </span>
+    </h1>
+
+    <div class="welcome">
+      <div class="text">
+        <p class="lead">¡Bienvenido! Nos alegra que des tu primer paso con <em>Jesús.</em> Te esperamos los domingos en Naucalpan. Ven como estás: aquí estamos para apoyarte en tu crecimiento espiritual.</p>
+        <a class="pill-marq" href="index.html#horarios" aria-label="Ver el horario del culto del domingo">
+          <span class="pill-track" aria-hidden="true">
+            <span>Visítanos este domingo</span><span>Visítanos este domingo</span><span>Visítanos este domingo</span><span>Visítanos este domingo</span>
+          </span>
+        </a>
+      </div>
+      <figure class="media">
+        <img src="img/pastores.jpg" width="1221" height="1098" alt="Nuestros pastores sonriendo para darte la bienvenida">
+        <span class="badge" aria-hidden="true">tiempo de gracia</span>
+      </figure>
+    </div>
+
+    <section class="signup" id="registro">
+      <h2>Cuéntanos de ti</h2>
+      <p class="intro">Déjanos tus datos y te ayudamos a dar tu primer paso. Los campos con <b style="color:var(--magenta)">*</b> son obligatorios.</p>
+      <form class="form" id="form" novalidate>
+        <div class="field full">
+          <label for="ayuda">¿Cómo podemos ayudarte a tomar tu primer paso? <b>*</b></label>
+          <div class="sel">
+            <select class="control" id="ayuda" name="ayuda" required>
+              <option value="" selected disabled>Selecciona una opción</option>
+              <option>Quiero visitar la iglesia</option>
+              <option>Quiero que oren por mí</option>
+              <option>Quiero conocer más sobre la iglesia</option>
+              <option>Quiero hablar con un pastor</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="nombre">Nombre <b>*</b></label>
+          <input class="control" id="nombre" name="nombre" type="text" autocomplete="given-name" required>
+        </div>
+        <div class="field">
+          <label for="apellidos">Apellidos <b>*</b></label>
+          <input class="control" id="apellidos" name="apellidos" type="text" autocomplete="family-name" required>
+        </div>
+        <div class="field full">
+          <label for="celular">Celular <b>*</b></label>
+          <div class="tel">
+            <span class="cc" aria-hidden="true">
+              <svg width="22" height="15" viewBox="0 0 22 15" role="img" aria-label="México"><rect width="7.4" height="15" fill="#006847"/><rect x="7.3" width="7.4" height="15" fill="#ffffff"/><rect x="14.6" width="7.4" height="15" fill="#ce1126"/></svg>
+              +52
+            </span>
+            <input class="control" id="celular" name="celular" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="55 1234 5678" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="asiste">¿Asistes a Tiempo de Gracia?</label>
+          <div class="sel">
+            <select class="control" id="asiste" name="asiste">
+              <option value="" selected disabled>Selecciona una opción</option>
+              <option>Es mi primera vez</option>
+              <option>Ya asisto</option>
+              <option>He asistido antes</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="conocio">¿Cómo fue que conociste o llegaste a la iglesia?</label>
+          <div class="sel">
+            <select class="control" id="conocio" name="conocio">
+              <option value="" selected disabled>Selecciona una opción</option>
+              <option>Invitación de un amigo o familiar</option>
+              <option>Redes sociales</option>
+              <option>Pasé por el lugar</option>
+              <option>Búsqueda en internet</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="oracion">¿Tienes alguna petición de oración?</label>
+          <textarea class="control" id="oracion" name="oracion" placeholder="Escribe tu petición de oración."></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Continuar</button>
+        </div>
+        <div class="result" id="result" hidden>
+          <h3>Tus datos están listos</h3>
+          <p>Revisa el mensaje y envíalo a la iglesia. Aquí no se guarda nada.</p>
+          <p id="ig-hint" hidden>Copia el mensaje y pégalo en un mensaje directo a nuestro Instagram.</p>
+          <pre id="msg"></pre>
+          <div class="row">
+            <a class="btn" id="wa" href="#" target="_blank" rel="noopener" hidden>Enviar por WhatsApp <span aria-hidden="true">&#8599;</span></a>
+            <a class="btn" id="ig" href="https://ig.me/m/tiempodegraciamexico" target="_blank" rel="noopener" hidden>Enviar por Instagram <span aria-hidden="true">&#8599;</span></a>
+            <button class="btn ghost" id="copy" type="button">Copiar mensaje</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <dl class="facts">
+      <div><dt>Culto</dt><dd>Domingos de 11:00 a 14:00 hrs</dd></div>
+      <div><dt>Dirección</dt><dd>Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo, 53240 Naucalpan de Juárez</dd></div>
+      <div><dt>Pastores</dt><dd>Pablo y Laura Guerrero</dd></div>
+    </dl>
+    <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Priv.+de+los+Cipreses+2,+Jardines+de+San+Mateo,+53240+Naucalpan+de+Ju%C3%A1rez,+M%C3%A9x." target="_blank" rel="noopener">Abrir en Maps <span aria-hidden="true">&#8599;</span></a>
+  </main>
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+
+  // Formulario: arma el mensaje con lo que escribió la persona. No se guarda ni se envía solo.
+  var WHATSAPP = ""; // número de la iglesia con lada, solo dígitos (ej. 5215512345678)
+  var form = document.getElementById("form"), result = document.getElementById("result");
+  var msg = document.getElementById("msg"), wa = document.getElementById("wa"), copyBtn = document.getElementById("copy");
+  var ig = document.getElementById("ig"), igHint = document.getElementById("ig-hint"), cel = document.getElementById("celular");
+  // Acepta espacios o guiones, pero pide exactamente 10 dígitos
+  function celDigits() { return val("celular").replace(/\D/g, ""); }
+  cel.addEventListener("input", function () { cel.setCustomValidity(""); });
+  function val(id) { var el = document.getElementById(id); return (el.value || "").trim(); }
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    cel.setCustomValidity(celDigits() && celDigits().length !== 10 ? "Escribe tu número a 10 dígitos." : "");
+    if (!form.reportValidity()) return;
+    var lines = ["Hola, soy " + val("nombre") + " " + val("apellidos") + ". Quiero dar mi primer paso en Tiempo de Gracia.",
+      "Me gustaría: " + val("ayuda"), "Celular: +52 " + celDigits()];
+    if (val("asiste")) lines.push("¿Asisto a la iglesia?: " + val("asiste"));
+    if (val("conocio")) lines.push("Cómo llegué: " + val("conocio"));
+    if (val("oracion")) lines.push("Petición de oración: " + val("oracion"));
+    var text = lines.join("\n");
+    msg.textContent = text;
+    var digits = WHATSAPP.replace(/\D/g, "");
+    if (digits) { wa.href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(text); wa.hidden = false; }
+    else { ig.hidden = false; igHint.hidden = false; } // sin número de WhatsApp todavía: enviar por Instagram
+    result.hidden = false;
+    result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  copyBtn.addEventListener("click", function () {
+    function done() { copyBtn.textContent = "Copiado"; setTimeout(function () { copyBtn.textContent = "Copiar mensaje"; }, 1600); }
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(msg);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      try { document.execCommand("copy"); done(); } catch (err) {}
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(msg.textContent).then(done, fallback); } else { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>

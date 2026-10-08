@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tiempo de Gracia · Iglesia Cristiana en Naucalpan</title>
+<meta name="description" content="Iglesia Cristiana Tiempo de Gracia en Jardines de San Mateo, Naucalpan de Juárez. Culto todos los domingos de 11:00 a 14:00 hrs. Ven como estás.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Tiempo de Gracia · Iglesia Cristiana en Naucalpan">
+<meta property="og:description" content="Culto todos los domingos de 11:00 a 14:00 hrs en Jardines de San Mateo, Naucalpan. Ven como estás.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: hero con pantalla de templo enmarcada en madera y luces de escenario; después secciones en filas limpias, sin tarjetas repetidas. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --wood-2: #8f5530;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #e89a2b;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --focus: #b9690f;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --wood-2: #b97a46; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --wood-2: #b97a46; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+  padding-inline: 20px; padding-block: 0 48px;
+}
+.wrap { max-width: 1040px; margin-inline: auto; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.05; text-wrap: balance; margin: 0; letter-spacing: -0.02em; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+
+.note { background: var(--screen); color: #f1f3fb; font-size: 14px; padding: 10px 20px; margin-inline: -20px; text-align: center; }
+.note b { color: var(--amber); font-weight: 600; }
+
+header.top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; padding-block: 18px; position: relative; }
+.tools { display: flex; align-items: center; gap: 10px; }
+.menu-btn { display: none; width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; align-items: center; justify-content: center; font-size: 20px; line-height: 1; }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+#menu { margin-inline-start: auto; }
+#menu > ul { list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 4px 6px; }
+#menu li { margin: 0; }
+.dd { position: relative; }
+.dd-btn, .navlink { font: 500 16px var(--font-body); color: var(--fg); background: none; border: 0; padding: 10px 12px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; }
+.dd-btn i { font-style: normal; color: var(--muted); font-weight: 400; font-size: 18px; line-height: 1; display: inline-block; }
+.dd.open .dd-btn i { transform: rotate(45deg); }
+.dd-btn:hover, .navlink:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.sub-menu { display: none; list-style: none; margin: 0; padding: 12px 8px; position: absolute; top: calc(100% + 4px); left: 0; min-width: 250px; background: #0b0b0f; color: #fff; border-radius: 18px; z-index: 20; box-shadow: 0 18px 40px -12px rgba(0,0,0,0.5); }
+.sub-menu::before { content: ""; position: absolute; left: 0; right: 0; top: -8px; height: 8px; }
+.sub-menu a { display: block; padding: 10px 16px; color: #fff; text-decoration: none; font-size: 18px; border-radius: 10px; }
+.sub-menu a:hover, .sub-menu a:focus-visible { background: rgba(255,255,255,0.14); }
+.dd.open .sub-menu { display: block; }
+@media (hover: hover) and (min-width: 761px) {
+  .dd:hover .sub-menu { display: block; }
+  .dd:hover .dd-btn i { transform: rotate(45deg); }
+}
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; margin-inline-start: 8px; }
+.pill:hover { filter: brightness(1.08); }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--blue); }
+.btn:hover { filter: brightness(1.08); }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+
+/* HERO */
+.hero { display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding-block: 24px 56px; }
+.hero h1 { font-size: clamp(40px, 6.4vw, 72px); font-weight: 800; margin-block: 14px 18px; }
+.hero h1 em { font-style: normal; color: var(--magenta); }
+.hero p.lead { font-size: 19px; color: var(--muted); max-width: 46ch; }
+.next { margin-top: 22px; font-size: 15px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--magenta); box-shadow: 0 0 0 4px color-mix(in srgb, var(--magenta) 25%, transparent); flex: none; }
+.next strong { color: var(--fg); }
+
+.stage { position: relative; padding: 14px; border-radius: 6px;
+  background: repeating-linear-gradient(90deg, var(--wood) 0 46px, var(--wood-2) 46px 48px);
+  box-shadow: 0 18px 40px -18px rgba(0,0,0,0.45); min-width: 0; }
+.screen { position: relative; overflow: hidden; aspect-ratio: 16 / 10; background: var(--screen); border-radius: 3px;
+  display: grid; place-content: center; text-align: center; padding: 20px; gap: 6px; color: #fff; isolation: isolate; }
+.screen::before { content: ""; position: absolute; inset: -20% -10% 40% -10%; z-index: -1;
+  background: radial-gradient(60% 80% at 20% 0%, color-mix(in srgb, var(--blue) 70%, transparent), transparent 70%),
+              radial-gradient(50% 70% at 85% 10%, color-mix(in srgb, var(--magenta) 65%, transparent), transparent 70%); }
+.screen small { font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber); font-weight: 600; }
+.screen b { font-family: var(--font-display); font-size: clamp(26px, 4.6vw, 46px); font-weight: 800; line-height: 1; letter-spacing: -0.01em; }
+.screen i { font-style: normal; font-family: var(--font-display); font-size: clamp(16px, 2.4vw, 24px); font-weight: 500; opacity: 0.9; }
+.lights { display: flex; height: 8px; margin-top: 12px; border-radius: 4px; overflow: hidden; }
+.lights span:nth-child(1) { flex: 3; background: var(--blue); }
+.lights span:nth-child(2) { flex: 2; background: var(--magenta); }
+.lights span:nth-child(3) { flex: 1; background: var(--amber); }
+
+/* SECCIONES */
+section { padding-block: 56px; border-top: 1px solid var(--line); scroll-margin-top: 8px; }
+#pastor { scroll-margin-top: 90px; }
+.sec-head { display: grid; grid-template-columns: 1fr 2fr; gap: 12px 40px; margin-bottom: 32px; }
+.sec-head h2 { font-size: clamp(30px, 4vw, 44px); font-weight: 700; margin-top: 8px; }
+.sec-head p { color: var(--muted); align-self: end; max-width: 56ch; }
+
+.service { display: grid; grid-template-columns: 200px 1fr; gap: 8px 24px; padding-block: 24px; border-block: 1px solid var(--line); align-items: baseline; }
+.service .day { font-family: var(--font-display); font-weight: 700; font-size: 26px; }
+.hours { font-family: var(--font-display); font-weight: 800; font-size: clamp(34px, 5vw, 52px); line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.hours small { font-size: 0.45em; font-weight: 600; color: var(--muted); margin-inline: 6px; }
+.service .sub { color: var(--muted); font-size: 16px; margin-top: 10px; }
+
+.about { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.about p { color: var(--muted); font-size: 18px; max-width: 52ch; }
+.pastor { border-left: 4px solid var(--magenta); padding-left: 20px; }
+.pastor .role { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.pastor .name { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 4vw, 40px); line-height: 1.05; margin-top: 6px; }
+
+.gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 36px; }
+.ph { position: relative; margin: 0; height: clamp(260px, 38vw, 400px); border-radius: 10px; overflow: hidden; min-width: 0; background: var(--screen); }
+.ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ph figcaption { position: absolute; inset: auto 0 0 0; padding: 36px 16px 14px; font: 600 14px var(--font-body); letter-spacing: 0.04em; color: #fff; background: linear-gradient(to top, rgba(8,11,28,0.78), transparent); }
+.ph.alabanza img { object-position: 50% 28%; }
+.ph.comunidad img { object-position: 50% 40%; }
+
+.pastor-col { display: grid; gap: 14px; min-width: 0; padding: 18px 18px 26px; border-radius: 32px; background: color-mix(in srgb, var(--fg) 13%, var(--bg)); max-width: 460px; }
+.pastor-photo { margin: 0; border-radius: 22px; overflow: hidden; background: var(--screen); aspect-ratio: 5 / 5.2; }
+.pastor-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.pastor-label { font: 500 clamp(18px, 2.4vw, 22px) var(--font-body); color: var(--muted); padding: 12px 8px 4px; }
+.pastor-name { font: 500 clamp(22px, 3vw, 26px) var(--font-body); color: var(--fg); margin: 0 8px; width: fit-content; max-width: calc(100% - 16px); padding-bottom: 4px; border-bottom: 1.5px solid var(--fg); }
+
+.where { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.where dl { margin: 0; display: grid; gap: 20px; }
+.info { margin: 0; }
+.info dt { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.info dd { margin: 4px 0 0; font-size: 20px; overflow-wrap: anywhere; }
+.where .addr-big { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.1; letter-spacing: -0.01em; }
+.where .addr-big span { display: block; color: var(--muted); font-family: var(--font-body); font-weight: 500; font-size: 18px; margin-top: 8px; letter-spacing: 0; }
+
+.map { position: relative; aspect-ratio: 4 / 3; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); min-width: 0; max-width: 100%; }
+.map svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.maps-btn { position: absolute; top: 12px; left: 12px; display: inline-flex; align-items: center; gap: 8px; background: var(--surface); color: var(--blue); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; font: 600 15px var(--font-body); text-decoration: none; box-shadow: 0 4px 14px -6px rgba(0,0,0,0.35); }
+.maps-btn:hover { filter: brightness(1.05); }
+.pin-label { position: absolute; left: 50%; top: 50%; transform: translate(14px, -34px); font: 700 15px var(--font-display); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; white-space: nowrap; }
+.map-note { position: absolute; right: 10px; bottom: 8px; font-size: 11px; color: var(--muted); }
+
+.soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.soc a { color: var(--fg); }
+
+footer { border-top: 1px solid var(--line); padding-top: 28px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 14px; }
+
+@media (max-width: 760px) {
+  .hero, .sec-head, .about, .where { grid-template-columns: 1fr; }
+  .hero { gap: 28px; }
+  .service { grid-template-columns: 1fr; }
+  .gallery { grid-template-columns: 1fr; }
+  section { padding-block: 40px; }
+  .menu-btn { display: inline-flex; }
+  .tools { margin-inline-start: auto; }
+  #menu { display: none; flex-basis: 100%; margin-inline-start: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+  #menu.open { display: block; }
+  #menu > ul { flex-direction: column; align-items: stretch; }
+  .dd-btn, .navlink { width: 100%; justify-content: space-between; font-size: 18px; padding: 12px; }
+  .sub-menu { position: static; box-shadow: none; min-width: 0; margin-block: 2px 8px; }
+  .pill { text-align: center; margin: 6px 0 0; display: block; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn { transition: filter .15s; }
+  .screen::before { animation: sway 9s ease-in-out infinite alternate; }
+  @keyframes sway { from { transform: translateX(-3%); } to { transform: translateX(3%); } }
+}
+</style>
+</head>
+<body>
+
+<div class="note"><b>Borrador.</b> Aún faltan teléfono/WhatsApp, donativos y una foto de niños.</div>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#inicio">Tiempo de <span>Gracia</span></a>
+    <div class="tools">
+      <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu">&#9776;</button>
+    </div>
+    <nav id="menu" aria-label="Principal">
+      <ul>
+        <li class="dd">
+          <button class="dd-btn" type="button" aria-expanded="false">Nosotros <i aria-hidden="true">+</i></button>
+          <ul class="sub-menu">
+            <li><a href="#nosotros">Quiénes somos</a></li>
+            <li><a href="#pastor">Nuestro pastor</a></li>
+          </ul>
+        </li>
+        <li class="dd">
+          <button class="dd-btn" type="button" aria-expanded="false">Culto <i aria-hidden="true">+</i></button>
+          <ul class="sub-menu">
+            <li><a href="#horarios">Horario dominical</a></li>
+            <li><a href="#ubicacion">Cómo llegar</a></li>
+          </ul>
+        </li>
+        <li><a class="navlink" href="#ubicacion">Ubicación</a></li>
+        <li><a class="navlink" href="primer-paso.html">Tu primer paso</a></li>
+        <li><a class="navlink" href="oracion.html">¿Necesitas oración?</a></li>
+        <li><a class="navlink" href="series.html">Series</a></li>
+        <li><a class="navlink" href="eventos.html">Eventos</a></li>
+        <li><a class="pill" href="primer-paso.html">Visítanos</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Iglesia Cristiana · Naucalpan de Juárez</p>
+        <h1>Es tiempo de <em>gracia.</em></h1>
+        <p class="lead">Una comunidad de fe en Naucalpan, Estado de México. Ven como estás y acompáñanos cada domingo.</p>
+        <div class="cta">
+          <a class="btn" href="#ubicacion">Cómo llegar</a>
+          <a class="btn ghost" href="primer-paso.html">Tu primer paso</a>
+        </div>
+        <p class="next"><span class="dot" aria-hidden="true"></span><span id="next">Próximo culto: <strong>domingo, 11:00 hrs</strong></span></p>
+      </div>
+      <div class="stage" aria-hidden="true">
+        <div class="screen">
+          <small>Bienvenido</small>
+          <b>TIEMPO DE GRACIA</b>
+          <i>Iglesia Cristiana</i>
+        </div>
+        <div class="lights"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <section id="horarios">
+      <div class="sec-head">
+        <div><p class="eyebrow">Culto dominical</p><h2>Cuándo nos reunimos</h2></div>
+        <p>Nos reunimos todos los domingos. Puedes llegar en cualquier momento del culto.</p>
+      </div>
+      <div class="service">
+        <div class="day">Domingos</div>
+        <div>
+          <div class="hours">11:00 <small>a</small> 14:00 <small>hrs</small></div>
+          <p class="sub">Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo, Naucalpan de Juárez.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="nosotros">
+      <div class="sec-head">
+        <div><p class="eyebrow">Quiénes somos</p><h2>Una comunidad de fe</h2></div>
+        <p>La Iglesia Cristiana Tiempo de Gracia es una comunidad de fe ubicada en Naucalpan de Juárez, Estado de México.</p>
+      </div>
+      <div class="about">
+        <div class="pastor-col" id="pastor">
+          <figure class="pastor-photo">
+            <img src="img/pastores.jpg" width="1221" height="1098" alt="Nuestros pastores sonriendo junto a un árbol de Navidad">
+          </figure>
+          <p class="pastor-label">Nuestros pastores</p>
+          <p class="pastor-name">Pablo Guerrero</p>
+          <p class="pastor-name">Laura Guerrero</p>
+        </div>
+        <p>Nos reunimos para adorar a Dios, aprender de su Palabra y crecer juntos como familia. Si es la primera vez que visitas una iglesia, eres bienvenido tal como eres.</p>
+      </div>
+      <div class="gallery">
+        <figure class="ph alabanza">
+          <img src="img/alabanza.jpg" width="1200" height="1798" loading="lazy" alt="Un hombre con la cabeza inclinada en un momento de alabanza">
+          <figcaption>Alabanza</figcaption>
+        </figure>
+        <figure class="ph comunidad">
+          <img src="img/comunidad.jpg" width="924" height="830" loading="lazy" alt="Un grupo de personas abrazadas en círculo orando juntas">
+          <figcaption>Comunidad</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="ubicacion">
+      <div class="sec-head">
+        <div><p class="eyebrow">Ubicación</p><h2>Cómo llegar</h2></div>
+        <p>Estamos en Jardines de San Mateo, en Naucalpan de Juárez.</p>
+      </div>
+      <div class="where">
+        <p class="addr-big">Priv. de los Cipreses 2, 1.º piso<span>Jardines de San Mateo, 53240 Naucalpan de Juárez, Estado de México</span></p>
+        <div class="map" role="group" aria-label="Mapa ilustrativo de la ubicación">
+          <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="400" height="300" style="fill: var(--bg)"/>
+            <g style="stroke: var(--line)" fill="none" stroke-linecap="round">
+              <path d="M-20 70 L420 120" stroke-width="16"/>
+              <path d="M-20 230 L420 200" stroke-width="12"/>
+              <path d="M130 -20 L170 320" stroke-width="14"/>
+              <path d="M310 -20 L280 320" stroke-width="10"/>
+              <path d="M-20 150 L420 160" stroke-width="5"/>
+              <path d="M220 -20 L230 320" stroke-width="5"/>
+              <path d="M60 -20 L40 320" stroke-width="5"/>
+            </g>
+            <path d="M200 150 C200 150 178 126 178 108 a22 22 0 0 1 44 0 C222 126 200 150 200 150Z" style="fill: var(--magenta)"/>
+            <circle cx="200" cy="108" r="8" style="fill: var(--surface)"/>
+          </svg>
+          <a class="maps-btn" href="https://www.google.com/maps/search/?api=1&amp;query=Priv.+de+los+Cipreses+2,+Jardines+de+San+Mateo,+53240+Naucalpan+de+Ju%C3%A1rez,+M%C3%A9x." target="_blank" rel="noopener">Abrir en Maps <span aria-hidden="true">&#8599;</span></a>
+          <span class="pin-label">Tiempo de Gracia</span>
+          <span class="map-note">Mapa ilustrativo</span>
+        </div>
+      </div>
+      <dl class="info" style="margin-top:32px; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px 32px;">
+        <div><dt>Culto</dt><dd>Domingos de 11:00 a 14:00 hrs</dd></div>
+        <div><dt>Pastores</dt><dd>Pablo y Laura Guerrero</dd></div>
+        <div><dt>Redes</dt><dd><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></dd></div>
+      </dl>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  // Menú: submenús, hamburguesa y tema
+  var root = document.documentElement;
+  var menu = document.getElementById("menu");
+  var menuBtn = document.getElementById("menu-btn");
+  var themeBtn = document.getElementById("theme");
+  function closeAll(except) {
+    document.querySelectorAll(".dd.open").forEach(function (dd) {
+      if (dd !== except) { dd.classList.remove("open"); dd.querySelector(".dd-btn").setAttribute("aria-expanded", "false"); }
+    });
+  }
+  document.querySelectorAll(".dd-btn").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      var dd = btn.parentElement, open = !dd.classList.contains("open");
+      closeAll(dd);
+      dd.classList.toggle("open", open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  });
+  document.addEventListener("click", function () { closeAll(null); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { var wasOpen = menu.classList.contains("open"); closeAll(null); menu.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); if (wasOpen) menuBtn.focus(); } });
+  menu.querySelectorAll("a").forEach(function (a) {
+    a.addEventListener("click", function () { closeAll(null); menu.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); });
+  });
+  menuBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    var open = !menu.classList.contains("open");
+    menu.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function syncTheme() { themeBtn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  themeBtn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    syncTheme();
+  });
+  syncTheme();
+
+  // Próximo culto según la hora de la Ciudad de México: domingos de 11:00 a 14:00
+  try {
+    var parts = {};
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Mexico_City", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", hourCycle: "h23", weekday: "short" })
+      .formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
+    var day = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(parts.weekday);
+    var hour = parseInt(parts.hour, 10);
+    var el = document.getElementById("next");
+    if (day === 0 && hour >= 11 && hour < 14) {
+      el.innerHTML = "<strong>Hoy hay culto</strong> · en curso hasta las 14:00 hrs";
+    } else if (day === 0 && hour < 11) {
+      el.innerHTML = "Próximo culto: <strong>hoy, 11:00 hrs</strong>";
+    } else {
+      var d = new Date(Date.UTC(+parts.year, +parts.month - 1, +parts.day + ((7 - day) % 7 || 7)));
+      el.innerHTML = "Próximo culto: <strong>domingo " + d.getUTCDate() + ", 11:00 hrs</strong>";
+    }
+  } catch (e) {}
+})();
+</script>
+
+</body></html>

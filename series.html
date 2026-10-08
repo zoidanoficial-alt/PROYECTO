@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Series · Tiempo de Gracia</title>
+<meta name="description" content="Mira los mensajes de nuestras series: Dominio propio, Gozo y Bondad. Iglesia Cristiana Tiempo de Gracia, Naucalpan.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Series · Tiempo de Gracia">
+<meta property="og:description" content="Mira los mensajes de nuestras series: Dominio propio, Gozo y Bondad. Iglesia Cristiana Tiempo de Gracia, Naucalpan.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: titular enorme, una fila de portadas tipográficas con luces de escenario (una por serie) y botones que abren cada mensaje en YouTube. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #e89a2b;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --focus: #b9690f;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 10px 12px; border-radius: 8px; }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); font-weight: 500; text-transform: uppercase; font-size: clamp(56px, 13vw, 190px); line-height: 0.98; letter-spacing: -0.04em; }
+.lead { color: var(--muted); font-size: 20px; max-width: 34em; padding-bottom: 44px; }
+
+.series { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; list-style: none; margin: 0; padding: 0; }
+.series li { min-width: 0; display: grid; gap: 16px; align-content: start; }
+.cover { position: relative; display: grid; align-content: end; aspect-ratio: 4 / 4.4; border-radius: 28px; overflow: hidden; padding: 22px; color: #fff; text-decoration: none; isolation: isolate; background: var(--screen); }
+.cover::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(70% 55% at 15% 0%, var(--c1), transparent 70%), radial-gradient(60% 50% at 95% 100%, var(--c2), transparent 70%); }
+.cover:hover::before { filter: brightness(1.12); }
+.s1 { --c1: color-mix(in srgb, var(--blue) 85%, #000); --c2: color-mix(in srgb, var(--magenta) 55%, #000); }
+.s2 { --c1: color-mix(in srgb, var(--amber) 80%, #000); --c2: color-mix(in srgb, var(--magenta) 60%, #000); }
+.s3 { --c1: color-mix(in srgb, var(--magenta) 80%, #000); --c2: color-mix(in srgb, var(--blue) 70%, #000); }
+.cover small { font: 600 12px var(--font-body); letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.85); margin-bottom: 8px; }
+.cover b { font-family: var(--font-display); font-weight: 800; font-size: clamp(38px, 5vw, 56px); line-height: 0.98; letter-spacing: -0.03em; text-transform: uppercase; text-wrap: balance; overflow-wrap: anywhere; }
+.play { position: absolute; top: 20px; right: 20px; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.92); display: grid; place-content: center; }
+.play::before { content: ""; margin-left: 4px; border: 9px solid transparent; border-left: 15px solid #111; border-right: 0; }
+.watch { display: inline-flex; align-items: center; gap: 8px; font: 600 16px var(--font-body); color: var(--fg); text-decoration: none; border-bottom: 1.5px solid var(--fg); width: fit-content; padding-bottom: 3px; }
+.watch:hover { color: var(--blue); border-color: var(--blue); }
+
+.more { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px; }
+.more p { font-size: 20px; max-width: 28em; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; }
+.btn.ghost { background: transparent; color: var(--blue); }
+.btn:hover { filter: brightness(1.08); }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+
+@media (max-width: 900px) { .series { grid-template-columns: 1fr; max-width: 460px; } }
+@media (max-width: 760px) { .top-links { margin-inline-start: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <div class="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="primer-paso.html">Tu primer paso</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="eventos.html">Eventos</a>
+      <a class="pill" href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube <span aria-hidden="true">&#8599;</span></a>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="big">Series</h1>
+    <p class="lead">Mira los mensajes de nuestras series. Cada uno se abre en nuestro canal de YouTube.</p>
+
+    <ul class="series">
+      <li>
+        <a class="cover s1" href="https://www.youtube.com/watch?v=3pP-Zk0qHEM" target="_blank" rel="noopener" aria-label="Ver la serie Dominio Propio en YouTube">
+          <span class="play" aria-hidden="true"></span>
+          <small>Serie</small>
+          <b>Dominio propio</b>
+        </a>
+        <a class="watch" href="https://www.youtube.com/watch?v=3pP-Zk0qHEM" target="_blank" rel="noopener">Ver en YouTube <span aria-hidden="true">&#8599;</span></a>
+      </li>
+      <li>
+        <a class="cover s2" href="https://www.youtube.com/watch?v=WpZSmpWRo4M" target="_blank" rel="noopener" aria-label="Ver la serie Gozo en YouTube">
+          <span class="play" aria-hidden="true"></span>
+          <small>Serie</small>
+          <b>Gozo</b>
+        </a>
+        <a class="watch" href="https://www.youtube.com/watch?v=WpZSmpWRo4M" target="_blank" rel="noopener">Ver en YouTube <span aria-hidden="true">&#8599;</span></a>
+      </li>
+      <li>
+        <a class="cover s3" href="https://www.youtube.com/watch?v=cdiuFBDNMB0" target="_blank" rel="noopener" aria-label="Ver la serie Bondad en YouTube">
+          <span class="play" aria-hidden="true"></span>
+          <small>Serie</small>
+          <b>Bondad</b>
+        </a>
+        <a class="watch" href="https://www.youtube.com/watch?v=cdiuFBDNMB0" target="_blank" rel="noopener">Ver en YouTube <span aria-hidden="true">&#8599;</span></a>
+      </li>
+    </ul>
+
+    <div class="more">
+      <p>¿Quieres ver más? Encuentra todos nuestros mensajes en YouTube y síguenos en Instagram.</p>
+      <div class="btns">
+        <a class="btn" href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">Canal de YouTube <span aria-hidden="true">&#8599;</span></a>
+        <a class="btn ghost" href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram <span aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
+</body>
+</html>

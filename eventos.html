@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Eventos · Tiempo de Gracia</title>
+<meta name="description" content="Próximos eventos de la Iglesia Cristiana Tiempo de Gracia en Naucalpan. Domingo 11 de octubre: primer capítulo de la temporada 6 de The Chosen.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Eventos · Tiempo de Gracia">
+<meta property="og:description" content="Próximos eventos de la Iglesia Cristiana Tiempo de Gracia en Naucalpan. Domingo 11 de octubre: primer capítulo de la temporada 6 de The Chosen.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: titular enorme y una fila por evento: fecha grande a la izquierda, texto y video a la derecha. El video se reproduce al pasar el mouse. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #e89a2b;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --focus: #b9690f;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 10px 12px; border-radius: 8px; }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); font-weight: 500; text-transform: uppercase; font-size: clamp(56px, 13vw, 190px); line-height: 0.98; letter-spacing: -0.04em; }
+.lead { color: var(--muted); font-size: 20px; max-width: 34em; padding-bottom: 44px; }
+
+.event { display: grid; grid-template-columns: 180px 1fr; gap: 24px 40px; padding-block: 36px; border-top: 1px solid var(--line); }
+.date { font-family: var(--font-display); line-height: 1; }
+.date .dow { display: block; font: 600 12px var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); margin-bottom: 8px; }
+.date b { display: block; font-weight: 800; font-size: clamp(64px, 9vw, 104px); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.date span { display: block; font-weight: 700; font-size: 26px; margin-top: 4px; }
+.ev-body { min-width: 0; display: grid; gap: 18px; align-content: start; }
+.ev-body .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--magenta); }
+.ev-body h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4.4vw, 48px); line-height: 1.05; letter-spacing: -0.02em; text-wrap: balance; }
+.ev-body .desc { color: var(--muted); font-size: 19px; max-width: 40em; }
+.ev-meta { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; }
+.ev-meta dt { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.ev-meta dd { margin: 2px 0 0; font-size: 18px; }
+
+/* Video: portada tipográfica que se cambia por el reproductor al pasar el mouse */
+.video { position: relative; aspect-ratio: 16 / 9; border-radius: 24px; overflow: hidden; background: var(--screen); cursor: pointer; isolation: isolate; max-width: 760px; }
+.video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.poster { position: absolute; inset: 0; display: grid; align-content: end; gap: 6px; padding: 24px; color: #fff; text-decoration: none; }
+.poster:hover .play { transform: scale(1.06); }
+.poster::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(60% 70% at 15% 0%, color-mix(in srgb, var(--amber) 70%, #000), transparent 70%), radial-gradient(55% 60% at 95% 100%, color-mix(in srgb, var(--blue) 65%, #000), transparent 70%); }
+.poster small { font: 600 12px var(--font-body); letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.85); }
+.poster b { font-family: var(--font-display); font-weight: 800; font-size: clamp(34px, 5.4vw, 60px); line-height: 0.98; letter-spacing: -0.03em; text-transform: uppercase; }
+.poster i { font-style: normal; font-size: 15px; color: rgba(255,255,255,0.8); }
+.poster .play { position: absolute; top: 50%; left: 50%; width: 72px; height: 72px; margin: -36px 0 0 -36px; border-radius: 50%; background: rgba(255,255,255,0.92); display: grid; place-content: center; }
+.poster .play::before { content: ""; margin-left: 5px; border: 12px solid transparent; border-left: 20px solid #111; border-right: 0; }
+.video.playing .poster { display: none; }
+.watch { display: inline-flex; align-items: center; gap: 8px; font: 600 16px var(--font-body); color: var(--fg); text-decoration: none; border-bottom: 1.5px solid var(--fg); width: fit-content; padding-bottom: 3px; }
+.watch:hover { color: var(--blue); border-color: var(--blue); }
+.hint { font-size: 14px; color: var(--muted); }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; }
+.btn:hover { filter: brightness(1.08); }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+
+@media (max-width: 760px) { .event { grid-template-columns: 1fr; gap: 16px; } .date b { font-size: 72px; } }
+@media (max-width: 760px) { .top-links { margin-inline-start: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <div class="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="primer-paso.html">Tu primer paso</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="series.html">Series</a>
+      <a class="pill" href="index.html#ubicacion">Cómo llegar</a>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="big">Eventos</h1>
+    <p class="lead">Momentos para reunirnos, convivir y crecer juntos. Todos son bienvenidos: trae a tu familia y a tus amigos.</p>
+
+    <article class="event" id="the-chosen">
+      <p class="date"><span class="dow">Domingo</span><b>11</b><span>octubre</span></p>
+      <div class="ev-body">
+        <p class="eyebrow">Noche de película · The Chosen</p>
+        <h2>Comparte con nosotros el primer capítulo de la sexta temporada de The Chosen</h2>
+        <p class="desc">Ven a ver con nosotros el estreno de The Chosen, la serie sobre la vida de Jesús y sus discípulos. Una tarde para disfrutar en comunidad. ¡Invita a quien quieras!</p>
+        <dl class="ev-meta">
+          <div><dt>Fecha</dt><dd>Domingo 11 de octubre</dd></div>
+          <div><dt>Lugar</dt><dd>Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo</dd></div>
+        </dl>
+        <div class="video" id="video" data-id="u433XFiq3mE">
+          <a class="poster" href="https://www.youtube.com/watch?v=u433XFiq3mE" target="_blank" rel="noopener" aria-label="Ver el video de The Chosen, temporada 6">
+            <span class="play" aria-hidden="true"></span>
+            <small>Temporada 6 · Capítulo 1</small>
+            <b>The Chosen</b>
+            <i id="poster-hint">Toca para verlo en YouTube</i>
+          </a>
+        </div>
+        <div class="btns">
+          <a class="watch" href="https://www.youtube.com/watch?v=u433XFiq3mE" target="_blank" rel="noopener">Ver en YouTube <span aria-hidden="true">&#8599;</span></a>
+        </div>
+        <p class="hint" id="hint" hidden>Al pasar el mouse el video empieza sin sonido; actívalo con el botón de volumen del reproductor.</p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+
+  // Video: en el sitio publicado se reproduce dentro de la página al pasar el mouse (sin sonido, porque
+  // los navegadores bloquean el sonido automático) y con sonido al tocarlo. La vista previa de claude.ai
+  // no permite videos incrustados, así que ahí el recuadro solo abre el video en YouTube.
+  var video = document.getElementById("video");
+  var embeddable = /^https?:$/.test(location.protocol) && !/claude/.test(location.hostname);
+  if (embeddable) {
+    var frame = null;
+    var cmd = function (func) { if (frame) frame.contentWindow.postMessage(JSON.stringify({ event: "command", func: func, args: [] }), "*"); };
+    var start = function (muted) {
+      if (!frame) {
+        frame = document.createElement("iframe");
+        frame.src = "https://www.youtube-nocookie.com/embed/" + video.dataset.id + "?autoplay=1&playsinline=1&rel=0&enablejsapi=1" + (muted ? "&mute=1" : "");
+        frame.title = "The Chosen, temporada 6";
+        frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+        frame.allowFullscreen = true;
+        video.appendChild(frame);
+        video.classList.add("playing");
+      } else {
+        cmd("playVideo");
+        if (!muted) cmd("unMute");
+      }
+    };
+    var canHover = window.matchMedia && window.matchMedia("(hover: hover)").matches;
+    document.getElementById("poster-hint").textContent = canHover ? "Pasa el mouse para ver el video" : "Toca para ver el video";
+    if (canHover) {
+      document.getElementById("hint").hidden = false;
+      video.addEventListener("mouseenter", function () { start(true); });
+      video.addEventListener("mouseleave", function () { cmd("pauseVideo"); });
+    }
+    video.querySelector(".poster").addEventListener("click", function (e) { e.preventDefault(); start(false); });
+  }
+})();
+</script>
+</body>
+</html>
