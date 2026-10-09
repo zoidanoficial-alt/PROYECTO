@@ -1,10 +1,12 @@
 package com.zoidan.progreso;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -41,9 +44,11 @@ public class MainActivity extends Activity {
     private static final String HOST = "progreso.local";
     private static final String START_URL = "https://" + HOST + "/index.html";
     private static final int REQ_FILE = 1;
+    private static final int REQ_CAMERA = 2;
 
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
+    private PermissionRequest pendingPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +63,7 @@ public class MainActivity extends Activity {
         s.setDatabaseEnabled(true);
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(true);
-        s.setMediaPlaybackRequiresUserGesture(true);
+        s.setMediaPlaybackRequiresUserGesture(false);
 
         web.setWebViewClient(new AssetClient());
         web.setWebChromeClient(new ChromeClient());
@@ -136,19 +141,65 @@ public class MainActivity extends Activity {
 
     private class ChromeClient extends WebChromeClient {
         @Override
+        public void onPermissionRequest(final PermissionRequest request) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    handlePermission(request);
+                }
+            });
+        }
+
+        @Override
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
             if (fileCallback != null) {
                 fileCallback.onReceiveValue(null);
             }
             fileCallback = callback;
+            Intent intent = params.createIntent();
+            String[] types = params.getAcceptTypes();
+            if (types != null && types.length > 0 && types[0].startsWith("video")) {
+                // Para videos de técnica: ofrecer grabar con la cámara además de elegir uno existente.
+                Intent chooser = Intent.createChooser(intent, "Video de técnica");
+                chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { new Intent(MediaStore.ACTION_VIDEO_CAPTURE) });
+                intent = chooser;
+            }
             try {
-                startActivityForResult(params.createIntent(), REQ_FILE);
+                startActivityForResult(intent, REQ_FILE);
             } catch (ActivityNotFoundException e) {
                 fileCallback = null;
                 callback.onReceiveValue(null);
                 return false;
             }
             return true;
+        }
+    }
+
+    /** La cámara en vivo (fotos con silueta) usa getUserMedia: se concede si Android ya dio el permiso. */
+    private void handlePermission(PermissionRequest request) {
+        for (String r : request.getResources()) {
+            if (!PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(r)) {
+                request.deny();
+                return;
+            }
+        }
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            request.grant(request.getResources());
+        } else {
+            pendingPermission = request;
+            requestPermissions(new String[] { Manifest.permission.CAMERA }, REQ_CAMERA);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        if (requestCode == REQ_CAMERA && pendingPermission != null) {
+            if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
+                pendingPermission.grant(pendingPermission.getResources());
+            } else {
+                pendingPermission.deny();
+            }
+            pendingPermission = null;
         }
     }
 

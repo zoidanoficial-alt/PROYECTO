@@ -1,7 +1,17 @@
-# Mi Progreso 2.0 (app Android)
+# Mi Progreso 3.0 (app Android)
 
 App de entrenamiento y progreso físico. Todo se guarda solo en el teléfono.
 
+- **Planet Fitness:** 75 ejercicios (58 disponibles en PF) con pictogramas, peso en kg o lb
+  por ejercicio (las máquinas vienen en lb), sustitutos por patrón de movimiento cuando
+  una máquina está ocupada y biblioteca con búsqueda.
+- **Carga y fatiga:** RIR/RPE por serie, sugerencia de peso × reps para superar la sesión
+  anterior, mapa de calor muscular con series efectivas por semana, 1RM (Epley) en vivo,
+  recuperación manual (HRV, sueño) con propuesta de descarga.
+- **Logros y nivel de fuerza:** récords de peso, reps y 1RM, volumen por sesión, rachas y
+  nivel (principiante → élite) en banca, sentadilla, peso muerto y press militar.
+- **Fotos:** cámara con la silueta de la foto anterior superpuesta y peso del día en cada
+  foto; video de técnica en cámara lenta con marcas manuales de cada repetición.
 - **Entreno (Gym Bible):** rutinas predefinidas (Pro Split · Get The Pump, Torso/Pierna)
   o personalizadas; registro de series con la marca de la última vez, aviso de récord
   (sobrecarga progresiva), técnicas (drop set, forzadas, negativas, choque), cronómetro

@@ -6,73 +6,180 @@
  */
 
 /* ------------------------------------------------------------------ *
- *  Ejercicios: grupo muscular y tipo (compuesto / aislamiento)
+ *  Ejercicios
+ *  [nombre, grupo, tipo (c = compuesto, a = aislamiento), patrón, equipo, ¿Planet Fitness?, ícono]
+ *  El patrón agrupa ejercicios intercambiables (para sustituir una máquina ocupada).
+ *  El equipo decide la unidad por defecto: máquinas y poleas en lb, como sus placas.
  * ------------------------------------------------------------------ */
-const EX = {
-  // Pierna
-  'Sentadilla con barra': ['pierna', 'c'],
-  'Sentadilla en Smith': ['pierna', 'c'],
-  'Hack squat': ['pierna', 'c'],
-  'Prensa 45°': ['pierna', 'c'],
-  'Peso muerto': ['espalda', 'c'],
-  'Peso muerto rumano': ['femoral', 'c'],
-  'Zancadas / split squat búlgaro': ['pierna', 'c'],
-  'Hip thrust': ['gluteo', 'c'],
-  'Extensión de cuádriceps': ['pierna', 'a'],
-  'Curl femoral tumbado': ['femoral', 'a'],
-  'Curl femoral sentado': ['femoral', 'a'],
+const EX_LIST = [
+  // Sentadilla / prensa
+  ['Sentadilla con barra', 'pierna', 'c', 'sentadilla', 'barra', 0, 'squat'],
+  ['Sentadilla en Smith', 'pierna', 'c', 'sentadilla', 'smith', 1, 'squat'],
+  ['Hack squat', 'pierna', 'c', 'sentadilla', 'maq', 0, 'squat'],
+  ['Prensa 45°', 'pierna', 'c', 'sentadilla', 'maq', 0, 'legpress'],
+  ['Prensa de piernas (máquina)', 'pierna', 'c', 'sentadilla', 'maq', 1, 'legpress'],
+  ['Sentadilla goblet con mancuerna', 'pierna', 'c', 'sentadilla', 'manc', 1, 'squat'],
+  ['Zancadas / split squat búlgaro', 'pierna', 'c', 'zancada', 'manc', 1, 'lunge'],
+  ['Zancadas en Smith', 'pierna', 'c', 'zancada', 'smith', 1, 'lunge'],
+  ['Extensión de cuádriceps', 'pierna', 'a', 'ext-cuad', 'maq', 1, 'legext'],
+  // Bisagra / femoral / glúteo
+  ['Peso muerto', 'espalda', 'c', 'bisagra', 'barra', 0, 'hinge'],
+  ['Peso muerto rumano', 'femoral', 'c', 'bisagra', 'manc', 1, 'hinge'],
+  ['Peso muerto rumano en Smith', 'femoral', 'c', 'bisagra', 'smith', 1, 'hinge'],
+  ['Hip thrust', 'gluteo', 'c', 'gluteo', 'smith', 1, 'hipthrust'],
+  ['Patada de glúteo (máquina)', 'gluteo', 'a', 'gluteo', 'maq', 1, 'hipthrust'],
+  ['Curl femoral tumbado', 'femoral', 'a', 'curl-fem', 'maq', 0, 'legcurl'],
+  ['Curl femoral sentado', 'femoral', 'a', 'curl-fem', 'maq', 1, 'legcurl'],
+  ['Abductor (máquina)', 'gluteo', 'a', 'abductor', 'maq', 1, 'abduct'],
+  ['Aductor (máquina)', 'pierna', 'a', 'aductor', 'maq', 1, 'abduct'],
+  ['Hiperextensiones', 'espalda', 'a', 'lumbar', 'corporal', 0, 'backext'],
+  ['Extensión de espalda (máquina)', 'espalda', 'a', 'lumbar', 'maq', 1, 'backext'],
   // Pecho
-  'Press banca con barra': ['pecho', 'c'],
-  'Press banca con mancuernas': ['pecho', 'c'],
-  'Press banca en Smith': ['pecho', 'c'],
-  'Press inclinado con barra': ['pecho', 'c'],
-  'Press inclinado con mancuernas': ['pecho', 'c'],
-  'Hammer Strength press': ['pecho', 'c'],
-  'Fondos en paralelas (con lastre)': ['pecho', 'c'],
-  'Aperturas con mancuernas': ['pecho', 'a'],
-  'Aperturas en máquina / polea': ['pecho', 'a'],
+  ['Press banca con barra', 'pecho', 'c', 'empuje-h', 'barra', 0, 'bench'],
+  ['Press banca con mancuernas', 'pecho', 'c', 'empuje-h', 'manc', 1, 'bench'],
+  ['Press banca en Smith', 'pecho', 'c', 'empuje-h', 'smith', 1, 'bench'],
+  ['Chest press (máquina)', 'pecho', 'c', 'empuje-h', 'maq', 1, 'bench'],
+  ['Hammer Strength press', 'pecho', 'c', 'empuje-h', 'maq', 0, 'bench'],
+  ['Press inclinado con barra', 'pecho', 'c', 'empuje-inc', 'barra', 0, 'incline'],
+  ['Press inclinado con mancuernas', 'pecho', 'c', 'empuje-inc', 'manc', 1, 'incline'],
+  ['Press inclinado en Smith', 'pecho', 'c', 'empuje-inc', 'smith', 1, 'incline'],
+  ['Fondos en paralelas (con lastre)', 'pecho', 'c', 'fondos', 'corporal', 0, 'dip'],
+  ['Fondos asistidos (máquina)', 'pecho', 'c', 'fondos', 'maq', 1, 'dip'],
+  ['Aperturas con mancuernas', 'pecho', 'a', 'apertura', 'manc', 1, 'fly'],
+  ['Aperturas en máquina / polea', 'pecho', 'a', 'apertura', 'maq', 1, 'fly'],
+  ['Pec deck (aperturas en máquina)', 'pecho', 'a', 'apertura', 'maq', 1, 'fly'],
+  ['Cruces en polea', 'pecho', 'a', 'apertura', 'polea', 1, 'fly'],
   // Espalda
-  'Remo con barra': ['espalda', 'c'],
-  'Remo con mancuerna': ['espalda', 'c'],
-  'Remo inclinado con mancuernas': ['espalda', 'c'],
-  'Remo en polea agarre estrecho': ['espalda', 'c'],
-  'Remo a una mano en polea': ['espalda', 'c'],
-  'Jalón al pecho': ['espalda', 'c'],
-  'Dominadas / chin-ups': ['espalda', 'c'],
-  'Hiperextensiones': ['espalda', 'a'],
+  ['Remo con barra', 'espalda', 'c', 'remo', 'barra', 0, 'row'],
+  ['Remo con mancuerna', 'espalda', 'c', 'remo', 'manc', 1, 'row'],
+  ['Remo inclinado con mancuernas', 'espalda', 'c', 'remo', 'manc', 1, 'row'],
+  ['Remo en Smith', 'espalda', 'c', 'remo', 'smith', 1, 'row'],
+  ['Remo sentado (máquina)', 'espalda', 'c', 'remo', 'maq', 1, 'seatedrow'],
+  ['Remo en polea agarre estrecho', 'espalda', 'c', 'remo', 'polea', 1, 'seatedrow'],
+  ['Remo a una mano en polea', 'espalda', 'c', 'remo', 'polea', 1, 'seatedrow'],
+  ['Jalón al pecho', 'espalda', 'c', 'jalon', 'maq', 1, 'pulldown'],
+  ['Dominadas / chin-ups', 'espalda', 'c', 'jalon', 'corporal', 0, 'pullup'],
+  ['Dominadas asistidas (máquina)', 'espalda', 'c', 'jalon', 'maq', 1, 'pullup'],
   // Hombro
-  'Press militar con barra': ['hombro', 'c'],
-  'Press militar con mancuernas': ['hombro', 'c'],
-  'Remo al cuello': ['hombro', 'c'],
-  'Elevaciones laterales': ['hombro', 'a'],
-  'Elevaciones laterales sentado': ['hombro', 'a'],
-  'Elevaciones frontales': ['hombro', 'a'],
-  'Pájaro posterior (reverse pec deck)': ['hombro', 'a'],
-  'Face pull': ['hombro', 'a'],
+  ['Press militar con barra', 'hombro', 'c', 'empuje-v', 'barra', 0, 'ohp'],
+  ['Press militar con mancuernas', 'hombro', 'c', 'empuje-v', 'manc', 1, 'ohp'],
+  ['Press militar en Smith', 'hombro', 'c', 'empuje-v', 'smith', 1, 'ohp'],
+  ['Shoulder press (máquina)', 'hombro', 'c', 'empuje-v', 'maq', 1, 'ohp'],
+  ['Remo al cuello', 'hombro', 'c', 'remo-cuello', 'manc', 1, 'curl'],
+  ['Elevaciones laterales', 'hombro', 'a', 'elev-lat', 'manc', 1, 'lateral'],
+  ['Elevaciones laterales sentado', 'hombro', 'a', 'elev-lat', 'manc', 1, 'lateral'],
+  ['Elevaciones laterales en polea', 'hombro', 'a', 'elev-lat', 'polea', 1, 'lateral'],
+  ['Elevaciones frontales', 'hombro', 'a', 'elev-front', 'manc', 1, 'lateral'],
+  ['Pájaro posterior (reverse pec deck)', 'hombro', 'a', 'deltoide-post', 'maq', 1, 'reardelt'],
+  ['Pájaros con mancuernas', 'hombro', 'a', 'deltoide-post', 'manc', 1, 'reardelt'],
+  ['Face pull', 'hombro', 'a', 'deltoide-post', 'polea', 1, 'seatedrow'],
   // Brazos
-  'Press banca agarre cerrado': ['triceps', 'c'],
-  'Curl con barra de pie': ['biceps', 'a'],
-  'Curl inclinado con mancuernas': ['biceps', 'a'],
-  'Curl predicador': ['biceps', 'a'],
-  'Curl martillo': ['biceps', 'a'],
-  'Extensión de tríceps en polea': ['triceps', 'a'],
-  'Press francés': ['triceps', 'a'],
+  ['Press banca agarre cerrado', 'triceps', 'c', 'triceps-c', 'barra', 0, 'bench'],
+  ['Curl con barra de pie', 'biceps', 'a', 'curl', 'barra', 1, 'curl'],
+  ['Curl inclinado con mancuernas', 'biceps', 'a', 'curl', 'manc', 1, 'curl'],
+  ['Curl predicador', 'biceps', 'a', 'curl', 'maq', 0, 'curl'],
+  ['Curl martillo', 'biceps', 'a', 'curl', 'manc', 1, 'curl'],
+  ['Curl de bíceps (máquina)', 'biceps', 'a', 'curl', 'maq', 1, 'curl'],
+  ['Curl en polea', 'biceps', 'a', 'curl', 'polea', 1, 'curl'],
+  ['Extensión de tríceps en polea', 'triceps', 'a', 'triceps', 'polea', 1, 'triceps'],
+  ['Extensión de tríceps (máquina)', 'triceps', 'a', 'triceps', 'maq', 1, 'triceps'],
+  ['Press francés', 'triceps', 'a', 'triceps', 'manc', 1, 'triceps'],
   // Pantorrilla y abdomen
-  'Elevación de talones de pie': ['pantorrilla', 'a'],
-  'Elevación de talones sentado': ['pantorrilla', 'a'],
-  'Donkey calf raise': ['pantorrilla', 'a'],
-  'Crunch en polea': ['abdomen', 'a'],
-  'Elevaciones de piernas colgado': ['abdomen', 'a'],
-  'Plancha': ['abdomen', 'a']
-};
+  ['Elevación de talones de pie', 'pantorrilla', 'a', 'pantorrilla', 'smith', 1, 'calf'],
+  ['Elevación de talones sentado', 'pantorrilla', 'a', 'pantorrilla', 'maq', 0, 'calf'],
+  ['Elevación de talones en prensa', 'pantorrilla', 'a', 'pantorrilla', 'maq', 1, 'calf'],
+  ['Donkey calf raise', 'pantorrilla', 'a', 'pantorrilla', 'corporal', 0, 'calf'],
+  ['Crunch en polea', 'abdomen', 'a', 'abdomen', 'polea', 1, 'abs'],
+  ['Crunch abdominal (máquina)', 'abdomen', 'a', 'abdomen', 'maq', 1, 'abs'],
+  ['Torso rotation (máquina)', 'abdomen', 'a', 'abdomen', 'maq', 1, 'rotation'],
+  ['Elevaciones de piernas colgado', 'abdomen', 'a', 'abdomen', 'corporal', 1, 'abs'],
+  ['Plancha', 'abdomen', 'a', 'abdomen', 'corporal', 1, 'plank']
+];
+
+const EX = {};
+EX_LIST.forEach(([n, g, t, p, e, pf, icon]) => { EX[n] = { g, t, p, e, pf: !!pf, icon }; });
+
+const EQUIP = { barra: 'Barra', manc: 'Mancuernas', maq: 'Máquina', polea: 'Polea', smith: 'Smith', corporal: 'Peso corporal' };
 
 const GROUPS = {
-  pierna: 'Cuádriceps', femoral: 'Femoral', gluteo: 'Glúteo', pecho: 'Pecho', espalda: 'Espalda',
-  hombro: 'Hombro', biceps: 'Bíceps', triceps: 'Tríceps', pantorrilla: 'Pantorrilla', abdomen: 'Abdomen'
+  pecho: 'Pecho', espalda: 'Espalda', hombro: 'Hombro', biceps: 'Bíceps', triceps: 'Tríceps',
+  pierna: 'Cuádriceps', femoral: 'Femoral', gluteo: 'Glúteo', pantorrilla: 'Pantorrilla', abdomen: 'Abdomen'
 };
 
-/** Series por semana por grupo: menos de `low` se queda corto, más de `high` es riesgo de sobreentrenamiento. */
-const VOLUME_BANDS = { low: 8, high: 22 };
+/** Series efectivas por semana que se consideran óptimas por grupo (meta del mapa de calor). */
+const WEEKLY_TARGET = { pecho: 16, espalda: 18, hombro: 16, biceps: 12, triceps: 12, pierna: 16, femoral: 12, gluteo: 12, pantorrilla: 12, abdomen: 12 };
+/** Por encima de esta proporción de la meta se avisa de sobreentrenamiento. */
+const OVERREACH = 1.4;
+
+/* Nivel de fuerza relativo: 1RM estimado / peso corporal (hombres, aproximado). */
+const STRENGTH_LEVELS = ['Principiante', 'Intermedio', 'Avanzado', 'Élite'];
+const STRENGTH_LIFTS = [
+  { name: 'Press banca', ex: ['Press banca con barra', 'Press banca en Smith'], cuts: [0.75, 1.25, 1.75] },
+  { name: 'Sentadilla', ex: ['Sentadilla con barra', 'Sentadilla en Smith'], cuts: [1.0, 1.5, 2.25] },
+  { name: 'Peso muerto', ex: ['Peso muerto'], cuts: [1.25, 1.75, 2.5] },
+  { name: 'Press militar', ex: ['Press militar con barra', 'Press militar en Smith'], cuts: [0.5, 0.8, 1.1] }
+];
+
+/* ------------------------------------------------------------------ *
+ *  Ilustraciones (pictogramas SVG por movimiento)
+ * ------------------------------------------------------------------ */
+const ICONS = {
+  squat: [[30, 11], 'M30 16L28 32M28 32L40 34L38 50M35 50H44M14 18H46M14 13V23M46 13V23M30 20L22 18'],
+  legpress: [[16, 19], 'M17 24L23 42M23 42L35 32L45 40M45 28L53 46M40 56L58 22M10 22L18 48'],
+  hinge: [[22, 13], 'M25 17L40 29M40 29L40 52M28 21L29 41M16 42H44M16 36V48M44 36V48'],
+  hipthrust: [[12, 25], 'M6 32H20M16 28L34 29L42 40L44 52M28 22H40M28 18V26M40 18V26'],
+  bench: [[14, 33], 'M8 40H50M48 40L50 52M18 36H40L50 46V54M24 35V20M10 20H40M10 15V25M40 15V25'],
+  incline: [[17, 40], 'M12 50L42 30M20 42L38 32M38 32L48 44V54M26 38L20 22M10 20H34M10 15V25M34 15V25'],
+  dip: [[32, 11], 'M14 30H26M38 30H50M32 16V36M32 20L22 30M32 20L42 30M32 36L28 50M32 36L36 50'],
+  ohp: [[32, 20], 'M32 25V42M32 42L26 56M32 42L38 56M32 28L22 12M32 28L42 12M14 10H50M14 5V15M50 5V15'],
+  pulldown: [[32, 24], 'M14 10H50M32 4V10M32 29V44M24 46H42M32 44H44V54M32 32L18 12M32 32L46 12'],
+  pullup: [[32, 18], 'M10 8H54M32 23V42M32 42L30 56M32 26L24 8M32 26L40 8'],
+  row: [[18, 17], 'M22 21L40 31M40 31L42 54M28 25L31 38M25 40H37M25 36V44M37 36V44'],
+  seatedrow: [[18, 22], 'M10 48H30M20 27L22 46M22 46L44 44M46 38V52M21 32L36 34M36 34H54M54 18V50'],
+  fly: [[32, 11], 'M32 16V40M32 22Q20 16 10 26M32 22Q44 16 54 26M32 40L28 56M32 40L36 56'],
+  lateral: [[32, 11], 'M32 16V40M32 22L12 24M32 22L52 24M10 19V29M54 19V29M32 40L28 56M32 40L36 56'],
+  reardelt: [[18, 20], 'M22 24L40 32M40 32L40 54M28 27L14 22M28 27L42 20'],
+  curl: [[32, 11], 'M32 16V40M32 22L29 32L40 24M38 19L42 29M32 40L28 56M32 40L36 56'],
+  triceps: [[28, 11], 'M50 6V50M50 10H40V28M28 16V40M28 22L30 32L40 30M28 40L24 56M28 40L32 56'],
+  legext: [[18, 20], 'M12 28V48H30M18 25L20 44M20 44H34M34 44L50 38M48 34V42'],
+  legcurl: [[18, 20], 'M12 28V48H30M18 25L20 44M20 44H34M34 44L30 57M26 54H34'],
+  calf: [[32, 10], 'M32 15V36M32 36V50M32 50L36 54M22 56H44M22 15H42'],
+  abs: [[18, 35], 'M8 54H56M22 38L32 48M32 48L42 38L50 52'],
+  plank: [[12, 34], 'M8 52H56M16 36L52 44M18 38V50H26'],
+  abduct: [[32, 14], 'M32 19V38M32 38L18 54M32 38L46 54M14 50V58M50 50V58M22 40H42'],
+  backext: [[16, 30], 'M20 32L40 36M40 36L52 52M24 52L40 36'],
+  rotation: [[32, 12], 'M32 17V40M22 26L42 22M18 42Q32 50 46 42M32 40L28 56M32 40L36 56'],
+  lunge: [[30, 10], 'M30 15V34M30 34L42 40V54M30 34L22 46L16 52']
+};
+function exIcon(name, size) {
+  const info = EX[name], def = ICONS[(info && info.icon) || 'curl'];
+  return `<svg class="ex-ico" width="${size || 44}" height="${size || 44}" viewBox="0 0 64 64" aria-hidden="true">
+    <circle cx="${def[0][0]}" cy="${def[0][1]}" r="4.5" fill="currentColor"/>
+    <path d="${def[1]}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
+/** Patrones cercanos que también sirven de sustituto (ej. prensa ocupada → sentadilla búlgara). */
+const RELATED = {
+  sentadilla: ['zancada'], zancada: ['sentadilla'], 'empuje-h': ['empuje-inc', 'fondos'], 'empuje-inc': ['empuje-h'],
+  fondos: ['empuje-h', 'triceps-c'], 'triceps-c': ['triceps', 'fondos'], triceps: ['triceps-c'], jalon: ['remo'], remo: ['jalon'],
+  bisagra: ['gluteo', 'curl-fem'], gluteo: ['bisagra'], 'curl-fem': ['bisagra'], 'elev-lat': ['remo-cuello'], 'remo-cuello': ['elev-lat'],
+  apertura: ['empuje-h'], lumbar: ['bisagra']
+};
+
+/** Sustitutos ordenados: mismo patrón, luego patrones cercanos, luego mismo grupo; Planet Fitness primero en cada nivel. */
+function substitutes(name) {
+  const me = EX[name];
+  if (!me) return [];
+  const all = Object.keys(EX).filter(n => n !== name);
+  const pf = (a, b) => EX[b].pf - EX[a].pf;
+  const same = all.filter(n => EX[n].p === me.p).sort(pf);
+  const near = all.filter(n => (RELATED[me.p] || []).includes(EX[n].p)).sort(pf);
+  const group = all.filter(n => EX[n].g === me.g && !same.includes(n) && !near.includes(n)).sort(pf);
+  return same.concat(near, group).slice(0, 8);
+}
+
+/* Máquinas típicas de Planet Fitness (el equipo varía por sucursal). */
+const PF_NOTE = 'Equipo típico de Planet Fitness: máquinas de placas (en lb), Smith, poleas, mancuernas hasta ~75 lb y estaciones de piernas. Cada sucursal varía.';
 
 /* ------------------------------------------------------------------ *
  *  Rutinas predefinidas
@@ -237,4 +344,44 @@ const PWO_ITEMS = [
   ['pwo_protein', 'Proteína rápida (whey o vegetal)', '5–15 min después de entrenar'],
   ['pwo_carbs', 'Carbohidratos de alto índice glucémico', 'Dextrosa, fruta, miel o jugo'],
   ['pwo_creatine', 'Creatina 5 g', 'Junto con los carbohidratos']
+];
+
+/* ------------------------------------------------------------------ *
+ *  RIR / RPE
+ * ------------------------------------------------------------------ */
+const RIR_OPTIONS = [
+  [0, 'RIR 0 · RPE 10 · al fallo'], [1, 'RIR 1 · RPE 9'], [2, 'RIR 2 · RPE 8'], [3, 'RIR 3 · RPE 7'], [4, 'RIR 4+ · RPE ≤6 · fácil']
+];
+
+/* ------------------------------------------------------------------ *
+ *  McDonald's México (del Excel del usuario: FatSecret México, datos no oficiales)
+ *  [nombre, kcal, proteína, carbohidratos, grasa]; null = la fuente no trae el dato
+ * ------------------------------------------------------------------ */
+const MCDONALDS = [
+  ['Hamburguesa', 258, 11.6, 36.5, 7.3],
+  ['Hamburguesa con Queso', 409, null, null, null],
+  ['Hamburguesa Doble con Queso', 450, null, null, null],
+  ['Hamburguesa Triple con Queso', 548, null, null, null],
+  ['Cuarto de Libra con Queso', 530, null, null, null],
+  ['Cuarto de Libra Doble con Queso', 778, null, null, null],
+  ['Big Mac', 540, 25, 52, 27],
+  ['McNífica', 539, 27, 40, 30],
+  ['McNífica Doble', 787, 47, 41, 48],
+  ['McPollo', 516, 19, 34, 25],
+  ['McNuggets 4', 166, null, null, null],
+  ['McNuggets 10', 430, null, null, null],
+  ['McMuffin Huevo Salchicha', 494, null, null, null],
+  ['McBurrito a la Mexicana', 519, 22, 9, 36, 'Los carbohidratos (9 g) parecen bajos para la porción'],
+  ['Papas Kids', 95, null, null, null],
+  ['Papas Medianas', 281, null, null, null],
+  ['Papas Grandes', 255, null, null, null, 'Menos kcal que las medianas en la fuente; verificar'],
+  ['Papa Hashbrown', 142, null, null, null],
+  ['Cono Vanilla', 162, null, null, null],
+  ['Sundae Chocolate', 262, null, null, null],
+  ['Sundae Fresa', 199, null, null, null],
+  ['McFlurry Chocolate Oreo Mix', 424, null, null, null],
+  ['Malteada Vainilla', 351, null, null, null],
+  ['Pay de Manzana', 241, null, null, null],
+  ['Pay de Queso', 257, null, null, null],
+  ['Angus Premium Tocino', 869, 46, 71, 44, 'Descontinuado según la fuente']
 ];
