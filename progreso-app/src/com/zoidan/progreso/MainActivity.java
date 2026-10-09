@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -18,6 +20,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import java.io.File;
@@ -151,6 +154,30 @@ public class MainActivity extends Activity {
 
     /** Puente expuesto a JavaScript como window.AndroidBridge. */
     public class Bridge {
+        /** Vibra al terminar el descanso entre series. */
+        @JavascriptInterface
+        public void vibrate(long ms) {
+            Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            if (v != null && v.hasVibrator()) {
+                v.vibrate(VibrationEffect.createOneShot(Math.min(ms, 2000), VibrationEffect.DEFAULT_AMPLITUDE));
+            }
+        }
+
+        /** Mantiene la pantalla encendida mientras hay un entreno en curso. */
+        @JavascriptInterface
+        public void keepScreenOn(final boolean on) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (on) {
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    } else {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    }
+                }
+            });
+        }
+
         /** Guarda un archivo de texto en Descargas/MiProgreso y devuelve dónde quedó (o "" si falla). */
         @JavascriptInterface
         public String saveFile(String name, String content) {

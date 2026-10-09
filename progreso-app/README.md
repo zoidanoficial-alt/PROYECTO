@@ -1,8 +1,21 @@
-# Mi Progreso (app Android)
+# Mi Progreso 2.0 (app Android)
 
-App para medir el progreso físico: peso diario con media de 7 días, medidas,
-fuerza (1RM estimado por ejercicio), fotos de progreso con comparación lado a
-lado y la rutina del plan. Todo se guarda solo en el teléfono.
+App de entrenamiento y progreso físico. Todo se guarda solo en el teléfono.
+
+- **Entreno (Gym Bible):** rutinas predefinidas (Pro Split · Get The Pump, Torso/Pierna)
+  o personalizadas; registro de series con la marca de la última vez, aviso de récord
+  (sobrecarga progresiva), técnicas (drop set, forzadas, negativas, choque), cronómetro
+  de descanso con vibración, volumen semanal por grupo, regla 75/25 y alerta de
+  sobreentrenamiento.
+- **Nutrición:** calorías con la fórmula de Marc McLean (peso en lb × 12/15/17) y macros
+  según somatotipo; registro de comidas, azúcar refinada (máx. 35 g), agua y ventana
+  post-entreno de 45 min.
+- **Progreso:** peso con media de 7 días y consejo de ajuste, medidas, 1RM estimado por
+  ejercicio y fotos con comparación lado a lado o superpuesta (guías de simetría).
+- **Más:** perfil, suplementos del día, fisiología del bombeo, mentalidad, las 7 reglas
+  de oro (un hábito nuevo por semana) y copia de seguridad.
+
+El contenido está en `assets/www/data.js`, la lógica en `assets/www/app.js`.
 
 ## Instalar
 
