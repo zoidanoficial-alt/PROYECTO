@@ -465,6 +465,7 @@ function strengthAlerts() {
  *  Gráficas (canvas, sin librerías)
  * ------------------------------------------------------------------ */
 function drawChart(canvas, opts) {
+  if (!canvas) return;
   const dpr = window.devicePixelRatio || 1;
   const W = canvas.clientWidth, H = canvas.clientHeight;
   if (!W || !H) return;
@@ -545,6 +546,7 @@ function showTab(tab) {
   $$('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   $$('section.view').forEach(s => s.classList.toggle('active', s.id === 'view-' + tab));
   $('#hdr-title').textContent = TITLES[tab];
+  redrawChart = () => {};
   render(tab);
   window.scrollTo(0, 0);
 }
@@ -667,13 +669,18 @@ function renderHome() {
   $('#home-log').onclick = () => openDayForm(t);
 
   const entries = weightEntries().filter(e => e.date >= addDays(t, -90));
-  requestAnimationFrame(() => drawChart($('#home-chart'), {
+  showChart(() => drawChart($('#home-chart'), {
     series: [
       { points: entries.map(e => ({ date: e.date, y: e.w })), color: getVar('--muted'), dots: true, line: false },
       { points: movingAvg(entries), color: getVar('--accent'), width: 3 }
     ],
     hlines: [{ y: p.goalWeight, color: getVar('--good'), label: 'Meta' }]
   }));
+}
+let redrawChart = () => {};
+function showChart(draw) {
+  redrawChart = draw;
+  requestAnimationFrame(draw);
 }
 const getVar = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
@@ -732,7 +739,7 @@ function renderLog() {
       </div>`;
     $('#meas-add').onclick = () => openMeasureForm();
     $$('#view-log tr.tap').forEach(tr => tr.onclick = () => openMeasureForm(tr.dataset.id));
-    requestAnimationFrame(() => drawChart($('#waist-chart'), {
+    showChart(() => drawChart($('#waist-chart'), {
       series: [{ points: waist.map(m => ({ date: m.date, y: m.waist })), color: getVar('--blue'), dots: true, r: 3.5 }]
     }));
   }
@@ -870,7 +877,7 @@ function renderLifts() {
     if (!confirm('¿Borrar esta serie?')) return;
     DB.lifts = DB.lifts.filter(l => l.id !== b.dataset.del); saveData(); renderLifts();
   });
-  if (pts.length) requestAnimationFrame(() => drawChart($('#lift-chart'), {
+  if (pts.length) showChart(() => drawChart($('#lift-chart'), {
     series: [{ points: pts, color: getVar('--accent'), dots: true, r: 3.5 }], yDec: 0, minPad: 2
   }));
 }
@@ -1122,7 +1129,7 @@ function renderMore() {
       <h2>Zona peligrosa</h2>
       <button class="danger block" id="reset">Borrar todos los datos</button>
     </div>
-    <p class="small muted" style="text-align:center">Mi Progreso 1.0 · tus datos no salen del teléfono</p>`;
+    <p class="small muted" style="text-align:center">Mi Progreso 1.1 · tus datos no salen del teléfono</p>`;
 
   $('#pr-save').onclick = () => {
     const g = id => num($(id).value);
@@ -1198,10 +1205,12 @@ function importBackup(ev) {
 DB = loadData();
 if (!localStorage.getItem(KEY)) saveData();
 showTab('home');
+// Al abrir el teclado Android redimensiona la ventana. Solo se redibujan las
+// gráficas: volver a pintar la vista quitaría el foco del campo y cerraría el teclado.
 let resizeT;
 window.addEventListener('resize', () => {
   clearTimeout(resizeT);
-  resizeT = setTimeout(() => { if (currentTab !== 'photos') render(currentTab); }, 150);
+  resizeT = setTimeout(redrawChart, 150);
 });
 </script>
 </body>
