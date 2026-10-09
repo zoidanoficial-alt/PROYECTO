@@ -955,7 +955,7 @@ function renderTrain() {
         <details ${nd && d.id === nd.id ? 'open' : ''}>
           <summary><span>${esc(d.name)} ${nd && d.id === nd.id ? '<span class="pill">HOY</span>' : ''}</span></summary>
           ${d.rest ? '<p class="small muted">Descanso: camina, estira y come bien. El músculo crece cuando descansas.</p>' : `
-          <div class="ex-mini-list">${d.ex.map(e => `<div class="ex-mini">${exIcon(e[0], 30)}<span>${esc(e[0])}<br><small>${e[1]} × ${esc(e[2])}${exInfo(e[0]).pf ? ' · PF' : ''}</small></span></div>`).join('')}</div>
+          <div class="ex-mini-list">${d.ex.map(e => `<div class="ex-mini" data-howto="${esc(e[0])}">${exIcon(e[0], 52)}<span>${esc(e[0])}<br><small>${e[1]} × ${esc(e[2])}${exInfo(e[0]).pf ? ' · PF' : ''}</small></span></div>`).join('')}</div>
           <button class="block" data-start="${d.id}" style="margin:8px 0 12px">Empezar ${esc(d.name.split('·').pop().trim())}</button>`}
         </details>`).join('') : '<div class="empty">Esta rutina no tiene días. Pulsa “Editar mi rutina”.</div>'}
     </div>
@@ -990,6 +990,7 @@ function renderTrain() {
     </div>`;
 
   $('#tr-free').onclick = () => { startSession('libre'); renderTrain(); window.scrollTo(0, 0); };
+  $$('#view-train [data-howto]').forEach(b => b.onclick = () => openHowTo(b.dataset.howto));
   $('#tr-lib').onclick = () => openExercisePicker(null);
   $('#rt-sel').onchange = e => { DB.profile.routine = e.target.value; saveData(); renderTrain(); };
   const ed = $('#rt-edit'); if (ed) ed.onclick = openRoutineEditor;
@@ -1035,6 +1036,7 @@ function renderSession(s) {
     <button class="block" id="ss-finish">Terminar entreno</button>
     <button class="ghost block" id="ss-cancel" style="margin-top:6px">Descartar sesión</button>`;
 
+  $$('#view-train [data-howto]').forEach(b => b.onclick = ev => { ev.stopPropagation(); openHowTo(b.dataset.howto); });
   $$('#view-train [data-open]').forEach(h => h.onclick = () => {
     const i = Number(h.dataset.open);
     SESS_UI.open = SESS_UI.open === i ? -1 : i;
@@ -1108,7 +1110,7 @@ function exerciseCard(s, e, i) {
   const sug = suggestion(name, reps, s.id);
   const dots = Array.from({ length: Math.max(sets, done.length) }, (_, k) => `<i class="${k < done.length ? 'on' : ''}"></i>`).join('');
   const head = `<div class="ex-head" data-open="${i}">
-      <div class="ex-ico-wrap">${complete ? '<span style="font-size:24px">✓</span>' : exIcon(name, 44)}</div>
+      <div class="ex-ico-wrap" data-howto="${esc(name)}">${exIcon(name, 68)}${complete ? '<span class="ex-done">✓</span>' : ''}</div>
       <div style="flex:1;min-width:0"><h4>${esc(name)}</h4>
         <div class="ex-meta">${sets} × ${esc(reps)} · ${EQUIP[info.e] || ''}${info.pf ? ' · <span style="color:var(--violet)">PF</span>' : ''}${s.swaps && s.swaps[i] ? ' · sustituto' : ''}</div>
         <div class="dots">${dots}</div></div>
@@ -1145,6 +1147,7 @@ function exerciseCard(s, e, i) {
       <button class="block" data-log="${i}">✓ Guardar serie</button>
       ${best ? `<div class="small muted" style="margin-top:8px;text-align:center">1RM estimado hoy: <b style="color:var(--text)">${wFmt(best, u)}</b>${sug ? ' · antes ' + wFmt(sug.last.best, u) : ''}</div>` : ''}
       <div class="ex-tools">
+        <button class="secondary small-btn" data-howto="${esc(name)}">📖 Cómo se hace</button>
         <button class="secondary small-btn" data-swap="${i}">⇄ Máquina ocupada</button>
         <button class="secondary small-btn" data-video="${i}">🎥 Técnica</button>
         <button class="secondary small-btn" data-more="${i}">${SESS_UI.more[i] ? 'Menos opciones' : 'Técnica de intensidad'}</button>
@@ -1214,7 +1217,7 @@ function openExercisePicker(onPick) {
     const list = Object.keys(EX).filter(n => (pickerGroup === 'all' || EX[n].g === pickerGroup) && (!pickerPf || EX[n].pf) && (!q || n.toLowerCase().includes(q.toLowerCase())));
     $('#pk-list', m).innerHTML = list.length ? list.map(n => {
       const x = EX[n];
-      return `<button class="pick-row" data-pick="${esc(n)}">${exIcon(n, 40)}<span><b>${esc(n)}</b><br><small>${GROUPS[x.g] || x.g} · ${EQUIP[x.e]} · ${x.t === 'c' ? 'compuesto' : 'aislamiento'}${x.pf ? ' · PF' : ''}</small></span></button>`;
+      return `<button class="pick-row" data-pick="${esc(n)}">${exIcon(n, 60)}<span><b>${esc(n)}</b><br><small>${GROUPS[x.g] || x.g} · ${EQUIP[x.e]} · ${x.t === 'c' ? 'compuesto' : 'aislamiento'}${x.pf ? ' · PF' : ''}</small></span></button>`;
     }).join('') : '<div class="empty">Sin resultados.</div>';
     $$('[data-pick]', m).forEach(b => b.onclick = () => { if (onPick) onPick(b.dataset.pick); else openExerciseInfo(b.dataset.pick); });
   };
@@ -1234,13 +1237,33 @@ function openExercisePicker(onPick) {
     draw(m, '');
   });
 }
+/** Fotos de inicio y final alternándose (animación de 2 cuadros) + músculos, pasos y error común. */
+function howToBlock(name) {
+  const id = EX_PHOTO[name], x = exInfo(name), h = HOWTO_EX[name] || HOWTO[x.p];
+  return `${id ? `<div class="howto-anim"><img src="img/ex/${id}-0.jpg" alt="Posición inicial"><img src="img/ex/${id}-1.jpg" alt="Posición final" class="b">
+      <span class="howto-tag a">Inicio</span><span class="howto-tag b">Final</span></div>` : `<div class="ex-hero">${exIcon(name, 120)}</div>`}
+    <div class="howto-muscle"><b>Trabaja:</b> ${esc(MUSCLES[x.p] || GROUPS[x.g] || '')}</div>
+    ${h ? `<ol class="howto-steps">${h[0].map(t => `<li>${esc(t)}</li>`).join('')}</ol>
+    <div class="status warn" style="margin-top:8px"><b>Error común</b>${esc(h[1])}</div>` : ''}`;
+}
+function openHowTo(name) {
+  const x = exInfo(name);
+  openModal(`
+    <div class="row spread"><h3 style="margin:0">${esc(name)}</h3><button class="ghost" id="ht-close">Cerrar</button></div>
+    <p class="small muted" style="margin:2px 0 10px">${EQUIP[x.e] || ''} · ${x.t === 'c' ? 'compuesto' : 'aislamiento'}${x.pf ? ' · disponible en Planet Fitness' : ''}</p>
+    ${howToBlock(name)}
+    <p class="small muted" style="margin-top:12px">La foto muestra el movimiento; tu máquina puede verse distinta según el gimnasio.</p>`, m => {
+    $('#ht-close', m).onclick = closeModal;
+  });
+}
+
 function openExerciseInfo(name) {
   const x = EX[name], subs = substitutes(name);
   const sets = DB.lifts.filter(l => l.ex === name), u = unitFor(name);
   const top = sets.length ? sets.reduce((a, b) => e1rm(b.w, b.r) > e1rm(a.w, a.r) ? b : a) : null;
   openModal(`
     <div class="row spread"><h3 style="margin:0">${esc(name)}</h3><button class="ghost" id="ei-back">Volver</button></div>
-    <div class="ex-hero">${exIcon(name, 120)}</div>
+    ${howToBlock(name)}
     <p class="small">${GROUPS[x.g] || x.g} · ${EQUIP[x.e]} · ${x.t === 'c' ? 'compuesto' : 'aislamiento'}${x.pf ? ' · disponible en Planet Fitness' : ''}</p>
     ${top ? `<p class="small">Tu mejor serie: <b>${wFmt(top.w, u)} × ${top.r}</b> · 1RM estimado ${wFmt(e1rm(top.w, top.r), u)}</p>` : ''}
     <p class="small muted" style="margin-bottom:4px">Sustitutos si está ocupado:</p>
@@ -1256,7 +1279,7 @@ function openSwap(s, i) {
   openModal(`
     <div class="row spread"><h3 style="margin:0">¿${esc(cur)} ocupado?</h3><button class="ghost" id="sw-close">Cerrar</button></div>
     <p class="small muted">Mismo patrón de movimiento y mismos músculos. Planet Fitness primero.</p>
-    ${subs.map(n => `<button class="pick-row" data-sub="${esc(n)}">${exIcon(n, 40)}<span><b>${esc(n)}</b><br><small>${EQUIP[EX[n].e]}${EX[n].pf ? ' · PF' : ''}${EX[n].p === EX[cur].p ? ' · mismo movimiento' : ' · alternativa'}</small></span></button>`).join('')}
+    ${subs.map(n => `<button class="pick-row" data-sub="${esc(n)}">${exIcon(n, 60)}<span><b>${esc(n)}</b><br><small>${EQUIP[EX[n].e]}${EX[n].pf ? ' · PF' : ''}${EX[n].p === EX[cur].p ? ' · mismo movimiento' : ' · alternativa'}</small></span></button>`).join('')}
     ${s.swaps && s.swaps[i] ? '<button class="secondary block" id="sw-undo" style="margin-top:8px">Volver al original</button>' : ''}`, m => {
     $('#sw-close', m).onclick = closeModal;
     $$('[data-sub]', m).forEach(b => b.onclick = () => { s.swaps = s.swaps || {}; s.swaps[i] = b.dataset.sub; saveData(); closeModal(); keepScroll(() => renderSession(s)); toast('Cambiado por ' + b.dataset.sub); });
@@ -1314,7 +1337,7 @@ function openSessionDetail(id) {
   openModal(`
     <div class="row spread"><h3 style="margin:0">${esc(s.dayName)}</h3><button class="ghost" id="sd-close">Cerrar</button></div>
     <p class="small muted">${longDate(s.date)} · ${Math.round((s.end - s.start) / 60000)} min · ${sets.length} series · ${Math.round(sessionVolume(id)).toLocaleString('es-MX')} kg de volumen</p>
-    ${Object.keys(byEx).map(ex => { const u = unitFor(ex); return `<div class="row" style="margin:10px 0 2px;gap:8px">${exIcon(ex, 28)}<b>${esc(ex)}</b></div><p class="small muted" style="margin:0">${byEx[ex].map(l => wFmt(l.w, u) + ' × ' + l.r + (l.rir != null ? ' @RIR' + l.rir : '') + (l.tech && l.tech !== 'normal' ? ' ' + TECHNIQUES[l.tech].short : '')).join(' · ')}</p>`; }).join('')}
+    ${Object.keys(byEx).map(ex => { const u = unitFor(ex); return `<div class="row" style="margin:10px 0 2px;gap:8px">${exIcon(ex, 40)}<b>${esc(ex)}</b></div><p class="small muted" style="margin:0">${byEx[ex].map(l => wFmt(l.w, u) + ' × ' + l.r + (l.rir != null ? ' @RIR' + l.rir : '') + (l.tech && l.tech !== 'normal' ? ' ' + TECHNIQUES[l.tech].short : '')).join(' · ')}</p>`; }).join('')}
     <button class="danger block" id="sd-del" style="margin-top:16px">Borrar sesión</button>`, m => {
     $('#sd-close', m).onclick = closeModal;
     $('#sd-del', m).onclick = () => {
@@ -1925,7 +1948,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" style="text-align:center">Mi Progreso 4.0 · tus datos no salen del teléfono</p>`;
+    <p class="small muted" style="text-align:center">Mi Progreso 4.1 · tus datos no salen del teléfono<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   $$('#view-more [data-theme]').forEach(b => b.onclick = () => { DB.profile.theme = b.dataset.theme; saveData(); applyTheme(); renderMore(); });

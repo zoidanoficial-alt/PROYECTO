@@ -1,4 +1,4 @@
-# Mi Progreso 4.0 (app Android)
+# Mi Progreso 4.1 (app Android)
 
 App de entrenamiento y progreso físico. Todo se guarda solo en el teléfono.
 
@@ -8,7 +8,8 @@ App de entrenamiento y progreso físico. Todo se guarda solo en el teléfono.
 - **Exportar para IA:** reporte PDF (resumen, gráfica de peso, nutrición, progreso por
   ejercicio, volumen, nivel de fuerza, logros y mensaje sugerido para la IA) y Excel con
   9 hojas de datos planos. Se guardan en Descargas/MiProgreso y se comparten desde la app.
-- **Planet Fitness:** 75 ejercicios (58 disponibles en PF) con pictogramas, peso en kg o lb
+- **Planet Fitness:** 75 ejercicios (58 disponibles en PF) con fotos reales de inicio y final
+  (Free Exercise DB, dominio público), ficha “Cómo se hace” con pasos en español, peso en kg o lb
   por ejercicio (las máquinas vienen en lb), sustitutos por patrón de movimiento cuando
   una máquina está ocupada y biblioteca con búsqueda.
 - **Carga y fatiga:** RIR/RPE por serie, sugerencia de peso × reps para superar la sesión

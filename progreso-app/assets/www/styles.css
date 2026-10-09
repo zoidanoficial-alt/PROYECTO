@@ -243,7 +243,9 @@ canvas.spark { width: 100%; height: 56px; display: block; }
 .ex-card.done { opacity: .8; }
 .ex-card h4 { margin: 0; font-size: 16px; letter-spacing: -.01em; }
 .ex-head { display: flex; gap: 12px; align-items: center; cursor: pointer; }
-.ex-ico-wrap { width: 52px; height: 52px; flex: none; border-radius: 16px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+.ex-ico-wrap { position: relative; width: 68px; height: 68px; flex: none; border-radius: 16px; overflow: hidden; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; cursor: zoom-in; }
+.ex-ico-wrap .ex-photo { width: 100%; height: 100%; border-radius: 0; }
+.ex-done { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(22, 163, 74, .55); color: #fff; font-size: 30px; font-weight: 800; }
 .ex-card.done .ex-ico-wrap { background: var(--good-soft); color: var(--good); }
 .ex-ico { display: block; }
 .ex-meta { font-size: 12px; color: var(--muted); }
@@ -267,7 +269,7 @@ canvas.spark { width: 100%; height: 56px; display: block; }
 .stepper input { text-align: center; font-size: 24px; font-weight: 750; padding: 6px 0; background: transparent; border: 0; font-variant-numeric: tabular-nums; }
 .stepper input:focus { background: var(--surface); }
 .stepper button { min-height: 40px; height: 40px; padding: 0; border-radius: 12px; background: var(--surface); color: var(--text); font-size: 22px; font-weight: 500; box-shadow: var(--shadow); }
-.stepper .unit-toggle { width: auto; height: auto; box-shadow: none; }
+.stepper .unit-toggle { width: auto; height: auto; min-height: 0; padding: 2px 9px; font-size: 12px; font-weight: 700; box-shadow: none; }
 .unit-toggle { background: var(--surface); color: var(--accent); border-radius: 99px; padding: 1px 8px; min-height: 0; font-size: 11px; font-weight: 700; box-shadow: none; border: 1px solid var(--line); }
 .rir-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; }
 .rir-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
@@ -368,3 +370,19 @@ canvas.spark { width: 100%; height: 56px; display: block; }
 .choice.on { border-color: var(--accent); background: var(--accent-soft); }
 
 .info-btn { background: var(--surface-2); color: var(--muted); width: 20px; height: 20px; min-height: 0; padding: 0; border-radius: 50%; font-size: 12px; font-weight: 800; line-height: 20px; }
+
+/* ---------- Fotos de ejercicios ---------- */
+.ex-photo { display: block; object-fit: cover; border-radius: 12px; background: var(--surface-2); flex: none; }
+.ex-mini { cursor: zoom-in; }
+.ex-mini .ex-photo { border-radius: 12px; }
+.pick-row .ex-photo { border-radius: 12px; }
+.howto-anim { position: relative; aspect-ratio: 4/3; border-radius: 18px; overflow: hidden; background: var(--surface-2); }
+.howto-anim img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.howto-anim img.b, .howto-anim .howto-tag.b { animation: frame 2.4s steps(1) infinite; }
+.howto-anim .howto-tag.a { animation: frameA 2.4s steps(1) infinite; }
+@keyframes frame { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 1; } }
+@keyframes frameA { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
+.howto-tag { position: absolute; left: 10px; top: 10px; background: rgba(17, 24, 39, .75); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
+.howto-muscle { margin: 12px 0 6px; font-size: 14px; }
+.howto-steps { margin: 6px 0 0; padding-left: 20px; font-size: 14px; }
+.howto-steps li { margin: 6px 0; }

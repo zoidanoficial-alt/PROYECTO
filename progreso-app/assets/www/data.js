@@ -152,11 +152,143 @@ const ICONS = {
   lunge: [[30, 10], 'M30 15V34M30 34L42 40V54M30 34L22 46L16 52']
 };
 function exIcon(name, size) {
+  const id = EX_PHOTO[name];
+  if (id) return `<img class="ex-photo" src="img/ex/${id}-0.jpg" width="${size || 44}" height="${size || 44}" loading="lazy" alt="">`;
   const info = EX[name], def = ICONS[(info && info.icon) || 'curl'];
   return `<svg class="ex-ico" width="${size || 44}" height="${size || 44}" viewBox="0 0 64 64" aria-hidden="true">
     <circle cx="${def[0][0]}" cy="${def[0][1]}" r="4.5" fill="currentColor"/>
     <path d="${def[1]}" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
+
+
+/* ------------------------------------------------------------------ *
+ *  Fotos reales de cada ejercicio (posición inicial y final).
+ *  Fuente: Free Exercise DB (github.com/yuhonas/free-exercise-db), dominio público (Unlicense).
+ * ------------------------------------------------------------------ */
+const EX_PHOTO = {
+  "Sentadilla con barra": "Barbell_Squat",
+  "Sentadilla en Smith": "Smith_Machine_Squat",
+  "Hack squat": "Hack_Squat",
+  "Prensa 45°": "Leg_Press",
+  "Prensa de piernas (máquina)": "Leg_Press",
+  "Sentadilla goblet con mancuerna": "Goblet_Squat",
+  "Zancadas / split squat búlgaro": "Split_Squat_with_Dumbbells",
+  "Zancadas en Smith": "Smith_Single-Leg_Split_Squat",
+  "Extensión de cuádriceps": "Leg_Extensions",
+  "Peso muerto": "Barbell_Deadlift",
+  "Peso muerto rumano": "Stiff-Legged_Dumbbell_Deadlift",
+  "Peso muerto rumano en Smith": "Smith_Machine_Stiff-Legged_Deadlift",
+  "Hip thrust": "Barbell_Hip_Thrust",
+  "Patada de glúteo (máquina)": "Glute_Kickback",
+  "Curl femoral tumbado": "Lying_Leg_Curls",
+  "Curl femoral sentado": "Seated_Leg_Curl",
+  "Abductor (máquina)": "Thigh_Abductor",
+  "Aductor (máquina)": "Thigh_Adductor",
+  "Hiperextensiones": "Hyperextensions_Back_Extensions",
+  "Extensión de espalda (máquina)": "Hyperextensions_Back_Extensions",
+  "Press banca con barra": "Barbell_Bench_Press_-_Medium_Grip",
+  "Press banca con mancuernas": "Dumbbell_Bench_Press",
+  "Press banca en Smith": "Smith_Machine_Bench_Press",
+  "Chest press (máquina)": "Machine_Bench_Press",
+  "Hammer Strength press": "Leverage_Chest_Press",
+  "Press inclinado con barra": "Barbell_Incline_Bench_Press_-_Medium_Grip",
+  "Press inclinado con mancuernas": "Incline_Dumbbell_Press",
+  "Press inclinado en Smith": "Smith_Machine_Incline_Bench_Press",
+  "Fondos en paralelas (con lastre)": "Dips_-_Chest_Version",
+  "Fondos asistidos (máquina)": "Dip_Machine",
+  "Aperturas con mancuernas": "Dumbbell_Flyes",
+  "Aperturas en máquina / polea": "Butterfly",
+  "Pec deck (aperturas en máquina)": "Butterfly",
+  "Cruces en polea": "Cable_Crossover",
+  "Remo con barra": "Bent_Over_Barbell_Row",
+  "Remo con mancuerna": "One-Arm_Dumbbell_Row",
+  "Remo inclinado con mancuernas": "Dumbbell_Incline_Row",
+  "Remo en Smith": "Smith_Machine_Bent_Over_Row",
+  "Remo sentado (máquina)": "Leverage_Iso_Row",
+  "Remo en polea agarre estrecho": "Seated_Cable_Rows",
+  "Remo a una mano en polea": "Seated_One-arm_Cable_Pulley_Rows",
+  "Jalón al pecho": "Wide-Grip_Lat_Pulldown",
+  "Dominadas / chin-ups": "Chin-Up",
+  "Dominadas asistidas (máquina)": "Band_Assisted_Pull-Up",
+  "Press militar con barra": "Standing_Military_Press",
+  "Press militar con mancuernas": "Dumbbell_Shoulder_Press",
+  "Press militar en Smith": "Smith_Machine_Overhead_Shoulder_Press",
+  "Shoulder press (máquina)": "Machine_Shoulder_Military_Press",
+  "Remo al cuello": "Standing_Dumbbell_Upright_Row",
+  "Elevaciones laterales": "Side_Lateral_Raise",
+  "Elevaciones laterales sentado": "Seated_Side_Lateral_Raise",
+  "Elevaciones laterales en polea": "Cable_Seated_Lateral_Raise",
+  "Elevaciones frontales": "Front_Dumbbell_Raise",
+  "Pájaro posterior (reverse pec deck)": "Reverse_Machine_Flyes",
+  "Pájaros con mancuernas": "Seated_Bent-Over_Rear_Delt_Raise",
+  "Face pull": "Face_Pull",
+  "Press banca agarre cerrado": "Close-Grip_Barbell_Bench_Press",
+  "Curl con barra de pie": "Barbell_Curl",
+  "Curl inclinado con mancuernas": "Alternate_Incline_Dumbbell_Curl",
+  "Curl predicador": "Preacher_Curl",
+  "Curl martillo": "Hammer_Curls",
+  "Curl de bíceps (máquina)": "Machine_Bicep_Curl",
+  "Curl en polea": "Standing_Biceps_Cable_Curl",
+  "Extensión de tríceps en polea": "Triceps_Pushdown",
+  "Extensión de tríceps (máquina)": "Machine_Triceps_Extension",
+  "Press francés": "EZ-Bar_Skullcrusher",
+  "Elevación de talones de pie": "Smith_Machine_Calf_Raise",
+  "Elevación de talones sentado": "Seated_Calf_Raise",
+  "Elevación de talones en prensa": "Calf_Press_On_The_Leg_Press_Machine",
+  "Donkey calf raise": "Donkey_Calf_Raises",
+  "Crunch en polea": "Cable_Crunch",
+  "Crunch abdominal (máquina)": "Ab_Crunch_Machine",
+  "Torso rotation (máquina)": "Cable_Russian_Twists",
+  "Elevaciones de piernas colgado": "Hanging_Leg_Raise",
+  "Plancha": "Plank"
+};
+
+/** Pasos en español por patrón de movimiento: [pasos, error común]. */
+const HOWTO = {
+  sentadilla: [['Pies a la anchura de hombros, puntas ligeramente hacia afuera.', 'Baja como si te sentaras: cadera atrás y rodillas en la dirección de las puntas.', 'Baja hasta que el muslo quede paralelo al suelo y sube empujando con todo el pie.'], 'Que las rodillas se vayan hacia adentro o que se levanten los talones.'],
+  zancada: [['Da un paso largo; el pie de atrás apoyado en la punta (o en un banco en la búlgara).', 'Baja recto hasta que la rodilla de atrás casi toque el suelo.', 'Sube empujando con el talón de la pierna de adelante.'], 'Inclinar el torso hacia adelante o dejar que la rodilla delantera se vaya hacia adentro.'],
+  'ext-cuad': [['Ajusta el respaldo para que la rodilla quede alineada con el eje de la máquina.', 'Estira las piernas hasta casi bloquear y aprieta el cuádriceps 1 segundo.', 'Baja despacio, en 2–3 segundos.'], 'Usar impulso y dejar caer el peso.'],
+  bisagra: [['Pies a la anchura de cadera, rodillas ligeramente flexionadas.', 'Lleva la cadera hacia atrás con la espalda recta; el peso baja pegado a las piernas.', 'Sube apretando glúteos hasta quedar erguido.'], 'Redondear la espalda baja.'],
+  gluteo: [['Coloca el apoyo (banco o almohadilla) de modo que la cadera quede libre.', 'Empuja con los talones y eleva la cadera hasta alinearla con el torso.', 'Aprieta los glúteos 1 segundo arriba y baja controlado.'], 'Arquear la zona lumbar en lugar de mover la cadera.'],
+  'curl-fem': [['Ajusta el rodillo justo arriba de los talones y la rodilla alineada con el eje.', 'Flexiona las piernas llevando los talones hacia los glúteos.', 'Regresa despacio sin dejar que el peso golpee.'], 'Levantar la cadera del asiento o del banco.'],
+  abductor: [['Siéntate con la espalda apoyada y las almohadillas por fuera de las rodillas.', 'Abre las piernas lo más que puedas de forma controlada.', 'Regresa despacio sin que choquen las placas.'], 'Ir demasiado rápido y rebotar.'],
+  aductor: [['Siéntate con la espalda apoyada y las almohadillas por dentro de las rodillas.', 'Cierra las piernas apretando la parte interna del muslo.', 'Abre despacio hasta sentir el estiramiento.'], 'Abrir más de lo que te permite tu flexibilidad.'],
+  lumbar: [['Apoya la cadera en la almohadilla y cruza los brazos sobre el pecho.', 'Baja el torso con la espalda recta.', 'Sube hasta quedar en línea recta con las piernas, sin pasarte hacia atrás.'], 'Hiperextender la espalda al final del movimiento.'],
+  'empuje-h': [['Acuéstate o siéntate con los omóplatos juntos y los pies firmes.', 'Baja el peso hasta la mitad del pecho con los codos a ~45°.', 'Empuja hacia arriba hasta casi estirar los brazos.'], 'Abrir los codos a 90° o rebotar el peso en el pecho.'],
+  'empuje-inc': [['Banco a 30–45°, omóplatos juntos y pies firmes.', 'Baja el peso a la parte alta del pecho.', 'Empuja hacia arriba y ligeramente hacia atrás.'], 'Despegar la espalda del banco para empujar.'],
+  fondos: [['Agarra las barras con los brazos estirados (o arrodíllate en la plataforma de asistencia).', 'Baja inclinando un poco el torso hacia adelante hasta que el hombro quede a la altura del codo.', 'Empuja hasta estirar los brazos.'], 'Bajar demasiado: estresa el hombro.'],
+  apertura: [['Brazos abiertos con los codos ligeramente flexionados y fijos.', 'Junta las manos frente al pecho como si abrazaras un árbol.', 'Abre despacio hasta sentir el estiramiento en el pecho.'], 'Flexionar y estirar los codos: se convierte en un press.'],
+  remo: [['Espalda recta y pecho afuera (inclinado o sentado según el ejercicio).', 'Jala llevando los codos hacia atrás y junta los omóplatos.', 'Regresa estirando los brazos sin encorvar la espalda.'], 'Jalar con los brazos y balancear el torso.'],
+  jalon: [['Agarra la barra un poco más ancho que los hombros; muslos fijos bajo el rodillo.', 'Jala la barra hacia la parte alta del pecho llevando los codos hacia abajo.', 'Sube despacio hasta estirar los brazos.'], 'Echarse muy atrás o bajar la barra por detrás de la nuca.'],
+  'empuje-v': [['Peso a la altura de los hombros, abdomen firme.', 'Empuja hacia arriba hasta casi estirar los brazos.', 'Baja controlado hasta la altura de la barbilla.'], 'Arquear la espalda baja para empujar.'],
+  'remo-cuello': [['Peso frente a los muslos, agarre a la anchura de hombros.', 'Sube el peso pegado al cuerpo llevando los codos hacia arriba y afuera.', 'Para cuando los codos lleguen a la altura de los hombros y baja despacio.'], 'Subir de más: puede lastimar el hombro.'],
+  'elev-lat': [['De pie o sentado, mancuernas a los lados y codos ligeramente flexionados.', 'Sube los brazos hacia los lados hasta la altura de los hombros.', 'Baja despacio en 2–3 segundos.'], 'Usar impulso o subir los hombros hacia las orejas.'],
+  'elev-front': [['Mancuernas frente a los muslos.', 'Sube un brazo (o los dos) al frente hasta la altura de los hombros.', 'Baja despacio.'], 'Balancear el cuerpo.'],
+  'deltoide-post': [['Pecho apoyado (máquina) o torso inclinado hacia adelante.', 'Abre los brazos hacia atrás apretando la parte trasera del hombro.', 'Regresa despacio.'], 'Juntar los omóplatos en exceso: trabaja más la espalda que el hombro.'],
+  'triceps-c': [['Acostado en el banco, agarre a la anchura de hombros.', 'Baja la barra a la parte baja del pecho con los codos pegados.', 'Empuja hasta estirar los brazos.'], 'Agarre demasiado cerrado: lastima las muñecas.'],
+  curl: [['Codos pegados al cuerpo y fijos.', 'Sube el peso flexionando el codo, sin mover el hombro.', 'Baja despacio hasta casi estirar el brazo.'], 'Balancear el torso para subir el peso.'],
+  triceps: [['Codos pegados al cuerpo (o apuntando al techo en el press francés).', 'Estira el codo por completo apretando el tríceps.', 'Regresa despacio sin mover los codos.'], 'Abrir los codos o mover los hombros.'],
+  pantorrilla: [['Coloca la punta de los pies en la plataforma con los talones libres.', 'Sube lo más alto posible sobre las puntas y aguanta 1 segundo.', 'Baja hasta sentir el estiramiento completo.'], 'Hacer rebotes cortos sin rango completo.'],
+  abdomen: [['Contrae el abdomen antes de empezar.', 'Enrolla el torso llevando las costillas hacia la cadera.', 'Regresa despacio sin perder la tensión.'], 'Jalar con los brazos o el cuello.']
+};
+const HOWTO_EX = {
+  'Plancha': [['Antebrazos bajo los hombros y cuerpo en línea recta de cabeza a talones.', 'Aprieta abdomen y glúteos.', 'Aguanta el tiempo indicado respirando normal.'], 'Dejar caer la cadera o levantarla demasiado.'],
+  'Elevaciones de piernas colgado': [['Cuélgate de la barra con los brazos estirados.', 'Sube las piernas (rectas o con rodillas flexionadas) hasta la altura de la cadera o más.', 'Baja despacio sin balancearte.'], 'Usar impulso con el cuerpo.'],
+  'Torso rotation (máquina)': [['Siéntate con el torso fijo en la máquina (en la foto, versión con polea).', 'Gira el torso hacia un lado usando el abdomen.', 'Regresa despacio y repite hacia el otro lado.'], 'Girar con los brazos en lugar del tronco.'],
+  'Prensa 45°': [['Espalda pegada al respaldo, pies a la anchura de hombros en el centro de la plataforma.', 'Baja hasta que las rodillas formen ~90°.', 'Empuja sin bloquear las rodillas al final.'], 'Despegar la cadera del asiento al bajar.'],
+  'Prensa de piernas (máquina)': [['Espalda pegada al respaldo, pies a la anchura de hombros.', 'Baja hasta que las rodillas formen ~90°.', 'Empuja sin bloquear las rodillas al final.'], 'Despegar la cadera del asiento al bajar.'],
+  'Peso muerto': [['Barra sobre la mitad del pie, agarre justo por fuera de las piernas.', 'Espalda recta y pecho afuera; empuja el suelo con las piernas.', 'Sube la barra pegada al cuerpo hasta quedar erguido.'], 'Redondear la espalda o alejar la barra del cuerpo.']
+};
+/** Músculos que trabaja cada patrón (principal y secundarios), para la ficha del ejercicio. */
+const MUSCLES = {
+  sentadilla: 'Cuádriceps y glúteo · también femoral y abdomen', zancada: 'Cuádriceps y glúteo · también femoral', 'ext-cuad': 'Cuádriceps',
+  bisagra: 'Femoral, glúteo y espalda baja', gluteo: 'Glúteo · también femoral', 'curl-fem': 'Femoral', abductor: 'Glúteo medio (parte externa de la cadera)',
+  aductor: 'Aductores (parte interna del muslo)', lumbar: 'Espalda baja · también glúteo', 'empuje-h': 'Pecho · también tríceps y hombro frontal',
+  'empuje-inc': 'Pecho superior · también hombro frontal y tríceps', fondos: 'Pecho inferior y tríceps', apertura: 'Pecho', remo: 'Espalda media y dorsal · también bíceps',
+  jalon: 'Dorsal ancho · también bíceps', 'empuje-v': 'Hombro · también tríceps', 'remo-cuello': 'Hombro lateral y trapecio', 'elev-lat': 'Hombro lateral',
+  'elev-front': 'Hombro frontal', 'deltoide-post': 'Hombro posterior y espalda alta', 'triceps-c': 'Tríceps · también pecho', curl: 'Bíceps · también antebrazo',
+  triceps: 'Tríceps', pantorrilla: 'Pantorrilla', abdomen: 'Abdomen'
+};
 
 /** Patrones cercanos que también sirven de sustituto (ej. prensa ocupada → sentadilla búlgara). */
 const RELATED = {
