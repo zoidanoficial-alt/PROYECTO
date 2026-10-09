@@ -1,7 +1,13 @@
-# Mi Progreso 3.0 (app Android)
+# Mi Progreso 4.0 (app Android)
 
 App de entrenamiento y progreso físico. Todo se guarda solo en el teléfono.
 
+- **Diseño 4.0:** tema claro (u oscuro), bienvenida guiada, Inicio con “qué toca hoy”,
+  botón + para registrar cualquier cosa, y entreno con un ejercicio abierto a la vez,
+  botones −/+ para peso y reps y RIR con un toque.
+- **Exportar para IA:** reporte PDF (resumen, gráfica de peso, nutrición, progreso por
+  ejercicio, volumen, nivel de fuerza, logros y mensaje sugerido para la IA) y Excel con
+  9 hojas de datos planos. Se guardan en Descargas/MiProgreso y se comparten desde la app.
 - **Planet Fitness:** 75 ejercicios (58 disponibles en PF) con pictogramas, peso en kg o lb
   por ejercicio (las máquinas vienen en lb), sustitutos por patrón de movimiento cuando
   una máquina está ocupada y biblioteca con búsqueda.
@@ -46,6 +52,9 @@ Requiere Android 8.0 o superior.
 Solo necesita Java 17+, `curl` y `python3`. El script descarga de Maven Central
 `aapt2`, `dx`, `apksig` y las clases de Android, compila, firma (esquema v2) y deja el
 APK en `dist/MiProgreso.apk`.
+
+El PDF usa jsPDF y jsPDF-AutoTable (MIT, en `assets/www/vendor/`); el Excel se genera
+sin librerías (`assets/www/export.js`).
 
 La app es un `WebView` (`src/.../MainActivity.java`) que sirve `assets/www/index.html`
 bajo `https://progreso.local/`, con un puente nativo para guardar copias de

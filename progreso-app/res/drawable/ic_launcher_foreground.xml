@@ -3,11 +3,11 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#00000000" android:strokeColor="#FFF97316"
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFFFF"
         android:strokeWidth="5" android:strokeLineCap="round" android:strokeLineJoin="round"
         android:pathData="M30,72 L46,58 L58,64 L78,40" />
-    <path android:fillColor="#FFF97316" android:pathData="M70,36 L82,36 L82,48 Z" />
-    <path android:fillColor="#FFF5F5F4" android:pathData="M32,50 h44 v4 h-44 z" />
-    <path android:fillColor="#FFF5F5F4" android:pathData="M36,42 h6 v20 h-6 z" />
-    <path android:fillColor="#FFF5F5F4" android:pathData="M66,42 h6 v20 h-6 z" />
+    <path android:fillColor="#FFFFFFFF" android:pathData="M70,36 L82,36 L82,48 Z" />
+    <path android:fillColor="#FFFFE3D3" android:pathData="M32,50 h44 v4 h-44 z" />
+    <path android:fillColor="#FFFFE3D3" android:pathData="M36,42 h6 v20 h-6 z" />
+    <path android:fillColor="#FFFFE3D3" android:pathData="M66,42 h6 v20 h-6 z" />
 </vector>

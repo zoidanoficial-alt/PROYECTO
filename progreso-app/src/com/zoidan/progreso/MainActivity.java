@@ -3,6 +3,8 @@ package com.zoidan.progreso;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -10,6 +12,9 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.graphics.Color;
+import android.util.Base64;
+import android.view.View;
 import android.os.Environment;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -203,8 +208,97 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** Escribe bytes en Descargas/MiProgreso y devuelve su content:// (o "" si falla). */
+    private Uri writeDownload(String name, String mime, byte[] bytes) throws IOException {
+        String safeName = name.replaceAll("[^A-Za-z0-9._-]", "_");
+        if (Build.VERSION.SDK_INT < 29) {
+            File file = new File(getExternalFilesDir(null), safeName);
+            FileOutputStream out = new FileOutputStream(file);
+            try {
+                out.write(bytes);
+            } finally {
+                out.close();
+            }
+            return Uri.fromFile(file);
+        }
+        ContentResolver resolver = getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, safeName);
+        values.put(MediaStore.MediaColumns.MIME_TYPE, mime);
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/MiProgreso");
+        Uri uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+        if (uri == null) {
+            throw new IOException("MediaStore insert");
+        }
+        OutputStream out = resolver.openOutputStream(uri);
+        try {
+            out.write(bytes);
+        } finally {
+            out.close();
+        }
+        return uri;
+    }
+
     /** Puente expuesto a JavaScript como window.AndroidBridge. */
     public class Bridge {
+        /** Guarda un archivo binario (PDF, Excel) recibido en base64. Devuelve su URI o "". */
+        @JavascriptInterface
+        public String saveBase64(String name, String mime, String base64) {
+            try {
+                return writeDownload(name, mime, Base64.decode(base64, Base64.DEFAULT)).toString();
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        /** Abre el menú de compartir de Android con un archivo ya guardado. */
+        @JavascriptInterface
+        public void shareFile(final String uri, final String mime, final String text) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Intent send = new Intent(Intent.ACTION_SEND);
+                    send.setType(mime);
+                    send.putExtra(Intent.EXTRA_STREAM, Uri.parse(uri));
+                    send.putExtra(Intent.EXTRA_TEXT, text);
+                    send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    try {
+                        startActivity(Intent.createChooser(send, "Compartir progreso"));
+                    } catch (ActivityNotFoundException ignored) {
+                    }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void copyText(String text) {
+            ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            if (cm != null) {
+                cm.setPrimaryClip(ClipData.newPlainText("Mi Progreso", text));
+            }
+        }
+
+        /** Colorea las barras del sistema según el tema de la app (íconos oscuros en tema claro). */
+        @JavascriptInterface
+        public void setBars(final String color, final boolean light) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        int c = Color.parseColor(color.trim());
+                        getWindow().setStatusBarColor(c);
+                        getWindow().setNavigationBarColor(c);
+                        web.setBackgroundColor(c);
+                        View decor = getWindow().getDecorView();
+                        int flags = decor.getSystemUiVisibility();
+                        int lightBits = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                        decor.setSystemUiVisibility(light ? (flags | lightBits) : (flags & ~lightBits));
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                }
+            });
+        }
+
         /** Vibra al terminar el descanso entre series. */
         @JavascriptInterface
         public void vibrate(long ms) {
