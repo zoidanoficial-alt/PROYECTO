@@ -362,7 +362,10 @@ function openExport() {
     <label class="check" style="margin:-4px 0 10px 4px"><input type="checkbox" id="ex-photos"> Incluir fotos de frente (primera y última)</label>
     <label class="check" style="margin:-6px 0 12px 4px"><input type="checkbox" id="ex-detail"> Incluir cada serie en el PDF</label>
     <button class="choice" id="ex-xlsx"><span class="c-ico">📊</span><span><b>Excel · datos completos</b><small>9 hojas: resumen, diario, comidas, series, sesiones, progreso, volumen, medidas y logros.</small></span></button>
+    <button class="choice" id="ex-csv"><span class="c-ico">🔁</span><span><b>CSV · formato Strong</b><small>Todas tus series en el formato estándar que importan Strong, Hevy y otras apps. Para llevarte tus datos a donde quieras.</small></span></button>
     <button class="secondary block" id="ex-prompt">Copiar mensaje para la IA</button>
+    <button class="ghost block" id="ex-import" style="margin-top:6px">Importar entrenos desde Strong o Hevy (CSV)</button>
+    <input type="file" id="ex-file" accept=".csv,text/csv,text/comma-separated-values" style="display:none">
     <div id="ex-result"></div>`, m => {
     $$('[data-per]', m).forEach(b => b.onclick = () => { exportPeriod = b.dataset.per; $$('[data-per]', m).forEach(x => x.classList.toggle('on', x === b)); });
     const done = (uri, name, mime) => {
@@ -383,10 +386,146 @@ function openExport() {
       const bytes = await makePdf(R, { photos: $('#ex-photos', m).checked, detail: $('#ex-detail', m).checked });
       done(saveBinary(name, 'application/pdf', bytes), name, 'application/pdf');
     });
+    $('#ex-csv', m).onclick = e => run(e.currentTarget, async () => {
+      const R = exportRange(exportPeriod), name = `miprogreso_strong_${R.from}_a_${R.to}.csv`;
+      done(saveBinary(name, 'text/csv', new TextEncoder().encode(strongCsv(R))), name, 'text/csv');
+    });
+    $('#ex-import', m).onclick = () => $('#ex-file', m).click();
+    $('#ex-file', m).onchange = ev => {
+      const f = ev.target.files && ev.target.files[0]; ev.target.value = '';
+      if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        try {
+          const res = importWorkoutCsv(String(rd.result));
+          $('#ex-result', m).innerHTML = `<div class="status good"><b>Importado desde ${res.source}</b>${res.sessions} sesiones y ${res.sets} series${res.newEx ? `, ${res.newEx} ejercicios nuevos creados` : ''}.</div>`;
+        } catch (e) { $('#ex-result', m).innerHTML = `<div class="status bad"><b>No se pudo importar</b>${esc(e.message)}</div>`; }
+      };
+      rd.readAsText(f);
+    };
     $('#ex-prompt', m).onclick = async () => {
       const txt = aiPrompt(exportRange(exportPeriod));
       try { await navigator.clipboard.writeText(txt); toast('Mensaje copiado: pégalo junto con el archivo'); }
       catch (e) { if (bridge && bridge.copyText) { bridge.copyText(txt); toast('Mensaje copiado'); } else toast('No se pudo copiar'); }
     };
   });
+}
+
+/* ------------------------------------------------------------------ *
+ *  CSV compatible con Strong / Hevy (exportar e importar)
+ * ------------------------------------------------------------------ */
+function csvCell(v) { const t = v == null ? '' : String(v); return /[",\n;]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; }
+/** Formato de exportación de Strong (lo importan Hevy y otras apps): una fila por serie, peso en kg. */
+function strongCsv(R) {
+  const rows = [['Date', 'Workout Name', 'Duration', 'Exercise Name', 'Set Order', 'Weight', 'Reps', 'Distance', 'Seconds', 'Notes', 'Workout Notes', 'RPE']];
+  const sessions = DB.sessions.filter(x => x.end && inRange(x.date, R)).sort((a, b) => a.start - b.start);
+  const loose = DB.lifts.filter(l => !l.sid && inRange(l.date, R));
+  const emit = (date, start, title, mins, sets) => {
+    const order = {};
+    sets.sort((a, b) => (a.t || 0) - (b.t || 0)).forEach(l => {
+      order[l.ex] = (order[l.ex] || 0) + 1;
+      const ts = new Date(start || l.t || parseDate(date).getTime());
+      const stamp = date + ' ' + String(ts.getHours()).padStart(2, '0') + ':' + String(ts.getMinutes()).padStart(2, '0') + ':00';
+      rows.push([stamp, title, mins + 'm', l.ex, order[l.ex], r1(l.w), l.r, '', '', l.tech && l.tech !== 'normal' ? TECHNIQUES[l.tech].name : '', '', l.rir != null ? 10 - l.rir : '']);
+    });
+  };
+  sessions.forEach(x => emit(x.date, x.start, x.dayName, Math.round((x.end - x.start) / 60000), DB.lifts.filter(l => l.sid === x.id)));
+  if (loose.length) emit(loose[0].date, null, 'Series sueltas', 0, loose);
+  return rows.map(r => r.map(csvCell).join(',')).join('\n');
+}
+
+function parseCsv(text) {
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += c; }
+    else if (c === '"') q = true;
+    else if (c === ',' || c === ';') { row.push(cell); cell = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(x => x.trim()));
+}
+
+/**
+ * Importa el CSV de Strong o de Hevy. Los ejercicios que no existen en el catálogo se crean como
+ * ejercicios propios (puedes renombrarlos luego); las series quedan agrupadas en sesiones por fecha y nombre.
+ */
+function importWorkoutCsv(text) {
+  const rows = parseCsv(text.replace(/^\uFEFF/, ''));
+  if (rows.length < 2) throw new Error('El archivo está vacío.');
+  const h = rows[0].map(x => x.trim().toLowerCase());
+  const col = (...names) => names.map(n => h.indexOf(n)).find(i => i >= 0);
+  let source, get;
+  if (h.includes('exercise_title')) {          // Hevy
+    source = 'Hevy';
+    const c = { date: col('start_time'), end: col('end_time'), title: col('title'), ex: col('exercise_title'), w: col('weight_kg'), r: col('reps'), rpe: col('rpe'), type: col('set_type') };
+    get = r => ({ when: r[c.date], end: r[c.end], title: r[c.title], ex: r[c.ex], w: num(r[c.w]), reps: num(r[c.r]), rpe: num(r[c.rpe]), warm: /warm/i.test(r[c.type] || '') });
+  } else if (h.includes('exercise name')) {    // Strong
+    source = 'Strong';
+    const c = { date: col('date'), title: col('workout name'), dur: col('duration'), ex: col('exercise name'), w: col('weight'), r: col('reps'), rpe: col('rpe') };
+    get = r => ({ when: r[c.date], dur: r[c.dur], title: r[c.title], ex: r[c.ex], w: num(r[c.w]), reps: num(r[c.r]), rpe: num(r[c.rpe]), warm: false });
+  } else throw new Error('No reconozco el formato. Exporta desde Strong o Hevy en CSV.');
+
+  const toDate = s => { const d = new Date(String(s).replace(' ', 'T')); return isNaN(d) ? null : d; };
+  const groups = {}; let newEx = 0, sets = 0;
+  rows.slice(1).forEach(r => {
+    const x = get(r);
+    if (!x.ex || !x.reps || x.warm) return;
+    const d = toDate(x.when); if (!d) return;
+    const key = dateStr(d) + '|' + (x.title || 'Entreno');
+    (groups[key] = groups[key] || { d, x, sets: [] }).sets.push(x);
+  });
+  Object.values(groups).forEach(g => {
+    const date = dateStr(g.d), start = g.d.getTime();
+    let mins = 60;
+    if (g.x.end && toDate(g.x.end)) mins = Math.max(1, Math.round((toDate(g.x.end) - g.d) / 60000));
+    else if (g.x.dur) { const m = String(g.x.dur).match(/(?:(\d+)h)?\s*(\d+)m/); if (m) mins = (Number(m[1]) || 0) * 60 + Number(m[2]); }
+    if (DB.sessions.some(s => s.date === date && s.imported === g.x.title + '@' + start)) return;   // no duplicar
+    const sid = uid();
+    DB.sessions.push({ id: sid, routine: 'libre', dayId: null, dayName: g.x.title || 'Entreno importado', date, start, end: start + mins * 60000, extra: [], swaps: {}, imported: g.x.title + '@' + start });
+    g.sets.forEach((x, k) => {
+      const exName = IMPORT_ALIASES[x.ex.toLowerCase()] || x.ex;
+      if (!EX[exName]) { DB.customEx.push(guessExercise(exName)); registerCustomExercises(); newEx++; }
+      DB.lifts.push({ id: uid(), ex: exName, w: x.w || 0, r: Math.round(x.reps), rir: x.rpe ? Math.max(0, Math.min(4, Math.round(10 - x.rpe))) : null, date, t: start + k * 1000, sid, tech: 'normal' });
+      sets++;
+    });
+  });
+  saveData();
+  return { source, sessions: Object.keys(groups).length, sets, newEx };
+}
+
+/** Nombres habituales de Strong/Hevy → ejercicios del catálogo. */
+const IMPORT_ALIASES = {
+  'bench press (barbell)': 'Press banca con barra', 'bench press (dumbbell)': 'Press banca con mancuernas', 'bench press (smith machine)': 'Press banca en Smith',
+  'incline bench press (barbell)': 'Press inclinado con barra', 'incline bench press (dumbbell)': 'Press inclinado con mancuernas', 'chest press (machine)': 'Chest press (máquina)',
+  'chest fly (machine)': 'Pec deck (aperturas en máquina)', 'butterfly (pec deck)': 'Pec deck (aperturas en máquina)', 'cable crossover': 'Cruces en polea', 'chest dip': 'Fondos en paralelas (con lastre)',
+  'push up': 'Lagartijas', 'squat (barbell)': 'Sentadilla con barra', 'squat (smith machine)': 'Sentadilla en Smith', 'goblet squat (kettlebell)': 'Sentadilla goblet con mancuerna',
+  'goblet squat': 'Sentadilla goblet con mancuerna', 'leg press': 'Prensa de piernas (máquina)', 'leg press (machine)': 'Prensa de piernas (máquina)', 'hack squat': 'Hack squat', 'hack squat (machine)': 'Hack squat',
+  'leg extension (machine)': 'Extensión de cuádriceps', 'lying leg curl (machine)': 'Curl femoral tumbado', 'seated leg curl (machine)': 'Curl femoral sentado',
+  'bulgarian split squat': 'Zancadas / split squat búlgaro', 'lunge (dumbbell)': 'Zancadas / split squat búlgaro', 'deadlift (barbell)': 'Peso muerto',
+  'romanian deadlift (barbell)': 'Peso muerto rumano con barra', 'romanian deadlift (dumbbell)': 'Peso muerto rumano', 'hip thrust (barbell)': 'Hip thrust', 'glute bridge': 'Puente de glúteo',
+  'hip abductor (machine)': 'Abductor (máquina)', 'hip adductor (machine)': 'Aductor (máquina)', 'calf raise (machine)': 'Elevación de talones sentado', 'standing calf raise (smith machine)': 'Elevación de talones de pie',
+  'seated calf raise (machine)': 'Elevación de talones sentado', 'lat pulldown (cable)': 'Jalón al pecho', 'lat pulldown (machine)': 'Jalón al pecho', 'pull up': 'Dominadas / chin-ups', 'chin up': 'Dominadas / chin-ups',
+  'pull up (assisted)': 'Dominadas asistidas (máquina)', 'seated row (cable)': 'Remo en polea agarre estrecho', 'seated row (machine)': 'Remo sentado (máquina)', 'bent over row (barbell)': 'Remo con barra',
+  'bent over row (dumbbell)': 'Remo con mancuerna', 'dumbbell row': 'Remo con mancuerna', 'face pull (cable)': 'Face pull', 'face pull': 'Face pull', 'back extension': 'Hiperextensiones',
+  'overhead press (barbell)': 'Press militar con barra', 'shoulder press (dumbbell)': 'Press militar con mancuernas', 'seated overhead press (dumbbell)': 'Press militar con mancuernas', 'shoulder press (machine)': 'Shoulder press (máquina)',
+  'lateral raise (dumbbell)': 'Elevaciones laterales', 'lateral raise (cable)': 'Elevaciones laterales en polea', 'front raise (dumbbell)': 'Elevaciones frontales', 'reverse fly (machine)': 'Pájaro posterior (reverse pec deck)',
+  'rear delt reverse fly (machine)': 'Pájaro posterior (reverse pec deck)', 'upright row (dumbbell)': 'Remo al cuello', 'bicep curl (barbell)': 'Curl con barra de pie', 'bicep curl (dumbbell)': 'Curl martillo',
+  'hammer curl (dumbbell)': 'Curl martillo', 'preacher curl (barbell)': 'Curl predicador', 'bicep curl (machine)': 'Curl de bíceps (máquina)', 'bicep curl (cable)': 'Curl en polea',
+  'incline curl (dumbbell)': 'Curl inclinado con mancuernas', 'triceps pushdown (cable - straight bar)': 'Extensión de tríceps en polea', 'triceps pushdown': 'Extensión de tríceps en polea', 'triceps rope pushdown': 'Extensión de tríceps en polea',
+  'skullcrusher (barbell)': 'Press francés', 'skull crusher (barbell)': 'Press francés', 'triceps extension (machine)': 'Extensión de tríceps (máquina)', 'bench press - close grip (barbell)': 'Press banca agarre cerrado',
+  'triceps dip': 'Fondos en banco', 'crunch (machine)': 'Crunch abdominal (máquina)', 'cable crunch': 'Crunch en polea', 'crunch': 'Crunch en el suelo', 'plank': 'Plancha', 'hanging leg raise': 'Elevaciones de piernas colgado'
+};
+/** Para un ejercicio desconocido, adivina músculo, equipo y tipo por su nombre (inglés o español). */
+function guessExercise(name) {
+  const n = name.toLowerCase(), has = re => re.test(n);
+  const g = has(/leg extension|extensión de cuád/) ? 'pierna' : has(/curl femoral|leg curl|hamstring|romanian|rumano/) ? 'femoral' : has(/glute|hip thrust|glúteo|abduct/) ? 'gluteo'
+    : has(/calf|pantorr|talones/) ? 'pantorrilla' : has(/squat|sentadilla|leg press|prensa|lunge|zancada|step/) ? 'pierna' : has(/crunch|plank|plancha|abs|abdom|leg raise/) ? 'abdomen'
+    : has(/tricep|tríceps|pushdown|skull|francés|dip/) ? 'triceps' : has(/curl|bicep|bíceps/) ? 'biceps' : has(/shoulder|lateral|overhead|military|hombro|militar|delt|face pull/) ? 'hombro'
+    : has(/row|pulldown|pull up|chin|lat |remo|jalón|dominada|deadlift|peso muerto|back/) ? 'espalda' : 'pecho';
+  const e = has(/smith/) ? 'smith' : has(/barbell|barra/) ? 'barra' : has(/dumbbell|mancuern|kettlebell/) ? 'manc' : has(/cable|polea/) ? 'polea' : has(/machine|máquina|lever/) ? 'maq' : has(/bodyweight|push up|pull up|chin|dip|plank|crunch/) ? 'corporal' : 'maq';
+  const t = has(/curl|raise|extension|fly|crossover|pushdown|kickback|crunch|elevaci|apertura|pec deck/) ? 'a' : 'c';
+  return { name, g, e, t };
 }

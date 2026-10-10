@@ -1,6 +1,19 @@
-# Mi Progreso 4.1 (app Android)
+# Mi Progreso 5.0 (app Android)
 
-App de entrenamiento y progreso físico. Todo se guarda solo en el teléfono.
+App de entrenamiento y progreso físico. Gratis, sin anuncios, sin cuenta y sin internet:
+todo se guarda en el teléfono y se exporta cuando quieras.
+
+- **5.0 · Menos fricción:** guardar una serie es un toque (el botón ya trae peso × reps) y el
+  botón “＋ Igual” de la barra de descanso repite la serie sin abrir nada. Cambiar de máquina
+  es un toque (⇄ en cada ejercicio). La sesión y el descanso sobreviven a cierres y a la app
+  minimizada, con aviso nativo al terminar el descanso.
+- **5.0 · Personalización real:** dónde entrenas (Planet Fitness, gimnasio completo, casa, sin
+  equipo) y molestias (rodilla, hombro, espalda baja, muñeca, codo): las rutinas se adaptan
+  solas al empezar y el buscador solo propone lo que puedes hacer. 93 ejercicios con foto,
+  incluidos 18 sin equipo o con poco equipo, y ejercicios propios ilimitados.
+- **5.0 · Libreta simple o app completa**, constancia sin culpa (meta semanal, semanas en
+  pausa que no rompen la racha, sin recordatorios) y CSV compatible con Strong/Hevy para
+  exportar e importar.
 
 - **Diseño 4.0:** tema claro (u oscuro), bienvenida guiada, Inicio con “qué toca hoy”,
   botón + para registrar cualquier cosa, y entreno con un ejercicio abierto a la vez,

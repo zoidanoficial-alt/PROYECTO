@@ -47,6 +47,7 @@
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
 html, body { margin: 0; background: var(--bg); color: var(--text); }
 body {
   font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -386,3 +387,18 @@ canvas.spark { width: 100%; height: 56px; display: block; }
 .howto-muscle { margin: 12px 0 6px; font-size: 14px; }
 .howto-steps { margin: 6px 0 0; padding-left: 20px; font-size: 14px; }
 .howto-steps li { margin: 6px 0; }
+
+/* ---------- 5.0 ---------- */
+.adapt-note { margin-top: 10px; font-size: 13px; background: var(--blue-soft); color: var(--text); border-radius: 12px; padding: 8px 10px; }
+.adapt-note.warn { background: var(--warn-soft); }
+.pick-row.dim { opacity: .55; }
+.chip-btn.on { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.ex-head .icon-btn { flex: none; font-size: 20px; color: var(--accent); background: var(--accent-soft); }
+.save-set { font-size: 17px; min-height: 56px; }
+#tb-repeat { background: var(--accent); color: #fff; font-weight: 750; }
+.timer-bar.done #tb-repeat { background: #fff; color: var(--good); }
+.week-dots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+.week-dots span { aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); font-size: 13px; font-weight: 700; }
+.week-dots span.on { background: var(--good); color: #fff; }
+.week-dots span.today { outline: 2px solid var(--accent); outline-offset: 2px; }
+nav.tabs.four { grid-template-columns: repeat(4, 1fr); }

@@ -2,6 +2,9 @@ package com.zoidan.progreso;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -54,6 +57,9 @@ public class MainActivity extends Activity {
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
     private PermissionRequest pendingPermission;
+    /** La app está a la vista: el aviso de descanso lo da el cronómetro de la página. */
+    static volatile boolean visible;
+    private static final int REQ_NOTIF = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +85,27 @@ public class MainActivity extends Activity {
         } else {
             web.loadUrl(START_URL);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        visible = true;
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (nm != null) nm.cancel(RestReceiver.NOTIFICATION_ID);
+    }
+
+    @Override
+    protected void onPause() {
+        visible = false;
+        super.onPause();
+    }
+
+    private PendingIntent restIntent(String title, String text) {
+        Intent i = new Intent(this, RestReceiver.class);
+        i.putExtra("title", title);
+        i.putExtra("text", text);
+        return PendingIntent.getBroadcast(this, 1, i, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override
@@ -241,6 +268,42 @@ public class MainActivity extends Activity {
 
     /** Puente expuesto a JavaScript como window.AndroidBridge. */
     public class Bridge {
+        /** Programa el aviso de fin de descanso para la hora indicada (epoch en ms). */
+        @JavascriptInterface
+        public void scheduleRest(String atMs, String title, String text) {
+            try {
+                long at = Long.parseLong(atMs);
+                AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                if (am == null) return;
+                PendingIntent pi = restIntent(title, text);
+                if (Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms()) {
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi);
+                } else {
+                    am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi);
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        @JavascriptInterface
+        public void cancelRest() {
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            if (am != null) am.cancel(restIntent("", ""));
+        }
+
+        /** Android 13+: pide permiso de notificaciones (solo se usa para el aviso de descanso). */
+        @JavascriptInterface
+        public void requestNotifications() {
+            if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestPermissions(new String[] { "android.permission.POST_NOTIFICATIONS" }, REQ_NOTIF);
+                    }
+                });
+            }
+        }
+
         /** Guarda un archivo binario (PDF, Excel) recibido en base64. Devuelve su URI o "". */
         @JavascriptInterface
         public String saveBase64(String name, String mime, String base64) {

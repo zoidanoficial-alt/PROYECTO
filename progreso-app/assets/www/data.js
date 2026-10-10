@@ -32,7 +32,7 @@ const EX_LIST = [
   ['Curl femoral sentado', 'femoral', 'a', 'curl-fem', 'maq', 1, 'legcurl'],
   ['Abductor (máquina)', 'gluteo', 'a', 'abductor', 'maq', 1, 'abduct'],
   ['Aductor (máquina)', 'pierna', 'a', 'aductor', 'maq', 1, 'abduct'],
-  ['Hiperextensiones', 'espalda', 'a', 'lumbar', 'corporal', 0, 'backext'],
+  ['Hiperextensiones', 'espalda', 'a', 'lumbar', 'maq', 0, 'backext'],
   ['Extensión de espalda (máquina)', 'espalda', 'a', 'lumbar', 'maq', 1, 'backext'],
   // Pecho
   ['Press banca con barra', 'pecho', 'c', 'empuje-h', 'barra', 0, 'bench'],
@@ -43,7 +43,7 @@ const EX_LIST = [
   ['Press inclinado con barra', 'pecho', 'c', 'empuje-inc', 'barra', 0, 'incline'],
   ['Press inclinado con mancuernas', 'pecho', 'c', 'empuje-inc', 'manc', 1, 'incline'],
   ['Press inclinado en Smith', 'pecho', 'c', 'empuje-inc', 'smith', 1, 'incline'],
-  ['Fondos en paralelas (con lastre)', 'pecho', 'c', 'fondos', 'corporal', 0, 'dip'],
+  ['Fondos en paralelas (con lastre)', 'pecho', 'c', 'fondos', 'fija', 0, 'dip'],
   ['Fondos asistidos (máquina)', 'pecho', 'c', 'fondos', 'maq', 1, 'dip'],
   ['Aperturas con mancuernas', 'pecho', 'a', 'apertura', 'manc', 1, 'fly'],
   ['Aperturas en máquina / polea', 'pecho', 'a', 'apertura', 'maq', 1, 'fly'],
@@ -58,7 +58,7 @@ const EX_LIST = [
   ['Remo en polea agarre estrecho', 'espalda', 'c', 'remo', 'polea', 1, 'seatedrow'],
   ['Remo a una mano en polea', 'espalda', 'c', 'remo', 'polea', 1, 'seatedrow'],
   ['Jalón al pecho', 'espalda', 'c', 'jalon', 'maq', 1, 'pulldown'],
-  ['Dominadas / chin-ups', 'espalda', 'c', 'jalon', 'corporal', 0, 'pullup'],
+  ['Dominadas / chin-ups', 'espalda', 'c', 'jalon', 'fija', 0, 'pullup'],
   ['Dominadas asistidas (máquina)', 'espalda', 'c', 'jalon', 'maq', 1, 'pullup'],
   // Hombro
   ['Press militar con barra', 'hombro', 'c', 'empuje-v', 'barra', 0, 'ohp'],
@@ -89,17 +89,62 @@ const EX_LIST = [
   ['Elevación de talones sentado', 'pantorrilla', 'a', 'pantorrilla', 'maq', 0, 'calf'],
   ['Elevación de talones en prensa', 'pantorrilla', 'a', 'pantorrilla', 'maq', 1, 'calf'],
   ['Donkey calf raise', 'pantorrilla', 'a', 'pantorrilla', 'corporal', 0, 'calf'],
+  // En casa / poco equipo
+  ['Lagartijas', 'pecho', 'c', 'empuje-h', 'corporal', 1, 'bench'],
+  ['Lagartijas inclinadas (manos en banco)', 'pecho', 'c', 'empuje-h', 'corporal', 1, 'bench'],
+  ['Press de piso con mancuernas', 'pecho', 'c', 'empuje-h', 'manc', 1, 'bench'],
+  ['Sentadilla sin peso', 'pierna', 'c', 'sentadilla', 'corporal', 1, 'squat'],
+  ['Zancadas sin peso', 'pierna', 'c', 'zancada', 'corporal', 1, 'lunge'],
+  ['Zancadas con barra', 'pierna', 'c', 'zancada', 'barra', 0, 'lunge'],
+  ['Subidas al banco con mancuernas', 'pierna', 'c', 'zancada', 'manc', 1, 'lunge'],
+  ['Puente de glúteo', 'gluteo', 'a', 'gluteo', 'corporal', 1, 'hipthrust'],
+  ['Puente de glúteo con barra', 'gluteo', 'c', 'gluteo', 'barra', 0, 'hipthrust'],
+  ['Puente de glúteo a una pierna', 'gluteo', 'a', 'gluteo', 'corporal', 1, 'hipthrust'],
+  ['Patada de glúteo en el suelo', 'gluteo', 'a', 'gluteo', 'corporal', 1, 'hipthrust'],
+  ['Peso muerto rumano con barra', 'femoral', 'c', 'bisagra', 'barra', 0, 'hinge'],
+  ['Fondos en banco', 'triceps', 'c', 'triceps-c', 'corporal', 1, 'dip'],
+  ['Remo invertido', 'espalda', 'c', 'remo', 'fija', 0, 'row'],
+  ['Remo con dos mancuernas', 'espalda', 'c', 'remo', 'manc', 1, 'row'],
+  ['Superman', 'espalda', 'a', 'lumbar', 'corporal', 1, 'backext'],
+  ['Crunch en el suelo', 'abdomen', 'a', 'abdomen', 'corporal', 1, 'abs'],
+  ['Dead bug', 'abdomen', 'a', 'abdomen', 'corporal', 1, 'abs'],
   ['Crunch en polea', 'abdomen', 'a', 'abdomen', 'polea', 1, 'abs'],
   ['Crunch abdominal (máquina)', 'abdomen', 'a', 'abdomen', 'maq', 1, 'abs'],
   ['Torso rotation (máquina)', 'abdomen', 'a', 'abdomen', 'maq', 1, 'rotation'],
-  ['Elevaciones de piernas colgado', 'abdomen', 'a', 'abdomen', 'corporal', 1, 'abs'],
+  ['Elevaciones de piernas colgado', 'abdomen', 'a', 'abdomen', 'fija', 1, 'abs'],
   ['Plancha', 'abdomen', 'a', 'abdomen', 'corporal', 1, 'plank']
 ];
 
 const EX = {};
 EX_LIST.forEach(([n, g, t, p, e, pf, icon]) => { EX[n] = { g, t, p, e, pf: !!pf, icon }; });
 
-const EQUIP = { barra: 'Barra', manc: 'Mancuernas', maq: 'Máquina', polea: 'Polea', smith: 'Smith', corporal: 'Peso corporal' };
+const EQUIP = { barra: 'Barra', manc: 'Mancuernas', maq: 'Máquina', polea: 'Polea', smith: 'Smith', fija: 'Barra fija / paralelas', corporal: 'Peso corporal' };
+
+/** Dónde entrena el usuario → qué equipo tiene. Se puede ajustar a mano en Más. */
+const GYM_PRESETS = {
+  pf: { name: 'Planet Fitness', ico: '🟣', equip: ['maq', 'polea', 'smith', 'manc', 'fija', 'corporal'] },
+  completo: { name: 'Gimnasio completo', ico: '🏋️', equip: ['barra', 'manc', 'maq', 'polea', 'smith', 'fija', 'corporal'] },
+  casa: { name: 'En casa', ico: '🏠', equip: ['manc', 'corporal'] },
+  nada: { name: 'Sin equipo', ico: '🤸', equip: ['corporal'] }
+};
+
+/**
+ * Molestias o lesiones: qué ejercicios conviene evitar con cada una.
+ * La app los cambia por una alternativa que no cargue esa zona (o avisa si no hay).
+ */
+const LIMITS = {
+  rodilla: { name: 'Rodilla', ico: '🦵', patterns: ['sentadilla', 'zancada', 'ext-cuad'], ex: [], tip: 'Prioriza puente de glúteo, curl femoral y prensa con rango corto y sin dolor.' },
+  hombro: { name: 'Hombro', ico: '💪', patterns: ['empuje-v', 'fondos', 'remo-cuello', 'elev-front'], ex: ['Press banca con barra', 'Press inclinado con barra', 'Dominadas / chin-ups', 'Press banca agarre cerrado', 'Fondos en banco'], tip: 'Mancuernas y máquinas con agarre neutro suelen ser más amables con el hombro.' },
+  espalda: { name: 'Espalda baja', ico: '🔙', patterns: ['bisagra', 'lumbar'], ex: ['Sentadilla con barra', 'Remo con barra', 'Press militar con barra', 'Zancadas con barra', 'Remo inclinado con mancuernas'], tip: 'Elige versiones con apoyo de pecho o espalda (máquinas, banco inclinado).' },
+  muneca: { name: 'Muñeca', ico: '✋', patterns: [], ex: ['Press francés', 'Curl con barra de pie', 'Lagartijas', 'Lagartijas inclinadas (manos en banco)', 'Fondos en banco', 'Fondos en paralelas (con lastre)', 'Press banca agarre cerrado'], tip: 'Agarre neutro (martillo) y máquinas reducen la carga en la muñeca.' },
+  codo: { name: 'Codo', ico: '🦾', patterns: [], ex: ['Press francés', 'Press banca agarre cerrado', 'Fondos en banco', 'Fondos en paralelas (con lastre)', 'Fondos asistidos (máquina)'], tip: 'Tríceps en polea con cuerda suele molestar menos.' },
+  impacto: { name: 'Sin impacto / saltos', ico: '🚫', patterns: [], ex: [], tip: 'La app no incluye saltos, burpees ni ejercicios de impacto.' }
+};
+function limitsFor(name, limits) {
+  const x = EX[name];
+  if (!x) return [];
+  return (limits || []).filter(k => LIMITS[k] && (LIMITS[k].patterns.includes(x.p) || LIMITS[k].ex.includes(name)));
+}
 
 const GROUPS = {
   pecho: 'Pecho', espalda: 'Espalda', hombro: 'Hombro', biceps: 'Bíceps', triceps: 'Tríceps',
@@ -166,6 +211,24 @@ function exIcon(name, size) {
  *  Fuente: Free Exercise DB (github.com/yuhonas/free-exercise-db), dominio público (Unlicense).
  * ------------------------------------------------------------------ */
 const EX_PHOTO = {
+  "Lagartijas": "Pushups",
+  "Lagartijas inclinadas (manos en banco)": "Incline_Push-Up",
+  "Press de piso con mancuernas": "Dumbbell_Floor_Press",
+  "Sentadilla sin peso": "Bodyweight_Squat",
+  "Zancadas sin peso": "Bodyweight_Walking_Lunge",
+  "Zancadas con barra": "Barbell_Lunge",
+  "Subidas al banco con mancuernas": "Dumbbell_Step_Ups",
+  "Puente de glúteo": "Butt_Lift_Bridge",
+  "Puente de glúteo con barra": "Barbell_Glute_Bridge",
+  "Puente de glúteo a una pierna": "Single_Leg_Glute_Bridge",
+  "Patada de glúteo en el suelo": "Glute_Kickback",
+  "Peso muerto rumano con barra": "Romanian_Deadlift",
+  "Fondos en banco": "Bench_Dips",
+  "Remo invertido": "Inverted_Row",
+  "Remo con dos mancuernas": "Bent_Over_Two-Dumbbell_Row",
+  "Superman": "Superman",
+  "Crunch en el suelo": "Crunches",
+  "Dead bug": "Dead_Bug",
   "Sentadilla con barra": "Barbell_Squat",
   "Sentadilla en Smith": "Smith_Machine_Squat",
   "Hack squat": "Hack_Squat",
@@ -272,6 +335,12 @@ const HOWTO = {
   abdomen: [['Contrae el abdomen antes de empezar.', 'Enrolla el torso llevando las costillas hacia la cadera.', 'Regresa despacio sin perder la tensión.'], 'Jalar con los brazos o el cuello.']
 };
 const HOWTO_EX = {
+  'Lagartijas': [['Manos un poco más abiertas que los hombros y cuerpo recto de cabeza a talones.', 'Baja el pecho hasta casi tocar el suelo con los codos a ~45°.', 'Empuja hasta estirar los brazos sin hundir la cadera.'], 'Dejar caer la cadera o abrir los codos a 90°.'],
+  'Lagartijas inclinadas (manos en banco)': [['Manos en un banco o mesa firme, cuerpo recto.', 'Baja el pecho hacia el borde.', 'Empuja hasta estirar los brazos.'], 'Arquear la espalda baja.'],
+  'Superman': [['Acostado boca abajo con brazos estirados al frente.', 'Levanta brazos, pecho y piernas a la vez unos centímetros.', 'Aguanta 2 segundos y baja despacio.'], 'Echar la cabeza hacia atrás.'],
+  'Dead bug': [['Boca arriba con brazos al techo y rodillas a 90°.', 'Estira un brazo y la pierna contraria sin despegar la espalda baja del suelo.', 'Regresa y alterna.'], 'Arquear la espalda baja.'],
+  'Remo invertido': [['Acuéstate bajo una barra firme (o mesa) y agárrala con los brazos estirados.', 'Con el cuerpo recto, jala el pecho hacia la barra.', 'Baja despacio.'], 'Dejar caer la cadera.'],
+  'Fondos en banco': [['Manos en el borde de un banco detrás de ti, piernas al frente.', 'Baja flexionando los codos hasta ~90°.', 'Empuja hasta estirar los brazos.'], 'Bajar demasiado: estresa el hombro.'],
   'Plancha': [['Antebrazos bajo los hombros y cuerpo en línea recta de cabeza a talones.', 'Aprieta abdomen y glúteos.', 'Aguanta el tiempo indicado respirando normal.'], 'Dejar caer la cadera o levantarla demasiado.'],
   'Elevaciones de piernas colgado': [['Cuélgate de la barra con los brazos estirados.', 'Sube las piernas (rectas o con rodillas flexionadas) hasta la altura de la cadera o más.', 'Baja despacio sin balancearte.'], 'Usar impulso con el cuerpo.'],
   'Torso rotation (máquina)': [['Siéntate con el torso fijo en la máquina (en la foto, versión con polea).', 'Gira el torso hacia un lado usando el abdomen.', 'Regresa despacio y repite hacia el otro lado.'], 'Girar con los brazos en lugar del tronco.'],
@@ -307,7 +376,7 @@ function substitutes(name) {
   const same = all.filter(n => EX[n].p === me.p).sort(pf);
   const near = all.filter(n => (RELATED[me.p] || []).includes(EX[n].p)).sort(pf);
   const group = all.filter(n => EX[n].g === me.g && !same.includes(n) && !near.includes(n)).sort(pf);
-  return same.concat(near, group).slice(0, 8);
+  return same.concat(near, group);
 }
 
 /* Máquinas típicas de Planet Fitness (el equipo varía por sucursal). */
