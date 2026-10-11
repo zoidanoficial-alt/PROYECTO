@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ministerios · Tiempo de Gracia</title>
+<meta name="description" content="Conoce los ministerios de la Iglesia Cristiana Tiempo de Gracia en Naucalpan y encuentra tu lugar para servir.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Ministerios · Tiempo de Gracia">
+<meta property="og:description" content="Conoce los ministerios de la Iglesia Cristiana Tiempo de Gracia en Naucalpan y encuentra tu lugar para servir.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: titular grande, lista de ministerios en filas (nombre, descripción, acciones) y formulario para quien quiere servir. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #b9690f;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 4px 2px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 8px 9px; border-radius: 8px; white-space: nowrap; }
+.menu-btn { display: none; margin-inline-start: auto; font: 600 15px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 9px 18px; cursor: pointer; }
+@media (max-width: 760px) {
+  header.top { column-gap: 10px; }
+  .brand { font-size: 20px; }
+  .menu-btn { display: inline-flex; padding: 8px 14px; }
+  .top-links { display: none; flex-direction: column; align-items: stretch; padding: 8px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+  .top-links.open { display: flex; }
+  .top-links .back { padding: 12px; font-size: 18px; }
+  .top-links .pill { text-align: center; margin-top: 6px; }
+}
+.back[aria-current="page"] { color: var(--magenta); }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+/* Titular y lista de ministerios en filas */
+h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); font-weight: 500; text-transform: uppercase; font-size: clamp(46px, 11vw, 160px); line-height: 0.98; letter-spacing: -0.04em; overflow-wrap: anywhere; }
+.lead { font-size: clamp(19px, 2.2vw, 23px); max-width: 36em; }
+.beta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin-top: 28px; padding: 12px 16px; border-radius: 12px; background: color-mix(in srgb, var(--amber) 14%, var(--surface)); border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); font-size: 15px; max-width: 46em; }
+.beta b { color: var(--amber); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; }
+.mins { list-style: none; margin: 40px 0 0; padding: 0; border-top: 1px solid var(--line); counter-reset: m; }
+.min { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) 230px; gap: 8px 32px; align-items: baseline; padding-block: 26px; border-bottom: 1px solid var(--line); }
+.min h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 3.6vw, 40px); line-height: 1.05; letter-spacing: -0.02em; }
+.min h2 small { display: block; margin-top: 6px; font: 600 12px var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.min p { color: var(--muted); max-width: 40em; }
+.min .acts { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: flex-end; }
+.link { font: 600 15px var(--font-body); color: var(--fg); text-decoration: none; border-bottom: 1.5px solid var(--fg); padding-bottom: 2px; white-space: nowrap; background: none; border-top: 0; border-left: 0; border-right: 0; cursor: pointer; }
+.link:hover { color: var(--blue); border-color: var(--blue); }
+.link.serve { color: var(--magenta); border-color: var(--magenta); }
+@media (max-width: 760px) { .min { grid-template-columns: 1fr; } .min .acts { justify-content: flex-start; } }
+
+/* Formulario */
+.signup { margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+.signup h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 10px; text-wrap: balance; }
+.signup .intro { color: var(--muted); max-width: 52ch; margin-bottom: 30px; }
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 16px; }
+.field { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 17px; color: var(--muted); }
+.field label b { color: var(--magenta); font-weight: 600; }
+.control { width: 100%; font: 400 17px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; padding: 14px 16px; min-height: 52px; }
+textarea.control { min-height: 150px; resize: vertical; }
+.control::placeholder { color: color-mix(in srgb, var(--fg) 50%, transparent); }
+.control:focus-visible, .tel:focus-within { outline: 3px solid var(--amber); outline-offset: 2px; }
+.sel { position: relative; }
+.sel select { appearance: none; -webkit-appearance: none; padding-inline-end: 46px; cursor: pointer; }
+.sel::after { content: ""; position: absolute; right: 18px; top: 50%; margin-top: -3px; border: 6px solid transparent; border-top-color: var(--fg); border-bottom: 0; pointer-events: none; }
+.tel { display: flex; align-items: center; min-height: 52px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; }
+.tel .cc { display: inline-flex; align-items: center; gap: 8px; padding-inline: 16px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tel .control { border: 0; background: transparent; min-height: 50px; padding-inline-start: 4px; outline: none; font-variant-numeric: tabular-nums; }
+.hint { font-size: 14px; color: var(--muted); }
+.form .actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; cursor: pointer; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--blue); }
+.result { grid-column: 1 / -1; padding: 22px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 14px; }
+.result h3 { margin: 0; font: 700 22px var(--font-display); letter-spacing: -0.01em; }
+.result pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 15px/1.55 var(--font-body); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.result .row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px 40px; margin: 56px 0 0; padding-top: 32px; border-top: 1px solid var(--line); }
+.facts dt { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.facts dd { margin: 6px 0 0; font-size: 20px; }
+
+@media (max-width: 760px) {
+  .form { grid-template-columns: 1fr; }
+  .top-links { margin-inline-start: 0; width: 100%; }
+}
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+@media (prefers-reduced-motion: reduce) {
+  .pill-track { animation: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="top-links">Menú</button>
+    <div class="top-links" id="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="primer-paso.html">Tu primer paso</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="transforma.html">Transforma</a>
+      <a class="back" href="capsulas.html">Cápsulas</a>
+      <a class="back" href="series.html">Series</a>
+      <a class="back" href="eventos.html">Eventos</a>
+      <a class="back" href="donativos.html">Donativos</a>
+      <a class="pill" href="#servir">Quiero servir</a>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="big">Ministerios</h1>
+    <p class="lead">En Tiempo de Gracia cada persona tiene un lugar para servir. Conoce los ministerios de la iglesia y encuentra el tuyo.</p>
+    <p class="beta" role="note"><b>Versión de prueba</b> <span>Lista para revisar con los pastores: los nombres y descripciones pueden cambiar.</span></p>
+
+    <ul class="mins">
+      <li class="min" id="m-jovenes">
+        <h2>Transforma<small>Jóvenes</small></h2>
+        <p>El grupo de jóvenes: amistad, Palabra y alabanza para vivir la fe en esta etapa.</p>
+        <div class="acts"><a class="link" href="transforma.html">Ver más</a><button class="link serve" type="button" data-min="Transforma">Quiero servir aquí</button></div>
+      </li>
+      <li class="min" id="m-alabanza">
+        <h2>Alabanza<small>Música y adoración</small></h2>
+        <p>Músicos y voces que guían a la iglesia en la adoración cada domingo.</p>
+        <div class="acts"><button class="link serve" type="button" data-min="Alabanza">Quiero servir aquí</button></div>
+      </li>
+      <li class="min" id="m-ninos">
+        <h2>Niños<small>Escuela dominical</small></h2>
+        <p>Enseñanza bíblica para los más pequeños mientras sus papás están en el culto.</p>
+        <div class="acts"><button class="link serve" type="button" data-min="Niños">Quiero servir aquí</button></div>
+      </li>
+      <li class="min" id="m-intercesion">
+        <h2>Intercesión<small>Oración</small></h2>
+        <p>Un equipo que ora por las peticiones de la iglesia y de quienes nos escriben.</p>
+        <div class="acts"><a class="link" href="oracion.html">Ver más</a><button class="link serve" type="button" data-min="Intercesión">Quiero servir aquí</button></div>
+      </li>
+      <li class="min" id="m-bienvenida">
+        <h2>Bienvenida<small>Recibir a los que llegan</small></h2>
+        <p>Saludar, orientar y acompañar a quienes nos visitan por primera vez.</p>
+        <div class="acts"><a class="link" href="primer-paso.html">Ver más</a><button class="link serve" type="button" data-min="Bienvenida">Quiero servir aquí</button></div>
+      </li>
+      <li class="min" id="m-medios">
+        <h2>Medios<small>Redes y transmisión</small></h2>
+        <p>Fotos, video, redes sociales y transmisiones para llevar el mensaje más lejos.</p>
+        <div class="acts"><a class="link" href="capsulas.html">Ver más</a><button class="link serve" type="button" data-min="Medios">Quiero servir aquí</button></div>
+      </li>
+    </ul>
+
+    <section class="signup" id="servir">
+      <h2>¿Quieres servir?</h2>
+      <p class="intro">Elige el ministerio que te interesa y déjanos tus datos. El líder del ministerio te contactará. Los campos con <b style="color:var(--magenta)">*</b> son obligatorios.</p>
+      <form class="form" id="form" novalidate>
+        <div class="field full">
+          <label for="ministerio">Ministerio <b>*</b></label>
+          <div class="sel">
+            <select class="control" id="ministerio" name="ministerio" required>
+              <option value="" selected disabled>Selecciona un ministerio</option>
+              <option>Transforma</option><option>Alabanza</option><option>Niños</option><option>Intercesión</option><option>Bienvenida</option><option>Medios</option>
+              <option>Aún no sé, quiero orientación</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="nombre">Nombre <b>*</b></label>
+          <input class="control" id="nombre" name="nombre" type="text" autocomplete="given-name" required>
+        </div>
+        <div class="field">
+          <label for="apellidos">Apellidos <b>*</b></label>
+          <input class="control" id="apellidos" name="apellidos" type="text" autocomplete="family-name" required>
+        </div>
+        <div class="field full">
+          <label for="celular">Celular <b>*</b></label>
+          <div class="tel">
+            <span class="cc" aria-hidden="true">
+              <svg width="22" height="15" viewBox="0 0 22 15" role="img" aria-label="México"><rect width="7.4" height="15" fill="#006847"/><rect x="7.3" width="7.4" height="15" fill="#ffffff"/><rect x="14.6" width="7.4" height="15" fill="#ce1126"/></svg>
+              +52
+            </span>
+            <input class="control" id="celular" name="celular" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="55 1234 5678" required>
+          </div>
+        </div>
+        <div class="field full">
+          <label for="mensaje">Cuéntanos un poco de ti</label>
+          <textarea class="control" id="mensaje" name="mensaje" placeholder="Por ejemplo, si tocas algún instrumento, tu experiencia o tus horarios."></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Continuar</button>
+        </div>
+        <div class="result" id="result" hidden>
+          <h3>Tu mensaje está listo</h3>
+          <p>Revísalo y envíalo. Aquí no se guarda nada.</p>
+          <p id="ig-hint" hidden>Copia el mensaje y pégalo en un mensaje directo a nuestro Instagram.</p>
+          <pre id="msg"></pre>
+          <div class="row">
+            <a class="btn" id="wa" href="#" target="_blank" rel="noopener" hidden>Enviar por WhatsApp <span aria-hidden="true">&#8599;</span></a>
+            <a class="btn" id="ig" href="https://ig.me/m/tiempodegraciamexico" target="_blank" rel="noopener" hidden>Enviar por Instagram <span aria-hidden="true">&#8599;</span></a>
+            <button class="btn ghost" id="copy" type="button">Copiar mensaje</button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script>
+(function () {
+  // Menú en celular
+  var menuBtn = document.getElementById("menu-btn"), links = document.getElementById("top-links");
+  menuBtn.addEventListener("click", function () {
+    var open = !links.classList.contains("open");
+    links.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    menuBtn.textContent = open ? "Cerrar" : "Menú";
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && links.classList.contains("open")) { menuBtn.click(); menuBtn.focus(); }
+  });
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+
+  // Formulario: arma el mensaje con lo que escribió la persona. No se guarda ni se envía solo.
+  var WHATSAPP = ""; // número de la iglesia con lada, solo dígitos (ej. 5215512345678)
+  var form = document.getElementById("form"), result = document.getElementById("result");
+  var msg = document.getElementById("msg"), wa = document.getElementById("wa"), copyBtn = document.getElementById("copy");
+  var ig = document.getElementById("ig"), igHint = document.getElementById("ig-hint"), cel = document.getElementById("celular");
+  var sel = document.getElementById("ministerio");
+  function val(id) { return (document.getElementById(id).value || "").trim(); }
+  function celDigits() { return val("celular").replace(/\D/g, ""); }
+  cel.addEventListener("input", function () { cel.setCustomValidity(""); });
+  // "Quiero servir aquí" elige el ministerio y baja al formulario
+  document.querySelectorAll("[data-min]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      sel.value = b.getAttribute("data-min");
+      document.getElementById("servir").scrollIntoView({ behavior: "smooth" });
+      setTimeout(function () { document.getElementById("nombre").focus({ preventScroll: true }); }, 400);
+    });
+  });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    cel.setCustomValidity(celDigits() && celDigits().length !== 10 ? "Escribe tu número a 10 dígitos." : "");
+    if (!form.reportValidity()) return;
+    var lines = ["Hola, soy " + val("nombre") + " " + val("apellidos") + " y me gustaría servir en el ministerio: " + val("ministerio") + ".",
+      "Celular: +52 " + celDigits()];
+    if (val("mensaje")) lines.push(val("mensaje"));
+    var text = lines.join("\n");
+    msg.textContent = text;
+    var digits = WHATSAPP.replace(/\D/g, "");
+    if (digits) { wa.href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(text); wa.hidden = false; }
+    else { ig.hidden = false; igHint.hidden = false; } // sin número de WhatsApp todavía: enviar por Instagram
+    result.hidden = false;
+    result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  copyBtn.addEventListener("click", function () {
+    function done() { copyBtn.textContent = "Copiado"; setTimeout(function () { copyBtn.textContent = "Copiar mensaje"; }, 1600); }
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(msg);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      try { document.execCommand("copy"); done(); } catch (err) {}
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(msg.textContent).then(done, fallback); } else { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>

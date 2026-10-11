@@ -62,8 +62,18 @@ header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 
 .theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
 .theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
 .theme[aria-pressed="true"]::after { transform: translateX(24px); }
-.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
-.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 10px 12px; border-radius: 8px; }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 4px 2px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 8px 9px; border-radius: 8px; white-space: nowrap; }
+.menu-btn { display: none; margin-inline-start: auto; font: 600 15px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 9px 18px; cursor: pointer; }
+@media (max-width: 760px) {
+  header.top { column-gap: 10px; }
+  .brand { font-size: 20px; }
+  .menu-btn { display: inline-flex; padding: 8px 14px; }
+  .top-links { display: none; flex-direction: column; align-items: stretch; padding: 8px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+  .top-links.open { display: flex; }
+  .top-links .back { padding: 12px; font-size: 18px; }
+  .top-links .pill { text-align: center; margin-top: 6px; }
+}
 .back[aria-current="page"] { color: var(--magenta); }
 .back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
 .pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
@@ -152,10 +162,13 @@ textarea.control { min-height: 150px; resize: vertical; }
   <header class="top">
     <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
     <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
-    <div class="top-links">
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="top-links">Menú</button>
+    <div class="top-links" id="top-links">
       <a class="back" href="index.html">&larr; Inicio</a>
       <a class="back" href="primer-paso.html">Tu primer paso</a>
       <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="capsulas.html">Cápsulas</a>
+      <a class="back" href="ministerios.html">Ministerios</a>
       <a class="back" href="series.html">Series</a>
       <a class="back" href="eventos.html">Eventos</a>
       <a class="back" href="donativos.html">Donativos</a>
@@ -271,6 +284,17 @@ textarea.control { min-height: 150px; resize: vertical; }
 </div>
 <script>
 (function () {
+  // Menú en celular
+  var menuBtn = document.getElementById("menu-btn"), links = document.getElementById("top-links");
+  menuBtn.addEventListener("click", function () {
+    var open = !links.classList.contains("open");
+    links.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    menuBtn.textContent = open ? "Cerrar" : "Menú";
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && links.classList.contains("open")) { menuBtn.click(); menuBtn.focus(); }
+  });
   var root = document.documentElement, btn = document.getElementById("theme");
   try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
   function isDark() {
