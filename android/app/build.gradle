@@ -1,0 +1,22 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "mx.tiempodegracia.app"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "mx.tiempodegracia.app"
+        minSdk 26
+        targetSdk 34
+        // GitHub Actions pasa el número de compilación para que cada APK nuevo sea una versión mayor
+        versionCode Integer.parseInt(System.getenv("VERSION_CODE") ?: "1")
+        versionName "1.0." + (System.getenv("VERSION_CODE") ?: "1")
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
