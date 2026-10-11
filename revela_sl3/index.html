@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Revela SL3</title>
+  <meta name="description" content="Revelado rápido de fotos para la Canon EOS Rebel SL3, con asistente de IA para fotos de huevos.">
+  <meta name="theme-color" content="#151618">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header id="top">
+    <div class="brand">Revela<b>SL3</b></div>
+    <nav class="modules">
+      <button data-view="library">Biblioteca</button>
+      <button data-view="develop" class="on">Revelar</button>
+    </nav>
+    <div class="actions">
+      <label class="btn">Importar<input id="fileInput" type="file" multiple accept=".cr3,.CR3,.jpg,.jpeg,.png,.webp,.heic,image/*" hidden></label>
+      <label class="btn hide-sm">Carpeta<input id="dirInput" type="file" webkitdirectory hidden></label>
+      <button id="exportBtn" class="btn primary" disabled>Exportar</button>
+      <button id="helpBtn" class="btn icon" title="Atajos de teclado">?</button>
+    </div>
+  </header>
+
+  <main id="app">
+    <aside id="left" class="side">
+      <details open class="panel">
+        <summary>Ajustes preestablecidos</summary>
+        <div id="presets" class="presets"></div>
+        <div class="row">
+          <button id="savePreset" class="btn small">Guardar ajustes actuales…</button>
+        </div>
+      </details>
+      <details open class="panel">
+        <summary>Historial</summary>
+        <ol id="history" class="history"></ol>
+      </details>
+      <details open class="panel">
+        <summary>Metadatos</summary>
+        <dl id="meta" class="meta"><dt>—</dt><dd>Sin foto</dd></dl>
+      </details>
+    </aside>
+
+    <section id="center">
+      <div id="toolbar">
+        <button id="beforeBtn" class="tool" title="Mantén presionado para ver el original (\)">Antes/Después</button>
+        <button id="cropBtn" class="tool" title="Recortar y enderezar (R)">Recortar</button>
+        <button id="zoomBtn" class="tool" title="Ver a resolución completa 1:1 (Z)">1:1</button>
+        <button id="autoBtn" class="tool" title="Tono automático (Shift+A)">Auto</button>
+        <span class="sep"></span>
+        <button id="undoBtn" class="tool" title="Deshacer (Ctrl+Z)">↶</button>
+        <button id="redoBtn" class="tool" title="Rehacer (Ctrl+Shift+Z)">↷</button>
+        <button id="copyBtn" class="tool" title="Copiar ajustes (Ctrl+C)">Copiar</button>
+        <button id="pasteBtn" class="tool" title="Pegar ajustes (Ctrl+V)">Pegar</button>
+        <button id="syncBtn" class="tool" title="Sincronizar ajustes con las fotos seleccionadas">Sincronizar</button>
+        <button id="resetBtn" class="tool" title="Restablecer todo">Restablecer</button>
+        <span id="status" class="status"></span>
+      </div>
+      <div id="stage">
+        <div id="canvasWrap">
+          <canvas id="view"></canvas>
+          <div id="cropLayer" hidden></div>
+          <div id="beforeTag" hidden>ANTES</div>
+        </div>
+        <div id="drop">
+          <div>
+            <h2>Arrastra aquí tus fotos de la SL3</h2>
+            <p>CR3 (RAW), JPEG, PNG o WebP. También puedes importar la carpeta <code>DCIM/100CANON</code> de la tarjeta SD.</p>
+            <p class="muted">Todo se procesa en tu equipo: las fotos no se suben a ningún servidor.</p>
+            <label class="btn primary">Elegir fotos<input id="fileInput2" type="file" multiple accept=".cr3,.CR3,.jpg,.jpeg,.png,.webp,.heic,image/*" hidden></label>
+          </div>
+        </div>
+      </div>
+      <div id="library" hidden>
+        <div class="lib-bar">
+          <label>Mostrar: <select id="filter">
+            <option value="all">Todas</option>
+            <option value="picks">Elegidas</option>
+            <option value="1">★ o más</option>
+            <option value="3">★★★ o más</option>
+            <option value="5">★★★★★</option>
+            <option value="norej">Sin rechazadas</option>
+          </select></label>
+          <span id="libCount" class="muted"></span>
+        </div>
+        <div id="grid" class="grid"></div>
+      </div>
+    </section>
+
+    <aside id="right" class="side">
+      <div class="panel histo-panel">
+        <canvas id="histo" width="512" height="200"></canvas>
+        <div id="histoInfo" class="histo-info"></div>
+      </div>
+
+      <details open class="panel ai">
+        <summary>Asistente IA · huevos</summary>
+        <div class="row">
+          <label>Tema
+            <select id="subject"></select>
+          </label>
+        </div>
+        <div id="score" class="score"></div>
+        <div class="row wrap">
+          <button id="applyAdvice" class="btn small primary" disabled>Aplicar sugerencias</button>
+          <button id="speakBtn" class="btn small" disabled>🔊 Dictar consejos</button>
+        </div>
+        <ul id="advice" class="advice"></ul>
+        <div class="claude">
+          <h4>Análisis profundo con Claude</h4>
+          <p class="muted small">Envía una copia reducida de la foto (no el original) a Claude para un diagnóstico visual y ajustes a la medida.</p>
+          <div class="row wrap">
+            <button id="aiBtn" class="btn small primary" disabled>Analizar con Claude</button>
+            <button id="keyBtn" class="btn small">Clave de API</button>
+          </div>
+          <div id="aiOut" class="ai-out"></div>
+          <div class="row ask">
+            <input id="askInput" type="text" placeholder="Pregunta: ¿cómo evito el reflejo en el cascarón?">
+            <button id="askBtn" class="btn small" disabled>Preguntar</button>
+          </div>
+        </div>
+      </details>
+
+      <details open class="panel">
+        <summary>Básicos</summary>
+        <div class="row treat">
+          <span>Tratamiento</span>
+          <div class="seg"><button id="tColor" class="on">Color</button><button id="tBw">B y N</button></div>
+        </div>
+        <div class="row">
+          <span>Balance de blancos</span>
+          <button id="wbPick" class="btn small" title="Gotero: haz clic en algo blanco o gris (W)">Gotero</button>
+          <button id="wbAuto" class="btn small">Auto</button>
+        </div>
+        <div id="sl-basic" class="sliders"></div>
+        <div class="row"><button id="autoBtn2" class="btn small">Tono automático</button></div>
+        <h4 class="sub">Presencia</h4>
+        <div id="sl-presence" class="sliders"></div>
+      </details>
+
+      <details class="panel">
+        <summary>Curva de tonos</summary>
+        <div class="seg chans">
+          <button data-ch="master" class="on">RGB</button><button data-ch="r">R</button><button data-ch="g">G</button><button data-ch="b">B</button>
+        </div>
+        <canvas id="curve" width="256" height="256"></canvas>
+        <p class="muted small">Clic para añadir punto · arrastra · doble clic para borrar.</p>
+        <button id="curveReset" class="btn small">Restablecer curva</button>
+      </details>
+
+      <details class="panel">
+        <summary>HSL / Color</summary>
+        <div class="seg hsl-tabs">
+          <button data-t="hslHue" class="on">Tono</button><button data-t="hslSat">Saturación</button><button data-t="hslLum">Luminancia</button>
+        </div>
+        <div id="sl-hsl" class="sliders"></div>
+      </details>
+
+      <details class="panel">
+        <summary>Detalle</summary>
+        <div id="sl-detail" class="sliders"></div>
+        <p class="muted small">Tip: mantén Alt (Option) al mover “Máscara” para ver qué zonas se enfocan.</p>
+      </details>
+
+      <details class="panel">
+        <summary>Efectos</summary>
+        <div id="sl-effects" class="sliders"></div>
+      </details>
+
+      <details class="panel" id="cropPanel">
+        <summary>Recortar y enderezar</summary>
+        <div class="row"><label>Proporción <select id="aspect"></select></label></div>
+        <div id="sl-angle" class="sliders"></div>
+        <div class="row wrap">
+          <button id="rotL" class="btn small">⟲ 90°</button>
+          <button id="rotR" class="btn small">⟳ 90°</button>
+          <button id="cropReset" class="btn small">Restablecer</button>
+          <button id="cropDone" class="btn small primary">Listo</button>
+        </div>
+      </details>
+    </aside>
+  </main>
+
+  <footer id="filmstrip"></footer>
+
+  <dialog id="exportDlg">
+    <form method="dialog">
+      <h3>Exportar</h3>
+      <label>Fotos
+        <select id="exScope">
+          <option value="current">Foto actual</option>
+          <option value="selected">Seleccionadas en la tira</option>
+          <option value="all">Todas (según filtro)</option>
+        </select>
+      </label>
+      <label>Formato
+        <select id="exFormat">
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/png">PNG</option>
+          <option value="image/webp">WebP</option>
+        </select>
+      </label>
+      <label>Calidad <input id="exQuality" type="range" min="50" max="100" value="92"> <output id="exQualityOut">92</output></label>
+      <label>Tamaño
+        <select id="exSize">
+          <option value="0">Tamaño completo</option>
+          <option value="4096">4096 px lado largo</option>
+          <option value="2048">2048 px lado largo (web / catálogo)</option>
+          <option value="1080">1080 px lado largo (redes)</option>
+        </select>
+      </label>
+      <label>Súper resolución
+        <select id="exSuper">
+          <option value="1">No (1x)</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x (imprimir / ampliar)</option>
+        </select>
+      </label>
+      <label>Nitidez de salida
+        <select id="exSharp">
+          <option value="keep">La del ajuste</option>
+          <option value="0">Ninguna</option>
+          <option value="25">Baja (pantalla)</option>
+          <option value="45">Media</option>
+          <option value="65">Alta (impresión mate)</option>
+        </select>
+      </label>
+      <label><input id="exExif" type="checkbox" checked> Conservar EXIF (JPEG)</label>
+      <label>Sufijo del nombre <input id="exSuffix" type="text" value="_revelada"></label>
+      <p id="exInfo" class="muted small"></p>
+      <progress id="exProgress" value="0" max="1" hidden></progress>
+      <menu>
+        <button value="cancel" class="btn">Cancelar</button>
+        <button id="exGo" value="default" class="btn primary">Exportar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="keyDlg">
+    <form method="dialog">
+      <h3>Clave de API de Anthropic</h3>
+      <p class="small">Consíguela en <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>. Se guarda solo en este navegador y se usa para hablar directo con la API de Claude. No la uses en computadoras compartidas.</p>
+      <input id="keyInput" type="password" placeholder="sk-ant-…" autocomplete="off">
+      <menu>
+        <button value="clear" class="btn">Borrar clave</button>
+        <button value="cancel" class="btn">Cancelar</button>
+        <button value="save" class="btn primary">Guardar</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="helpDlg">
+    <form method="dialog">
+      <h3>Atajos de teclado</h3>
+      <table class="keys">
+        <tr><td>← →</td><td>Foto anterior / siguiente</td></tr>
+        <tr><td>0–5</td><td>Calificación con estrellas</td></tr>
+        <tr><td>P / X / U</td><td>Elegida / rechazada / sin marca</td></tr>
+        <tr><td>\</td><td>Mantén para ver el original</td></tr>
+        <tr><td>R</td><td>Recortar y enderezar</td></tr>
+        <tr><td>Z</td><td>Vista 1:1 (resolución completa)</td></tr>
+        <tr><td>W</td><td>Gotero de balance de blancos</td></tr>
+        <tr><td>Shift + A</td><td>Tono automático</td></tr>
+        <tr><td>G / D</td><td>Biblioteca / Revelar</td></tr>
+        <tr><td>Ctrl + Z / Ctrl + Shift + Z</td><td>Deshacer / rehacer</td></tr>
+        <tr><td>Ctrl + C / Ctrl + V</td><td>Copiar / pegar ajustes</td></tr>
+        <tr><td>Ctrl + E</td><td>Exportar</td></tr>
+        <tr><td>Doble clic en un control</td><td>Regresarlo a 0</td></tr>
+      </table>
+      <menu><button class="btn primary">Cerrar</button></menu>
+    </form>
+  </dialog>
+
+  <div id="toast" hidden></div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,5 +1,9 @@
 # Casandra BMV
 
+> Este repositorio también incluye **[Revela SL3](revela_sl3/README.md)**:
+> un editor de fotos tipo Lightroom para la Canon EOS Rebel SL3 con asistente
+> de IA para fotos de huevos.
+
 Un script que jala precios de emisoras de la Bolsa Mexicana de Valores,
 calcula qué tan "estirados" están (precio vs. tendencia + múltiplos de
 valuación) y manda una alerta redactada en tono de **Casandra**: la

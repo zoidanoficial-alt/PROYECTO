@@ -1,0 +1,17 @@
+{
+  "name": "Revela SL3",
+  "short_name": "Revela SL3",
+  "description": "Revelado rápido de fotos para la Canon EOS Rebel SL3 con asistente de IA para fotos de huevos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#151618",
+  "theme_color": "#151618",
+  "lang": "es-MX",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "file_handlers": [
+    { "action": "./", "accept": { "image/jpeg": [".jpg", ".jpeg"], "image/x-canon-cr3": [".cr3"] } }
+  ]
+}
