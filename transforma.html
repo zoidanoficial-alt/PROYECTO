@@ -72,8 +72,15 @@ header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 
 /* Titular: la palabra TRANSFORMA con las tres luces de escenario del sitio */
 .hero-t { padding-block: 32px 40px; display: grid; gap: 22px; }
 .hero-t .tag { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--magenta); }
-.hero-t h1 { margin: 0; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(40px, 13vw, 150px); line-height: 0.92; letter-spacing: -0.045em; white-space: nowrap; }
-.hero-t h1 span { color: var(--magenta); }
+.hero-t h1 { margin: 0 -20px; overflow: hidden; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(64px, 14vw, 170px); line-height: 0.95; letter-spacing: -0.045em; }
+.t-track { display: flex; width: max-content; animation: slide 22s linear infinite; }
+.t-group { display: flex; align-items: center; flex: none; gap: 0.3em; padding-inline-end: 0.3em; white-space: nowrap; }
+.t-group em { font-style: normal; color: var(--magenta); }
+.t-group i { display: inline-block; width: 0.3em; height: 0.3em; border-radius: 50%; background: var(--amber); flex: none; }
+.t-group i:nth-of-type(2n) { background: var(--blue); }
+.hero-t h1:hover .t-track { animation-play-state: paused; }
+@keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .t-track { animation: none; } }
 .beam { display: flex; height: 10px; border-radius: 5px; overflow: hidden; max-width: 560px; }
 .beam i:nth-child(1) { flex: 3; background: var(--blue); }
 .beam i:nth-child(2) { flex: 2; background: var(--magenta); }
@@ -159,7 +166,12 @@ textarea.control { min-height: 150px; resize: vertical; }
   <main>
     <div class="hero-t">
       <p class="tag">Jóvenes · Tiempo de Gracia</p>
-      <h1>Trans<span>forma</span></h1>
+      <h1 aria-label="Transforma">
+        <span class="t-track" aria-hidden="true">
+          <span class="t-group"><span>Trans<em>forma</em></span><i></i><span>Trans<em>forma</em></span><i></i></span>
+          <span class="t-group"><span>Trans<em>forma</em></span><i></i><span>Trans<em>forma</em></span><i></i></span>
+        </span>
+      </h1>
       <div class="beam" aria-hidden="true"><i></i><i></i><i></i></div>
       <p class="lead">Transforma es el grupo de jóvenes de Tiempo de Gracia. Un lugar para hacer amigos, hablar de lo que de verdad importa y crecer en la fe juntos. Si es tu primera vez, te estamos esperando.</p>
       <div class="cta">
