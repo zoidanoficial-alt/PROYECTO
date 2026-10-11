@@ -64,6 +64,7 @@ header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 
 .theme[aria-pressed="true"]::after { transform: translateX(24px); }
 .top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
 .back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 10px 12px; border-radius: 8px; }
+.back[aria-current="page"] { color: var(--magenta); }
 .back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
 .pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
 .pill:hover { filter: brightness(1.08); }
@@ -143,10 +144,11 @@ textarea.control { min-height: 130px; resize: vertical; }
     <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
     <div class="top-links">
       <a class="back" href="index.html">&larr; Inicio</a>
-      <a class="back" href="#registro">Déjanos tus datos</a>
       <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="transforma.html">Transforma</a>
       <a class="back" href="series.html">Series</a>
       <a class="back" href="eventos.html">Eventos</a>
+      <a class="back" href="donativos.html">Donativos</a>
       <a class="pill" href="index.html#ubicacion">Cómo llegar</a>
     </div>
   </header>

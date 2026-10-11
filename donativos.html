@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Donativos · Tiempo de Gracia</title>
+<meta name="description" content="Formas de dar tu ofrenda y diezmo a la Iglesia Cristiana Tiempo de Gracia en Naucalpan: transferencia, en línea o en persona el domingo.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Donativos · Tiempo de Gracia">
+<meta property="og:description" content="Formas de dar tu ofrenda y diezmo a la Iglesia Cristiana Tiempo de Gracia en Naucalpan: transferencia, en línea o en persona el domingo.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: titular grande, versículo, aviso de versión de prueba y tres formas de dar en filas con sus datos. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #b9690f;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 10px 12px; border-radius: 8px; }
+.back[aria-current="page"] { color: var(--magenta); }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+/* Titular y formas de dar */
+h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); font-weight: 500; text-transform: uppercase; font-size: clamp(50px, 12vw, 168px); line-height: 0.98; letter-spacing: -0.04em; overflow-wrap: anywhere; }
+.lead { font-size: clamp(19px, 2.2vw, 23px); max-width: 36em; }
+.verse { margin: 28px 0 0; padding-left: 18px; border-left: 4px solid var(--magenta); color: var(--muted); font-size: 18px; max-width: 40em; }
+.verse cite { display: block; font-style: normal; font-weight: 600; color: var(--fg); margin-top: 6px; font-size: 15px; }
+.beta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin-top: 32px; padding: 14px 16px; border-radius: 12px; background: color-mix(in srgb, var(--amber) 14%, var(--surface)); border: 1px solid color-mix(in srgb, var(--amber) 45%, transparent); font-size: 15px; }
+.beta b { color: var(--amber); text-transform: uppercase; letter-spacing: 0.1em; font-size: 12px; flex: none; }
+.ways { margin-top: 48px; border-top: 1px solid var(--line); }
+.way { display: grid; grid-template-columns: 260px 1fr; gap: 12px 40px; padding-block: 32px; border-bottom: 1px solid var(--line); }
+.way h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 3vw, 34px); line-height: 1.05; letter-spacing: -0.02em; }
+.way .k { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); display: block; margin-bottom: 8px; }
+.way .body { display: grid; gap: 16px; min-width: 0; }
+.way .body > p { color: var(--muted); max-width: 40em; }
+.bank { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px 32px; }
+.bank dt { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.bank dd { margin: 4px 0 0; font-size: 20px; overflow-wrap: anywhere; }
+.bank .num { font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.tbd { color: var(--muted); font-style: italic; font-family: var(--font-body); font-weight: 400; letter-spacing: 0; }
+.copy-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+@media (max-width: 760px) { .way { grid-template-columns: 1fr; } }
+
+/* Formulario */
+.signup { margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+.signup h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 10px; text-wrap: balance; }
+.signup .intro { color: var(--muted); max-width: 52ch; margin-bottom: 30px; }
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 16px; }
+.field { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 17px; color: var(--muted); }
+.field label b { color: var(--magenta); font-weight: 600; }
+.control { width: 100%; font: 400 17px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; padding: 14px 16px; min-height: 52px; }
+textarea.control { min-height: 150px; resize: vertical; }
+.control::placeholder { color: color-mix(in srgb, var(--fg) 50%, transparent); }
+.control:focus-visible, .tel:focus-within { outline: 3px solid var(--amber); outline-offset: 2px; }
+.sel { position: relative; }
+.sel select { appearance: none; -webkit-appearance: none; padding-inline-end: 46px; cursor: pointer; }
+.sel::after { content: ""; position: absolute; right: 18px; top: 50%; margin-top: -3px; border: 6px solid transparent; border-top-color: var(--fg); border-bottom: 0; pointer-events: none; }
+.tel { display: flex; align-items: center; min-height: 52px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; }
+.tel .cc { display: inline-flex; align-items: center; gap: 8px; padding-inline: 16px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tel .control { border: 0; background: transparent; min-height: 50px; padding-inline-start: 4px; outline: none; font-variant-numeric: tabular-nums; }
+.hint { font-size: 14px; color: var(--muted); }
+.form .actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; cursor: pointer; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--blue); }
+.result { grid-column: 1 / -1; padding: 22px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 14px; }
+.result h3 { margin: 0; font: 700 22px var(--font-display); letter-spacing: -0.01em; }
+.result pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 15px/1.55 var(--font-body); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.result .row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px 40px; margin: 56px 0 0; padding-top: 32px; border-top: 1px solid var(--line); }
+.facts dt { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.facts dd { margin: 6px 0 0; font-size: 20px; }
+
+@media (max-width: 760px) {
+  .form { grid-template-columns: 1fr; }
+  .top-links { margin-inline-start: 0; width: 100%; }
+}
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+@media (prefers-reduced-motion: reduce) {
+  .pill-track { animation: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <div class="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="primer-paso.html">Tu primer paso</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="transforma.html">Transforma</a>
+      <a class="back" href="series.html">Series</a>
+      <a class="back" href="eventos.html">Eventos</a>
+      <a class="pill" href="#transferencia">Dar ahora</a>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="big">Donativos</h1>
+    <p class="lead">Gracias por sembrar en la obra de Dios. Tus ofrendas y diezmos nos ayudan a sostener los cultos, a los jóvenes de Transforma y a servir a nuestra comunidad en Naucalpan.</p>
+    <blockquote class="verse">“Cada uno dé como propuso en su corazón: no con tristeza, ni por necesidad, porque Dios ama al dador alegre.”<cite>2 Corintios 9:7</cite></blockquote>
+
+    <p class="beta" role="note"><b>Versión de prueba</b> <span>Los datos bancarios y el enlace de pago son ejemplos y se completarán cuando los pastores los confirmen. Todavía no hagas transferencias con esta página.</span></p>
+
+    <div class="ways">
+      <section class="way" id="transferencia">
+        <div><span class="k">Opción 1</span><h2>Transferencia bancaria</h2></div>
+        <div class="body">
+          <p>Desde la app de tu banco, con SPEI. En el concepto puedes escribir “Ofrenda” o “Diezmo”.</p>
+          <dl class="bank">
+            <div><dt>Banco</dt><dd class="tbd">Por confirmar</dd></div>
+            <div><dt>Titular</dt><dd class="tbd">Por confirmar</dd></div>
+            <div><dt>CLABE</dt><dd class="num" id="clabe" data-clabe=""><span class="tbd">Por confirmar</span></dd></div>
+          </dl>
+          <div class="copy-row">
+            <button class="btn ghost" id="copy-clabe" type="button" aria-disabled="true">Copiar CLABE</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="way" id="en-linea">
+        <div><span class="k">Opción 2</span><h2>Con tarjeta en línea</h2></div>
+        <div class="body">
+          <p>Paga con tarjeta de débito o crédito desde un enlace seguro (por ejemplo, Mercado Pago o PayPal).</p>
+          <div><a class="btn" id="pay-link" href="#" aria-disabled="true">Dar en línea <span aria-hidden="true">&#8599;</span></a></div>
+          <p class="tbd">El enlace se activará cuando la iglesia tenga su cuenta de pagos.</p>
+        </div>
+      </section>
+
+      <section class="way" id="en-persona">
+        <div><span class="k">Opción 3</span><h2>En persona, el domingo</h2></div>
+        <div class="body">
+          <p>Durante el culto hay un momento para dar tu ofrenda y tu diezmo. Te esperamos los domingos de 11:00 a 14:00 hrs en Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo.</p>
+          <div><a class="btn ghost" href="index.html#ubicacion">Cómo llegar</a></div>
+        </div>
+      </section>
+    </div>
+
+    <dl class="facts">
+      <div><dt>¿Dudas?</dt><dd>Escríbenos por <a href="https://ig.me/m/tiempodegraciamexico" target="_blank" rel="noopener">Instagram</a> y con gusto te ayudamos.</dd></div>
+      <div><dt>Pastores</dt><dd>Pablo y Laura Guerrero</dd></div>
+    </dl>
+  </main>
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+
+  // Datos de donativos: llénalos cuando los pastores los confirmen y los botones se activan solos.
+  var CLABE = "";    // 18 dígitos, sin espacios
+  var PAY_URL = "";  // enlace de Mercado Pago, PayPal, etc.
+  var clabeEl = document.getElementById("clabe"), copyBtn = document.getElementById("copy-clabe"), pay = document.getElementById("pay-link");
+  if (CLABE) {
+    clabeEl.textContent = CLABE.replace(/(\d{3})(\d{3})(\d{11})(\d)/, "$1 $2 $3 $4");
+    copyBtn.removeAttribute("aria-disabled");
+    copyBtn.addEventListener("click", function () {
+      function done() { copyBtn.textContent = "CLABE copiada"; setTimeout(function () { copyBtn.textContent = "Copiar CLABE"; }, 1600); }
+      function fallback() {
+        var r = document.createRange(); r.selectNodeContents(clabeEl);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        try { document.execCommand("copy"); done(); } catch (err) {}
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(CLABE).then(done, fallback); } else { fallback(); }
+    });
+  } else {
+    copyBtn.disabled = true;
+  }
+  if (PAY_URL) {
+    pay.href = PAY_URL; pay.target = "_blank"; pay.rel = "noopener"; pay.removeAttribute("aria-disabled");
+  } else {
+    pay.addEventListener("click", function (e) { e.preventDefault(); });
+    pay.setAttribute("tabindex", "-1");
+  }
+})();
+</script>
+</body>
+</html>

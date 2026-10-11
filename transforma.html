@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transforma · Jóvenes Tiempo de Gracia</title>
+<meta name="description" content="Transforma es el grupo de jóvenes de la Iglesia Cristiana Tiempo de Gracia en Naucalpan. ¿Es tu primera vez? Regístrate y te damos la bienvenida.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Transforma · Jóvenes Tiempo de Gracia">
+<meta property="og:description" content="Transforma es el grupo de jóvenes de la Iglesia Cristiana Tiempo de Gracia en Naucalpan. ¿Es tu primera vez? Regístrate y te damos la bienvenida.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: titular gigante TRANSFORMA con las luces de escenario, cuatro razones en fila, datos de la reunión y el formulario para quienes vienen por primera vez. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #b9690f;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 10px 12px; border-radius: 8px; }
+.back[aria-current="page"] { color: var(--magenta); }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+/* Titular: la palabra TRANSFORMA con las tres luces de escenario del sitio */
+.hero-t { padding-block: 32px 40px; display: grid; gap: 22px; }
+.hero-t .tag { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--magenta); }
+.hero-t h1 { margin: 0; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(40px, 13vw, 150px); line-height: 0.92; letter-spacing: -0.045em; white-space: nowrap; }
+.hero-t h1 span { color: var(--magenta); }
+.beam { display: flex; height: 10px; border-radius: 5px; overflow: hidden; max-width: 560px; }
+.beam i:nth-child(1) { flex: 3; background: var(--blue); }
+.beam i:nth-child(2) { flex: 2; background: var(--magenta); }
+.beam i:nth-child(3) { flex: 1; background: var(--amber); }
+.hero-t .lead { font-size: clamp(19px, 2.2vw, 23px); max-width: 36em; }
+.hero-t .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.what { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0; border-top: 1px solid var(--line); margin-top: 16px; }
+.what div { padding: 22px 20px 22px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.what b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -0.01em; margin-bottom: 4px; }
+.what p { color: var(--muted); font-size: 16px; }
+.facts .tbd { color: var(--muted); font-style: italic; }
+.form .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 16px; border: 0; margin: 0; padding: 0; min-width: 0; }
+.checks legend { font-size: 17px; color: var(--muted); margin-bottom: 8px; padding: 0; }
+.checks label { display: flex; align-items: center; gap: 10px; font-size: 17px; color: var(--fg); background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; padding: 12px 14px; cursor: pointer; }
+.checks input { width: 20px; height: 20px; accent-color: var(--magenta); flex: none; margin: 0; }
+.checks label:has(input:checked) { border-color: var(--magenta); background: color-mix(in srgb, var(--magenta) 10%, var(--surface)); }
+.note-minor { font-size: 15px; color: var(--muted); grid-column: 1 / -1; }
+.note-minor b { color: var(--fg); }
+
+/* Formulario */
+.signup { margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+.signup h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 10px; text-wrap: balance; }
+.signup .intro { color: var(--muted); max-width: 52ch; margin-bottom: 30px; }
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 16px; }
+.field { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: 17px; color: var(--muted); }
+.field label b { color: var(--magenta); font-weight: 600; }
+.control { width: 100%; font: 400 17px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; padding: 14px 16px; min-height: 52px; }
+textarea.control { min-height: 150px; resize: vertical; }
+.control::placeholder { color: color-mix(in srgb, var(--fg) 50%, transparent); }
+.control:focus-visible, .tel:focus-within { outline: 3px solid var(--amber); outline-offset: 2px; }
+.sel { position: relative; }
+.sel select { appearance: none; -webkit-appearance: none; padding-inline-end: 46px; cursor: pointer; }
+.sel::after { content: ""; position: absolute; right: 18px; top: 50%; margin-top: -3px; border: 6px solid transparent; border-top-color: var(--fg); border-bottom: 0; pointer-events: none; }
+.tel { display: flex; align-items: center; min-height: 52px; background: var(--surface); border: 1px solid color-mix(in srgb, var(--fg) 30%, transparent); border-radius: 12px; }
+.tel .cc { display: inline-flex; align-items: center; gap: 8px; padding-inline: 16px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tel .control { border: 0; background: transparent; min-height: 50px; padding-inline-start: 4px; outline: none; font-variant-numeric: tabular-nums; }
+.hint { font-size: 14px; color: var(--muted); }
+.form .actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; cursor: pointer; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--blue); }
+.result { grid-column: 1 / -1; padding: 22px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); display: grid; gap: 14px; }
+.result h3 { margin: 0; font: 700 22px var(--font-display); letter-spacing: -0.01em; }
+.result pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 15px/1.55 var(--font-body); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.result .row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px 40px; margin: 56px 0 0; padding-top: 32px; border-top: 1px solid var(--line); }
+.facts dt { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.facts dd { margin: 6px 0 0; font-size: 20px; }
+
+@media (max-width: 760px) {
+  .form { grid-template-columns: 1fr; }
+  .top-links { margin-inline-start: 0; width: 100%; }
+}
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+@media (prefers-reduced-motion: reduce) {
+  .pill-track { animation: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <div class="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="primer-paso.html">Tu primer paso</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="series.html">Series</a>
+      <a class="back" href="eventos.html">Eventos</a>
+      <a class="back" href="donativos.html">Donativos</a>
+      <a class="pill" href="#registro">Es mi primera vez</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero-t">
+      <p class="tag">Jóvenes · Tiempo de Gracia</p>
+      <h1>Trans<span>forma</span></h1>
+      <div class="beam" aria-hidden="true"><i></i><i></i><i></i></div>
+      <p class="lead">Transforma es el grupo de jóvenes de Tiempo de Gracia. Un lugar para hacer amigos, hablar de lo que de verdad importa y crecer en la fe juntos. Si es tu primera vez, te estamos esperando.</p>
+      <div class="cta">
+        <a class="btn" href="#registro">Es mi primera vez</a>
+        <a class="btn ghost" href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Síguenos en Instagram <span aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+
+    <div class="what">
+      <div><b>Amigos</b><p>Conoce a otros jóvenes que, como tú, tienen preguntas y ganas de vivir algo real.</p></div>
+      <div><b>Palabra</b><p>Hablamos de la Biblia con temas que tienen que ver con tu vida diaria.</p></div>
+      <div><b>Alabanza</b><p>Música, oración y espacio para encontrarte con Dios.</p></div>
+      <div><b>Servir</b><p>Descubre tus dones y participa en lo que hacemos como iglesia.</p></div>
+    </div>
+
+    <dl class="facts">
+      <div><dt>Cuándo</dt><dd class="tbd">Día y hora por confirmar</dd></div>
+      <div><dt>Dónde</dt><dd>Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo, Naucalpan</dd></div>
+      <div><dt>Para quién</dt><dd class="tbd">Edades por confirmar</dd></div>
+    </dl>
+
+    <section class="signup" id="registro">
+      <h2>¿Primera vez en Transforma?</h2>
+      <p class="intro">Déjanos tus datos y alguien del equipo de jóvenes te escribirá para darte la bienvenida. Los campos con <b style="color:var(--magenta)">*</b> son obligatorios.</p>
+      <form class="form" id="form" novalidate>
+        <div class="field">
+          <label for="nombre">Nombre <b>*</b></label>
+          <input class="control" id="nombre" name="nombre" type="text" autocomplete="given-name" required>
+        </div>
+        <div class="field">
+          <label for="apellidos">Apellidos <b>*</b></label>
+          <input class="control" id="apellidos" name="apellidos" type="text" autocomplete="family-name" required>
+        </div>
+        <div class="field">
+          <label for="edad">Edad <b>*</b></label>
+          <input class="control" id="edad" name="edad" type="number" inputmode="numeric" min="10" max="40" required>
+        </div>
+        <div class="field">
+          <label for="celular">Celular <b>*</b></label>
+          <div class="tel">
+            <span class="cc" aria-hidden="true">
+              <svg width="22" height="15" viewBox="0 0 22 15" role="img" aria-label="México"><rect width="7.4" height="15" fill="#006847"/><rect x="7.3" width="7.4" height="15" fill="#ffffff"/><rect x="14.6" width="7.4" height="15" fill="#ce1126"/></svg>
+              +52
+            </span>
+            <input class="control" id="celular" name="celular" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="55 1234 5678" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="insta">Tu Instagram</label>
+          <input class="control" id="insta" name="insta" type="text" autocomplete="off" placeholder="@usuario">
+        </div>
+        <div class="field">
+          <label for="conocio">¿Cómo te enteraste de Transforma?</label>
+          <div class="sel">
+            <select class="control" id="conocio" name="conocio">
+              <option value="" selected disabled>Selecciona una opción</option>
+              <option>Me invitó un amigo o amiga</option>
+              <option>Mi familia va a la iglesia</option>
+              <option>Redes sociales</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+        <fieldset class="checks field full">
+          <legend>¿Qué te gustaría encontrar?</legend>
+          <label><input type="checkbox" name="busca" value="Hacer amigos"> Hacer amigos</label>
+          <label><input type="checkbox" name="busca" value="Conocer más de Dios"> Conocer más de Dios</label>
+          <label><input type="checkbox" name="busca" value="Música y alabanza"> Música y alabanza</label>
+          <label><input type="checkbox" name="busca" value="Servir en la iglesia"> Servir en la iglesia</label>
+        </fieldset>
+        <div class="field full">
+          <label for="mensaje">¿Algo que quieras contarnos?</label>
+          <textarea class="control" id="mensaje" name="mensaje" placeholder="Por ejemplo, algo por lo que quieras que oremos o una pregunta."></textarea>
+        </div>
+        <p class="note-minor"><b>¿Eres menor de edad?</b> Cuéntale a tu mamá, papá o tutor que quieres venir a Transforma. Ellos también son bienvenidos.</p>
+        <div class="actions">
+          <button class="btn" type="submit">Continuar</button>
+        </div>
+        <div class="result" id="result" hidden>
+          <h3>Tu mensaje está listo</h3>
+          <p>Revísalo y envíalo. Aquí no se guarda nada.</p>
+          <p id="ig-hint" hidden>Copia el mensaje y pégalo en un mensaje directo a nuestro Instagram.</p>
+          <pre id="msg"></pre>
+          <div class="row">
+            <a class="btn" id="wa" href="#" target="_blank" rel="noopener" hidden>Enviar por WhatsApp <span aria-hidden="true">&#8599;</span></a>
+            <a class="btn" id="ig" href="https://ig.me/m/tiempodegraciamexico" target="_blank" rel="noopener" hidden>Enviar por Instagram <span aria-hidden="true">&#8599;</span></a>
+            <button class="btn ghost" id="copy" type="button">Copiar mensaje</button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </main>
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+
+  // Formulario: arma el mensaje con lo que escribió la persona. No se guarda ni se envía solo.
+  var WHATSAPP = ""; // número de la iglesia con lada, solo dígitos (ej. 5215512345678)
+  var form = document.getElementById("form"), result = document.getElementById("result");
+  var msg = document.getElementById("msg"), wa = document.getElementById("wa"), copyBtn = document.getElementById("copy");
+  var ig = document.getElementById("ig"), igHint = document.getElementById("ig-hint"), cel = document.getElementById("celular");
+  function val(id) { return (document.getElementById(id).value || "").trim(); }
+  // Acepta espacios o guiones, pero pide exactamente 10 dígitos
+  function celDigits() { return val("celular").replace(/\D/g, ""); }
+  cel.addEventListener("input", function () { cel.setCustomValidity(""); });
+  var edad = document.getElementById("edad");
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    cel.setCustomValidity(celDigits() && celDigits().length !== 10 ? "Escribe tu número a 10 dígitos." : "");
+    if (!form.reportValidity()) return;
+    var busca = Array.prototype.map.call(form.querySelectorAll('input[name="busca"]:checked'), function (c) { return c.value; });
+    var lines = ["Hola, soy " + val("nombre") + " " + val("apellidos") + ", tengo " + val("edad") + " años y es mi primera vez en Transforma.",
+      "Celular: +52 " + celDigits()];
+    if (val("insta")) lines.push("Instagram: " + val("insta"));
+    if (val("conocio")) lines.push("Cómo me enteré: " + val("conocio"));
+    if (busca.length) lines.push("Me gustaría: " + busca.join(", "));
+    if (val("mensaje")) lines.push(val("mensaje"));
+    var text = lines.join("\n");
+    msg.textContent = text;
+    var digits = WHATSAPP.replace(/\D/g, "");
+    if (digits) { wa.href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(text); wa.hidden = false; }
+    else { ig.hidden = false; igHint.hidden = false; } // sin número de WhatsApp todavía: enviar por Instagram
+    result.hidden = false;
+    result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+  copyBtn.addEventListener("click", function () {
+    function done() { copyBtn.textContent = "Copiado"; setTimeout(function () { copyBtn.textContent = "Copiar mensaje"; }, 1600); }
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(msg);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      try { document.execCommand("copy"); done(); } catch (err) {}
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(msg.textContent).then(done, fallback); } else { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>
