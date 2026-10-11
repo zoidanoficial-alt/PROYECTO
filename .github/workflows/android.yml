@@ -24,9 +24,21 @@ jobs:
       - name: Compilar APK
         env:
           VERSION_CODE: ${{ github.run_number }}
-        run: gradle -p android assembleDebug --no-daemon
-      - name: Renombrar
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk TiempoDeGracia.apk
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -n "$KS_B64" ] && [ -n "$KEYSTORE_PASSWORD" ]; then
+            # Firma fija: las versiones nuevas se instalan encima de las anteriores
+            printf '%s' "$KS_B64" | tr -d ' \r\n' | base64 -d > "$RUNNER_TEMP/firma.p12"
+            export KEYSTORE_FILE="$RUNNER_TEMP/firma.p12"
+            gradle -p android assembleRelease --no-daemon
+            cp android/app/build/outputs/apk/release/app-release.apk TiempoDeGracia.apk
+            rm -f "$RUNNER_TEMP/firma.p12"
+          else
+            echo "::warning::Faltan los secretos ANDROID_KEYSTORE_BASE64 y ANDROID_KEYSTORE_PASSWORD; se usa una firma de prueba."
+            gradle -p android assembleDebug --no-daemon
+            cp android/app/build/outputs/apk/debug/app-debug.apk TiempoDeGracia.apk
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: TiempoDeGracia-apk
