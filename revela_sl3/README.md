@@ -23,6 +23,24 @@ GitHub Pages). Desde el celular, ábrela en Chrome o Safari y elige
 
 Navegadores: Chrome, Edge, Firefox o Safari recientes (requiere WebGL2).
 
+## App para Android (APK)
+
+Cada cambio en `revela_sl3/` compila la APK en GitHub Actions y la publica en:
+
+**https://github.com/zoidanoficial-alt/PROYECTO/releases/download/revela-sl3-latest/RevelaSL3.apk**
+
+1. Abre ese enlace en tu teléfono (con tu sesión de GitHub si el repositorio es privado).
+2. Descarga `RevelaSL3.apk` y ábrela; Android te pedirá permitir "instalar apps
+   desconocidas" para tu navegador o administrador de archivos.
+3. Las versiones nuevas se instalan encima sin perder tus ajustes.
+
+En la app: **Importar** abre tus fotos (JPEG y CR3 que pasaste de la cámara con
+Camera Connect o con la tarjeta SD); **Exportar** guarda en
+`Documentos/RevelaSL3` y abre el menú Compartir (Fotos, WhatsApp, Drive…);
+el dictado usa la voz en español del teléfono.
+
+Compilarla tú mismo (requiere Android SDK y Java 21): `npm ci && npm run android:apk`.
+
 ## Qué hace
 
 | Lightroom | Revela SL3 |
