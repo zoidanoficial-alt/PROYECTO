@@ -1,0 +1,9 @@
+{
+  "appId": "mx.revela.sl3",
+  "appName": "Revela SL3",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#151618"
+  }
+}

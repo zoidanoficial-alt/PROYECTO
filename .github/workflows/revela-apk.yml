@@ -1,0 +1,71 @@
+name: Revela SL3 · APK Android
+
+on:
+  push:
+    paths:
+      - 'revela_sl3/**'
+      - '.github/workflows/revela-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: revela-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: revela_sl3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: revela_sl3/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Dependencias
+        run: npm ci
+
+      - name: Pruebas
+        run: npm test
+
+      - name: Copiar la app web al proyecto Android
+        run: npm run android:sync
+
+      - name: Compilar APK
+        working-directory: revela_sl3/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/RevelaSL3.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RevelaSL3-apk
+          path: RevelaSL3.apk
+
+      # Publica la APK con un enlace fijo para descargarla desde el teléfono:
+      # https://github.com/<dueño>/<repo>/releases/download/revela-sl3-latest/RevelaSL3.apk
+      - name: Publicar en Releases
+        working-directory: ${{ github.workspace }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete revela-sl3-latest --cleanup-tag -y || true
+          gh release create revela-sl3-latest RevelaSL3.apk \
+            --target "$GITHUB_SHA" \
+            --title "Revela SL3 para Android (compilación ${GITHUB_RUN_NUMBER})" \
+            --notes "Abre este enlace desde tu teléfono Android, descarga **RevelaSL3.apk** e instálala (permite \"instalar apps desconocidas\" para tu navegador cuando te lo pida). Rama: ${GITHUB_REF_NAME} · commit ${GITHUB_SHA::7}."

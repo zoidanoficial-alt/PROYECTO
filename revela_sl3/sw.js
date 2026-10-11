@@ -5,7 +5,7 @@ const FILES = [
   './', 'index.html', 'css/app.css', 'manifest.webmanifest', 'icons/icon.svg',
   'js/main.js', 'js/engine.js', 'js/shaders.js', 'js/params.js', 'js/curve.js', 'js/curve-editor.js',
   'js/crop.js', 'js/loader.js', 'js/cr3.js', 'js/tiff.js', 'js/analysis.js', 'js/advisor.js',
-  'js/sl3.js', 'js/claude.js',
+  'js/sl3.js', 'js/claude.js', 'js/platform.js',
 ];
 
 self.addEventListener('install', (e) => {

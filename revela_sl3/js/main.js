@@ -13,6 +13,7 @@ import { aiReview, aiAsk } from './claude.js';
 import { CurveEditor } from './curve-editor.js';
 import { CropOverlay, ASPECTS, aspectRatio, fitCrop, withAspect, maxCrop } from './crop.js';
 import { isSL3, formatShutter, PROGRAMS, detectSize } from './sl3.js';
+import { isNative, saveNative, shareFiles, nativeSpeech } from './platform.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
@@ -552,7 +553,23 @@ $('#applyAdvice').onclick = () => {
 };
 
 // Dictado por voz (Web Speech API).
+let nativeSpeaking = false;
 function speak(lines) {
+  if (nativeSpeech) {
+    if (nativeSpeaking) { nativeSpeech.stop(); return; }
+    nativeSpeaking = true;
+    nativeSpeech.cancelled = false;
+    $('#speakBtn').textContent = '⏹ Detener';
+    nativeSpeech.speak(lines.filter(Boolean), () => {
+      nativeSpeaking = false;
+      $('#speakBtn').textContent = '🔊 Dictar consejos';
+    }).catch(() => {
+      nativeSpeaking = false;
+      $('#speakBtn').textContent = '🔊 Dictar consejos';
+      toast('No se pudo usar la voz del teléfono. Revisa que tengas instalada la voz en español.');
+    });
+    return;
+  }
   const synth = window.speechSynthesis;
   if (!synth) { toast('Tu navegador no tiene síntesis de voz.'); return; }
   if (synth.speaking) { synth.cancel(); $('#speakBtn').textContent = '🔊 Dictar consejos'; return; }
@@ -1035,9 +1052,15 @@ $('#exGo').onclick = async (e) => {
   prog.value = 0;
   $('#exGo').disabled = true;
   try {
-    await exportImages(list, opts, (n) => { prog.value = n; });
+    const saved = await exportImages(list, opts, (n) => { prog.value = n; });
     $('#exportDlg').close();
-    toast(`Exportadas ${list.length} foto(s).`);
+    if (isNative) {
+      const where = saved.find((x) => x.where)?.where;
+      toast(where ? `Guardadas en ${where}. Elige dónde compartirlas…` : 'Listas. Elige dónde guardarlas…', 4000);
+      await shareFiles(saved.map((x) => x.uri));
+    } else {
+      toast(`Exportadas ${list.length} foto(s).`);
+    }
   } catch (err) {
     console.error(err);
     toast(`Error al exportar: ${err.message}. Prueba un tamaño menor.`, 6000);
@@ -1050,6 +1073,7 @@ async function exportImages(list, opts, onProgress) {
   const canvas = document.createElement('canvas');
   const eng = new Engine(canvas, { preserve: true });
   const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }[opts.type];
+  const saved = [];
   try {
     for (let n = 0; n < list.length; n++) {
       const im = list[n];
@@ -1089,13 +1113,16 @@ async function exportImages(list, opts, onProgress) {
       eng.render(p, { width, height });
       let blob = await new Promise((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error('sin memoria'))), opts.type, opts.quality));
       if (opts.exif && info.app1) blob = await withExif(blob, info.app1);
-      download(blob, `${im.name.replace(/\.[^.]+$/, '')}${opts.suffix || ''}.${ext}`);
+      const fname = `${im.name.replace(/\.[^.]+$/, '')}${opts.suffix || ''}.${ext}`;
+      if (isNative) saved.push(await saveNative(blob, fname));
+      else download(blob, fname);
       onProgress(n + 1);
       await new Promise((r) => setTimeout(r, 250)); // deja respirar al navegador entre descargas
     }
   } finally {
     eng.dispose();
   }
+  return saved;
 }
 
 function download(blob, name) {
@@ -1153,10 +1180,15 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => { if (e.key === '\\') setBefore(false); });
 
 // ---------------------------------------------------------------- arranque
+if (isNative) {
+  document.body.classList.add('native');
+  // Android no reconoce la extensión .cr3: sin filtro el selector muestra todo.
+  ['#fileInput', '#fileInput2'].forEach((s) => $(s).removeAttribute('accept'));
+}
 buildControls();
 renderPresets();
 
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+if (!isNative && 'serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 

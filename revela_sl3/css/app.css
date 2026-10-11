@@ -294,8 +294,10 @@ dialog progress { width: 100%; }
   .modules { margin-left: 0; order: 3; width: 100%; }
   .actions { margin-left: auto; }
   .hide-sm { display: none; }
-  #app { display: block; }
-  #center { display: block; }
+  #app { display: flex; flex-direction: column; }
+  #center { display: block; order: 0; }
+  #right { order: 1; }
+  #left { display: block; order: 2; border-right: 0; border-top: 1px solid var(--line); }
   #stage { height: 58vh; padding: 8px; }
   #view { max-height: calc(58vh - 16px); }
   #right { border-left: 0; }
@@ -304,3 +306,8 @@ dialog progress { width: 100%; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
   dialog form > label { grid-template-columns: 1fr; }
 }
+
+/* ---------- App Android (Capacitor) ---------- */
+body.native .hide-sm { display: none; }
+body.native #top { padding-top: max(8px, env(safe-area-inset-top), var(--safe-area-inset-top, 0px)); }
+body.native #filmstrip { padding-bottom: max(8px, env(safe-area-inset-bottom), var(--safe-area-inset-bottom, 0px)); }
