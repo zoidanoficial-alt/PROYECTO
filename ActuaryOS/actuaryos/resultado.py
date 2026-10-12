@@ -91,8 +91,8 @@ class Resultado:
             disponibles = ", ".join(self.cifras)
             raise KeyError(f"No hay una cifra «{clave}». Disponibles: {disponibles}")
         c = self.cifras[clave]
-        return f"¿Por qué {c.etiqueta} = {c.valor:,.4f} ({self.unidad} de {self.moneda})?\n" \
-               + c.explicacion.texto(modo)
+        unidad = "" if clave.startswith("factor:") else f" ({self.unidad} de {self.moneda})"
+        return f"¿Por qué {c.etiqueta} = {c.valor:,.4f}{unidad}?\n" + c.explicacion.texto(modo)
 
     def _revisar(self, estado: str, revisor: str, comentario: str) -> None:
         if not revisor.strip():

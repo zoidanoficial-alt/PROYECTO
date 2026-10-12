@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Triángulo de desarrollo: filas que se acortan con cada año -->
+    <path android:fillColor="#FFFFFF" android:pathData="M30,32h48v9h-48z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M30,45h36v9h-36z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M30,58h24v9h-24z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M30,71h12v9h-12z" />
+    <path android:fillColor="#9CC2FF" android:pathData="M70,45h8v9h-8z M58,58h8v9h-8z M70,58h8v9h-8z M46,71h8v9h-8z M58,71h8v9h-8z M70,71h8v9h-8z" />
+</vector>

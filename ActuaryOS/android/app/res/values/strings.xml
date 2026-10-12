@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ActuaryOS</string>
+    <string name="elegir_archivo">Elegir archivo de datos</string>
+    <string name="compartir">Compartir informe</string>
+</resources>

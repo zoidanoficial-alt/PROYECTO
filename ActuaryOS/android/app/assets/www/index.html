@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ActuaryOS</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="marca">Actuary<b>OS</b></div>
+    <label class="modo">
+      <span>Modo experto</span>
+      <input type="checkbox" id="modoExperto">
+    </label>
+  </header>
+
+  <nav class="pasos" id="pasos">
+    <button data-paso="datos" class="activo">1 · Datos</button>
+    <button data-paso="metodos" disabled>2 · Métodos</button>
+    <button data-paso="resultados" disabled>3 · Resultados</button>
+    <button data-paso="informe" disabled>4 · Informe</button>
+  </nav>
+
+  <main>
+    <!-- Paso 1 -->
+    <section id="paso-datos" class="paso activo">
+      <div class="tarjeta intro">
+        <h1>Reservas de siniestros</h1>
+        <p>Carga un triángulo de pagos acumulados. Revisamos los datos antes de calcular y nunca los corregimos en silencio.</p>
+        <button id="btnEjemplo" class="secundario">Usar ejemplo: Seguros Horizonte</button>
+      </div>
+
+      <div class="tarjeta">
+        <h2>Datos</h2>
+        <div class="fila-botones">
+          <label class="boton secundario" for="archivo">Elegir archivo CSV</label>
+          <input type="file" id="archivo" accept=".csv,text/csv,text/plain" hidden>
+        </div>
+        <label class="campo">O pega el contenido (una fila por año, una columna por edad):
+          <textarea id="texto" rows="7" spellcheck="false" placeholder="anio,12,24,36,48&#10;2021,100,150,180,200&#10;..."></textarea>
+        </label>
+        <div class="rejilla">
+          <label class="campo">Formato
+            <select id="formato">
+              <option value="ancho">Ancho (fila por año)</option>
+              <option value="largo">Largo (origen, desarrollo, valor)</option>
+            </select>
+          </label>
+          <label class="campo">Unidad
+            <select id="unidad">
+              <option value="sin especificar">Sin especificar</option>
+              <option value="pesos">Pesos</option>
+              <option value="miles" selected>Miles</option>
+              <option value="millones">Millones</option>
+            </select>
+          </label>
+          <label class="campo">Moneda
+            <input id="moneda" value="MXN" maxlength="8">
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" id="incremental"> Los montos son pagos del periodo (acumularlos)</label>
+        <label class="check"><input type="checkbox" id="limpiar"> Aceptar números con $ o separadores de miles</label>
+        <p class="nota">Ambas opciones son transformaciones explícitas y quedan registradas en el informe.</p>
+        <button id="btnValidar" class="primario">Revisar datos</button>
+      </div>
+
+      <div id="validacion" class="oculto">
+        <div class="tarjeta">
+          <h2>Revisión de datos</h2>
+          <div id="hallazgos"></div>
+          <div class="tabla-scroll"><table id="tablaTriangulo" class="tabla"></table></div>
+          <button id="btnAMetodos" class="primario oculto">Continuar a métodos</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Paso 2 -->
+    <section id="paso-metodos" class="paso">
+      <div class="tarjeta">
+        <h2>¿Qué métodos permiten tus datos?</h2>
+        <div id="evaluacion"></div>
+      </div>
+      <div class="tarjeta">
+        <h2>Métodos a ejecutar</h2>
+        <label class="check"><input type="checkbox" id="mCL" checked> Chain Ladder</label>
+        <label class="check"><input type="checkbox" id="mMack" checked> Mack (error estándar e intervalo)</label>
+        <label class="check"><input type="checkbox" id="mBF"> Bornhuetter-Ferguson</label>
+        <div class="rejilla">
+          <label class="campo">Factor de cola
+            <input id="cola" type="number" step="0.001" min="1" value="1">
+          </label>
+          <label class="campo">Nivel del intervalo (Mack)
+            <select id="nivel"><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select>
+          </label>
+        </div>
+        <p class="nota">Cola = 1 supone que el año más antiguo ya terminó de desarrollarse. Cámbialo sólo con justificación.</p>
+        <div id="bfOpciones" class="oculto">
+          <h3>Supuestos de Bornhuetter-Ferguson</h3>
+          <p class="nota">La app no inventa estos supuestos: deben venir de tarificación, plan de negocio o referencia de mercado.</p>
+          <div id="primas" class="rejilla"></div>
+          <div class="rejilla">
+            <label class="campo">Siniestralidad esperada (%)
+              <input id="elr" type="number" step="0.1" min="1" max="400" placeholder="p. ej. 75">
+            </label>
+            <label class="campo">Fuente del supuesto
+              <input id="fuenteElr" placeholder="p. ej. plan de negocio 2024">
+            </label>
+          </div>
+        </div>
+        <div id="errorMetodos" class="aviso error oculto"></div>
+        <button id="btnCalcular" class="primario">Calcular reservas</button>
+      </div>
+    </section>
+
+    <!-- Paso 3 -->
+    <section id="paso-resultados" class="paso">
+      <div class="tarjeta destacado">
+        <div class="etiqueta">Reserva estimada total</div>
+        <button class="cifra-grande porque" id="totalPrincipal"></button>
+        <div class="sub" id="totalSub"></div>
+        <div class="estado" id="estado"></div>
+      </div>
+      <div id="resultados"></div>
+      <div class="tarjeta">
+        <h2>¿Qué pasa si…?</h2>
+        <p class="nota">Cambia un supuesto y observa el efecto contra la estimación original. No modifica el resultado guardado.</p>
+        <label class="campo">Factor de cola: <b id="colaValor">1.000</b>
+          <input id="escCola" type="range" min="1" max="1.2" step="0.005" value="1">
+        </label>
+        <label class="campo">Ajuste a los factores de desarrollo: <b id="ajusteValor">0%</b>
+          <input id="escAjuste" type="range" min="-10" max="20" step="1" value="0">
+        </label>
+        <div id="escenario" class="escenario"></div>
+      </div>
+      <div class="tarjeta">
+        <h2>Revisión actuarial</h2>
+        <p class="nota">Los resultados son un borrador hasta que una persona responsable los apruebe.</p>
+        <label class="campo">Nombre de quien revisa <input id="revisor"></label>
+        <label class="campo">Comentario <textarea id="comentario" rows="2"></textarea></label>
+        <div class="fila-botones">
+          <button id="btnAprobar" class="primario">Aprobar</button>
+          <button id="btnRechazar" class="secundario">Rechazar</button>
+        </div>
+        <div id="errorRevision" class="aviso error oculto"></div>
+      </div>
+      <button id="btnAInforme" class="primario ancho">Generar informe</button>
+    </section>
+
+    <!-- Paso 4 -->
+    <section id="paso-informe" class="paso">
+      <div class="tarjeta">
+        <h2>Informe</h2>
+        <p class="nota">Todas las cifras provienen del motor de cálculo. Revísalo antes de entregarlo.</p>
+        <div class="fila-botones">
+          <button id="btnCompartir" class="primario">Compartir</button>
+          <button id="btnCopiar" class="secundario">Copiar</button>
+        </div>
+        <pre id="informe" class="informe"></pre>
+      </div>
+    </section>
+  </main>
+
+  <div id="hoja" class="hoja oculto" role="dialog" aria-modal="true">
+    <div class="hoja-fondo" data-cerrar></div>
+    <div class="hoja-panel">
+      <button class="cerrar" data-cerrar aria-label="Cerrar">×</button>
+      <div id="hojaContenido"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast oculto"></div>
+
+  <script src="motor.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

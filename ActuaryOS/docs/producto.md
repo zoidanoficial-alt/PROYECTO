@@ -35,7 +35,7 @@ manuales a un flujo de trabajo integrado, auditable y mucho más rápido.
 | Laboratorio actuarial | Frecuencia, severidad, siniestralidad, primas | ⏳ Caso 2 |
 | Simulador de riesgos | Monte Carlo, VaR, TVaR, sensibilidad | ⏳ Caso 3 |
 | Copiloto con IA | Asistente conversacional sobre el motor | ⏳ después del Caso 4 |
-| Interfaz web | Carga, vista previa y botones «¿Por qué?» | ⏳ |
+| App Android | Caso 1 completo en el teléfono, sin internet ([`android/`](../android/README.md)) | ✅ v0.1 (APK de prueba) |
 
 ## Casos de producto
 

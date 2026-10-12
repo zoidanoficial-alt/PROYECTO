@@ -10,6 +10,8 @@ salga de texto libre.
 **v0.1** cubre el [Caso 1: reservas de siniestros](casos/caso1_seguros_horizonte/README.md).
 La visión completa y la hoja de ruta están en [`docs/producto.md`](docs/producto.md).
 
+**App Android:** [`android/salida/ActuaryOS-0.1.0.apk`](android/salida/ActuaryOS-0.1.0.apk). Ver [`android/README.md`](android/README.md).
+
 ## Instalación
 
 ```bash
