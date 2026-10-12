@@ -113,6 +113,16 @@ function buildSheets(R) {
     .concat(lv.map(l => ['nivel_' + l.name.toLowerCase().replace(' ', '_'), l.ratio == null ? 'sin datos' : STRENGTH_LEVELS[l.level] + ' (' + r1(l.ratio) + '× peso corporal, 1RM ' + r1(l.best) + ' kg)']))
     .concat([['prompt_sugerido_para_ia', aiPrompt(R)]]);
 
+  // 6.2: antojos, molestias digestivas y calidad de la dieta por día
+  const antojos = [['fecha', 'hora', 'tipo', 'detalle', 'disparador_o_sospechoso', 'gravedad_1a3']];
+  const hm = t => { const x = new Date(t); return String(x.getHours()).padStart(2, '0') + ':' + String(x.getMinutes()).padStart(2, '0'); };
+  dates.forEach(d => {
+    const e = DB.days[d] || {};
+    (e.cravings || []).forEach(c => antojos.push([d, hm(c.t), c.kind, c.swap ? 'cambiado por opción saludable (' + c.swap + ')' : '', c.trig ? TRIGGERS[c.trig] || c.trig : '', '']));
+    (e.gut || []).forEach(g => antojos.push([d, hm(g.t), 'molestia digestiva', g.sym.map(k => GUT_SYMPTOMS[k]).join('; '), g.sus.map(k => GUT_SUSPECTS[k][0]).join('; '), g.sev]));
+    if (e.quality) { const n = QUALITY.filter(([id]) => e.quality[id]); if (n.length) antojos.push([d, '', 'calidad del día', n.length + '/' + QUALITY.length, n.map(q => q[2]).join('; '), '']); }
+  });
+
   return [
     { name: 'Resumen', rows: resumen, widths: [34, 90] },
     { name: 'Diario', rows: diario },
@@ -122,7 +132,8 @@ function buildSheets(R) {
     { name: 'Progreso por ejercicio', rows: progreso },
     { name: 'Volumen semanal', rows: volumen },
     { name: 'Medidas', rows: medidas },
-    { name: 'Logros', rows: logros }
+    { name: 'Logros', rows: logros },
+    { name: 'Antojos y digestion', rows: antojos }
   ];
 }
 

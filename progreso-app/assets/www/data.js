@@ -483,7 +483,88 @@ const FOODS = [
   ['Yogur griego natural 170 g', 17, 6, 0, 6],
   ['Aguacate ½', 1, 6, 11, 0],
   ['Pan integral (2 rebanadas)', 8, 24, 2, 4],
-  ['Miel 1 cucharada', 0, 17, 0, 17]
+  ['Miel 1 cucharada', 0, 17, 0, 17],
+  // 6.2 · alimentos "indispensables" (Nutrición y Genética)
+  ['Brócoli cocido 1 taza', 4, 11, 1, 2],
+  ['Nueces 20 g (5 piezas)', 3, 3, 13, 1],
+  ['Aceite de oliva 1 cucharada', 0, 0, 14, 0],
+  ['Manzana mediana', 0, 25, 0, 19],
+  ['Kiwi (2)', 2, 20, 1, 12],
+  ['Kéfir natural 250 ml', 9, 11, 8, 11],
+  ['Lentejas cocidas 1 taza', 18, 40, 1, 4],
+  ['Chocolate 70 % 20 g', 2, 9, 8, 5]
+];
+
+/* ------------------------------------------------------------------ *
+ *  6.2 · Nutrición y Genética (Jorge Dotto), ideas en palabras propias
+ *  y solo lo que tiene buen respaldo; lo dudoso del libro se dejó fuera.
+ * ------------------------------------------------------------------ */
+// "¿Hambre o antojo?": [id, pregunta, respuesta que apunta a hambre real]
+const HUNGER_QS = [
+  ['any', '¿Te comerías cualquier cosa, por ejemplo pollo con arroz o una fruta?', true],
+  ['sudden', '¿Las ganas llegaron de golpe, no poco a poco?', false],
+  ['hours', '¿Hace más de 3–4 horas de tu última comida?', true],
+  ['trigger', '¿Hay algo detrás: estrés, aburrimiento, tristeza, festejo o estar con gente?', false],
+  ['sleep', '¿Dormiste mal anoche?', false]
+];
+const TRIGGERS = { estres: '😤 Estrés', aburrido: '🥱 Aburrimiento', triste: '😔 Tristeza o soledad', festejo: '🎉 Festejo', social: '👥 Con gente', cansado: '😴 Cansancio', ninguno: '🤷 Nada en especial' };
+// Los alimentos más adictivos (escala de Yale) y un cambio que se parece y no rompe el día
+const CRAVING_SWAPS = [
+  ['🍕 Pizza', 'Tortilla o pan integral con pollo, tomate y un poco de queso al horno'],
+  ['🍫 Chocolate', '2 cuadritos (20 g) de chocolate 70 % o más, despacio'],
+  ['🍟 Papas o frituras', 'Palomitas naturales, aceitunas o zanahoria y pepino con limón'],
+  ['🍪 Galletas o pan dulce', 'Manzana con 5 nueces'],
+  ['🍦 Helado', 'Yogur griego congelado con fruta picada'],
+  ['🍔 Hamburguesa', 'Hamburguesa casera de res magra con pan integral'],
+  ['🥤 Refresco', 'Agua mineral con limón y hielo, o refresco sin azúcar'],
+  ['🧀 Queso', 'Queso fresco o cottage en porción medida']
+];
+const CRAVING_STEPS = [
+  'Toma un vaso grande de agua (medio litro también ayuda antes de comer).',
+  'Espera 10 minutos haciendo otra cosa: camina, ordena, sal a tomar aire.',
+  'Si sigue, elige el cambio de la lista o una porción pequeña y medida, y disfrútala sin culpa.',
+  'Anótalo: ver el patrón (cuándo y por qué) es lo que lo cambia.'
+];
+// Calidad del día: lo que más repiten las listas de Harvard y la Clínica Mayo
+const QUALITY = [
+  ['verde', '🥦', 'Verdura verde o crucífera', 'brócoli, espinaca, kale, col'],
+  ['fruta', '🍎', '2 frutas o más', 'manzana, kiwi, frutos rojos, plátano'],
+  ['fibra', '🌾', 'Integral o legumbre', 'avena, frijoles, lentejas, arroz integral'],
+  ['grasa', '🫒', 'Grasa buena', 'aceite de oliva, aguacate, 5 nueces'],
+  ['fermentado', '🥛', 'Fermentado', 'yogur, kéfir, chucrut, kimchi'],
+  ['color', '🌈', 'Plato de colores', '3 colores distintos en una comida']
+];
+// Molestias digestivas: síntomas y posibles culpables para ver patrones
+const GUT_SYMPTOMS = { hinchazon: 'Hinchazón', gases: 'Gases', dolor: 'Dolor de panza', acidez: 'Acidez', diarrea: 'Diarrea', pesadez: 'Pesadez o sueño', retencion: 'Retención de líquidos' };
+const GUT_SUSPECTS = {
+  lacteos: ['🥛 Lácteos', 'Si es la lactosa: los quesos curados casi no tienen y el yogur suele caer mejor. Hay leche deslactosada y pastillas de lactasa.'],
+  trigo: ['🍞 Pan, harina o pasta', 'No dejes el gluten por tu cuenta si sospechas celiaquía: primero el análisis de sangre, porque sin gluten sale falso negativo.'],
+  sal: ['🧂 Mucha sal', 'Meta: menos de 5 g de sal al día. Lo que más trae: embutidos, sopas instantáneas y snacks; condimenta con hierbas y limón.'],
+  procesados: ['📦 Ultraprocesados', 'Revisa la lista de ingredientes: entre menos ingredientes, mejor. Algunos emulsionantes (E4xx) caen mal a ciertas personas.'],
+  picante: ['🌶️ Picante o grasa', 'Prueba porciones más chicas y no cenar pesado justo antes de dormir.'],
+  alcohol: ['🍺 Alcohol', 'El alcohol irrita y además frena la recuperación muscular.'],
+  legumbres: ['🫘 Legumbres o crucíferas', 'Dan gases por su fibra (que tu microbiota sí agradece). Súbelas poco a poco y remójalas bien.']
+};
+const PROBIOTICS = ['Yogur natural', 'Kéfir (más de 30 cepas)', 'Chucrut sin pasteurizar', 'Kimchi', 'Tempeh', 'Miso (sin hervirlo)', 'Natto', 'Kombucha (lleva algo de alcohol)'];
+const PREBIOTICS = ['Plátano', 'Manzana con cáscara', 'Cebolla', 'Ajo', 'Espárrago', 'Poro (puerro)', 'Avena', 'Cebada', 'Linaza', 'Jícama'];
+// Productos de temporada (Anexo II, hemisferio sur; en el norte se recorre 6 meses)
+const SEASONS_SOUTH = {
+  verano: { months: [11, 0, 1], fruits: 'Pera, uva, durazno, chabacano, ciruela, melón, sandía, fresa, cereza, piña', veg: 'Jitomate, papa, cebolla, espárrago, elote, albahaca, pimiento, acelga, berenjena, calabacita' },
+  otono: { months: [2, 3, 4], fruits: 'Plátano, manzana, naranja, toronja, mandarina, limón, aguacate', veg: 'Lechuga, brócoli, col, coliflor, zanahoria, calabaza, camote, acelga, ejote, betabel, rábano' },
+  invierno: { months: [5, 6, 7], fruits: 'Plátano, manzana, naranja, toronja, mandarina, limón, aguacate', veg: 'Brócoli, col, coliflor, zanahoria, calabaza, camote, coles de Bruselas, betabel, rábano' },
+  primavera: { months: [8, 9, 10], fruits: 'Plátano, fresa, manzana, limón, piña, aguacate', veg: 'Lechuga, papa, betabel, acelga, calabacita, alcachofa, apio, chícharos' }
+};
+// Mitos y datos con buen respaldo
+const FOOD_FACTS = [
+  ['La sal rosa o de mar es más sana', 'Tienen el mismo sodio que la sal de mesa. La de mesa además lleva yodo, que previene el bocio. Lo que importa es la cantidad: menos de 5 g al día.'],
+  ['El huevo sube el colesterol', 'En personas sanas el colesterol del huevo sube muy poco el de la sangre. Es muy saciante y ayuda en definición. Si tienes colesterol alto o diabetes, pregúntale a tu médico cuántos.'],
+  ['Si me cae mal la leche, dejo todos los lácteos', 'Los quesos curados casi no tienen lactosa y el yogur suele tolerarse bien por la fermentación. Intolerancia a la lactosa no es lo mismo que alergia a la proteína de la leche.'],
+  ['Sin gluten es más sano', 'Solo para celiacos o sensibles diagnosticados. Para el resto, los integrales (avena, cebada, centeno) protegen el corazón. Y si sospechas celiaquía, no lo quites antes del análisis.'],
+  ['Los tests de intolerancias en sangre (ALCAT) sirven', 'No tienen validez científica. Una alergia real se confirma con un alergólogo.'],
+  ['Un test de ADN me dice la dieta perfecta', 'Los estudios no muestran que una dieta según tus genes adelgace más que una dieta bien hecha. Calorías, proteína y constancia siguen mandando.'],
+  ['La chía adelgaza', 'Aporta fibra y omega-3 vegetal, pero no quema grasa. 2 cucharadas (28 g) son unas 140 kcal.'],
+  ['"Integral" en la etiqueta es suficiente', 'Mira los ingredientes: si el primero es harina de trigo refinada y el segundo azúcar, no es integral de verdad.'],
+  ['El kiwi es un somnífero natural', 'Comer 2 kiwis antes de dormir ayudó un poco en un estudio pequeño. Puede sumar, pero no sustituye dormir 7–9 horas con buena rutina.']
 ];
 
 /* ------------------------------------------------------------------ *

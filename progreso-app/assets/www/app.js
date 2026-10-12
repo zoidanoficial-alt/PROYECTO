@@ -1850,6 +1850,9 @@ function renderFood() {
       <button class="block" id="fd-add" style="margin-top:12px">+ Añadir comida</button>
     </div>
 
+    ${cravingCard()}
+    ${qualityCard(t)}
+
     ${left != null ? pwoCard() : `
     <div class="card">
       <h2>Ventana post-entreno</h2>
@@ -1863,7 +1866,15 @@ function renderFood() {
       <h2>Proteína completa</h2>
       <div class="chips">${PROTEIN_SOURCES.map(x => `<span class="chip">${esc(x)}</span>`).join('')}</div>
       <p class="small muted" style="margin:10px 0 0">Los libros llegan a 1.5 g por libra (~3.3 g/kg) en hipertrofia avanzada. Tu objetivo actual, según el reparto por somatotipo, es ${tg.protein} g (${fmt(tg.protein / currentWeight(), 1)} g/kg).</p>
+    </div>
+    ${gutCard()}
+    ${microbiomeCard()}
+    ${seasonCard()}
+    <div class="card">
+      <h2>Mitos y datos <small>· lo que sí tiene respaldo</small></h2>
+      ${FOOD_FACTS.map(([m, f]) => `<details><summary>❌ ${esc(m)}</summary><p class="small" style="margin:0 0 12px">✅ ${esc(f)}</p></details>`).join('')}
     </div>`;
+  bindFoodExtras(t);
 
   $('#fd-add').onclick = () => openMealForm(t);
   const pw = $('#fd-pwo'); if (pw) pw.onclick = () => { startPwo(); renderFood(); };
@@ -1871,6 +1882,154 @@ function renderFood() {
     DB.days[t].meals.splice(Number(b.dataset.delmeal), 1); saveData(); renderFood();
   });
   bindPwo($('#view-food'));
+}
+
+/* ---------- 6.2: hambre vs antojo, calidad del día, digestión y temporada ---------- */
+function daysBack(n) { const out = []; for (let k = 0; k < n; k++) out.push(addDays(todayStr(), -k)); return out; }
+function cravingsWeek() {
+  const wk = weekKey(todayStr()), out = [];
+  Object.keys(DB.days).forEach(d => { if (weekKey(d) === wk) (DB.days[d].cravings || []).forEach(c => out.push(c)); });
+  return out;
+}
+function cravingCard() {
+  const list = cravingsWeek(), ant = list.filter(c => c.kind === 'antojo');
+  const trig = {};
+  ant.forEach(c => { if (c.trig && c.trig !== 'ninguno') trig[c.trig] = (trig[c.trig] || 0) + 1; });
+  const top = Object.keys(trig).sort((a, b) => trig[b] - trig[a])[0];
+  const won = ant.filter(c => c.swap).length;
+  return `<div class="card">
+    <h2>¿Hambre o antojo?</h2>
+    <p class="small muted" style="margin-top:0">Si te comerías cualquier cosa, es hambre. Si solo te sirve algo en especial, es antojo. Responde 5 preguntas y te digo qué hacer.</p>
+    <button class="block" id="fd-hunger">🤔 Tengo ganas de comer</button>
+    ${list.length ? `<p class="small" style="margin:10px 0 0">Esta semana: <b>${ant.length}</b> antojo${ant.length === 1 ? '' : 's'}${won ? ` · <b style="color:var(--good)">${won}</b> cambiado${won === 1 ? '' : 's'} por algo mejor 💪` : ''}${top ? ` · más seguido por <b>${esc(TRIGGERS[top])}</b>` : ''}</p>` : ''}
+  </div>`;
+}
+function openHungerCheck() {
+  const ans = {};
+  const draw = m => {
+    const done = HUNGER_QS.every(([id]) => ans[id] != null);
+    let res = '';
+    if (done) {
+      const score = HUNGER_QS.reduce((a, [id, , real]) => a + (ans[id] === real ? (id === 'any' ? 2 : 1) : 0), 0);
+      const real = score >= 4, tg = targets(), tot = dayTotals(todayStr());
+      res = real ? `<div class="status good"><b>Es hambre real 🍽️</b>Tu cuerpo pide energía: come una comida completa con proteína.${tg.protein - tot.p > 0 ? ` Hoy te faltan <b>${Math.round(tg.protein - tot.p)} g de proteína</b> y ${Math.max(0, tg.kcal - tot.kcal).toLocaleString('es-MX')} kcal.` : ''} Lo que más sacia: proteína, legumbres, avena, huevo, plátano o aguacate.</div>
+          <div class="row" style="margin-top:12px"><button class="secondary" id="hc-close" style="flex:1">Cerrar</button><button id="hc-meal" style="flex:1">Registrar comida</button></div>`
+        : `<div class="status warn"><b>Parece antojo 🧠</b>Es normal: casi todos los tenemos. Prueba esto:</div>
+          <ol class="small" style="padding-left:20px">${CRAVING_STEPS.map(x => `<li style="margin:5px 0">${esc(x)}</li>`).join('')}</ol>
+          <div class="small muted" style="font-weight:600;margin:6px 0">¿Qué se te antoja? Cámbialo por:</div>
+          ${CRAVING_SWAPS.map(([f, sw], k) => `<button class="swap-row ${ans.swap === k ? 'on' : ''}" data-swap-food="${k}"><b>${f}</b><span>→ ${esc(sw)}</span></button>`).join('')}
+          <div class="small muted" style="font-weight:600;margin:10px 0 6px">¿Qué lo provocó?</div>
+          <div class="chips">${Object.keys(TRIGGERS).map(k => `<button class="chip-btn ${ans.trig === k ? 'on' : ''}" data-trig="${k}">${TRIGGERS[k]}</button>`).join('')}</div>
+          <button class="block" id="hc-save" style="margin-top:12px">${ans.swap != null ? '💪 Lo cambié por algo mejor' : 'Anotar antojo'}</button>`;
+    }
+    m.innerHTML = `<h3>¿Hambre o antojo?</h3>
+      ${HUNGER_QS.map(([id, q]) => `<div class="hq"><span>${esc(q)}</span><div class="seg" style="margin:0"><button data-hq="${id}|1" class="${ans[id] === true ? 'on' : ''}">Sí</button><button data-hq="${id}|0" class="${ans[id] === false ? 'on' : ''}">No</button></div></div>`).join('')}
+      ${res}`;
+    $$('[data-hq]', m).forEach(b => b.onclick = () => { const [id, v] = b.dataset.hq.split('|'); ans[id] = v === '1'; draw(m); });
+    $$('[data-swap-food]', m).forEach(b => b.onclick = () => { const k = Number(b.dataset.swapFood); ans.swap = ans.swap === k ? null : k; draw(m); });
+    $$('[data-trig]', m).forEach(b => b.onclick = () => { ans.trig = b.dataset.trig; draw(m); });
+    const save = (kind) => {
+      const e = day(todayStr()); e.cravings = e.cravings || [];
+      e.cravings.push({ t: Date.now(), kind, trig: ans.trig || null, swap: ans.swap != null ? CRAVING_SWAPS[ans.swap][0] : null });
+      saveData();
+    };
+    if ($('#hc-close', m)) $('#hc-close', m).onclick = () => { save('hambre'); closeModal(); renderFood(); };
+    if ($('#hc-meal', m)) $('#hc-meal', m).onclick = () => { save('hambre'); openMealForm(todayStr()); };
+    if ($('#hc-save', m)) $('#hc-save', m).onclick = () => {
+      save('antojo'); closeModal(); renderFood();
+      toast(ans.swap != null ? '💪 ¡Bien jugado! Antojo cambiado' : '✓ Anotado. Ver el patrón ya es avanzar');
+    };
+  };
+  openModal('', draw);
+}
+
+function qualityCard(t) {
+  const q = (DB.days[t] && DB.days[t].quality) || {}, n = QUALITY.filter(([id]) => q[id]).length;
+  return `<div class="card">
+    <div class="row spread"><h2 style="margin:0">Calidad de hoy</h2><span class="pill ${n >= 5 ? 'good' : ''}">${n}/${QUALITY.length}</span></div>
+    <p class="small muted" style="margin:4px 0 10px">Las calorías mandan en el peso; esto cuida tu salud y tu digestión. Toca lo que ya comiste.</p>
+    <div class="q-grid">${QUALITY.map(([id, ico, name, ex]) => `<button class="q-item ${q[id] ? 'on' : ''}" data-q="${id}"><span>${ico}</span><b>${name}</b><small>${ex}</small></button>`).join('')}</div>
+    ${n === QUALITY.length ? '<p class="small" style="margin:10px 0 0;color:var(--good);font-weight:650">🌈 ¡Día completo! Tu cuerpo (y tu microbiota) lo agradecen.</p>' : ''}
+  </div>`;
+}
+
+function gutCard() {
+  const logs = [];
+  daysBack(30).forEach(d => ((DB.days[d] && DB.days[d].gut) || []).forEach(g => logs.push(g)));
+  let pattern = '';
+  if (logs.length >= 3) {
+    const cnt = {};
+    logs.forEach(g => (g.sus || []).forEach(x => { cnt[x] = (cnt[x] || 0) + 1; }));
+    const top = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
+    if (top && cnt[top] >= 2 && cnt[top] / logs.length >= 0.5) pattern = `<div class="status warn"><b>Posible patrón: ${GUT_SUSPECTS[top][0]}</b>Aparece en ${cnt[top]} de tus ${logs.length} molestias del último mes. ${esc(GUT_SUSPECTS[top][1])}</div>`;
+    else pattern = `<p class="small muted" style="margin:10px 0 0">${logs.length} molestias en 30 días, sin un culpable claro todavía. Sigue anotando.</p>`;
+  }
+  return `<div class="card">
+    <h2>Panza en paz <small>· molestias digestivas</small></h2>
+    <p class="small muted" style="margin-top:0">Si algo te cae mal (de 30 min a 2 h después de comer), anótalo. Con 3 registros te muestro si se repite un alimento.</p>
+    <button class="secondary block" id="fd-gut">+ Anotar molestia</button>
+    ${pattern}
+    <p class="small muted" style="margin:10px 0 0">⚠️ Si se te hinchan labios o lengua, te falta el aire, hay sangre, fiebre o bajas de peso sin querer: ve al médico. Esto no es un diagnóstico.</p>
+  </div>`;
+}
+function openGutForm() {
+  const g = { sym: [], sus: [], sev: 2 };
+  const draw = m => {
+    m.innerHTML = `<h3>¿Qué sentiste?</h3>
+      <div class="chips">${Object.keys(GUT_SYMPTOMS).map(k => `<button class="chip-btn ${g.sym.includes(k) ? 'on' : ''}" data-gs="${k}">${GUT_SYMPTOMS[k]}</button>`).join('')}</div>
+      <div class="small muted" style="font-weight:600;margin:14px 0 6px">¿Qué comiste antes? (lo que sospeches)</div>
+      <div class="chips">${Object.keys(GUT_SUSPECTS).map(k => `<button class="chip-btn ${g.sus.includes(k) ? 'on' : ''}" data-gx="${k}">${GUT_SUSPECTS[k][0]}</button>`).join('')}</div>
+      <div class="small muted" style="font-weight:600;margin:14px 0 6px">¿Qué tan fuerte?</div>
+      <div class="seg">${[[1, 'Leve'], [2, 'Moderada'], [3, 'Fuerte']].map(([v, l]) => `<button data-gv="${v}" class="${g.sev === v ? 'on' : ''}">${l}</button>`).join('')}</div>
+      <div class="row"><button class="secondary" id="gf-cancel" style="flex:1">Cancelar</button><button id="gf-save" style="flex:1">Guardar</button></div>`;
+    const tog = (arr, k) => { const i = arr.indexOf(k); if (i >= 0) arr.splice(i, 1); else arr.push(k); };
+    $$('[data-gs]', m).forEach(b => b.onclick = () => { tog(g.sym, b.dataset.gs); draw(m); });
+    $$('[data-gx]', m).forEach(b => b.onclick = () => { tog(g.sus, b.dataset.gx); draw(m); });
+    $$('[data-gv]', m).forEach(b => b.onclick = () => { g.sev = Number(b.dataset.gv); draw(m); });
+    $('#gf-cancel', m).onclick = closeModal;
+    $('#gf-save', m).onclick = () => {
+      if (!g.sym.length) { toast('Elige al menos un síntoma'); return; }
+      const e = day(todayStr()); e.gut = e.gut || [];
+      e.gut.push(Object.assign({ t: Date.now() }, g)); saveData(); closeModal(); renderFood(); toast('✓ Anotado');
+    };
+  };
+  openModal('', draw);
+}
+
+function microbiomeCard() {
+  const male = DB.profile.sex !== 'f';
+  return `<div class="card">
+    <h2>Tu microbiota <small>· el "segundo genoma"</small></h2>
+    <p class="small" style="margin-top:0">Las bacterias de tu intestino comen fibra y la convierten en compuestos que bajan la inflamación. Meta de fibra: <b>~${male ? 38 : 25} g al día</b> (unos 14 g por cada 1000 kcal).</p>
+    <div class="small muted" style="font-weight:600;margin-bottom:6px">Probióticos (bacterias vivas)</div>
+    <div class="chips">${PROBIOTICS.map(x => `<span class="chip">${esc(x)}</span>`).join('')}</div>
+    <div class="small muted" style="font-weight:600;margin:12px 0 6px">Prebióticos (su comida)</div>
+    <div class="chips">${PREBIOTICS.map(x => `<span class="chip">${esc(x)}</span>`).join('')}</div>
+    <p class="small muted" style="margin:10px 0 0">Ojo: los encurtidos en vinagre o pasteurizados ya no traen bacterias vivas, y el miso pierde las suyas si lo hierves.</p>
+  </div>`;
+}
+
+function seasonCard() {
+  const north = DB.profile.hemi !== 'sur', m = new Date().getMonth(), key = north ? (m + 6) % 12 : m;
+  const name = Object.keys(SEASONS_SOUTH).find(k => SEASONS_SOUTH[k].months.includes(key)), sz = SEASONS_SOUTH[name];
+  const label = { verano: 'Verano', otono: 'Otoño', invierno: 'Invierno', primavera: 'Primavera' }[name];
+  return `<div class="card">
+    <div class="row spread"><h2 style="margin:0">De temporada · ${label}</h2><button class="ghost" id="fd-hemi">${north ? 'Hemisferio norte' : 'Hemisferio sur'} ⇄</button></div>
+    <p class="small muted" style="margin:4px 0 10px">En su temporada están más frescos, más baratos y con más nutrientes.</p>
+    <p class="small" style="margin:0 0 6px">🍓 <b>Frutas:</b> ${esc(sz.fruits)}</p>
+    <p class="small" style="margin:0">🥕 <b>Verduras:</b> ${esc(sz.veg)}</p>
+  </div>`;
+}
+
+function bindFoodExtras(t) {
+  const v = $('#view-food');
+  $('#fd-hunger', v).onclick = openHungerCheck;
+  $('#fd-gut', v).onclick = openGutForm;
+  $('#fd-hemi', v).onclick = () => { DB.profile.hemi = DB.profile.hemi === 'sur' ? 'norte' : 'sur'; saveData(); keepScroll(renderFood); };
+  $$('[data-q]', v).forEach(b => b.onclick = () => {
+    const e = day(t); e.quality = e.quality || {};
+    e.quality[b.dataset.q] = !e.quality[b.dataset.q]; saveData(); vibrate(15); keepScroll(renderFood);
+  });
 }
 
 let mealTab = 'basic';
@@ -2413,7 +2572,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" style="text-align:center">Mi Progreso 6.1 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
+    <p class="small muted" style="text-align:center">Mi Progreso 6.2 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
