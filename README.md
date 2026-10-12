@@ -220,3 +220,11 @@ Las pruebas cubren el cálculo de múltiplos, el manejo de rachas en
 `state.py` y la escalada de drama en `voice.py`. No requieren red ni
 `yfinance` instalado (sólo `fetch.py` depende de la librería, y se importa
 de forma perezosa).
+
+---
+
+## Otros proyectos en este repositorio
+
+- [`ActuaryOS/`](ActuaryOS/README.md): flujo de trabajo actuarial explicable y
+  auditable (reservas Chain Ladder, Bornhuetter-Ferguson y Mack con datos
+  sintéticos). Es independiente de Casandra BMV.

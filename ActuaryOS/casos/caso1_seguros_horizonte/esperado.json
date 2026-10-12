@@ -1,0 +1,16 @@
+{
+  "descripcion": "Resultados esperados del Caso 1 (Seguros Horizonte), calculados a mano con fracciones exactas. Cifras en miles de MXN salvo 'presentacion'.",
+  "tolerancia": 1e-5,
+  "chain_ladder": {
+    "factores": {"12-24": 1.4277777778, "24-36": 1.1981132075, "36-48": 1.1111111111},
+    "factores_fraccion": {"12-24": "514/360", "24-36": "381/318", "36-48": "200/180"},
+    "ultimo": {"2021": 200.0, "2022": 223.3333333333, "2023": 260.9224318658, "2024": 304.1136734218},
+    "reserva": {"2021": 0.0, "2022": 22.3333333333, "2023": 64.9224318658, "2024": 144.1136734218},
+    "reserva_total": 231.3694386210,
+    "presentacion_total": "$231,369.44 MXN"
+  },
+  "bornhuetter_ferguson": {
+    "supuestos": {"siniestralidad_esperada": 0.75, "primas": "primas_devengadas.csv"},
+    "reserva_total": 224.5589938417
+  }
+}
