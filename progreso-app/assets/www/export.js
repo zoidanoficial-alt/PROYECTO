@@ -173,7 +173,7 @@ ${sh.rows.length > 1 ? `<autoFilter ref="A1:${colName(cols - 1)}${sh.rows.length
     { name: '_rels/.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>' },
     { name: 'xl/workbook.xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s, i) => `<sheet name="${xmlEsc(s.name.slice(0, 31))}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets></workbook>` },
     { name: 'xl/_rels/workbook.xml.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>` },
-    { name: 'xl/styles.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF26B2A"/></patternFill></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>' }
+    { name: 'xl/styles.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FF1EE3E0"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF1E2B34"/></patternFill></fill></fills><borders count="1"><border/></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>' }
   ].concat(sheets.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: sheetXml(s) })));
   return zipStore(files);
 }
@@ -198,21 +198,22 @@ async function makePdf(R, opts) {
   const rawText = doc.text.bind(doc);
   doc.text = (t, ...rest) => rawText(Array.isArray(t) ? t.map(safe) : safe(t), ...rest);
   const sheets = buildSheets(R), S = name => sheets.find(s => s.name === name).rows;
-  const W = 210, M = 14, ORANGE = [242, 107, 42], GRAY = [107, 114, 128];
+  const W = 210, M = 14, ORANGE = [255, 95, 10], TEAL = [11, 143, 156], SLATE = [30, 43, 52], CYAN = [30, 227, 224], GRAY = [90, 107, 117];
   let y = 0;
   const p = DB.profile;
 
   // Portada / encabezado
-  doc.setFillColor(...ORANGE); doc.rect(0, 0, W, 34, 'F');
-  doc.setTextColor(255); doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
+  doc.setFillColor(...SLATE); doc.rect(0, 0, W, 34, 'F');
+  doc.setFillColor(...ORANGE); doc.rect(0, 34, W, 1.6, 'F');
+  doc.setTextColor(...CYAN); doc.setFont('helvetica', 'bold'); doc.setFontSize(20);
   doc.text('Reporte de progreso', M, 16);
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(238, 246, 247);
   doc.text(`${p.name ? p.name + ' · ' : ''}${longDate(R.from)} a ${longDate(R.to)} · Mi Progreso`, M, 25);
   doc.setTextColor(17); y = 44;
 
   const h2 = txt => {
     if (y > 255) { doc.addPage(); y = 18; } else if (y > 50) y += 4;
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...ORANGE); doc.text(txt, M, y);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...TEAL); doc.text(txt, M, y);
     doc.setTextColor(17); doc.setFont('helvetica', 'normal'); y += 5;
   };
   const para = txt => {
@@ -226,7 +227,7 @@ async function makePdf(R, opts) {
     doc.autoTable(Object.assign({
       head: [head], body, startY: y, margin: { left: M, right: M }, theme: 'grid',
       styles: { fontSize: 8.5, cellPadding: 1.8, lineColor: [229, 231, 235], lineWidth: 0.2 },
-      headStyles: { fillColor: ORANGE, textColor: 255, fontStyle: 'bold' },
+      headStyles: { fillColor: SLATE, textColor: CYAN, fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [248, 249, 251] }
     }, extra || {}));
     y = doc.lastAutoTable.finalY + 8;
@@ -244,7 +245,7 @@ async function makePdf(R, opts) {
     for (let i = 0; i <= 3; i++) { const v = lo + (hi - lo) * i / 3; doc.line(x0, py(v), x1, py(v)); doc.text(v.toFixed(1), M, py(v) + 1); }
     doc.text(shortDate(pts[0].date), x0, bot + 4); doc.text(shortDate(pts[pts.length - 1].date), x1, bot + 4, { align: 'right' });
     if (goal != null) { doc.setDrawColor(22, 163, 74); doc.setLineDashPattern([1.5, 1.2], 0); doc.line(x0, py(goal), x1, py(goal)); doc.setLineDashPattern([], 0); doc.setTextColor(22, 163, 74); doc.text('Meta ' + goal, x1, py(goal) - 1, { align: 'right' }); }
-    doc.setDrawColor(...ORANGE); doc.setLineWidth(0.7);
+    doc.setDrawColor(...TEAL); doc.setLineWidth(0.7);
     for (let i = 1; i < pts.length; i++) doc.line(px(pts[i - 1].date), py(pts[i - 1].y), px(pts[i].date), py(pts[i].y));
     doc.setFontSize(8); doc.setTextColor(...GRAY); doc.text(label, x0, top - 1);
     doc.setTextColor(17); y = bot + 10;
@@ -321,7 +322,7 @@ async function makePdf(R, opts) {
   doc.addPage(); y = 18;
   h2('Cómo analizar este reporte con una IA');
   para('Sube este PDF (o el Excel, que trae los datos crudos en hojas separadas) a ChatGPT, Claude o Gemini y pega este mensaje:');
-  doc.setFillColor(255, 241, 232); const pl = doc.splitTextToSize(aiPrompt(R), W - 2 * M - 8);
+  doc.setFillColor(224, 247, 247); const pl = doc.splitTextToSize(aiPrompt(R), W - 2 * M - 8);
   doc.roundedRect(M, y, W - 2 * M, pl.length * 4.6 + 8, 3, 3, 'F'); doc.setFontSize(10); doc.setTextColor(17); doc.text(pl, M + 4, y + 7); y += pl.length * 4.6 + 14;
   para('Glosario: RIR = repeticiones en reserva (0 = fallo). RPE = 10 - RIR. 1RM estimado = peso × (1 + reps/30). Serie efectiva = serie de trabajo con RIR de 3 o menos. Media de 7 días = promedio del peso de los últimos 7 días.');
 

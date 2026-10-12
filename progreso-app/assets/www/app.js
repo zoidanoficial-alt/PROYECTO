@@ -51,7 +51,7 @@ const KEY = 'miprogreso.v1';   // misma clave desde la 1.0: los datos se conserv
 
 function defaultProfile() {
   return {
-    theme: 'light',
+    theme: 'dark', logoTheme: true,
     name: '', height: 180, age: 29,
     startWeight: 88, startDate: '2026-10-09', goalWeight: 81,
     phase: 'definicion', somatotype: 'meso',
@@ -696,7 +696,7 @@ function pwoCard() {
   const left = pwoLeft();
   if (left == null) return '';
   const e = DB.days[todayStr()] || {}, s = e.supps || {};
-  return `<div class="card" style="border-color:rgba(249,115,22,.5)">
+  return `<div class="card" style="border:1px solid rgba(255,95,10,.5)">
     <div class="row spread"><h2 style="margin:0">Ventana post-entreno</h2><span class="pill" id="pwo-left">${mmss(left / 1000)}</span></div>
     <p class="small muted" style="margin:6px 0 8px">Tu cuerpo pasa de catabólico a anabólico: aprovecha los primeros ${PWO_MINUTES} min.</p>
     ${PWO_ITEMS.map(([id, name, sub]) => `<label class="check" style="margin:6px 0"><input type="checkbox" data-pwo="${id}" ${s[id] ? 'checked' : ''}> <span>${esc(name)}<br><span class="small muted">${esc(sub)}</span></span></label>`).join('')}
@@ -761,7 +761,7 @@ function renderHome() {
       <div class="row spread" style="margin-bottom:10px"><h2 style="margin:0">Hoy</h2><span class="small muted">${tg.kcal.toLocaleString('es-MX')} kcal objetivo</span></div>
       <div class="rings">
         <div>${ring(tot.kcal, tg.kcal, 'var(--accent)', Math.round(tot.kcal / Math.max(1, tg.kcal) * 100) + '%')}<div class="ring-label"><b>${tot.kcal.toLocaleString('es-MX')}</b>kcal</div></div>
-        <div>${ring(tot.p, tg.protein, 'var(--violet)', Math.round(tot.p) + 'g')}<div class="ring-label"><b>de ${tg.protein} g</b>proteína</div></div>
+        <div>${ring(tot.p, tg.protein, 'var(--orange)', Math.round(tot.p) + 'g')}<div class="ring-label"><b>de ${tg.protein} g</b>proteína</div></div>
         <div>${ring(tot.water, tg.water, 'var(--blue)', fmt(tot.water / 1000, 1) + 'L')}<div class="ring-label"><b>de ${fmt(tg.water / 1000, 1)} L</b>agua</div></div>
       </div>
       ${tot.s > tg.sugar ? `<div class="status bad"><b>Azúcar: ${Math.round(tot.s)} g</b>Pasaste el máximo de ${tg.sugar} g de hoy.</div>` : ''}
@@ -839,7 +839,7 @@ function drawSpark(canvas, ys) {
   const lo = Math.min(...ys), hi = Math.max(...ys), span = Math.max(hi - lo, 0.5);
   const px = i => 4 + i / (ys.length - 1) * (W - 8), py = v => 6 + (1 - (v - lo) / span) * (H - 12);
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, 'rgba(242,107,42,.22)'); g.addColorStop(1, 'rgba(242,107,42,0)');
+  g.addColorStop(0, 'rgba(30,227,224,.22)'); g.addColorStop(1, 'rgba(30,227,224,0)');
   ctx.beginPath(); ys.forEach((v, i) => i ? ctx.lineTo(px(i), py(v)) : ctx.moveTo(px(i), py(v)));
   ctx.lineTo(px(ys.length - 1), H); ctx.lineTo(px(0), H); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
   ctx.beginPath(); ys.forEach((v, i) => i ? ctx.lineTo(px(i), py(v)) : ctx.moveTo(px(i), py(v)));
@@ -965,10 +965,10 @@ const BODY_BACK = {
 function heatColor(g, groups) {
   const n = groups[g] || 0, ratio = n / WEEKLY_TARGET[g];
   if (!n) return 'var(--line)';
-  if (ratio > OVERREACH) return '#ef4444';
-  if (ratio >= 0.85) return '#22c55e';
-  if (ratio >= 0.5) return '#eab308';
-  return '#60a5fa';
+  if (ratio > OVERREACH) return '#ff5f0a';
+  if (ratio >= 0.85) return '#1ee3e0';
+  if (ratio >= 0.5) return '#0e9fae';
+  return '#4f6b7a';
 }
 function bodySvg(parts, groups, label) {
   const silhouette = '<circle cx="50" cy="14" r="10"/><path d="M38 28H62L80 40L84 90H76L72 52L66 58L66 104L62 190H52L50 110L48 190H38L34 104L34 58L28 52L24 90H16L20 40Z"/>';
@@ -983,8 +983,8 @@ function heatmapCard(vol) {
     <h2>Mapa muscular <small>· series efectivas, últimos 7 días</small></h2>
     <div class="body-maps">${bodySvg(BODY_FRONT, g, 'Frente')}${bodySvg(BODY_BACK, g, 'Espalda')}</div>
     <div class="legend" style="justify-content:center;margin-bottom:8px">
-      <span><i style="background:#60a5fa"></i>Poco</span><span><i style="background:#eab308"></i>Casi</span>
-      <span><i style="background:#22c55e"></i>Óptimo</span><span><i style="background:#ef4444"></i>Exceso</span></div>
+      <span><i style="background:#4f6b7a"></i>Poco</span><span><i style="background:#0e9fae"></i>Casi</span>
+      <span><i style="background:#1ee3e0"></i>Óptimo</span><span><i style="background:#ff5f0a"></i>Exceso</span></div>
     ${Object.keys(WEEKLY_TARGET).map(k => {
       const n = g[k] || 0, t = WEEKLY_TARGET[k];
       return `<div class="vol-row"><span>${GROUPS[k]}</span><div class="bar"><div style="width:${Math.min(100, n / (t * OVERREACH) * 100)}%;background:${heatColor(k, g)}"></div></div><span style="text-align:right">${n}/${t}</span></div>`;
@@ -1120,17 +1120,66 @@ function sessionExercises(s) {
     const d = getRoutine(s.routine).days.find(x => x.id === s.dayId);
     base = d ? d.ex : [];
   }
-  return base.concat(s.extra || []).map((e, i) => s.swaps && s.swaps[i] ? [s.swaps[i]].concat(e.slice(1)) : e);
+  return base.concat(s.extra || []).map((e, i) => {
+    let x = s.swaps && s.swaps[i] ? [s.swaps[i]].concat(e.slice(1)) : e;
+    if (s.sets && s.sets[i] != null) x = [x[0], s.sets[i]].concat(x.slice(2));   // meta de series cambiada en la sesión
+    return x;
+  });
 }
 
-/* Estado de la pantalla de sesión: qué ejercicio está abierto y el RIR elegido en cada uno. */
-const SESS_UI = { sid: null, open: 0, rir: {}, more: {} };
+/* Estado de la pantalla de sesión: ejercicio abierto, RIR elegido, series iguales a guardar y
+   el avance que ya mostraba cada barra (para animarla desde ahí). */
+const SESS_UI = { sid: null, open: 0, rir: {}, more: {}, n: {}, prog: {}, celebrate: null };
+
+/** Mensaje de la barra de un ejercicio: siempre en positivo, nunca lo que falta como reproche. */
+function progMsg(n, sets, beat) {
+  if (!n) return '💪 ¡Vamos por la primera!';
+  if (n > sets) return `🦾 ¡Modo bestia! +${n - sets} extra`;
+  if (n === sets) return beat ? '💯 ¡Al 1000%! Superaste tu última vez' : '🏆 ¡Completado! Lo diste todo';
+  if (n === sets - 1) return '⚡ ¡Última serie! Dalo todo';
+  if (n / sets >= 0.5) return '🔥 ¡Mitad hecha! No aflojes';
+  return '🚀 ¡Buen arranque! Sigue así';
+}
+/** Barra de progreso con una marca por serie; se anima desde el valor que tenía antes de guardar. */
+function progBar(n, sets, key, big) {
+  const pct = sets ? Math.min(1, n / sets) : 0;
+  const from = SESS_UI.prog[key] != null ? SESS_UI.prog[key] : pct;
+  SESS_UI.prog[key] = pct;
+  const ticks = sets > 1 && sets <= 12 ? Array.from({ length: sets - 1 }, (_, k) => `<i style="left:${(k + 1) / sets * 100}%"></i>`).join('') : '';
+  return `<div class="xp ${big ? 'big' : ''} ${pct >= 1 ? 'full' : ''} ${n > sets ? 'extra' : ''}">
+    <div class="xp-track"><div class="xp-fill" data-to="${(pct * 100).toFixed(1)}" style="width:${(from * 100).toFixed(1)}%"></div>${big ? '' : ticks}</div>
+    <b class="xp-num">${big ? Math.round(pct * 100) + '%' : n + '/' + sets}</b></div>`;
+}
+/** Trabajo comparable con la última vez: kg × reps, o solo reps si es con peso corporal. */
+function beatLast(name, done, sid) {
+  const lt = lastTime(name, sid);
+  if (!lt) return null;
+  const bw = lt.sets.every(x => !x.w);
+  const work = arr => arr.reduce((a, x) => a + (bw ? x.r : x.w * x.r), 0);
+  const prev = work(lt.sets), now = work(done);
+  return prev ? { bw, prev, now, ratio: now / prev } : null;
+}
+/** Confeti con los colores del logo al completar un ejercicio. */
+function burst(el) {
+  if (!el || !gamify()) return;
+  const colors = ['#1ee3e0', '#8af5f0', '#ff5f0a', '#ff8a3d', '#0e9fae'];
+  for (let k = 0; k < 22; k++) {
+    const c = document.createElement('span');
+    c.className = 'confetti';
+    const ang = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 110;
+    c.style.cssText = `background:${colors[k % colors.length]};--dx:${Math.cos(ang) * dist}px;--dy:${Math.sin(ang) * dist - 30}px;--rot:${Math.random() * 720 - 360}deg;animation-delay:${Math.random() * .12}s`;
+    el.appendChild(c);
+    setTimeout(() => c.remove(), 1400);
+  }
+  el.classList.add('celebrate');
+  setTimeout(() => el.classList.remove('celebrate'), 1300);
+}
 
 function renderSession(s) {
   document.body.classList.add('in-session');
   const exs = sessionExercises(s);
   if (SESS_UI.sid !== s.id) {
-    SESS_UI.sid = s.id; SESS_UI.rir = {}; SESS_UI.more = {};
+    SESS_UI.sid = s.id; SESS_UI.rir = {}; SESS_UI.more = {}; SESS_UI.n = {}; SESS_UI.prog = {};
     const firstOpen = exs.findIndex(e => DB.lifts.filter(l => l.sid === s.id && l.ex === e[0]).length < e[1]);
     SESS_UI.open = s.open != null ? s.open : firstOpen < 0 ? 0 : firstOpen;
   }
@@ -1143,7 +1192,8 @@ function renderSession(s) {
     <div class="card">
       <div class="row spread"><div><div class="small muted">En curso · ${mins} min</div><div style="font-size:19px;font-weight:750">${esc(s.dayName)}</div></div>
         <div style="text-align:right"><div style="font-size:19px;font-weight:750">${done.length}<span class="muted" style="font-size:14px">/${targetSets || '–'}</span></div><div class="small muted">series</div></div></div>
-      <div class="bar"><div style="width:${targetSets ? Math.min(100, done.length / targetSets * 100) : 0}%"></div></div>
+      ${progBar(done.length, targetSets, 'all', true)}
+      <div class="xp-msg">${!done.length ? '🔥 Hoy vienes por todo. ¡Primera serie!' : done.length >= targetSets ? '🏆 ¡Entreno completo! Termina cuando quieras' : done.length / targetSets >= 0.5 ? '⚡ Ya pasaste la mitad, ¡no aflojes!' : '🚀 Vas encendido, sigue sumando'}</div>
       <div class="small muted">${Math.round(vol).toLocaleString('es-MX')} kg movidos${isDeload() ? ' · <b style="color:var(--warn)">día de descarga</b>' : ''}</div>
     </div>
     ${exs.length ? exs.map((e, i) => exerciseCard(s, e, i)).join('') : '<div class="card"><div class="empty"><span class="emoji">🏋️</span>Añade tu primer ejercicio.</div></div>'}
@@ -1157,7 +1207,24 @@ function renderSession(s) {
     SESS_UI.open = SESS_UI.open === i ? -1 : i;
     keepScroll(() => renderSession(s));
   });
-  const relabel = i => { const b = $('#save-' + i); if (b) b.textContent = saveLabel($('#w-' + i).value, $('#r-' + i).value, unitFor(exs[i][0])); };
+  const relabel = i => { const b = $('#save-' + i); if (b) b.textContent = saveLabel($('#w-' + i).value, $('#r-' + i).value, unitFor(exs[i][0]), SESS_UI.n[i] || 1); };
+  // Series iguales: guarda varias series con el mismo peso y reps de una vez.
+  $$('#view-train [data-nset]').forEach(b => b.onclick = () => {
+    const [i, d] = b.dataset.nset.split('|').map(Number);
+    SESS_UI.n[i] = Math.max(1, Math.min(10, (SESS_UI.n[i] || 1) + d));
+    $('#n-' + i).textContent = SESS_UI.n[i]; vibrate(15); relabel(i);
+  });
+  // Meta de series de hoy para este ejercicio.
+  $$('#view-train [data-meta]').forEach(b => b.onclick = () => {
+    const [i, d] = b.dataset.meta.split('|').map(Number);
+    s.sets = s.sets || {};
+    s.sets[i] = Math.max(1, Math.min(12, exs[i][1] + d));
+    saveData(); vibrate(15); keepScroll(() => renderSession(s));
+  });
+  // Las barras crecen desde donde estaban hasta el nuevo avance.
+  const fills = $$('#view-train .xp-fill[data-to]');
+  if (fills.length) { void fills[0].offsetWidth; requestAnimationFrame(() => fills.forEach(f => { f.style.width = f.dataset.to + '%'; })); }
+  if (SESS_UI.celebrate != null) { const c = $(`#view-train [data-card="${SESS_UI.celebrate}"]`); SESS_UI.celebrate = null; setTimeout(() => burst(c), 350); }
   $$('#view-train [data-step]').forEach(b => b.onclick = () => {
     const [i, field, dir] = b.dataset.step.split('|'), ex = exs[Number(i)][0];
     const inp = $('#' + field + '-' + i), v = num(inp.value) || 0;
@@ -1225,17 +1292,18 @@ function exerciseCard(s, e, i) {
   const complete = done.length >= sets;
   const open = SESS_UI.open === i;
   const sug = suggestion(name, reps, s.id);
-  const dots = Array.from({ length: Math.max(sets, done.length) }, (_, k) => `<i class="${k < done.length ? 'on' : ''}"></i>`).join('');
+  const beat = beatLast(name, done, s.id), won = beat && beat.ratio >= 1;
   const head = `<div class="ex-head" data-open="${i}">
       <div class="ex-ico-wrap" data-howto="${esc(name)}">${exIcon(name, 68)}${complete ? '<span class="ex-done">✓</span>' : ''}</div>
       <div style="flex:1;min-width:0"><h4>${esc(name)}</h4>
         <div class="ex-meta">${sets} × ${esc(reps)} · ${EQUIP[info.e] || ''}${info.pf && DB.profile.gym === 'pf' ? ' · <span style="color:var(--violet)">PF</span>' : ''}</div>
-        <div class="dots">${dots}</div></div>
+        ${progBar(done.length, sets, 'ex' + i)}
+        <div class="xp-msg">${progMsg(done.length, sets, won)}${won && done.length < sets ? ' · 🚀 ya superaste tu última vez' : ''}</div></div>
       <button class="icon-btn" data-swap="${i}" aria-label="Cambiar ejercicio" title="Máquina ocupada: cambiar">⇄</button>
     </div>
     ${s.adapt && s.adapt[i] && s.swaps && s.swaps[i] === name ? `<div class="adapt-note">✨ Adaptado: ${esc(s.adapt[i])}</div>` : ''}
     ${exIssues(name).length ? `<div class="adapt-note warn">⚠ ${esc(issueText(exIssues(name), name))}. Toca ⇄ para cambiarlo.</div>` : ''}`;
-  if (!open) return `<div class="ex-card ${complete ? 'done' : ''}">${head}</div>`;
+  if (!open) return `<div class="ex-card ${complete ? 'done' : ''}" data-card="${i}">${head}</div>`;
 
   const lastSet = done[done.length - 1];
   const bodyweight = ['corporal', 'fija'].includes(info.e);
@@ -1243,7 +1311,12 @@ function exerciseCard(s, e, i) {
   const preR = lastSet ? lastSet.r : sug ? sug.a.r : '';
   const rir = SESS_UI.rir[i] != null ? SESS_UI.rir[i] : lastSet && lastSet.rir != null ? lastSet.rir : 2;
   const best = done.length ? Math.max(...done.map(d => e1rm(d.w, d.r))) : null;
-  return `<div class="ex-card">
+  const n = SESS_UI.n[i] || 1;
+  const beatHtml = beat ? `<div class="beat ${won ? 'win' : ''}">
+      <div class="row spread small"><span>⚔️ Contra tu última vez</span><b>${Math.round(beat.ratio * 100)}%</b></div>
+      <div class="beat-track"><div class="beat-fill" style="width:${Math.min(100, beat.ratio / 1.25 * 100)}%"></div><i class="beat-goal" style="left:80%"></i></div>
+      <div class="small muted">${won ? '🚀 ¡Ya la superaste! Cada rep extra es ganancia pura.' : `Te faltan ${beat.bw ? Math.ceil(beat.prev - beat.now) + ' reps' : wFmt(beat.prev - beat.now, u).replace(/ (kg|lb)$/, ' $1 de volumen')} para superarla. ¡Tú puedes!`}</div></div>` : '';
+  return `<div class="ex-card" data-card="${i}">
     ${head}
     <div class="ex-body">
       ${sug ? `<div class="suggest"><b>Para superarte hoy:</b><br>
@@ -1255,7 +1328,9 @@ function exerciseCard(s, e, i) {
         const tech = TECHNIQUES[d.tech] && d.tech !== 'normal' ? ' · ' + TECHNIQUES[d.tech].short : '';
         return `<span class="set-chip ${pr ? 'pr' : ''}" data-edit="${d.id}">${k + 1}. <b>${wFmt(d.w, u)} × ${d.r}</b>${d.rir != null ? ' · RIR ' + d.rir : ''}${tech}${pr ? ' ↑' : ''}</span>`;
       }).join('')}</div>` : ''}
-      <div class="small muted" style="margin-bottom:6px;font-weight:600">Serie ${done.length + 1}${done.length < sets ? ' de ' + sets : ' (extra)'} · descanso ${mmss(rest || 90)}</div>
+      ${beatHtml}
+      <div class="meta-row"><span>Serie ${done.length + 1}${done.length < sets ? ' de ' + sets : ' (extra)'} · descanso ${mmss(rest || 90)}</span>
+        <span class="mini-step" title="Meta de series de hoy"><button data-meta="${i}|-1" aria-label="Una serie menos">−</button><b>Meta ${sets}</b><button data-meta="${i}|1" aria-label="Una serie más">+</button></span></div>
       <div class="steppers">
         <div class="stepper"><div class="s-label">${bodyweight ? 'Peso extra' : 'Peso'} <button class="unit-toggle" data-unit="${i}">${u} ⇄</button></div>
           <div class="s-row"><button data-step="${i}|w|-1">−</button><input id="w-${i}" inputmode="decimal" value="${preW}" placeholder="0"><button data-step="${i}|w|1">+</button></div></div>
@@ -1264,7 +1339,9 @@ function exerciseCard(s, e, i) {
       </div>
       <div class="rir-label"><span>¿Cuántas más podías hacer? (RIR)</span><button class="info-btn" data-info="1">?</button></div>
       <div class="rir-row">${[[0, 'fallo'], [1, 'una'], [2, 'dos'], [3, 'tres'], [4, 'fácil']].map(([v, l]) => `<button data-rir="${i}|${v}" class="${v === rir ? 'on' : ''}">${v === 4 ? '4+' : v}<small>${l}</small></button>`).join('')}</div>
-      <button class="block save-set" data-log="${i}" id="save-${i}">${saveLabel(preW, preR, u)}</button>
+      <div class="sets-row"><span>¿Cuántas series así?<small>Si hiciste varias iguales, guárdalas de una vez</small></span>
+        <span class="mini-step"><button data-nset="${i}|-1" aria-label="Menos series">−</button><b id="n-${i}">${n}</b><button data-nset="${i}|1" aria-label="Más series">+</button></span></div>
+      <button class="block save-set" data-log="${i}" id="save-${i}">${saveLabel(preW, preR, u, n)}</button>
       ${best && !isSimple() ? `<div class="small muted" style="margin-top:8px;text-align:center">1RM estimado hoy: <b style="color:var(--text)">${wFmt(best, u)}</b>${sug ? ' · antes ' + wFmt(sug.last.best, u) : ''}</div>` : ''}
       <div class="ex-tools">
         <button class="secondary small-btn" data-howto="${esc(name)}">📖 Cómo se hace</button>
@@ -1290,6 +1367,7 @@ function repeatFromTimer() {
   saveData(); vibrate(prs.length ? 150 : 40);
   const n = DB.lifts.filter(l => l.sid === s.id && l.ex === r.ex).length;
   toast((prs.length ? '🏆 ' : '✓ ') + 'Serie ' + n + ' guardada: ' + wFmt(set.w, unitFor(set.ex)) + ' × ' + set.r);
+  if (n === e[1]) SESS_UI.celebrate = exs.indexOf(e);
   if (n >= e[1]) {
     const next = exs.findIndex((x, k) => k > r.i && DB.lifts.filter(l => l.sid === s.id && l.ex === x[0]).length < x[1]);
     if (next >= 0) SESS_UI.open = next;
@@ -1298,9 +1376,12 @@ function repeatFromTimer() {
   if (currentTab === 'train') keepScroll(() => renderSession(s));
 }
 
-function saveLabel(w, r, u) {
-  if (num(w) == null || !num(r)) return '✓ Guardar serie';
-  return num(w) === 0 ? `✓ Guardar ${num(r)} reps` : `✓ Guardar ${num(w)} ${u} × ${num(r)}`;
+function saveLabel(w, r, u, n) {
+  n = n || 1;
+  const what = n > 1 ? n + ' series' : 'serie';
+  if (num(w) == null || !num(r)) return '✓ Guardar ' + what;
+  const load = num(w) === 0 ? `${num(r)} reps` : `${num(w)} ${u} × ${num(r)}`;
+  return n > 1 ? `✓ Guardar ${n} series · ${load}` : `✓ Guardar ${load}`;
 }
 
 function logSet(s, i) {
@@ -1310,21 +1391,31 @@ function logSet(s, i) {
   const lastSet = DB.lifts.filter(l => l.sid === s.id && l.ex === ex).sort((a, b) => b.t - a.t)[0];
   const rir = SESS_UI.rir[i] != null ? SESS_UI.rir[i] : lastSet && lastSet.rir != null ? lastSet.rir : 2;
   const techSel = $('#t-' + i);
-  const set = { id: uid(), ex, w: toKg(w, u), r: Math.round(r), rir, date: s.date, t: Date.now(), sid: s.id, tech: techSel ? techSel.value : 'normal' };
-  DB.lifts.push(set);
-  const prs = checkSetRecords(set);
+  const before = DB.lifts.filter(l => l.sid === s.id && l.ex === ex).length;
+  const count = Math.max(1, Math.min(10, SESS_UI.n[i] || 1));
+  let prs = [];
+  for (let k = 0; k < count; k++) {
+    const set = { id: uid(), ex, w: toKg(w, u), r: Math.round(r), rir, date: s.date, t: Date.now() + k, sid: s.id, tech: techSel ? techSel.value : 'normal' };
+    DB.lifts.push(set);
+    prs = prs.concat(checkSetRecords(set));
+  }
+  SESS_UI.n[i] = 1;
   saveData();
   vibrate(prs.length ? 150 : 40);
   if (prs.length && gamify()) toast('🏆 ¡Récord en ' + ex + '!');
-  // Al completar las series objetivo, se abre el siguiente ejercicio pendiente.
-  const n = DB.lifts.filter(l => l.sid === s.id && l.ex === ex).length;
+  else if (count > 1) toast('✓ ' + count + ' series guardadas');
+  // Al completar las series objetivo: festejo y se abre el siguiente ejercicio pendiente.
+  const n = before + count, finished = before < e[1] && n >= e[1];
+  if (finished) SESS_UI.celebrate = i;
   if (n >= e[1]) {
     const next = exs.findIndex((x, k) => k > i && DB.lifts.filter(l => l.sid === s.id && l.ex === x[0]).length < x[1]);
-    if (next >= 0) { SESS_UI.open = next; toast(prs.length ? '🏆 ¡Récord! Siguiente: ' + exs[next][0] : '✓ Listo. Siguiente: ' + exs[next][0]); }
+    if (next >= 0) { SESS_UI.open = next; toast(prs.length ? '🏆 ¡Récord! Siguiente: ' + exs[next][0] : '✓ ¡Ejercicio completo! Siguiente: ' + exs[next][0]); }
+    else if (finished) toast('🏆 ¡' + ex + ' completo!');
   }
   startRest(e[3] || 90, 'Descanso · ' + ex, n < e[1] ? { sid: s.id, i, ex } : null);
   keepScroll(() => renderSession(s));
-  if (n >= e[1]) setTimeout(() => { const c = $$('#view-train .ex-card')[SESS_UI.open]; if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60);
+  // Si hubo festejo, se espera a que se vea antes de bajar al siguiente ejercicio.
+  if (n >= e[1]) setTimeout(() => { const c = $(`#view-train [data-card="${SESS_UI.open}"]`); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, finished ? 1100 : 60);
 }
 
 function openEditSet(id, after) {
@@ -2168,7 +2259,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" style="text-align:center">Mi Progreso 5.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
+    <p class="small muted" style="text-align:center">Mi Progreso 6.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
@@ -2273,7 +2364,7 @@ function openOnboarding() {
   const progress = () => `<div class="ob-step">Paso ${step + 1} de ${total}</div><div class="ob-progress">${Array.from({ length: total }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   const choice = (key, val, ico, title, sub) => `<button class="choice ${draft[key] === val ? 'on' : ''}" data-ch="${key}|${val}"><span class="c-ico">${ico}</span><span><b>${title}</b><small>${sub}</small></span></button>`;
   const steps = [
-    () => `<h3>¡Hola! 👋 Configuremos tu app</h3><p class="small muted" style="margin-top:0">Gratis, sin anuncios, sin cuenta y sin internet. Con esto calculo tus metas; lo puedes cambiar luego en Más.</p>
+    () => `<img class="ob-logo" src="img/logo.png" alt=""><h3>¡Hola! 👋 Configuremos tu app</h3><p class="small muted" style="margin-top:0">Gratis, sin anuncios, sin cuenta y sin internet. Con esto calculo tus metas; lo puedes cambiar luego en Más.</p>
       <label>¿Cómo te llamas?<input id="ob-name" value="${esc(draft.name)}" placeholder="Tu nombre"></label>
       <div class="grid2">
         <label>Peso actual (kg)<input id="ob-w" inputmode="decimal" value="${draft.startWeight}"></label>
@@ -2360,6 +2451,8 @@ setInterval(() => {
 
 DB = loadData();
 registerCustomExercises();
+// 6.0: los colores del logo son oscuros; se aplica una sola vez el tema oscuro (luego se puede volver a Claro).
+if (!DB.profile.logoTheme) { DB.profile.theme = 'dark'; DB.profile.logoTheme = true; }
 // Quien ya usaba la app (tiene registros) no ve la bienvenida.
 if (DB.profile.onboarded == null) DB.profile.onboarded = DB.lifts.length > 0 || Object.keys(DB.days).length > 1;
 saveData();
