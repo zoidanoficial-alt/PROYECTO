@@ -516,3 +516,48 @@ label.mini > input { margin-top: 3px; }
 .q-item b { font-size: 13px; line-height: 1.2; }
 .q-item small { font-size: 11px; color: var(--muted); line-height: 1.25; }
 .q-item.on { border-color: var(--accent); background: var(--accent-soft); }
+
+/* ---------- 7.0: coach, chequeo, análisis y retos ---------- */
+.seg.wrap { flex-wrap: wrap; }
+.seg.wrap button { flex: 1 0 30%; }
+.ck-row { display: flex; align-items: center; justify-content: space-between; background: var(--surface-2); border-radius: 14px; padding: 8px 8px 8px 14px; font-size: 14px; }
+.ck-q { font-size: 13px; font-weight: 650; color: var(--muted); margin: 12px 0 6px; }
+.ck-scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.ck-scale button { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 2px; min-height: 0; background: var(--surface-2); color: var(--text); border: 2px solid transparent; border-radius: 12px; font-weight: 500; }
+.ck-scale button span { font-size: 22px; line-height: 1.1; }
+.ck-scale button small { font-size: 10px; color: var(--muted); }
+.ck-scale button.on { border-color: var(--accent); background: var(--accent-soft); }
+.ready-score { margin: 4px 0 2px; }
+.why-row { display: grid; grid-template-columns: 26px 1fr auto; gap: 6px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.why-row b.neg { color: var(--warn); } .why-row b.pos { color: var(--good); }
+.plan-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.plan-pick button { display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--surface-2); color: var(--text); border: 2px solid transparent; font-size: 20px; padding: 10px 4px; }
+.plan-pick button b { font-size: 13px; }
+.plan-pick button.on { border-color: var(--accent); background: var(--accent-soft); }
+.ck-prompt { border: 1px solid var(--accent); }
+.coach-row, .tr-row, .sum-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.coach-row:last-child, .tr-row:last-of-type, .sum-row:last-of-type { border-bottom: 0; }
+.coach-row .grow, .tr-row .grow, .sum-row .grow { flex: 1; min-width: 0; }
+.coach-tag { flex: none; font-size: 12px; font-weight: 700; padding: 5px 9px; border-radius: 99px; background: var(--surface-2); cursor: pointer; white-space: nowrap; }
+.coach-tag.subir { background: var(--orange-soft); color: var(--orange); }
+.coach-tag.reps { background: var(--accent-soft); color: var(--accent); }
+.coach-tag.estancado, .coach-tag.bajar { background: var(--warn-soft); color: var(--warn); }
+.ana-big { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ana-big b { font-size: 24px; font-variant-numeric: tabular-nums; }
+.sim { background: var(--accent-soft); border-radius: 14px; padding: 10px 12px; margin-top: 8px; }
+.sim b { font-size: 17px; color: var(--accent); }
+.goal-row { padding: 8px 0 12px; border-bottom: 1px solid var(--line); }
+.goal-row:last-child { border-bottom: 0; }
+.mini-bars { position: relative; display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; height: 90px; align-items: end; margin-top: 6px; padding-bottom: 16px; }
+.mini-bars .mb { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.mini-bars .mb i { width: 100%; border-radius: 6px 6px 3px 3px; background: linear-gradient(180deg, var(--cyan), var(--blue)); opacity: .85; }
+.mini-bars .mb i.ok { background: linear-gradient(180deg, var(--orange-2), var(--orange)); opacity: 1; }
+.mini-bars .mb small { position: absolute; bottom: -16px; font-size: 10px; color: var(--muted); }
+.mini-bars .mb-goal { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--orange); margin-bottom: 16px; }
+#ch-card { position: relative; overflow: hidden; }
+.ch-row { display: flex; gap: 10px; align-items: center; padding: 6px 0; }
+.ch-row .grow { flex: 1; min-width: 0; font-size: 14px; }
+.ch-row .ch-ico { font-size: 24px; }
+.ch-row.done b { color: var(--good); }
+.fix-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+#modal { position: relative; }

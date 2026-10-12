@@ -73,7 +73,8 @@ function defaultData() {
     custom: { name: 'Mi rutina', desc: 'Rutina creada por ti.', days: [] },
     units: {}, achievements: [], customEx: [], pauses: [],
     // 6.1: grupos de ejercicios ("Mis entrenos") y qué entreno toca cada día (0 = lunes … 6 = domingo)
-    workouts: [], plan: [null, null, null, null, null, null, null]
+    workouts: [], plan: [null, null, null, null, null, null, null],
+    goals: [], challenges: null
   };
 }
 /** Pasa los días de la rutina personalizada anterior a "Mis entrenos" y los reparte en la semana. */
@@ -106,6 +107,7 @@ function loadData() {
         achievements: d.achievements || [],
         customEx: d.customEx || [],
         pauses: d.pauses || [],
+        goals: d.goals || [], challenges: d.challenges || null,
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -367,9 +369,12 @@ function suggestion(ex, repsText, sid) {
   } else if (rir === 0 && r < lo) {
     a = opt(w, r + 1); b = opt(w - step, lo);
     why = 'La última vez llegaste al fallo por debajo del rango: consolida el peso.';
-  } else if (r >= hi) {
+  } else if (r >= hi && last.sets.filter(x => Math.abs(x.w - last.top.w) < 0.01).every(x => x.r >= hi)) {
     a = opt(w + step, lo); b = opt(w, r + 1);
-    why = `Llegaste al tope del rango (${hi}): toca subir peso.`;
+    why = `Hiciste el tope del rango (${hi}) en todas las series con ese peso: toca subir.`;
+  } else if (r >= hi) {
+    a = opt(w, hi); b = opt(w + step, lo);
+    why = `Llegaste a ${hi} en tu mejor serie, pero no en todas: mismo peso hasta completar ${hi} en cada serie.`;
   } else {
     a = opt(w, r + 1); b = opt(w + step, Math.max(lo, r - 1));
     why = 'Una rep más con el mismo peso, o un escalón más de peso.';
@@ -437,8 +442,10 @@ function recoveryToday() {
 function isDeload() {
   const t = todayStr();
   if (DB.days[t] && DB.days[t].deload != null) return DB.days[t].deload;
-  const r = recoveryToday();
-  return !!(r && r.low);
+  const s = activeSession();
+  if (s && s.adjustDone) return s.adjust === 'modificar';
+  const rd = readiness();
+  return !!(rd && rd.plan === 'modificar');
 }
 
 /* ------------------------------------------------------------------ *
@@ -725,9 +732,21 @@ function pwoCard() {
     <div class="row spread"><h2 style="margin:0">Ventana post-entreno</h2><span class="pill" id="pwo-left">${mmss(left / 1000)}</span></div>
     <p class="small muted" style="margin:6px 0 8px">Tu cuerpo pasa de catabólico a anabólico: aprovecha los primeros ${PWO_MINUTES} min.</p>
     ${PWO_ITEMS.map(([id, name, sub]) => `<label class="check" style="margin:6px 0"><input type="checkbox" data-pwo="${id}" ${s[id] ? 'checked' : ''}> <span>${esc(name)}<br><span class="small muted">${esc(sub)}</span></span></label>`).join('')}
+    <div class="row" style="margin-top:8px"><button class="secondary small-btn" data-pwo-act="restart" style="flex:1">↺ Reiniciar a ${PWO_MINUTES}:00</button><button class="secondary small-btn" data-pwo-act="cancel" style="flex:1">✕ Cancelar ventana</button></div>
   </div>`;
 }
 function bindPwo(root) {
+  $$('[data-pwo-act]', root).forEach(b => b.onclick = () => {
+    if (b.dataset.pwoAct === 'restart') { startPwo(); toast('↺ Ventana reiniciada: ' + PWO_MINUTES + ' min'); }
+    else {
+      if (!confirm('¿Cancelar la ventana post-entreno? Se desmarca lo que hayas palomeado en ella.')) return;
+      DB.pwo = null;
+      const e = DB.days[todayStr()];
+      if (e && e.supps) PWO_ITEMS.forEach(([id]) => { delete e.supps[id]; });
+      saveData(); toast('Ventana cancelada');
+    }
+    render(currentTab);
+  });
   $$('[data-pwo]', root).forEach(cb => cb.onchange = () => {
     const e = day(todayStr()); e.supps = e.supps || {};
     e.supps[cb.dataset.pwo] = cb.checked;
@@ -805,15 +824,9 @@ function renderHome() {
     </div>
 
     ${weekCard()}
+    ${challengesCard()}
 
-    ${full ? `<div class="card">
-      <div class="row spread">
-        <div><h2 style="margin:0">Recuperación</h2><div class="small muted">${rec ? (dl ? 'Hoy toca descarga' : 'Lista para entrenar') : 'Sin datos de hoy'}</div></div>
-        ${rec ? `<span class="pill ${rec.score >= 70 ? 'good' : rec.score >= 45 ? 'warn' : ''}" style="font-size:14px">${rec.score}/100</span>` : '<button class="secondary small-btn" id="rec-log">Registrar</button>'}
-      </div>
-      ${rec ? '<div class="row" style="margin-top:10px"><button class="secondary small-btn" id="rec-log" style="flex:1">Editar</button><button class="secondary small-btn" id="rec-toggle" style="flex:1">' + (dl ? 'Entrenar normal' : 'Hacer descarga') + '</button></div>' : '<button id="rec-toggle" hidden></button>'}
-    </div>
-
+    ${full ? readinessCard() + `
     <div class="card">
       <div class="row spread" style="margin-bottom:4px"><h2 style="margin:0">Reglas de oro</h2><span class="pill ${habitsDone === habits.length ? 'good' : 'gray'}">${habitsDone}/${habits.length}</span></div>
       <p class="small muted" style="margin:0 0 4px">Semana ${habits.length} de ${HABITS.length}: un hábito nuevo cada semana.</p>
@@ -876,12 +889,12 @@ function drawSpark(canvas, ys) {
 function quickAction(k) {
   const t = todayStr();
   if (k === 'weight') return openWeightQuick();
-  if (k === 'water') { const e = day(t); e.water = (e.water || 0) + 250; saveData(); toast('💧 +250 ml · ' + fmt(e.water / 1000, 2) + ' L hoy'); vibrate(30); return render(currentTab); }
+  if (k === 'water') { const e = day(t); e.water = (e.water || 0) + 250; e.waterLog = (e.waterLog || []).concat(250); saveData(); toast('💧 +250 ml · ' + fmt(e.water / 1000, 2) + ' L hoy'); vibrate(30); return render(currentTab); }
   if (k === 'meal') return openMealForm(t);
   if (k === 'photo') { progMode = 'photos'; showTab('progress'); return openGhostCamera(); }
   if (k === 'measure') return openMeasureForm();
   if (k === 'train') { if (!activeSession()) startSession('libre'); return showTab('train'); }
-  if (k === 'recovery') return openRecoveryForm(() => render(currentTab));
+  if (k === 'recovery') return openCheckin(() => render(currentTab));
   if (k === 'export') return openExport();
   if (k === 'history') { progMode = 'strength'; return showTab('progress'); }
 }
@@ -895,7 +908,7 @@ function openQuickSheet() {
       <button data-qs="train"><span>🏋️</span>Entreno</button>
       <button data-qs="photo"><span>📷</span>Foto</button>
       <button data-qs="measure"><span>📏</span>Medidas</button>
-      ${isSimple() ? '' : '<button data-qs="recovery"><span>😴</span>Sueño / HRV</button>'}
+      ${isSimple() ? '' : '<button data-qs="recovery"><span>😴</span>Chequeo</button>'}
       <button data-qs="export"><span>📄</span>Exportar</button>
     </div>`, m => {
     $$('[data-qs]', m).forEach(b => b.onclick = () => { closeModal(); quickAction(b.dataset.qs); });
@@ -947,6 +960,8 @@ function startSession(routineKey, dayId, wid) {
       if (a && a.alt) { s.swaps[i] = a.alt; s.adapt[i] = 'En vez de ' + e[0] + ' (' + a.why + ')'; used.push(a.alt); }
     });
   }
+  const rd = readiness();
+  if (rd) { s.adjust = rd.plan === 'mantener' ? null : rd.plan; s.adjustDone = true; }
   DB.sessions.push(s);
   DB.active = s.id;
   if (DB.profile.restAlerts && !DB.profile.notifAsked) { DB.profile.notifAsked = true; requestNotifications(); }
@@ -969,8 +984,8 @@ function finishSession() {
   startPwo();
   checkMilestones(s);
   closeSession();
-  toast(`Sesión guardada: ${n} series y ${Math.round(sessionVolume(s.id)).toLocaleString('es-MX')} kg de volumen. ¡Arrancó tu ventana post-entreno!`);
   showTab('home');
+  openSessionSummary(s);
 }
 
 /* Mapa de calor muscular (frente y espalda) */
@@ -1037,9 +1052,7 @@ function recoveryCard() {
   </div>`;
 }
 function bindRecovery(root, rerender) {
-  const t = todayStr();
-  $('#rec-log', root).onclick = () => openRecoveryForm(rerender);
-  $('#rec-toggle', root).onclick = () => { day(t).deload = !isDeload(); saveData(); rerender(); };
+  const b = $('#ck-open', root); if (b) b.onclick = () => openCheckin(rerender);
 }
 function openRecoveryForm(rerender) {
   const t = todayStr(), r = (DB.days[t] && DB.days[t].rec) || {};
@@ -1079,6 +1092,8 @@ function renderTrain() {
   const recent = DB.sessions.filter(x => x.end).sort((a, b) => b.start - a.start).slice(0, 8);
 
   $('#view-train').innerHTML = `
+    ${isSimple() ? '' : readinessCard()}
+    ${coachPlanCard()}
     <div class="grid2" style="margin-bottom:12px">
       <button id="tr-free">Entreno libre</button>
       <button class="secondary" id="tr-lib">Ejercicios y máquinas</button>
@@ -1101,7 +1116,7 @@ function renderTrain() {
         </details>`).join('') : '<div class="empty">Esta rutina no tiene días.</div>'}
     </div>`}
 
-    ${isSimple() ? '' : recoveryCard() + heatmapCard(vol)}
+    ${isSimple() ? '' : heatmapCard(vol)}
 
     ${isSimple() ? '' : `<div class="card">
       <h2>Balance de la semana</h2>
@@ -1136,7 +1151,8 @@ function renderTrain() {
   if (p.routine === 'custom') bindWeekPlan();
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });
   $$('#view-train [data-sess]').forEach(tr => tr.onclick = () => openSessionDetail(tr.dataset.sess));
-  if (!isSimple()) bindRecovery($('#view-train'), renderTrain);
+  bindRecovery($('#view-train'), renderTrain);
+  bindCoach($('#view-train'));
 }
 
 /** Ejercicios de la sesión: los del día (con los cambios por máquina ocupada) más los añadidos. */
@@ -1149,6 +1165,7 @@ function sessionExercises(s) {
   return base.concat(s.extra || []).map((e, i) => {
     let x = s.swaps && s.swaps[i] ? [s.swaps[i]].concat(e.slice(1)) : e;
     if (s.sets && s.sets[i] != null) x = [x[0], s.sets[i]].concat(x.slice(2));   // meta de series cambiada en la sesión
+    else if (s.adjust) x = [x[0], adjSets(x[1], s.adjust)].concat(x.slice(2));   // plan del chequeo: reducir o descarga
     return x;
   });
 }
@@ -1222,6 +1239,8 @@ function renderSession(s) {
       <div class="xp-msg">${!done.length ? '🔥 Hoy vienes por todo. ¡Primera serie!' : done.length >= targetSets ? '🏆 ¡Entreno completo! Termina cuando quieras' : done.length / targetSets >= 0.5 ? '⚡ Ya pasaste la mitad, ¡no aflojes!' : '🚀 Vas encendido, sigue sumando'}</div>
       <div class="small muted">${Math.round(vol).toLocaleString('es-MX')} kg movidos${isDeload() ? ' · <b style="color:var(--warn)">día de descarga</b>' : ''}</div>
     </div>
+    ${!s.adjustDone && !isSimple() ? `<div class="card ck-prompt"><b>¿Cómo llegas hoy?</b><p class="small muted" style="margin:2px 0 8px">30 s para ajustar series e intensidad a tu recuperación.</p><div class="row"><button id="ss-ck" style="flex:2">Hacer chequeo</button><button class="secondary" id="ss-ck-skip" style="flex:1">Omitir</button></div></div>`
+      : s.adjust ? `<div class="adapt-note" style="margin:0 0 12px">${PLAN_INFO[s.adjust].icon} <b>Plan ${PLAN_INFO[s.adjust].name.toLowerCase()}:</b> ${PLAN_INFO[s.adjust].text} <button class="ghost" id="ss-ck" style="padding:0 4px">Cambiar</button></div>` : ''}
     ${exs.length ? exs.map((e, i) => exerciseCard(s, e, i)).join('') : '<div class="card"><div class="empty"><span class="emoji">🏋️</span>Añade tu primer ejercicio.</div></div>'}
     <div class="grid2" style="margin-bottom:10px"><button class="secondary" id="ss-add">+ Añadir ejercicio</button><button class="secondary" id="ss-save">⭐ Guardar como entreno</button></div>
     <button class="block" id="ss-finish">Terminar entreno</button>
@@ -1288,6 +1307,8 @@ function renderSession(s) {
     setTimeout(() => { const cards = $$('#view-train .ex-card'); if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
   });
   $('#ss-save').onclick = () => saveSessionAsWorkout(s);
+  const ck = $('#ss-ck'); if (ck) ck.onclick = () => openCheckin(() => { SESS_UI.prog = {}; renderSession(s); });
+  const sk = $('#ss-ck-skip'); if (sk) sk.onclick = () => { s.adjustDone = true; saveData(); keepScroll(() => renderSession(s)); };
   // Reiniciar un ejercicio: borra solo sus series de hoy, sin tocar la rutina ni lo demás.
   $$('#view-train [data-reset]').forEach(b => b.onclick = () => {
     const i = Number(b.dataset.reset), ex = exs[i][0];
@@ -1844,9 +1865,11 @@ function renderFood() {
       </div>
       <div class="row spread small" style="margin-top:10px"><span>Azúcar refinada</span><span style="color:${tot.s > tg.sugar ? 'var(--bad)' : 'var(--good)'}">${Math.round(tot.s)} / ${tg.sugar} g máx.</span></div>
       <div class="row spread small" style="margin-top:4px"><span>Agua</span><span>${fmt(tot.water / 1000, 2)} / ${fmt(tg.water / 1000, 1)} L</span></div>
+      <div class="fix-bar"><button class="secondary small-btn" data-wat="250">💧 +250 ml</button><button class="secondary small-btn" data-wat="500">+500 ml</button>${tot.water ? '<button class="secondary small-btn" data-wat="undo">↶ Deshacer</button><button class="ghost small-btn" data-wat="reset">Reiniciar</button>' : ''}</div>
       ${meals.length ? `<table style="margin-top:10px"><thead><tr><th>Comida</th><th class="num">P</th><th class="num">C</th><th class="num">G</th><th></th></tr></thead><tbody>
         ${meals.map((m, i) => `<tr><td>${esc(m.name)}${m.partial ? ' <span class="muted small">(' + m.kcal + ' kcal, sin macros)</span>' : ''}</td><td class="num">${Math.round(m.p)}</td><td class="num">${Math.round(m.c)}</td><td class="num">${Math.round(m.f)}</td><td class="num"><button class="ghost" data-delmeal="${i}">✕</button></td></tr>`).join('')}
       </tbody></table>` : ''}
+      ${meals.length ? '<div class="fix-bar" style="margin-top:8px"><span class="small muted" style="flex:1">¿Te equivocaste? Usa ✕ en una comida o:</span><button class="secondary small-btn" id="fd-undo">↶ Última</button><button class="ghost small-btn" id="fd-reset">Reiniciar día</button></div>' : ''}
       <button class="block" id="fd-add" style="margin-top:12px">+ Añadir comida</button>
     </div>
 
@@ -1877,6 +1900,18 @@ function renderFood() {
   bindFoodExtras(t);
 
   $('#fd-add').onclick = () => openMealForm(t);
+  $$('#view-food [data-wat]').forEach(b => b.onclick = () => {
+    const e = day(t), a = b.dataset.wat;
+    if (a === 'undo') { const last = (e.waterLog || []).pop() || 250; e.water = Math.max(0, (e.water || 0) - last); toast('↶ −' + last + ' ml'); }
+    else if (a === 'reset') { if (!confirm('¿Poner el agua de hoy en 0 para volver a registrarla?')) return; e.water = 0; e.waterLog = []; }
+    else { e.water = (e.water || 0) + Number(a); e.waterLog = (e.waterLog || []).concat(Number(a)); vibrate(20); }
+    saveData(); keepScroll(renderFood);
+  });
+  const fu = $('#fd-undo'); if (fu) fu.onclick = () => { const e = DB.days[t]; const m = e.meals.pop(); saveData(); keepScroll(renderFood); toast('↶ Quitada: ' + m.name); };
+  const fr = $('#fd-reset'); if (fr) fr.onclick = () => {
+    if (!confirm('¿Borrar todas las comidas de hoy (kcal y proteína en 0) para registrarlas de nuevo?')) return;
+    const e = DB.days[t]; e.meals = []; delete e.kcal; delete e.protein; saveData(); keepScroll(renderFood); toast('Comidas de hoy reiniciadas');
+  };
   const pw = $('#fd-pwo'); if (pw) pw.onclick = () => { startPwo(); renderFood(); };
   $$('#view-food [data-delmeal]').forEach(b => b.onclick = () => {
     DB.days[t].meals.splice(Number(b.dataset.delmeal), 1); saveData(); renderFood();
@@ -2079,15 +2114,15 @@ function openMealForm(date) {
 /* ------------------------------------------------------------------ *
  *  PROGRESO: peso, medidas, fuerza y fotos
  * ------------------------------------------------------------------ */
-let progMode = 'weight';
+let progMode = 'analysis';
 function renderProgress() {
   if (progMode === 'logros' && !gamify()) progMode = 'weight';
-  const seg = `<div class="seg">${[['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']].concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
+  const seg = `<div class="seg wrap">${[['analysis', '📊 Análisis'], ['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']].concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   const v = $('#view-progress');
   v.innerHTML = seg + '<div id="prog-body"></div><button class="secondary block" id="prog-export" style="margin-top:4px">📄 Exportar PDF / Excel para analizar con IA</button>';
   $('#prog-export').onclick = openExport;
   $$('#view-progress .seg button').forEach(b => b.onclick = () => { progMode = b.dataset.mode; redrawChart = () => {}; renderProgress(); });
-  ({ weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
+  ({ analysis: renderAnalysis, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
 }
 
 function renderWeight(el) {
@@ -2572,7 +2607,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" style="text-align:center">Mi Progreso 6.2 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
+    <p class="small muted" style="text-align:center">Mi Progreso 7.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
@@ -2756,10 +2791,10 @@ window.addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTi
 
 // Contador de la ventana post-entreno (sin repintar la vista).
 setInterval(() => {
-  const el = $('#pwo-left');
-  if (!el) return;
+  const els = $$('[id="pwo-left"]');
+  if (!els.length) return;
   const left = pwoLeft();
-  el.textContent = left == null ? 'Cerrada' : mmss(left / 1000);
+  els.forEach(el => { el.textContent = left == null ? 'Cerrada' : mmss(left / 1000); });
 }, 1000);
 
 DB = loadData();
