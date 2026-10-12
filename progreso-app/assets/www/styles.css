@@ -475,3 +475,28 @@ header { display: flex; align-items: center; gap: 12px; }
 header .hdr-logo { width: 40px; height: 40px; flex: none; border-radius: 12px; background: #1e2b34; padding: 4px; }
 header .hdr-text { min-width: 0; }
 .ob-logo { display: block; width: 96px; height: 96px; margin: 2px auto 8px; border-radius: 26px; background: #1e2b34; padding: 10px; }
+
+/* ---------- 6.1: Mi semana y Mis entrenos ---------- */
+.wk-row { display: grid; grid-template-columns: 52px 1fr 40px; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.wk-row:last-child { border-bottom: 0; }
+.wk-row select { padding: 9px 12px; font-size: 15px; }
+.wk-day { font-size: 15px; line-height: 1.1; }
+.wk-day small { display: block; font-size: 10px; color: var(--orange); font-weight: 800; letter-spacing: .05em; }
+.wk-row.today select { border-color: var(--accent); }
+button.wk-go { background: var(--accent); color: var(--on-accent); font-size: 15px; }
+.wo-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.wo-row:last-of-type { border-bottom: 0; }
+.wo-row .grow { flex: 1; min-width: 0; cursor: pointer; }
+.wo-pics { display: flex; flex: none; }
+.wo-pics .ex-photo, .wo-pics svg { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--surface); margin-left: -14px; }
+.wo-pics > :first-child { margin-left: 0; }
+.wo-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.wo-days button { position: relative; padding: 0; min-height: 42px; background: var(--surface-2); color: var(--text); font-size: 14px; }
+.wo-days button.on { background: var(--accent); color: var(--on-accent); }
+.wo-days button.taken::after { content: ""; position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+.wo-ex { background: var(--surface-2); border-radius: 16px; padding: 10px; margin-bottom: 8px; }
+.wo-ex .icon-btn { width: 34px; height: 34px; font-size: 15px; background: var(--surface); }
+.wo-ex input { background: var(--surface); padding: 8px 10px; font-size: 15px; }
+label.mini { font-size: 11px; margin-bottom: 0; }
+label.mini > input { margin-top: 3px; }
+.fix-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin: -4px 0 12px; }

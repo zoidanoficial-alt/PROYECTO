@@ -71,8 +71,18 @@ function defaultData() {
     measures: [], lifts: [], sessions: [],
     active: null, pwo: null,
     custom: { name: 'Mi rutina', desc: 'Rutina creada por ti.', days: [] },
-    units: {}, achievements: [], customEx: [], pauses: []
+    units: {}, achievements: [], customEx: [], pauses: [],
+    // 6.1: grupos de ejercicios ("Mis entrenos") y qué entreno toca cada día (0 = lunes … 6 = domingo)
+    workouts: [], plan: [null, null, null, null, null, null, null]
   };
+}
+/** Pasa los días de la rutina personalizada anterior a "Mis entrenos" y los reparte en la semana. */
+function migrateWorkouts(custom) {
+  const ws = ((custom && custom.days) || []).filter(d => d.ex && d.ex.length).map(d => ({ id: d.id, name: d.name, ex: d.ex.map(e => e.slice()) }));
+  const spots = [[], [0], [0, 3], [0, 2, 4], [0, 1, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5, 6]][Math.min(7, ws.length)];
+  const plan = [null, null, null, null, null, null, null];
+  spots.forEach((k, j) => { plan[k] = ws[j].id; });
+  return { workouts: ws, plan };
 }
 
 let DB;
@@ -95,7 +105,8 @@ function loadData() {
         units: d.units || {},
         achievements: d.achievements || [],
         customEx: d.customEx || [],
-        pauses: d.pauses || []
+        pauses: d.pauses || [],
+        ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
   } catch (e) { console.error(e); }
@@ -244,7 +255,20 @@ function startPwo() {
  *  Entrenamiento
  * ------------------------------------------------------------------ */
 const e1rm = (w, r) => w * (1 + r / 30);
-function getRoutine(key) { return key === 'custom' ? DB.custom : ROUTINES[key] || ROUTINES.pro; }
+function getRoutine(key) { return key === 'custom' ? weekRoutine() : ROUTINES[key] || ROUTINES.pro; }
+const WEEKDAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+function weekdayIdx(date) { return (parseDate(date).getDay() + 6) % 7; }
+function workoutById(id) { return id ? DB.workouts.find(w => w.id === id) || null : null; }
+/** Rutina personalizada = tu semana: cada día tiene el entreno que le asignaste, o descanso. */
+function weekRoutine() {
+  return {
+    name: 'Mi semana', desc: 'Tú decides qué entreno toca cada día de la semana.',
+    days: WEEKDAYS.map((n, k) => {
+      const w = workoutById(DB.plan[k]);
+      return w ? { id: 'w' + k, name: n + ' · ' + w.name, ex: w.ex, wid: w.id } : { id: 'w' + k, name: n + ' · Descanso', rest: true, ex: [] };
+    })
+  };
+}
 function exInfo(name) { return EX[name] || { g: 'otro', t: 'c', p: 'otro', e: 'maq', pf: false, icon: 'curl' }; }
 function activeSession() { return DB.active ? DB.sessions.find(s => s.id === DB.active) || null : null; }
 
@@ -291,6 +315,7 @@ function stepFor(ex, u) { return u === 'lb' ? 5 : exInfo(ex).e === 'manc' ? 1 : 
 /** Siguiente día del ciclo según la última sesión hecha con esa rutina. */
 function nextDay(routineKey) {
   const r = getRoutine(routineKey);
+  if (routineKey === 'custom') return r.days[weekdayIdx(todayStr())];
   if (!r.days.length) return null;
   const last = DB.sessions.filter(s => s.routine === routineKey && s.end).sort((a, b) => b.start - a.start)[0];
   if (!last) return r.days[0];
@@ -902,18 +927,21 @@ function openWeightQuick() {
 /* ------------------------------------------------------------------ *
  *  ENTRENO (Gym Bible)
  * ------------------------------------------------------------------ */
-function startSession(routineKey, dayId) {
-  let name, id;
-  if (routineKey === 'libre') { name = 'Entreno libre'; id = null; }
+function startSession(routineKey, dayId, wid) {
+  let name, id = null, base = null;
+  const w = workoutById(wid);
+  if (w) { name = w.name; base = w.ex; routineKey = 'custom'; }
+  else if (routineKey === 'libre') name = 'Entreno libre';
   else {
     const d = getRoutine(routineKey).days.find(x => x.id === dayId);
-    if (!d) return;
-    name = d.name; id = d.id;
+    if (!d || d.rest) return;
+    name = d.name; id = d.id; base = d.ex;
   }
-  const s = { id: uid(), routine: routineKey, dayId: id, dayName: name, date: todayStr(), start: Date.now(), end: null, extra: [], swaps: {}, adapt: {} };
+  // Se guarda una copia de los ejercicios: editar tus entrenos no cambia una sesión ya empezada.
+  const s = { id: uid(), routine: routineKey, dayId: id, dayName: name, date: todayStr(), start: Date.now(), end: null, extra: [], swaps: {}, adapt: {}, base: base ? base.map(e => e.slice()) : null };
   // Adapta la rutina a tu equipo y molestias antes de empezar.
-  if (id) {
-    const base = getRoutine(routineKey).days.find(x => x.id === id).ex, used = base.map(e => e[0]).filter(okForMe);
+  if (base) {
+    const used = base.map(e => e[0]).filter(okForMe);
     base.forEach((e, i) => {
       const a = adaptFor(e[0], used);
       if (a && a.alt) { s.swaps[i] = a.alt; s.adapt[i] = 'En vez de ' + e[0] + ' (' + a.why + ')'; used.push(a.alt); }
@@ -1058,13 +1086,11 @@ function renderTrain() {
     <label>Rutina
       <select id="rt-sel">
         ${Object.keys(ROUTINES).map(k => `<option value="${k}" ${p.routine === k ? 'selected' : ''}>${esc(ROUTINES[k].name)}</option>`).join('')}
-        <option value="custom" ${p.routine === 'custom' ? 'selected' : ''}>${esc(DB.custom.name)} (personalizada)</option>
+        <option value="custom" ${p.routine === 'custom' ? 'selected' : ''}>⭐ Mi semana (personalizada)</option>
       </select>
     </label>
     <p class="small muted" style="margin-top:-4px">${esc(r.desc || '')}</p>
-    ${p.routine === 'custom' ? '<button class="secondary block" id="rt-edit" style="margin-bottom:12px">Editar mi rutina</button>' : ''}
-
-    <div class="card">
+    ${p.routine === 'custom' ? weekPlanCard() : `<div class="card">
       <h2>Días</h2>
       ${r.days.length ? r.days.map(d => `
         <details ${nd && d.id === nd.id ? 'open' : ''}>
@@ -1072,8 +1098,8 @@ function renderTrain() {
           ${d.rest ? '<p class="small muted">Descanso: camina, estira y come bien. El músculo crece cuando descansas.</p>' : `
           <div class="ex-mini-list">${d.ex.map(e => `<div class="ex-mini" data-howto="${esc(e[0])}">${exIcon(e[0], 52)}<span>${esc(e[0])}<br><small>${e[1]} × ${esc(e[2])}${exInfo(e[0]).pf ? ' · PF' : ''}</small></span></div>`).join('')}</div>
           <button class="block" data-start="${d.id}" style="margin:8px 0 12px">Empezar ${esc(d.name.split('·').pop().trim())}</button>`}
-        </details>`).join('') : '<div class="empty">Esta rutina no tiene días. Pulsa “Editar mi rutina”.</div>'}
-    </div>
+        </details>`).join('') : '<div class="empty">Esta rutina no tiene días.</div>'}
+    </div>`}
 
     ${isSimple() ? '' : recoveryCard() + heatmapCard(vol)}
 
@@ -1107,7 +1133,7 @@ function renderTrain() {
   $$('#view-train [data-howto]').forEach(b => b.onclick = () => openHowTo(b.dataset.howto));
   $('#tr-lib').onclick = () => openExercisePicker(null);
   $('#rt-sel').onchange = e => { DB.profile.routine = e.target.value; saveData(); renderTrain(); };
-  const ed = $('#rt-edit'); if (ed) ed.onclick = openRoutineEditor;
+  if (p.routine === 'custom') bindWeekPlan();
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });
   $$('#view-train [data-sess]').forEach(tr => tr.onclick = () => openSessionDetail(tr.dataset.sess));
   if (!isSimple()) bindRecovery($('#view-train'), renderTrain);
@@ -1115,9 +1141,9 @@ function renderTrain() {
 
 /** Ejercicios de la sesión: los del día (con los cambios por máquina ocupada) más los añadidos. */
 function sessionExercises(s) {
-  let base = [];
-  if (s.routine !== 'libre') {
-    const d = getRoutine(s.routine).days.find(x => x.id === s.dayId);
+  let base = s.base || [];
+  if (!s.base && s.routine !== 'libre') {
+    const d = getRoutine(s.routine).days.find(x => x.id === s.dayId) || workoutById(s.dayId);
     base = d ? d.ex : [];
   }
   return base.concat(s.extra || []).map((e, i) => {
@@ -1197,7 +1223,7 @@ function renderSession(s) {
       <div class="small muted">${Math.round(vol).toLocaleString('es-MX')} kg movidos${isDeload() ? ' · <b style="color:var(--warn)">día de descarga</b>' : ''}</div>
     </div>
     ${exs.length ? exs.map((e, i) => exerciseCard(s, e, i)).join('') : '<div class="card"><div class="empty"><span class="emoji">🏋️</span>Añade tu primer ejercicio.</div></div>'}
-    <button class="secondary block" id="ss-add" style="margin-bottom:10px">+ Añadir ejercicio</button>
+    <div class="grid2" style="margin-bottom:10px"><button class="secondary" id="ss-add">+ Añadir ejercicio</button><button class="secondary" id="ss-save">⭐ Guardar como entreno</button></div>
     <button class="block" id="ss-finish">Terminar entreno</button>
     <button class="ghost block" id="ss-cancel" style="margin-top:6px">Descartar sesión</button>`;
 
@@ -1260,6 +1286,30 @@ function renderSession(s) {
     SESS_UI.open = sessionExercises(s).length - 1;
     saveData(); closeModal(); renderSession(s);
     setTimeout(() => { const cards = $$('#view-train .ex-card'); if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+  });
+  $('#ss-save').onclick = () => saveSessionAsWorkout(s);
+  // Reiniciar un ejercicio: borra solo sus series de hoy, sin tocar la rutina ni lo demás.
+  $$('#view-train [data-reset]').forEach(b => b.onclick = () => {
+    const i = Number(b.dataset.reset), ex = exs[i][0];
+    const ids = DB.lifts.filter(l => l.sid === s.id && l.ex === ex).map(l => l.id);
+    if (!confirm(`¿Reiniciar ${ex}? Se borran sus ${ids.length} series de hoy y empiezas este ejercicio de cero. Lo demás no cambia.`)) return;
+    DB.lifts = DB.lifts.filter(l => !ids.includes(l.id));
+    DB.achievements = DB.achievements.filter(a => !ids.some(id => a.id.startsWith('pr-' + id)));
+    if (s.sets) delete s.sets[i];
+    delete SESS_UI.n[i]; delete SESS_UI.prog['ex' + i];
+    if (REST.repeat && REST.repeat.ex === ex) stopRest();
+    SESS_UI.open = i; saveData(); vibrate(40);
+    keepScroll(() => renderSession(s)); toast('↺ ' + ex + ' reiniciado');
+  });
+  $$('#view-train [data-undo]').forEach(b => b.onclick = () => {
+    const i = Number(b.dataset.undo), ex = exs[i][0];
+    const last = DB.lifts.filter(l => l.sid === s.id && l.ex === ex).sort((a, c) => c.t - a.t)[0];
+    if (!last) return;
+    DB.lifts = DB.lifts.filter(l => l.id !== last.id);
+    DB.achievements = DB.achievements.filter(a => !a.id.startsWith('pr-' + last.id));
+    if (REST.repeat && REST.repeat.ex === ex) stopRest();
+    saveData(); vibrate(30);
+    keepScroll(() => renderSession(s)); toast('↶ Borrada la serie de ' + wFmt(last.w, unitFor(ex)) + ' × ' + last.r);
   });
   $('#ss-finish').onclick = finishSession;
   $('#ss-cancel').onclick = () => {
@@ -1327,7 +1377,9 @@ function exerciseCard(s, e, i) {
         const pr = DB.achievements.some(a => a.id.startsWith('pr-' + d.id));
         const tech = TECHNIQUES[d.tech] && d.tech !== 'normal' ? ' · ' + TECHNIQUES[d.tech].short : '';
         return `<span class="set-chip ${pr ? 'pr' : ''}" data-edit="${d.id}">${k + 1}. <b>${wFmt(d.w, u)} × ${d.r}</b>${d.rir != null ? ' · RIR ' + d.rir : ''}${tech}${pr ? ' ↑' : ''}</span>`;
-      }).join('')}</div>` : ''}
+      }).join('')}</div>
+      <div class="fix-row"><span class="small muted">¿Te equivocaste? Toca una serie para corregirla.</span>
+        <span class="row" style="gap:6px"><button class="secondary small-btn" data-undo="${i}">↶ Última</button><button class="secondary small-btn" data-reset="${i}">↺ Reiniciar</button></span></div>` : ''}
       ${beatHtml}
       <div class="meta-row"><span>Serie ${done.length + 1}${done.length < sets ? ' de ' + sets : ' (extra)'} · descanso ${mmss(rest || 90)}</span>
         <span class="mini-step" title="Meta de series de hoy"><button data-meta="${i}|-1" aria-label="Una serie menos">−</button><b>Meta ${sets}</b><button data-meta="${i}|1" aria-label="Una serie más">+</button></span></div>
@@ -1425,13 +1477,18 @@ function openEditSet(id, after) {
   openModal(`
     <h3>Editar serie</h3>
     <p class="small muted" style="margin-top:0">${esc(l.ex)} · ${longDate(l.date)}</p>
+    <div class="small muted" style="font-weight:600;margin-bottom:6px">¿En qué unidad era ese peso?</div>
+    <div class="seg" id="es-u"><button data-u="kg" class="${u === 'kg' ? 'on' : ''}">kg</button><button data-u="lb" class="${u === 'lb' ? 'on' : ''}">lb</button></div>
     <div class="grid2">
-      <label>Peso (${u})<input id="es-w" inputmode="decimal" value="${roundTo(fromKg(l.w, u), u === 'lb' ? 1 : 0.5)}"></label>
+      <label>Peso<input id="es-w" inputmode="decimal" value="${roundTo(fromKg(l.w, u), u === 'lb' ? 1 : 0.5)}"></label>
       <label>Repeticiones<input id="es-r" inputmode="numeric" value="${l.r}"></label>
     </div>
     <label>Esfuerzo<select id="es-q">${RIR_OPTIONS.map(([v, t]) => `<option value="${v}" ${v === l.rir ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
     <label>Técnica<select id="es-t">${Object.keys(TECHNIQUES).map(k => `<option value="${k}" ${k === (l.tech || 'normal') ? 'selected' : ''}>${esc(TECHNIQUES[k].name)}</option>`).join('')}</select></label>
     <div class="row"><button class="danger" id="es-del">Borrar</button><button class="secondary" id="es-cancel" style="flex:1">Cancelar</button><button id="es-save" style="flex:1">Guardar</button></div>`, m => {
+    // Cambiar la unidad no convierte el número: sirve si anotaste 50 en lb pero eran 50 kg.
+    let eu = u;
+    $$('#es-u [data-u]', m).forEach(b => b.onclick = () => { eu = b.dataset.u; $$('#es-u [data-u]', m).forEach(x => x.classList.toggle('on', x === b)); });
     $('#es-cancel', m).onclick = closeModal;
     $('#es-del', m).onclick = () => {
       DB.lifts = DB.lifts.filter(x => x.id !== id);
@@ -1441,7 +1498,8 @@ function openEditSet(id, after) {
     $('#es-save', m).onclick = () => {
       const w = num($('#es-w', m).value), r = num($('#es-r', m).value);
       if (w == null || r == null || r < 1) { toast('Revisa peso y repeticiones'); return; }
-      l.w = toKg(w, u); l.r = Math.round(r); l.rir = Number($('#es-q', m).value); l.tech = $('#es-t', m).value;
+      l.w = toKg(w, eu); l.r = Math.round(r);
+      if (eu !== u) DB.units[l.ex] = eu; l.rir = Number($('#es-q', m).value); l.tech = $('#es-t', m).value;
       saveData(); closeModal(); after();
     };
   });
@@ -1621,41 +1679,137 @@ function openSessionDetail(id) {
 }
 
 /* Editor de rutina personalizada */
-function openRoutineEditor() {
-  const c = DB.custom;
-  const draw = m => {
-    m.innerHTML = `
-      <div class="row spread"><h3 style="margin:0">Mi rutina</h3><button class="ghost" id="re-close">Listo</button></div>
-      <label style="margin-top:10px">Nombre<input id="re-name" value="${esc(c.name)}"></label>
-      <p class="small muted" style="margin-top:0">Consejo del libro: 75 % compuestos y 25 % aislamiento.</p>
-      ${c.days.map((d, di) => `
-        <div class="ex-card">
-          <div class="row spread"><h4>${esc(d.name)}</h4><button class="ghost" data-delday="${di}">Borrar día</button></div>
-          ${d.ex.map((e, ei) => `<div class="set-done"><span>${esc(e[0])} · ${e[1]}×${esc(e[2])}</span><button class="ghost" data-delex="${di}:${ei}">✕</button></div>`).join('')}
-          <select id="re-ex-${di}" style="margin-top:8px">${Object.keys(EX).map(n => `<option>${esc(n)}</option>`).join('')}</select>
-          <div class="grid3" style="margin-top:6px">
-            <input id="re-sets-${di}" inputmode="numeric" value="4" placeholder="series">
-            <input id="re-reps-${di}" value="8–12" placeholder="reps">
-            <input id="re-rest-${di}" inputmode="numeric" value="90" placeholder="desc. s">
-          </div>
-          <button class="secondary block" data-addex="${di}" style="margin-top:6px">+ Añadir a ${esc(d.name)}</button>
-        </div>`).join('')}
-      <div class="row" style="margin-top:6px"><input id="re-dayname" placeholder="Nombre del día (ej. Día 1 · Pecho)"><button id="re-addday">+ Día</button></div>`;
-    $('#re-close', m).onclick = () => { c.name = $('#re-name', m).value.trim() || 'Mi rutina'; saveData(); closeModal(); renderTrain(); };
-    $('#re-addday', m).onclick = () => {
-      const n = $('#re-dayname', m).value.trim();
-      if (!n) { toast('Escribe el nombre del día'); return; }
-      c.days.push({ id: uid(), name: n, ex: [] }); saveData(); draw(m);
-    };
-    $$('[data-delday]', m).forEach(b => b.onclick = () => { if (confirm('¿Borrar este día?')) { c.days.splice(Number(b.dataset.delday), 1); saveData(); draw(m); } });
-    $$('[data-delex]', m).forEach(b => b.onclick = () => { const [di, ei] = b.dataset.delex.split(':').map(Number); c.days[di].ex.splice(ei, 1); saveData(); draw(m); });
-    $$('[data-addex]', m).forEach(b => b.onclick = () => {
-      const di = Number(b.dataset.addex);
-      c.days[di].ex.push([$('#re-ex-' + di, m).value, num($('#re-sets-' + di, m).value) || 3, $('#re-reps-' + di, m).value || '10', num($('#re-rest-' + di, m).value) || 90]);
-      saveData(); draw(m);
+/* ---------- Mi semana: grupos de ejercicios por día ---------- */
+function weekPlanCard() {
+  const today = weekdayIdx(todayStr());
+  const opts = sel => `<option value="">😴 Descanso</option>` + DB.workouts.map(w => `<option value="${w.id}" ${w.id === sel ? 'selected' : ''}>${esc(w.name)}</option>`).join('');
+  return `<div class="card">
+      <h2>Mi semana <small>· elige qué entrenas cada día</small></h2>
+      ${WEEKDAYS.map((n, k) => {
+        const w = workoutById(DB.plan[k]);
+        return `<div class="wk-row ${k === today ? 'today' : ''}">
+          <b class="wk-day">${n.slice(0, 3)}${k === today ? '<small>HOY</small>' : ''}</b>
+          <select data-plan="${k}" ${DB.workouts.length ? '' : 'disabled'}>${opts(DB.plan[k])}</select>
+          ${w ? `<button class="icon-btn wk-go" data-wkstart="${k}" aria-label="Empezar ${esc(w.name)}">▶</button>` : '<span class="wk-go"></span>'}
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card">
+      <div class="row spread" style="margin-bottom:8px"><h2 style="margin:0">Mis entrenos <small>· grupos de ejercicios</small></h2></div>
+      ${DB.workouts.length ? DB.workouts.map(w => {
+        const days = WEEKDAYS.filter((_, k) => DB.plan[k] === w.id).map(d => d.slice(0, 3));
+        return `<div class="wo-row">
+          <div class="wo-pics">${w.ex.slice(0, 3).map(e => exIcon(e[0], 40)).join('')}</div>
+          <div class="grow" data-woedit="${w.id}"><b>${esc(w.name)}</b><br><small class="muted">${w.ex.length} ejercicio${w.ex.length === 1 ? '' : 's'} · ${days.length ? days.join(', ') : 'sin día asignado'}</small></div>
+          <button class="icon-btn" data-woedit="${w.id}" aria-label="Editar">✏️</button>
+          <button class="icon-btn wk-go" data-wostart="${w.id}" aria-label="Empezar">▶</button>
+        </div>`;
+      }).join('') : '<div class="empty"><span class="emoji">🗂️</span>Crea tus entrenos (por ejemplo "Pecho y tríceps" o "Pierna") y asígnalos a los días que quieras.</div>'}
+      <button class="block" id="wo-new" style="margin-top:10px">+ Nuevo entreno</button>
+    </div>`;
+}
+function bindWeekPlan() {
+  const v = $('#view-train');
+  $$('[data-plan]', v).forEach(sel => sel.onchange = () => { DB.plan[Number(sel.dataset.plan)] = sel.value || null; saveData(); keepScroll(renderTrain); });
+  $$('[data-wkstart]', v).forEach(b => b.onclick = () => { startSession('custom', 'w' + b.dataset.wkstart); renderTrain(); window.scrollTo(0, 0); });
+  $$('[data-wostart]', v).forEach(b => b.onclick = () => { startSession('custom', null, b.dataset.wostart); renderTrain(); window.scrollTo(0, 0); });
+  $$('[data-woedit]', v).forEach(b => b.onclick = () => openWorkoutEditor(b.dataset.woedit));
+  $('#wo-new', v).onclick = () => openWorkoutEditor(null);
+}
+
+/**
+ * Editor de un entreno (grupo de ejercicios): nombre, días de la semana y ejercicios con
+ * series, reps y descanso. Trabaja sobre una copia y solo guarda al pulsar Guardar.
+ * `draft` permite volver al editor después de elegir un ejercicio en la biblioteca.
+ */
+function openWorkoutEditor(id, draft) {
+  const orig = workoutById(id);
+  const d = draft || {
+    id: orig ? orig.id : uid(), isNew: !orig, name: orig ? orig.name : '',
+    ex: orig ? orig.ex.map(e => e.slice()) : [],
+    days: WEEKDAYS.map((_, k) => orig ? DB.plan[k] === orig.id : false)
+  };
+  const sync = m => {
+    d.name = $('#wo-name', m).value;
+    d.ex.forEach((e, k) => {
+      e[1] = Math.max(1, Math.min(12, num($('#wo-s-' + k, m).value) || e[1]));
+      e[2] = $('#wo-r-' + k, m).value.trim() || e[2];
+      e[3] = Math.max(15, Math.min(600, num($('#wo-d-' + k, m).value) || e[3]));
     });
   };
+  const draw = m => {
+    m.innerHTML = `
+      <h3>${d.isNew ? 'Nuevo entreno' : 'Editar entreno'}</h3>
+      <label>Nombre<input id="wo-name" value="${esc(d.name)}" placeholder="Ej. Pecho y tríceps"></label>
+      <div class="small muted" style="font-weight:600;margin-bottom:6px">¿Qué días lo haces?</div>
+      <div class="wo-days">${WEEKDAYS.map((n, k) => {
+        const other = !d.days[k] && DB.plan[k] && DB.plan[k] !== d.id ? workoutById(DB.plan[k]) : null;
+        return `<button class="${d.days[k] ? 'on' : ''} ${other ? 'taken' : ''}" data-wday="${k}" title="${other ? 'Ahora: ' + esc(other.name) : ''}">${n.slice(0, 2)}</button>`;
+      }).join('')}</div>
+      <p class="small muted" style="margin:4px 0 12px">Un punto naranja = ese día ya tiene otro entreno; si lo marcas, lo reemplazas.</p>
+      <div class="section-title" style="margin-top:4px">Ejercicios (${d.ex.length})</div>
+      ${d.ex.length ? d.ex.map((e, k) => `
+        <div class="wo-ex">
+          <div class="row">${exIcon(e[0], 44)}<b class="grow" style="font-size:14px">${k + 1}. ${esc(e[0])}</b>
+            <button class="icon-btn" data-womove="${k}|-1" ${k ? '' : 'disabled'} aria-label="Subir">↑</button>
+            <button class="icon-btn" data-womove="${k}|1" ${k < d.ex.length - 1 ? '' : 'disabled'} aria-label="Bajar">↓</button>
+            <button class="icon-btn" data-wodel="${k}" aria-label="Quitar">✕</button></div>
+          <div class="grid3" style="margin-top:6px">
+            <label class="mini">Series<input id="wo-s-${k}" inputmode="numeric" value="${e[1]}"></label>
+            <label class="mini">Reps<input id="wo-r-${k}" value="${esc(e[2])}"></label>
+            <label class="mini">Descanso (s)<input id="wo-d-${k}" inputmode="numeric" value="${e[3] || 90}"></label>
+          </div>
+        </div>`).join('') : '<div class="empty">Añade los ejercicios de este entreno.</div>'}
+      <button class="secondary block" id="wo-add" style="margin:4px 0 14px">+ Añadir ejercicio</button>
+      <div class="row">${d.isNew ? '' : '<button class="danger" id="wo-del">Borrar</button>'}<button class="secondary" id="wo-cancel" style="flex:1">Cancelar</button><button id="wo-save" style="flex:1">Guardar</button></div>`;
+    $$('[data-wday]', m).forEach(b => b.onclick = () => { sync(m); const k = Number(b.dataset.wday); d.days[k] = !d.days[k]; draw(m); });
+    $$('[data-womove]', m).forEach(b => b.onclick = () => {
+      sync(m); const [k, dir] = b.dataset.womove.split('|').map(Number);
+      const t = d.ex[k]; d.ex[k] = d.ex[k + dir]; d.ex[k + dir] = t; draw(m);
+    });
+    $$('[data-wodel]', m).forEach(b => b.onclick = () => { sync(m); d.ex.splice(Number(b.dataset.wodel), 1); draw(m); });
+    $('#wo-add', m).onclick = () => {
+      sync(m);
+      openExercisePicker(name => {
+        const comp = exInfo(name).t === 'c';
+        d.ex.push([name, comp ? 4 : 3, comp ? '8–12' : '10–15', comp ? 120 : 75]);
+        openWorkoutEditor(d.id, d);
+      });
+    };
+    $('#wo-cancel', m).onclick = closeModal;
+    const del = $('#wo-del', m);
+    if (del) del.onclick = () => {
+      if (!confirm('¿Borrar el entreno "' + d.name + '"? Tus series ya registradas no se borran.')) return;
+      DB.workouts = DB.workouts.filter(w => w.id !== d.id);
+      DB.plan = DB.plan.map(x => x === d.id ? null : x);
+      saveData(); closeModal(); renderTrain(); toast('Entreno borrado');
+    };
+    $('#wo-save', m).onclick = () => {
+      sync(m);
+      const name = d.name.trim();
+      if (!name) { toast('Ponle nombre a tu entreno'); return; }
+      if (!d.ex.length) { toast('Añade al menos un ejercicio'); return; }
+      const w = workoutById(d.id);
+      if (w) { w.name = name; w.ex = d.ex; } else DB.workouts.push({ id: d.id, name, ex: d.ex });
+      DB.plan = DB.plan.map((x, k) => d.days[k] ? d.id : x === d.id ? null : x);
+      saveData(); closeModal();
+      if (currentTab === 'train') renderTrain();
+      const days = WEEKDAYS.filter((_, k) => d.days[k]);
+      toast('✓ "' + name + '" guardado' + (days.length ? ' para ' + days.join(', ').toLowerCase() : ''));
+    };
+  };
   openModal('', draw);
+}
+
+/** Guarda los ejercicios de la sesión actual como un entreno reutilizable. */
+function saveSessionAsWorkout(s) {
+  const exs = sessionExercises(s);
+  if (!exs.length) { toast('Añade ejercicios primero'); return; }
+  openWorkoutEditor(null, {
+    id: uid(), isNew: true, name: s.routine === 'libre' ? '' : s.dayName.split('·').pop().trim(),
+    ex: exs.map(e => [e[0], Math.max(e[1], DB.lifts.filter(l => l.sid === s.id && l.ex === e[0]).length), e[2], e[3]]),
+    days: WEEKDAYS.map(() => false)
+  });
 }
 
 /* ------------------------------------------------------------------ *
@@ -2259,7 +2413,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" style="text-align:center">Mi Progreso 6.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
+    <p class="small muted" style="text-align:center">Mi Progreso 6.1 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
