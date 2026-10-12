@@ -133,7 +133,8 @@ function buildSheets(R) {
     { name: 'Volumen semanal', rows: volumen },
     { name: 'Medidas', rows: medidas },
     { name: 'Logros', rows: logros },
-    { name: 'Antojos y digestion', rows: antojos }
+    { name: 'Antojos y digestion', rows: antojos },
+    { name: 'Actividades', rows: [['fecha', 'tipo', 'minutos', 'km', 'ritmo_min_km', 'esfuerzo_1a10']].concat((DB.activities || []).filter(a => a.date >= R.from && a.date <= R.to).sort((a, b) => a.date < b.date ? -1 : 1).map(a => [a.date, ACTIVITY_TYPES[a.type] ? ACTIVITY_TYPES[a.type][1] : a.type, a.min, a.km || '', a.km ? Math.round(a.min / a.km * 100) / 100 : '', a.rpe])) }
   ];
 }
 

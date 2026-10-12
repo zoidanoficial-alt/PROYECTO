@@ -419,7 +419,7 @@ function weekChallenges() {
   }
   const p = DB.profile, list = [];
   const lastWk = DB.sessions.filter(s => s.end && weekKey(s.date) === addDays(wk, -7)).length;
-  list.push({ id: 'ses', title: `Entrena ${p.weeklyTarget || 3} veces`, goal: p.weeklyTarget || 3, ico: '🏋️' });
+  list.push({ id: 'ses', title: `Muévete ${weekTarget(wk)} días (gym o cualquier actividad)`, goal: weekTarget(wk), ico: '🏋️' });
   const pr = prChallenge(wk);
   if (pr) list.push(pr);
   const mealDays = lastDays(7).filter(d => DB.days[d] && (DB.days[d].meals || []).length).length;
@@ -488,7 +488,14 @@ function openSessionSummary(s) {
     <div class="small muted" style="font-weight:600;margin-bottom:4px">Fuerza vs la última vez (1RM estimado)</div>
     ${lines}
     ${next.length ? `<div class="status good" style="margin-top:12px"><b>Para la próxima: sube carga</b>${esc(next.join(' · '))}</div>` : ''}
+    <div class="small muted" style="font-weight:600;margin:12px 0 6px">¿Qué te ayudó a entrenar hoy? (aprendo tu fórmula)</div>
+    <div class="chips">${Object.keys(HELPERS).map(k => `<button class="chip-btn" data-help="${k}">${HELPERS[k]}</button>`).join('')}</div>
     <p class="small muted">Arrancó tu ventana post-entreno de ${PWO_MINUTES} min.</p>
-    <button class="block" id="sum-ok">¡Listo!</button>`, m => { $('#sum-ok', m).onclick = () => { closeModal(); render(currentTab); }; });
+    <button class="block" id="sum-ok">¡Listo!</button>`, m => {
+      $$('[data-help]', m).forEach(b => b.onclick = () => {
+        b.classList.toggle('on'); s.helped = $$('[data-help].on', m).map(x => x.dataset.help); saveData();
+      });
+      $('#sum-ok', m).onclick = () => { closeModal(); render(currentTab); };
+    });
   if (prs.length || up > down) setTimeout(() => burst($('#modal')), 250);
 }

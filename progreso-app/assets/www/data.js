@@ -389,6 +389,20 @@ const PF_NOTE = 'Equipo típico de Planet Fitness: máquinas de placas (en lb), 
 const CALVES = [['Elevación de talones de pie', 2, '25', 60], ['Elevación de talones sentado', 2, '25', 60], ['Donkey calf raise', 2, '25', 60]];
 
 const ROUTINES = {
+  inicio: {
+    name: 'Primeros pasos · cuerpo completo',
+    desc: 'Para empezar desde cero, en casa o en el gym: 3 días de 20 minutos, con tu propio peso. Sin presión: suma confianza.',
+    days: [
+      { id: 'i1', name: 'Día A · Cuerpo completo', ex: [
+        ['Sentadilla sin peso', 2, '8–12', 60], ['Lagartijas inclinadas (manos en banco)', 2, '6–10', 60],
+        ['Puente de glúteo', 2, '10–15', 45], ['Superman', 2, '8–10', 45], ['Plancha', 2, '20–30 s', 45]] },
+      { id: 'i2', name: 'Descanso activo · camina 15 min', rest: true, ex: [] },
+      { id: 'i3', name: 'Día B · Cuerpo completo', ex: [
+        ['Zancadas sin peso', 2, '6–8 por pierna', 60], ['Remo invertido', 2, '6–10', 60],
+        ['Puente de glúteo', 2, '12–15', 45], ['Dead bug', 2, '8 por lado', 45], ['Lagartijas inclinadas (manos en banco)', 2, '6–10', 60]] },
+      { id: 'i4', name: 'Descanso activo · camina 15 min', rest: true, ex: [] }
+    ]
+  },
   pro: {
     name: 'Pro Split · Get The Pump',
     desc: 'Alta intensidad y volumen por grupo muscular. Ciclo de 7 días; pantorrillas 2 días sí, 1 no, 2 sí.',
@@ -667,3 +681,44 @@ const MCDONALDS = [
   ['Pay de Queso', 257, null, null, null],
   ['Angus Premium Tocino', 869, 46, 71, 44, 'Descontinuado según la fuente']
 ];
+
+
+/* ------------------------------------------------------------------ *
+ *  8.0 · Tu camino: etapas, actividades, compromisos, equipo y lugares
+ * ------------------------------------------------------------------ */
+const STAGES = {
+  1: { ico: '🌱', name: 'Empezar', who: 'Nunca he entrenado o hace años que no lo hago', goal: 'Perder el miedo y sumar confianza con acciones pequeñas.', next: 'Muévete 2 semanas seguidas (2 días activos por semana).' },
+  2: { ico: '🧱', name: 'Construir el hábito', who: 'A veces entreno, pero me cuesta ser constante', goal: 'Una rutina que quepa en tu vida real.', next: 'Cumple tu meta semanal 6 de las últimas 8 semanas.' },
+  3: { ico: '🚀', name: 'Mejorar', who: 'Entreno seguido y quiero resultados', goal: 'Más fuerza, más resistencia, mejor físico: con datos.', next: 'Sostén 6 meses de constancia y mejora real en tus marcas.' },
+  4: { ico: '🌎', name: 'Vivir en movimiento', who: 'Ya es parte de mi vida y quiero mantenerlo', goal: 'Disfrutar, probar deportes nuevos y conservar tu autonomía física.', next: '' }
+};
+const ACTIVITY_TYPES = {
+  fuerza: ['🏋️', 'Fuerza'], correr: ['🏃', 'Correr'], caminar: ['🚶', 'Caminar'], bici: ['🚴', 'Bici'], nadar: ['🏊', 'Natación'],
+  yoga: ['🧘', 'Yoga'], pilates: ['🤸', 'Pilates'], movilidad: ['🧎', 'Movilidad'], casa: ['🏠', 'En casa'], deporte: ['⚽', 'Deporte'], bajo: ['🌿', 'Bajo impacto']
+};
+const DISTANCE_TYPES = ['correr', 'caminar', 'bici', 'nadar'];
+const BARRIERS = {
+  tiempo: ['⏰', 'Falta de tiempo', 'Sesiones de 15–20 min y un plan de mantenimiento para semanas pesadas.'],
+  motivacion: ['🔋', 'Se me va la motivación', 'Metas pequeñas, retos semanales y ver tu propio progreso.'],
+  nosaber: ['❓', 'No sé qué hacer', 'Cada ejercicio con foto, pasos y una misión clara.'],
+  verguenza: ['🙈', 'Me da pena el gym', 'Empieza en casa; cuando quieras, rutinas de gym con máquinas sencillas.'],
+  cansancio: ['😮‍💨', 'Llego cansado', 'Chequeo antes de entrenar: si estás cansado, la app reduce el plan.'],
+  dolor: ['🩹', 'Molestias o lesiones', 'Ejercicios adaptados y botón de dolor que frena la progresión.'],
+  viajes: ['🧳', 'Viajo o cambio de horarios', 'Sesiones de hotel y reprogramar sin romper tu constancia.']
+};
+const HELPERS = { manana: '🌅 Entrenar temprano', amigos: '👥 Con alguien', musica: '🎧 Música', meta: '🎯 Meta pequeña', noche: '🎒 Preparé todo la noche anterior', agenda: '📅 Lo tenía agendado', corto: '⏱️ Sesión corta' };
+const COMMIT_IDEAS = [
+  ['Caminar 10 min después de comer', 5], ['5 min de movilidad al levantarme', 7], ['Llevar la mochila del gym lista', 3],
+  ['Dormir antes de las 11 pm', 5], ['Proteína en el desayuno', 5], ['Subir escaleras en vez de elevador', 5]
+];
+// Equipo útil según tu situación: sin enlaces de afiliado ni comisiones, y nada de suplementos de "milagro".
+const GEAR = [
+  { need: 'Entrenar en casa', items: [['Bandas elásticas de resistencia (set de 3–5)', 'Lo más versátil y barato; caben en una maleta.'], ['Mancuernas ajustables', 'Si vas en serio en casa: una sola pieza reemplaza un rack.'], ['Tapete o colchoneta', 'Para core, movilidad y yoga.'], ['Barra de dominadas de puerta', 'Solo si tu marco la soporta.']] },
+  { need: 'Empezar a correr', items: [['Tenis de running probados en tienda', 'Lo único realmente importante: que te queden cómodos. No necesitas los más caros.'], ['Calcetines técnicos', 'Evitan ampollas.'], ['Reloj o app con GPS', 'Opcional; tu teléfono basta al inicio.']] },
+  { need: 'Gimnasio', items: [['Botella de agua y toalla', 'Lo básico.'], ['Cinturón de levantamiento', 'Solo cuando ya levantes pesado en sentadilla o peso muerto; no hace falta al principio.'], ['Straps', 'Para remos y peso muerto pesados cuando el agarre falla antes que la espalda.']] },
+  { need: 'Viajes', items: [['Bandas elásticas + liga mini', 'Con eso y tu peso corporal tienes una sesión completa en el hotel.'], ['Cuerda para saltar', 'Cardio en 2 m².']] }
+];
+const SUPPLEMENT_HONEST = 'Lo único con evidencia sólida para la mayoría: proteína (si no llegas comiendo) y creatina monohidratada. Lo demás es opcional o marketing.';
+const PLACES = [['🏋️', 'Gimnasios', 'gimnasio'], ['🧘', 'Clases de yoga', 'clases de yoga'], ['🤸', 'Pilates', 'pilates'], ['🏊', 'Albercas', 'alberca pública'], ['🏃', 'Parques para correr', 'parque para correr'], ['⚽', 'Canchas y ligas', 'cancha deportiva'], ['🧗', 'Escalada', 'muro de escalada'], ['🥊', 'Box o artes marciales', 'gimnasio de box']];
+const HOTEL_SESSION = [['Sentadilla sin peso', 3, '15–20', 45], ['Lagartijas', 3, '8–15', 60], ['Zancadas sin peso', 3, '10 por pierna', 45], ['Puente de glúteo', 3, '15–20', 45], ['Superman', 2, '12', 45], ['Plancha', 3, '30–45 s', 45]];
+const LEVEL_NAMES = ['Primer paso', 'En marcha', 'Constante', 'Comprometido', 'Atleta en construcción', 'Atleta', 'Referente', 'Leyenda personal'];
