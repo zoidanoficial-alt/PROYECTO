@@ -213,11 +213,11 @@ function cycleReadiness(add) {
 function cycleCard() {
   if (!cycleOn()) return '';
   const st = cycStats(), t = todayStr(), ph = phaseOn(t, st), c = cycDay(t);
-  if (!st.last) return `<div class="card cyc-card"><h2>Tu ciclo</h2><p class="small muted" style="margin-top:0">Registra el primer día de tu última regla para empezar. Con cada ciclo aprenderé tus patrones.</p>
+  if (!st.last) return `<div class="card cyc-card open"><h2>Tu ciclo</h2><p class="small muted" style="margin-top:0">Registra el primer día de tu última regla para empezar. Con cada ciclo aprenderé tus patrones.</p>
     <div class="row"><button id="cy-start" style="flex:1">🩸 Me bajó hoy</button><button class="secondary" id="cy-past" style="flex:1">Fue otro día</button></div></div>`;
   const P = CYC_PHASES[ph.key], pat = cyclePatterns();
   const upcoming = ph.untilNext <= 5 ? pat.notes.filter(n => n.ico === '🌘' || n.ico === '🔁') : [];
-  return `<div class="card cyc-card ${P.cls}">
+  return `<div class="card cyc-card ${P.cls}" data-fold-title="Tu ciclo" data-fold-sum="Día ${ph.n} · ${P.name.split(' (')[0]} · próxima regla ~${shortDate(st.next)}" data-fold-ico="${P.ico}" ${upcoming.length ? '' : ''}>
     <div class="row spread"><div><div class="small muted">Día ${ph.n} de tu ciclo</div><h2 style="margin:0">${P.ico} ${P.name}</h2></div>
       <button class="secondary small-btn" id="cy-log">${c ? '✓ Editar hoy' : '+ ¿Cómo estás?'}</button></div>
     <p class="small" style="margin:8px 0 4px">Próxima regla: <b>${shortDate(addDays(st.next, -st.margin))} – ${shortDate(addDays(st.next, st.margin))}</b> <span class="muted">(lo más probable ${shortDate(st.next)}${st.confident ? '' : ', estimación con pocos datos'})</span></p>

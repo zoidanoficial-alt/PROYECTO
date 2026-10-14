@@ -215,14 +215,18 @@ function coachPlanCard() {
     const c = coachFor(e[0], e[2]), sets = adjSets(e[1], plan);
     const target = c.sug ? (plan === 'modificar' ? `${roundTo(c.sug.a.w * 0.9, stepFor(e[0], c.u))} ${c.u} × ${Math.min(c.sug.a.r, c.hi)}` : c.sug.a.w ? `${c.sug.a.w} ${c.u} × ${c.sug.a.r}` : `${c.sug.a.r} reps`) : e[2] + ' reps';
     return `<div class="coach-row"><div class="grow"><b>${esc(e[0])}</b><br><small class="muted">${sets} × ${esc(target)}</small></div><span class="coach-tag ${c.kind}" data-coach="${esc(e[0])}|${esc(e[2])}">${c.label}</span></div>`;
-  }).join('');
-  return `<div class="card">
-    <div class="row spread"><h2 style="margin:0">Tu plan de hoy</h2><span class="pill">${esc(nd.name.split('·').pop().trim())}</span></div>
-    <p class="small muted" style="margin:4px 0 8px">Calculado con tus últimas sesiones${r ? ' y tu chequeo de hoy (' + PLAN_INFO[plan].name.toLowerCase() + ')' : ''}. Toca una etiqueta para ver por qué.</p>
-    ${rows}
+  });
+  return `<div class="card keep plan-card">
+    <div class="row spread"><div><div class="small muted">Tu plan de hoy</div><h2 style="margin:0">${esc(nd.name.split('·').pop().trim())}</h2></div>${r ? `<span class="pill">${PLAN_INFO[plan].icon} ${PLAN_INFO[plan].name}</span>` : ''}</div>
+    <div style="margin-top:6px">${rows.slice(0, 3).join('')}</div>
+    ${rows.length > 3 ? `<details class="more-rows"><summary class="small">Ver los ${rows.length} ejercicios</summary>${rows.slice(3).join('')}</details>` : ''}
+    <button class="block" id="cp-start" data-day="${nd.id}" style="margin-top:12px">▶ Empezar entreno</button>
+    <p class="small muted" style="margin:8px 0 0;text-align:center">Toca una etiqueta para ver por qué te lo recomiendo.</p>
   </div>`;
 }
 function bindCoach(root) {
+  const st = $('#cp-start', root);
+  if (st) st.onclick = () => { startSession(DB.profile.routine, st.dataset.day); renderTrain(); window.scrollTo(0, 0); };
   $$('[data-coach]', root).forEach(b => b.onclick = () => {
     const [ex, reps] = b.dataset.coach.split('|'), c = coachFor(ex, reps), h = exHistory(ex).slice(-4);
     openModal(`<h3>${c.label} · ${esc(ex)}</h3>

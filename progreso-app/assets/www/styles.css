@@ -617,3 +617,52 @@ label.mini > input { margin-top: 3px; }
 .cal-d.today { box-shadow: 0 0 0 2px var(--accent); }
 .legend i.ph-men { background: var(--ph-men); } .legend i.ph-fol { background: var(--ph-fol); } .legend i.ph-ov { background: var(--ph-ov); } .legend i.ph-lut { background: var(--ph-lut); } .legend i.ph-pre { background: var(--ph-pre); }
 .legend i.pred-sw { background: transparent; border: 1.5px dashed var(--muted); }
+
+/* ---------- 10.0: minimalista y equilibrado ---------- */
+:root { --radius: 18px; }
+main { padding-top: 2px; }
+.card { box-shadow: none; border: 1px solid var(--line); margin-bottom: 12px; }
+:root[data-theme="dark"] .card { border-color: rgba(255, 255, 255, .05); }
+.section-title { margin: 22px 4px 8px; font-size: 12px; letter-spacing: .08em; }
+.fold { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 8px; overflow: hidden; }
+:root[data-theme="dark"] .fold { border-color: rgba(255, 255, 255, .05); }
+details.fold:last-of-type { border-bottom: 1px solid var(--line); }
+.fold > summary { padding: 12px 14px; gap: 12px; justify-content: flex-start; font-weight: 400; min-height: 60px; }
+.fold > summary::after { margin-left: auto; padding-left: 6px; }
+.fold .f-ico { width: 36px; height: 36px; flex: none; border-radius: 12px; display: grid; place-items: center; background: var(--surface-2); font-size: 18px; }
+.fold .f-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.fold .f-txt b { font-size: 15px; font-weight: 650; }
+.fold .f-txt small { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fold .f-badge { flex: none; font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft); padding: 3px 9px; border-radius: 99px; max-width: 42%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fold[open] > summary { border-bottom: 1px solid var(--line); }
+.fold-body { padding: 12px 14px 14px; animation: fade .18s ease-out; }
+.fold-body > .card { background: transparent; border: 0; box-shadow: none; padding: 0; margin: 0; }
+.fold-head-hidden { display: none; }
+.fold-body > .card > .row.spread:first-child:has(> .fold-head-hidden) { justify-content: flex-end; }
+.fold-body > .card > .row.spread:first-child:has(> div > .fold-head-hidden) > div > .small.muted { display: none; }
+.fold-body > .card.stage-card, .fold-body > .card.cyc-card { border-left: 0; }
+.glance { display: grid; gap: 8px; margin-bottom: 12px; }
+.glance.g3 { grid-template-columns: repeat(3, 1fr); } .glance.g4 { grid-template-columns: repeat(4, 1fr); }
+.glance button { display: flex; flex-direction: column; align-items: flex-start; gap: 0; padding: 10px 10px 9px; min-height: 0; border-radius: 16px; background: var(--surface); color: var(--text); border: 1px solid var(--line); text-align: left; font-weight: 500; }
+:root[data-theme="dark"] .glance button { border-color: rgba(255, 255, 255, .05); }
+.glance .g-ico { font-size: 16px; line-height: 1.2; }
+.glance b { font-size: 18px; font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1.25; margin-top: 2px; }
+.glance small { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.quick { gap: 8px; margin-bottom: 4px; }
+.quick button { box-shadow: none; border: 1px solid var(--line); padding: 10px 4px; }
+:root[data-theme="dark"] .quick button { border-color: rgba(255, 255, 255, .05); }
+.quick button .q-ico { width: 34px; height: 34px; font-size: 18px; border-radius: 12px; }
+.hero { margin-bottom: 12px; padding: 16px 18px; }
+.hero h3 { font-size: 22px; }
+/* Pestañas de Progreso en una sola fila deslizable */
+.seg.wrap.scroll { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.seg.wrap.scroll::-webkit-scrollbar { display: none; }
+.seg.wrap.scroll button { flex: none; padding: 8px 14px; white-space: nowrap; }
+.tool-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 4px; }
+.tool-row button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; min-height: 0; font-size: 12px; font-weight: 600; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 16px; }
+:root[data-theme="dark"] .tool-row button { border-color: rgba(255, 255, 255, .05); }
+.tool-row button span { font-size: 20px; }
+.more-rows { border: 0; }
+.more-rows > summary { padding: 8px 0 4px; color: var(--accent); font-weight: 650; justify-content: center; gap: 6px; }
+.more-rows > summary::after { font-size: 18px; }
+.plan-card .coach-row:last-child { border-bottom: 1px solid var(--line); }

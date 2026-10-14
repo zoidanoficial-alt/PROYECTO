@@ -204,7 +204,7 @@ function stageReady() {
 }
 function stageCard() {
   const st = stage(), S = STAGES[st], ready = stageReady();
-  return `<div class="card stage-card">
+  return `<div class="card stage-card ${ready ? 'open' : ''}" data-fold-title="Tu camino" data-fold-sum="Etapa ${st} de 4 · ${S.name}" data-fold-ico="${S.ico}" data-fold-badge="${ready ? '¡Listo para subir!' : ''}" data-fold-keep-head="1">
     <div class="stage-steps">${[1, 2, 3, 4].map(k => `<span class="${k < st ? 'past' : k === st ? 'on' : ''}">${STAGES[k].ico}</span>`).join('<i></i>')}</div>
     <div class="small muted" style="margin-top:8px">Etapa ${st} de 4</div>
     <h3 style="margin:0">${S.ico} ${S.name}</h3>

@@ -734,7 +734,7 @@ function pwoCard() {
   const left = pwoLeft();
   if (left == null) return '';
   const e = DB.days[todayStr()] || {}, s = e.supps || {};
-  return `<div class="card" style="border:1px solid rgba(255,95,10,.5)">
+  return `<div class="card keep" style="border:1px solid rgba(255,95,10,.5)">
     <div class="row spread"><h2 style="margin:0">Ventana post-entreno</h2><span class="pill" id="pwo-left">${mmss(left / 1000)}</span></div>
     <p class="small muted" style="margin:6px 0 8px">Tu cuerpo pasa de catabólico a anabólico: aprovecha los primeros ${PWO_MINUTES} min.</p>
     ${PWO_ITEMS.map(([id, name, sub]) => `<label class="check" style="margin:6px 0"><input type="checkbox" data-pwo="${id}" ${s[id] ? 'checked' : ''}> <span>${esc(name)}<br><span class="small muted">${esc(sub)}</span></span></label>`).join('')}
@@ -798,8 +798,7 @@ function renderHome() {
   const full = !isSimple();
   $('#view-home').innerHTML = `
     ${hero}
-    ${cycleCard()}
-    ${stageCard()}
+    ${glanceStrip()}
     ${full ? pwoCard() : ''}
 
     <div class="quick">
@@ -810,7 +809,7 @@ function renderHome() {
       <button data-q="photo"><span class="q-ico" style="background:var(--warn-soft)">📷</span>Foto</button>
     </div>
 
-    ${full ? `<div class="card">
+    ${full ? `<div class="card" data-fold-title="Comida y agua" data-fold-ico="🍽️" data-fold-sum="${tot.kcal.toLocaleString('es-MX')} de ${tg.kcal.toLocaleString('es-MX')} kcal · ${Math.round(tot.p)} g proteína · ${fmt(tot.water / 1000, 1)} L">
       <div class="row spread" style="margin-bottom:10px"><h2 style="margin:0">Hoy</h2><span class="small muted">${tg.kcal.toLocaleString('es-MX')} kcal objetivo</span></div>
       <div class="rings">
         <div>${ring(tot.kcal, tg.kcal, 'var(--accent)', Math.round(tot.kcal / Math.max(1, tg.kcal) * 100) + '%')}<div class="ring-label"><b>${tot.kcal.toLocaleString('es-MX')}</b>kcal</div></div>
@@ -820,7 +819,7 @@ function renderHome() {
       ${tot.s > tg.sugar ? `<div class="status bad"><b>Azúcar: ${Math.round(tot.s)} g</b>Pasaste el máximo de ${tg.sugar} g de hoy.</div>` : ''}
     </div>` : ''}
 
-    <div class="card">
+    <div class="card" data-fold-title="Peso" data-fold-sum="${esc(adv.title)}" data-fold-badge="${r1 == null ? '' : signed(r1, 2) + ' kg/sem'}">
       <div class="row spread">
         <div><div class="small muted">Peso · media 7 días</div><div class="big">${fmt(cur)}<span class="muted" style="font-size:17px;font-weight:600"> kg</span></div></div>
         <div style="text-align:right"><div class="small muted">Esta semana</div>
@@ -836,6 +835,8 @@ function renderHome() {
     ${stage() >= 2 ? agendaCard() : ''}
     ${challengesCard()}
     ${commitsCard()}
+    ${cycleCard()}
+    ${stageCard()}
     ${full ? whatWorksCard() : ''}
 
     ${full ? readinessCard() + `
@@ -845,7 +846,7 @@ function renderHome() {
       ${habits.map(h => `<label class="habit"><input type="checkbox" data-habit="${h.id}" ${habitDone(h, t) ? 'checked' : ''}> ${esc(h.name)}${h.auto && habitAuto(h, t) ? '<span class="auto">auto ✓</span>' : ''}</label>`).join('')}
     </div>
 
-    <div class="card"><div class="quote"><b>💡 ${esc(mTitle)}</b>${esc(mText)}<small>Idea de ${esc(mSrc)}</small></div></div>` : ''}
+    <div class="card" data-fold-title="Idea del día" data-fold-sum="${esc(mTitle)}" data-fold-ico="💭"><div class="quote"><b>💡 ${esc(mTitle)}</b>${esc(mText)}<small>Idea de ${esc(mSrc)}</small></div></div>` : ''}
 
     ${gamify() && DB.achievements.length ? `<div class="card">
       <div class="row spread"><h2 style="margin:0">Logros recientes</h2><button class="ghost" id="home-ach">Ver todos ›</button></div>
@@ -865,6 +866,8 @@ function renderHome() {
   const ach = $('#home-ach'); if (ach) ach.onclick = () => { progMode = 'logros'; showTab('progress'); };
   const vh = $('#view-home');
   bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
+  bindGlance(vh);
+  foldify(vh, [['Para hoy', ['Chequeo', 'Tu ciclo', 'Comida y agua', 'Reglas de oro', 'compromisos']], ['Esta semana', ['Tu semana', 'agenda', 'Retos', 'Peso']], ['Tu camino', '*']]);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
   showChart(() => drawSpark($('#home-spark'), movingAvg(entries).map(e => e.y)));
 }
@@ -1108,24 +1111,24 @@ function renderTrain() {
   const recent = DB.sessions.filter(x => x.end).sort((a, b) => b.start - a.start).slice(0, 8);
 
   $('#view-train').innerHTML = `
-    ${isSimple() ? '' : readinessCard()}
     ${coachPlanCard()}
-    <div class="grid2" style="margin-bottom:12px">
-      <button class="secondary" id="tr-act">🏃 Otra actividad</button>
-      <button class="secondary" id="tr-hotel">🧳 Sesión de hotel</button>
+    <div class="tool-row">
+      <button id="tr-free"><span>⚡</span>Libre</button>
+      <button id="tr-act"><span>🏃</span>Actividad</button>
+      <button id="tr-hotel"><span>🧳</span>Hotel</button>
+      <button id="tr-lib"><span>📚</span>Ejercicios</button>
     </div>
-    <div class="grid2" style="margin-bottom:12px">
-      <button id="tr-free">Entreno libre</button>
-      <button class="secondary" id="tr-lib">Ejercicios y máquinas</button>
+    ${isSimple() ? '' : readinessCard()}
+    <div class="card" data-fold-title="Tu rutina" data-fold-sum="${esc(p.routine === 'custom' ? 'Mi semana (personalizada)' : r.name)}" data-fold-ico="📋">
+      <label style="margin-bottom:6px">Rutina
+        <select id="rt-sel">
+          ${Object.keys(ROUTINES).map(k => `<option value="${k}" ${p.routine === k ? 'selected' : ''}>${esc(ROUTINES[k].name)}</option>`).join('')}
+          <option value="custom" ${p.routine === 'custom' ? 'selected' : ''}>⭐ Mi semana (personalizada)</option>
+        </select>
+      </label>
+      <p class="small muted" style="margin:0">${esc(r.desc || '')}</p>
     </div>
-    <label>Rutina
-      <select id="rt-sel">
-        ${Object.keys(ROUTINES).map(k => `<option value="${k}" ${p.routine === k ? 'selected' : ''}>${esc(ROUTINES[k].name)}</option>`).join('')}
-        <option value="custom" ${p.routine === 'custom' ? 'selected' : ''}>⭐ Mi semana (personalizada)</option>
-      </select>
-    </label>
-    <p class="small muted" style="margin-top:-4px">${esc(r.desc || '')}</p>
-    ${p.routine === 'custom' ? weekPlanCard() : `<div class="card">
+    ${p.routine === 'custom' ? weekPlanCard() : `<div class="card" data-fold-title="Días de la rutina" data-fold-sum="${nd ? 'Hoy: ' + esc(nd.name.split('·').pop().trim()) : ''}" data-fold-ico="🗓️">
       <h2>Días</h2>
       ${r.days.length ? r.days.map(d => `
         <details ${nd && d.id === nd.id ? 'open' : ''}>
@@ -1170,6 +1173,7 @@ function renderTrain() {
   $('#tr-lib').onclick = () => openExercisePicker(null);
   $('#rt-sel').onchange = e => { DB.profile.routine = e.target.value; saveData(); renderTrain(); };
   if (p.routine === 'custom') bindWeekPlan();
+  foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Tu rutina', 'Días', 'Mi semana', 'Mis entrenos']], ['Tu semana', ['Mapa', 'Balance', 'actividades', 'sesiones']], ['Aprende', '*']]);
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });
   $$('#view-train [data-sess]').forEach(tr => tr.onclick = () => openSessionDetail(tr.dataset.sess));
   bindRecovery($('#view-train'), renderTrain);
@@ -1369,6 +1373,84 @@ function renderSession(s) {
     closeSession(); renderTrain();
   };
 }
+/* ------------------------------------------------------------------ *
+ *  10.0 · Diseño minimalista: secciones plegables (revelación progresiva)
+ * ------------------------------------------------------------------ */
+const FOLD_ICONS = [['Peso', '⚖️'], ['Hoy', '🍽️'], ['Tu semana', '📅'], ['agenda', '🗓️'], ['Retos', '🏆'], ['compromisos', '🤝'], ['funciona', '💡'],
+  ['Chequeo', '⚡'], ['Reglas de oro', '✨'], ['7 reglas', '✨'], ['Logros', '🏅'], ['ciclo', '🌙'], ['Ciclo', '🌙'], ['camino', '🧭'], ['Idea', '💭'], ['Días', '📋'], ['Mi semana', '🗓️'],
+  ['Mis entrenos', '🗂️'], ['Mapa muscular', '🫀'], ['Balance', '⚖️'], ['Técnicas', '🔥'], ['sesiones', '🕘'], ['actividades', '🏃'], ['objetivo', '🎯'], ['Hambre', '🤔'],
+  ['Calidad', '🌈'], ['post-entreno', '⏱️'], ['Proteína', '🥩'], ['Panza', '🫃'], ['microbiota', '🦠'], ['temporada', '🍓'], ['Mitos', '❌'], ['Exportar', '📄'], ['Cómo quieres', '🧩'],
+  ['Dónde entrenas', '📍'], ['Molestias', '🩹'], ['Constancia', '🗓️'], ['trucos', '🤝'], ['Apariencia', '🎨'], ['Perfil', '👤'], ['Suplementos', '💊'], ['bombeo', '💥'], ['Mentalidad', '🧠'],
+  ['Copia', '💾'], ['peligrosa', '⚠️'], ['Equipo', '🎒'], ['moverte', '🗺️'], ['plan de hoy', '🎯'], ['Recuperación', '😴']];
+/**
+ * Convierte las tarjetas de un contenedor en filas plegables de una línea (título, resumen y
+ * flecha). Mueve los nodos sin recrearlos, así sus botones siguen funcionando. Las tarjetas con
+ * la clase "keep" quedan a la vista. `groups` ordena las secciones bajo títulos.
+ */
+function foldify(root, groups) {
+  const open = DB.profile.folds || {};
+  const cards = Array.from(root.children).filter(c => c.classList.contains('card') && !c.classList.contains('keep'));
+  const made = [];
+  cards.forEach(card => {
+    const h = card.querySelector(':scope > h2, :scope > .row > h2, :scope > .row > div > h2, :scope > h3, :scope > .row > div > h3');
+    const title = card.dataset.foldTitle || (h ? (h.childNodes[0] ? h.childNodes[0].textContent : h.textContent).replace(/^[^\wÁÉÍÓÚÑ¿¡]+/u, '').trim() : '');
+    if (!title) return;
+    const sub = card.dataset.foldSum || (h && h.querySelector('small') ? h.querySelector('small').textContent.replace(/^\s*·\s*/, '') : '');
+    const pill = card.querySelector(':scope > .row .pill');
+    const badge = card.dataset.foldBadge || (pill ? pill.textContent : '');
+    const ico = card.dataset.foldIco || (FOLD_ICONS.find(([k]) => title.includes(k)) || [0, '•'])[1];
+    const id = 'f-' + title.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').slice(0, 30);
+    if (h && !card.dataset.foldKeepHead) h.classList.add('fold-head-hidden');
+    const d = document.createElement('details');
+    d.className = 'fold'; d.dataset.fold = id;
+    if (open[id] || card.classList.contains('open')) d.open = true;
+    d.innerHTML = `<summary><span class="f-ico">${ico}</span><span class="f-txt"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${badge ? `<span class="f-badge">${esc(badge)}</span>` : ''}</summary><div class="fold-body"></div>`;
+    card.replaceWith(d);
+    d.lastChild.appendChild(card);
+    made.push({ d, title });
+  });
+  if (groups) {
+    const placed = new Set();
+    groups.forEach(([name, keys]) => {
+      const mine = made.filter(m => !placed.has(m) && (keys === '*' || keys.some(k => m.title.includes(k))));
+      if (!mine.length) return;
+      const t = document.createElement('div'); t.className = 'section-title'; t.textContent = name;
+      root.appendChild(t);
+      mine.forEach(m => { placed.add(m); root.appendChild(m.d); });
+    });
+  }
+}
+// Recordar qué secciones dejaste abiertas y redibujar las gráficas al abrir.
+document.addEventListener('toggle', e => {
+  const d = e.target;
+  if (!d.classList || !d.classList.contains('fold')) return;
+  DB.profile.folds = DB.profile.folds || {};
+  if (d.open) DB.profile.folds[d.dataset.fold] = true; else delete DB.profile.folds[d.dataset.fold];
+  saveData();
+  if (d.open) requestAnimationFrame(() => redrawChart());
+}, true);
+
+/** Vistazo de hoy: 3–4 datos clave en una sola fila. */
+function glanceStrip() {
+  const r = typeof readiness === 'function' ? readiness() : null, n = sessionsThisWeek(), g = weekTarget(), cur = currentWeight();
+  const tiles = [
+    ['ck', r ? PLAN_INFO[r.plan].icon : '⚡', r ? r.score + '' : 'Chequeo', r ? PLAN_INFO[r.plan].name : '¿cómo llegas?'],
+    ['wk', '📅', n + '/' + g, 'días activos'],
+    ['wt', '⚖️', cur ? fmt(cur) : '—', 'kg · media 7 d']
+  ];
+  if (cycleOn()) { const ph = phaseOn(todayStr()); tiles.push(['cy', ph ? CYC_PHASES[ph.key].ico : '🌙', ph ? 'Día ' + ph.n : 'Ciclo', ph ? CYC_PHASES[ph.key].name.split(' (')[0].replace('Días previos a la regla', 'Premenstrual') : 'registrar']); }
+  return `<div class="glance g${tiles.length}">${tiles.map(([k, i, v, l]) => `<button data-glance="${k}"><span class="g-ico">${i}</span><b>${v}</b><small>${esc(l)}</small></button>`).join('')}</div>`;
+}
+function bindGlance(root) {
+  $$('[data-glance]', root).forEach(b => b.onclick = () => {
+    const k = b.dataset.glance;
+    if (k === 'ck') openCheckin(() => render(currentTab));
+    else if (k === 'wt') openWeightQuick();
+    else if (k === 'cy') openCycleDay(todayStr(), () => render(currentTab));
+    else { const f = $('#view-home [data-fold^="f-mi-agenda"]') || $('#view-home [data-fold^="f-tu-semana"]'); if (f) { f.open = true; f.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
+  });
+}
+
 function keepScroll(fn) { const y = window.scrollY; fn(); window.scrollTo(0, y); }
 
 function explainRir() {
@@ -1875,7 +1957,7 @@ function renderFood() {
   const meals = (DB.days[t] && DB.days[t].meals) || [];
   const left = pwoLeft();
   $('#view-food').innerHTML = `
-    <div class="card">
+    <div class="card" data-fold-sum="${tg.kcal.toLocaleString('es-MX')} kcal · P ${tg.protein} g · C ${tg.carbs} g · G ${tg.fat} g">
       <h2>Tu objetivo diario</h2>
       <div class="big">${tg.kcal.toLocaleString('es-MX')} <span class="muted" style="font-size:16px;font-weight:500">kcal</span></div>
       <p class="small muted" style="margin:4px 0 10px">${p.autoMacros
@@ -1889,7 +1971,7 @@ function renderFood() {
       <p class="small muted" style="margin:10px 0 0">${esc(tg.soma.name)}: ${tg.soma.c} % carbohidratos · ${tg.soma.p} % proteína · ${tg.soma.f} % grasa. Reparte en 3–4 comidas completas.</p>
     </div>
 
-    <div class="card">
+    <div class="card keep">
       <h2>Hoy</h2>
       <div class="row spread small"><span><b>${tot.kcal.toLocaleString('es-MX')}</b> / ${tg.kcal.toLocaleString('es-MX')} kcal</span><span>${tot.meals} comida${tot.meals === 1 ? '' : 's'}</span></div>
       <div class="macros">
@@ -1932,6 +2014,7 @@ function renderFood() {
       ${FOOD_FACTS.map(([m, f]) => `<details><summary>❌ ${esc(m)}</summary><p class="small" style="margin:0 0 12px">✅ ${esc(f)}</p></details>`).join('')}
     </div>`;
   bindFoodExtras(t);
+  foldify($('#view-food'), [['Para hoy', ['Hambre', 'Calidad', 'post-entreno']], ['Tu plan', ['objetivo', 'Proteína']], ['Salud y conocimiento', '*']]);
 
   $('#fd-add').onclick = () => openMealForm(t);
   $$('#view-food [data-wat]').forEach(b => b.onclick = () => {
@@ -2152,7 +2235,7 @@ let progMode = 'analysis';
 function renderProgress() {
   if (progMode === 'logros' && !gamify()) progMode = 'weight';
   if (progMode === 'ciclo' && !cycleOn()) progMode = 'analysis';
-  const seg = `<div class="seg wrap">${[['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
+  const seg = `<div class="seg wrap scroll">${[['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   const v = $('#view-progress');
   v.innerHTML = seg + '<div id="prog-body"></div><button class="secondary block" id="prog-export" style="margin-top:4px">📄 Exportar PDF / Excel para analizar con IA</button>';
   $('#prog-export').onclick = openExport;
@@ -2657,7 +2740,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" style="text-align:center">Mi Progreso 9.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
+    <p class="small muted" id="more-foot" style="text-align:center;margin-top:20px">Mi Progreso 10.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
@@ -2717,6 +2800,9 @@ function renderMore() {
     try { await photoStore.clear(); } catch (e) {}
     toast('Datos borrados'); showTab('home');
   };
+  const foot = $('#more-foot');
+  foldify($('#view-more'), [['Tu perfil', ['Perfil', 'Cómo quieres', 'Dónde entrenas', 'Molestias', 'Constancia', 'Ciclo', 'Apariencia']], ['Conocimiento', ['Suplementos', 'bombeo', 'Mentalidad', '7 reglas', 'Equipo', 'moverte']], ['Tus datos', '*']]);
+  if (foot) $('#view-more').appendChild(foot);
 }
 
 async function exportBackup() {
