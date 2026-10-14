@@ -842,6 +842,7 @@ function renderHome() {
   $('#view-home').innerHTML = `
     ${hero}
     ${comebackCard()}
+    ${notifPromptCard()}
     ${glanceStrip()}
     ${full ? pwoCard() : ''}
 
@@ -913,7 +914,7 @@ function renderHome() {
   if (full) bindRecovery($('#view-home'), renderHome);
   const ach = $('#home-ach'); if (ach) ach.onclick = () => { progMode = 'logros'; showTab('progress'); };
   const vh = $('#view-home');
-  bindComeback(vh, renderHome); bindCycleInvite(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
+  bindComeback(vh, renderHome); bindNotifPrompt(vh, renderHome); bindCycleInvite(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
   bindGlance(vh);
   foldify(vh, [['Para hoy', ['Misiones de hoy', 'Chequeo', 'Tu ciclo', 'Comida y agua', 'Reglas de oro', 'compromisos']], ['Esta semana', ['Tu semana', 'agenda', 'Retos', 'Peso']], ['Tu camino', '*']]);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
@@ -2766,8 +2767,10 @@ function renderMore() {
       <label class="habit"><input type="checkbox" id="st-pause" ${DB.pauses.includes(weekKey(todayStr())) ? 'checked' : ''}> Pausar esta semana (vacaciones, lesión, descarga)</label>
       <label class="habit"><input type="checkbox" id="st-gamify" ${p.gamify !== false ? 'checked' : ''}> Mostrar logros y rachas</label>
       <label class="habit"><input type="checkbox" id="st-rest" ${p.restAlerts ? 'checked' : ''}> Avisar cuando termine el descanso (aunque la app esté minimizada)</label>
-      <p class="small muted" style="margin:8px 0 0">La app no manda recordatorios ni avisos de racha. Las semanas en pausa no rompen tu racha.</p>
+      <p class="small muted" style="margin:8px 0 0">Nunca hay avisos de racha ni culpas. Las semanas en pausa no rompen tu racha.</p>
     </div>
+
+    ${notifSettingsCard()}
 
     ${cycleSettingsCard()}
 
@@ -2887,6 +2890,7 @@ function renderMore() {
   $$('#view-more [data-stage]').forEach(b => b.onclick = () => { const n = Number(b.dataset.stage); if (n !== stage()) addEvent(todayStr(), 'stage', 'Cambiaste a la etapa ' + n + ': ' + STAGES[n].name, STAGES[n].ico); DB.profile.stage = n; saveRe(); });
   $('#st-pause').onchange = e => { const k = weekKey(todayStr()); DB.pauses = DB.pauses.filter(x => x !== k).concat(e.target.checked ? [k] : []); saveData(); toast(e.target.checked ? 'Semana en pausa. Descansa ' + g('tranquilo.', 'tranquila.') : 'Pausa quitada'); };
   $('#st-gamify').onchange = e => { DB.profile.gamify = e.target.checked; saveData(); };
+  bindNotifSettings($('#view-more'), renderMore);
   $('#st-rest').onchange = e => { DB.profile.restAlerts = e.target.checked; saveData(); if (e.target.checked) requestNotifications(); };
   $$('#view-more [data-theme]').forEach(b => b.onclick = () => { DB.profile.theme = b.dataset.theme; saveData(); applyTheme(); renderMore(); });
   $$('#view-more [data-look]').forEach(b => b.onclick = () => { DB.profile.look = b.dataset.look; saveData(); applyTheme(); keepScroll(renderMore); });
@@ -2927,7 +2931,7 @@ function renderMore() {
     toast('Datos borrados'); showTab('home');
   };
   const foot = $('#more-foot');
-  foldify($('#view-more'), [['Tu perfil', ['Perfil', 'Cómo quieres', 'Dónde entrenas', 'Molestias', 'Constancia', 'Ciclo', 'Apariencia']], ['Conocimiento', ['Suplementos', 'bombeo', 'Mentalidad', '7 reglas', 'Equipo', 'moverte']], ['Tus datos', '*']]);
+  foldify($('#view-more'), [['Tu perfil', ['Perfil', 'Cómo quieres', 'Dónde entrenas', 'Molestias', 'Constancia', 'Notificaciones', 'Ciclo', 'Apariencia']], ['Conocimiento', ['Suplementos', 'bombeo', 'Mentalidad', '7 reglas', 'Equipo', 'moverte']], ['Tus datos', '*']]);
   if (foot) $('#view-more').appendChild(foot);
 }
 
@@ -3121,6 +3125,9 @@ restoreRest();
 restoreRun();   // 12.0: recupera una carrera en curso si la app se cerró
 labelButtons(); femify();
 if (RUN.st) showTab('train');
+// 17.0: si se abrió tocando un recordatorio, ir a su pestaña; y reprogramar la agenda con los datos de hoy.
+try { const nt = bridge && bridge.takeLaunchTab ? bridge.takeLaunchTab() : ''; if (nt && !RUN.st && !DB.active) window.onNotifOpen(nt); } catch (e) {}
+setTimeout(syncReminders, 1500);
 if (!DB.profile.onboarded) openOnboarding();
 // 12.0: quien activó el ciclo antes de existir el consentimiento lo confirma una vez (si no acepta, se desactiva).
 else if (DB.profile.cycleOn && !DB.profile.cycleConsent) setTimeout(() => openCycleConsent(() => render(currentTab)), 500);

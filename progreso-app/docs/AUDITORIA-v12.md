@@ -398,3 +398,46 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - Al vencer el aviso y recargar, la sesión ya no existe.
 - La cabecera cabe a 320 px con letra al 140 %.
 - Regresión v9–v22, persist y desborde: sin errores.
+
+---
+
+## 17.0 · Notificaciones: recordatorios locales inteligentes
+
+**Problema:** la app solo avisaba el fin del descanso. No recordaba el entreno, el chequeo, el peso, el agua, la proteína ni el running.
+
+**Diseño:**
+- **Local y privado:** la página arma una agenda de 7 días con tus datos (`notif.js`) y Android la dispara con AlarmManager aunque la app esté cerrada (`ReminderReceiver.java`). No hay servidor, cuenta ni datos que salgan del teléfono.
+- **Solo cuando hace falta:** la agenda se recalcula cada vez que sales de la app (visibilitychange/pagehide), al abrirla y al cambiar ajustes. Si ya entrenaste, te pesaste, hiciste el chequeo o llegaste a tu meta de agua o proteína, ese aviso desaparece.
+- **Tipos de aviso** (cada uno se activa por separado y con hora propia):
+
+  | Aviso | Hora por defecto | Cuándo |
+  |---|---|---|
+  | Entreno del día | 18:00 | Días de tu agenda, con el nombre del día de la rutina |
+  | Sesión de running | 07:00 | Días con sesión del plan; reemplaza al de fuerza |
+  | Chequeo | 08:00 | Días de entreno |
+  | Peso | 07:30 | Cada mañana |
+  | Agua | 11:00, 15:00 y 19:00 | Solo si vas por debajo del 30/60/85 % de tu meta |
+  | Proteína | 20:30 | Solo si te falta más del 30 % |
+  | Compromisos | 20:00 | Si tienes uno pendiente |
+  | Regreso amable | 18:00 | Uno solo por pausa, con 4+ días sin actividad |
+  | Resumen semanal | Domingo 19:00 | Cada semana |
+  | Ciclo | 09:00 | Apagado por defecto. Texto discreto ("Recordatorio de tu calendario"), porque se ve en la pantalla bloqueada |
+
+- **Reglas:**
+  - Nada entre 22:00 y 7:00; el selector de hora no deja elegir fuera de ese rango.
+  - Máximo 4 avisos al día, por prioridad: running/entreno > chequeo > peso > proteína > agua > compromisos.
+  - Tono sin culpas ni rachas.
+- **Permisos:**
+  - Tarjeta única en Inicio: "Activar notificaciones" o "Ahora no". Al activarlas se pide el permiso de Android 13+.
+  - En Más → Notificaciones: estado real del sistema (`areNotificationsEnabled`), botón "Abrir ajustes" si están bloqueadas, "Enviar una de prueba" y lista de los próximos 4 avisos.
+- **Al tocar un aviso** se abre la pestaña que corresponde: Entreno, Nutrición, Progreso o Inicio.
+- **Reinicio del teléfono o actualización de la app:** `BootReceiver` vuelve a programar la agenda guardada. Es el único receptor expuesto y solo atiende BOOT_COMPLETED y MY_PACKAGE_REPLACED. El receptor que muestra los avisos no está expuesto, así que otra app no puede hacer que Mi Progreso muestre notificaciones falsas.
+- **Batería:** alarmas con ventana de 10 min (`setWindow`), sin alarmas exactas.
+
+**Archivos:**
+- Nuevos: `notif.js`, `ReminderReceiver.java`, `BootReceiver.java`.
+- Modificados: `MainActivity.java` (setReminders, notifStatus, openNotifSettings, notifyNow, takeLaunchTab, onNewIntent, permiso), `AndroidManifest.xml` (RECEIVE_BOOT_COMPLETED, receptores, singleTop, 17.0 / 21), `app.js`, `index.html`, `styles.css`.
+
+**Limitaciones:**
+- Probado con un bridge de Android simulado y el reloj fijado. Falta comprobarlo en un teléfono real.
+- Algunas capas de Android (MIUI/HyperOS de Xiaomi, por ejemplo) bloquean las alarmas de apps en segundo plano. Si no llegan, en Ajustes → Apps → Mi Progreso → Ahorro de batería hay que elegir "Sin restricciones" y activar el inicio automático.

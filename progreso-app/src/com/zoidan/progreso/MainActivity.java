@@ -22,6 +22,7 @@ import android.os.Environment;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.webkit.GeolocationPermissions;
 import java.util.Locale;
@@ -70,6 +71,8 @@ public class MainActivity extends Activity {
     /** Voz para las carreras guiadas. */
     private TextToSpeech tts;
     private boolean ttsReady;
+    /** Pestaña a abrir cuando se entra tocando un recordatorio. */
+    private volatile String launchTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,10 +104,20 @@ public class MainActivity extends Activity {
         web.setWebChromeClient(new ChromeClient());
         web.addJavascriptInterface(new Bridge(), "AndroidBridge");
 
+        launchTab = getIntent() != null ? getIntent().getStringExtra("tab") : null;
         if (savedInstanceState != null) {
             web.restoreState(savedInstanceState);
         } else {
             web.loadUrl(START_URL);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String tab = intent != null ? intent.getStringExtra("tab") : null;
+        if (tab != null && tab.matches("[a-z]+")) {
+            web.evaluateJavascript("window.onNotifOpen && window.onNotifOpen('" + tab + "')", null);
         }
     }
 
@@ -259,6 +272,11 @@ public class MainActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        if (requestCode == REQ_NOTIF) {
+            final boolean ok = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
+            web.evaluateJavascript("window.onNotifPermission && window.onNotifPermission(" + ok + ")", null);
+            return;
+        }
         if (requestCode == REQ_LOCATION && pendingGeo != null) {
             boolean ok = false;
             for (int r : results) ok |= r == PackageManager.PERMISSION_GRANTED;
@@ -363,6 +381,45 @@ public class MainActivity extends Activity {
                     }
                 });
             }
+        }
+
+        /** 17.0 · Recibe la agenda de recordatorios (JSON) y la programa. Devuelve cuántos quedaron. */
+        @JavascriptInterface
+        public int setReminders(String json) {
+            return ReminderReceiver.schedule(MainActivity.this, json);
+        }
+
+        /** "on" si Android deja mostrar notificaciones de la app; "off" si están bloqueadas o sin permiso. */
+        @JavascriptInterface
+        public String notifStatus() {
+            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            return nm != null && nm.areNotificationsEnabled() ? "on" : "off";
+        }
+
+        /** Abre los ajustes de notificaciones de la app (si el permiso se negó, solo se activa desde ahí). */
+        @JavascriptInterface
+        public void openNotifSettings() {
+            try {
+                Intent i = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                i.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+            } catch (Exception ignored) {
+            }
+        }
+
+        /** Notificación de prueba inmediata (se muestra aunque la app esté abierta). */
+        @JavascriptInterface
+        public void notifyNow(String title, String text) {
+            ReminderReceiver.post(MainActivity.this, 99, title, text, "more");
+        }
+
+        /** Pestaña pedida por el recordatorio con que se abrió la app (se entrega una sola vez). */
+        @JavascriptInterface
+        public String takeLaunchTab() {
+            String t = launchTab;
+            launchTab = null;
+            return t == null ? "" : t;
         }
 
         /** Guarda un archivo binario (PDF, Excel) recibido en base64. Devuelve su URI o "". */
