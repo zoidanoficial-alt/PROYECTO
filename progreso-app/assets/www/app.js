@@ -75,7 +75,7 @@ function defaultData() {
     // 6.1: grupos de ejercicios ("Mis entrenos") y qué entreno toca cada día (0 = lunes … 6 = domingo)
     workouts: [], plan: [null, null, null, null, null, null, null],
     goals: [], challenges: null,
-    activities: [], runs: [], commits: [], events: [], hardWeeks: [], moves: {}
+    activities: [], runs: [], retos: [], commits: [], events: [], hardWeeks: [], moves: {}
   };
 }
 /** Pasa los días de la rutina personalizada anterior a "Mis entrenos" y los reparte en la semana. */
@@ -1211,6 +1211,7 @@ function renderTrain() {
     </div>`}
 
     ${activitiesCard()}
+    ${retosCard()}
     <div class="card">
       <h2>Últimas sesiones</h2>
       ${recent.length ? `<table><tbody>${recent.map(x => `<tr class="tap" data-sess="${x.id}"><td>${shortDate(x.date)}</td><td>${esc(x.dayName)}</td><td class="num">${DB.lifts.filter(l => l.sid === x.id).length} series</td><td class="num">${Math.round((x.end - x.start) / 60000)} min</td></tr>`).join('')}</tbody></table>`
@@ -1222,7 +1223,8 @@ function renderTrain() {
   $('#tr-lib').onclick = () => openExercisePicker(null);
   $('#rt-sel').onchange = e => { DB.profile.routine = e.target.value; saveData(); renderTrain(); };
   if (p.routine === 'custom') bindWeekPlan();
-  foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Tu rutina', 'Días', 'Mi semana', 'Mis entrenos']], ['Tu semana', ['Objetivo de series', 'Mapa', 'Balance', 'actividades', 'sesiones']], ['Aprende', '*']]);
+  bindRetos($('#view-train'));
+  foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Tu rutina', 'Días', 'Mi semana', 'Mis entrenos', 'Retos']], ['Tu semana', ['Objetivo de series', 'Mapa', 'Balance', 'actividades', 'sesiones']], ['Aprende', '*']]);
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });
   $$('#view-train [data-sess]').forEach(tr => tr.onclick = () => openSessionDetail(tr.dataset.sess));
   bindRecovery($('#view-train'), renderTrain);

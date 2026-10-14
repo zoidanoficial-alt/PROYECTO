@@ -327,3 +327,52 @@ Fuente: informe "Planet Fitness México: caminadoras y catálogo completo de má
 - El modelo exacto de caminadora en PF México no está confirmado (el informe lo marca como "probable").
 - La app no se conecta a la consola Matrix: no hay API pública, y el Bluetooth o Apple Watch depende de la consola. La distancia se confirma a mano.
 - El catálogo es del informe; la disponibilidad real se marca por sucursal.
+
+---
+
+## 15.0 · Retos de peso corporal y rutina "Héroe ágil" (verificado)
+
+Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): qué está confirmado y qué no". Solo se usó lo que el informe da por confirmado, y se aplicaron sus propias recomendaciones: copiar la estructura y no el volumen, mantener el cardio, no seguir dietas extremas y no hacer acrobacia sin supervisión.
+
+### Retos (`retos.js`)
+- **Ubicación:** Entreno → Fuerza → "Retos de peso corporal".
+- **Cindy:** AMRAP de 5 dominadas, 10 flexiones y 15 sentadillas.
+  - Duración de 10, 12, 15 o 20 min; por defecto 12, como recomienda el informe.
+  - Botón grande "+1 ronda" con deshacer, cuenta regresiva y avisos por voz (mitad del tiempo, último minuto, "¡Tiempo!").
+  - Al final pregunta las repeticiones extra de la ronda incompleta (0–29).
+- **Escalera (Duffy Gaver):** la ronda n son n dominadas, 2n fondos, 3n flexiones, 4n abdominales y 5n sentadillas, subiendo hasta el tope y bajando a 1.
+  - Topes de 3, 5, 8 o 10; por defecto 5 (375 repeticiones). La versión de 10 son 1,500 repeticiones en 19 rondas, igual que en el informe.
+  - Se marca "✓ Ronda lista" y cuenta el tiempo. Si la terminas antes, se guarda como intento parcial y no cuenta como marca.
+- **Variantes de dominada:** estrictas, asistidas o remo invertido.
+- **Marcas personales:** solo se comparan entre el mismo reto, duración/tope y variante. Una marca nueva genera un evento en el historial y confeti.
+- **Referencia de Tom Holland:** sus 27 rondas se muestran como contexto, no como meta.
+- **Pantalla bloqueada:** tocar fuera no cierra el reto, y la pantalla se queda encendida.
+- **Registro:** cada reto cuenta como actividad ("Reto peso corporal") y hay una hoja "Retos" en el Excel.
+
+### Rutina "Héroe ágil · inspirada en Tom Holland"
+- **Circuito de fuerza de Ashwell, 2 veces por semana:** peso muerto ×8, press inclinado ×10, elevaciones de piernas ×15 y fondos lastrados ×12, en 5 rondas con 30 s de descanso.
+- **Un día de peso corporal con lastre opcional.**
+- **Cardio de 20–30 min.**
+- **Reto semanal.**
+- **Pesos:** la descripción aclara que su peso muerto era a 2× su peso corporal y que tú empiezas con el peso que te permita 8 repeticiones limpias. El coach de cargas hace el resto.
+
+### Ficha "Cómo entrena Tom Holland: lo confirmado"
+- **Fases** de 2008 a 2026.
+- **Qué copiar:** estructura, cardio, porciones con la mano (2 puños de cada grupo) y creatina.
+- **Qué no:** 500 kcal al día con 16 km de carrera, mortales sin progresión y macros inventados.
+- **Aviso** de que no hay afiliación con Marvel, Sony ni el actor.
+
+### No incluido (y por qué)
+- **Circuito HIIT con mancuernas (bear crawl, thrusters, remo renegado):** el informe dice que su atribución por película es contradictoria, y esos ejercicios no existen en el catálogo con foto y técnica.
+- **EMS y máscara de altitud:** requieren equipo, y el informe no aporta evidencia de beneficio.
+- **Acrobacia:** el informe la desaconseja sin entrenador.
+
+### Verificación
+- **v22.mjs, con reloj simulado:**
+  - Cindy de 10 min con 12 rondas + 7 se guarda como marca, genera su actividad y su evento, y el deshacer funciona.
+  - Un segundo intento peor no cuenta como marca, y otra variante cuenta por separado.
+  - La escalera hasta 3 hace las rondas 1-2-3-2-1 y se completa.
+  - Una escalera parcial no cuenta como marca, y tocar fuera no cierra el reto.
+  - Los 6 ejercicios de la rutina existen y la ficha no desborda.
+- **Desborde** a 320 y 393 px con letra al 140 %: 0 px.
+- **Regresión v9–v21 y persist:** sin errores.

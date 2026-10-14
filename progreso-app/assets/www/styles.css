@@ -953,3 +953,15 @@ td, th { overflow-wrap: anywhere; }
 .pf-yn button { min-width: 44px; min-height: 40px; padding: 0 8px; border-radius: 12px; font-size: 13px; background: var(--surface-2); color: var(--muted); border: 2px solid transparent; }
 .pf-yn button.on[data-v="si"] { border-color: var(--good); color: var(--good); background: var(--good-soft); }
 .pf-yn button.on[data-v="no"] { border-color: var(--bad); color: var(--bad); background: var(--bad-soft); }
+
+/* ---------- 15.0 · Retos de peso corporal ---------- */
+.reto-pick { margin-bottom: 8px; }
+.reto-live { text-align: center; }
+.reto-count { text-align: center; margin: 6px 0; }
+.reto-count b { display: block; font-size: 44px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--accent); }
+.reto-count small { color: var(--muted); font-size: 13px; }
+.reto-moves { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 8px 0 12px; }
+.reto-moves span { background: var(--surface-2); border-radius: 99px; padding: 6px 12px; font-size: 14px; }
+.reto-moves b { color: var(--text); font-size: 16px; }
+.reto-big { min-height: 64px; font-size: 20px; font-weight: 800; }
+table.facts td:first-child { width: 32%; overflow-wrap: normal; word-break: normal; hyphens: auto; padding-right: 8px; vertical-align: top; }

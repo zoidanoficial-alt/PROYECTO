@@ -432,6 +432,25 @@ const ROUTINES = {
         ['Curl predicador', 4, '10–12', 75], ['Press banca agarre cerrado', 4, '10–12', 120]] }
     ]
   },
+  heroe: {
+    name: 'Héroe ágil · inspirada en Tom Holland',
+    desc: 'Inspirada en lo documentado de su preparación para Spider-Man: el circuito de fuerza de George Ashwell (Far From Home), un día de peso corporal con lastre opcional (Brand New Day), cardio para no repetir su error y un reto semanal (Cindy o escalera, en Entreno → Retos). El circuito: 1 serie de cada ejercicio seguida, 30 s entre ejercicios, 5 rondas (la primera ligera, de calentamiento). Su peso muerto era a 2× su peso corporal: tú empieza con lo que te permita 8 repeticiones limpias.',
+    days: [
+      { id: 'h1', name: 'Día 1 · Circuito de fuerza', ex: [
+        ['Peso muerto', 5, '8', 30], ['Press inclinado con mancuernas', 5, '10', 30],
+        ['Elevaciones de piernas colgado', 5, '15', 30], ['Fondos en paralelas (con lastre)', 5, '12', 30]] },
+      { id: 'h2', name: 'Cardio · corre o caminadora 20–30 min', rest: true, ex: [] },
+      { id: 'h3', name: 'Día 2 · Peso corporal + lastre', ex: [
+        ['Dominadas / chin-ups', 4, '6–10', 120], ['Fondos en paralelas (con lastre)', 4, '8–12', 120],
+        ['Lagartijas', 3, '15–20', 60], ['Sentadilla goblet con mancuerna', 3, '15', 75], ['Plancha', 3, '45 s', 45]] },
+      { id: 'h4', name: 'Descanso · movilidad 10 min', rest: true, ex: [] },
+      { id: 'h5', name: 'Día 3 · Circuito de fuerza', ex: [
+        ['Peso muerto', 5, '8', 30], ['Press inclinado con mancuernas', 5, '10', 30],
+        ['Elevaciones de piernas colgado', 5, '15', 30], ['Fondos en paralelas (con lastre)', 5, '12', 30]] },
+      { id: 'h6', name: 'Reto de la semana · Cindy o escalera (Entreno → Retos)', rest: true, ex: [] },
+      { id: 'h7', name: 'Descanso', rest: true, ex: [] }
+    ]
+  },
   gluteo: {
     name: 'Glúteo y tonificación · 4 días',
     desc: 'Más glúteo y pierna, con torso para postura y hombros definidos: 2 días de glúteo/pierna y 2 de torso + abdomen.',
@@ -715,7 +734,7 @@ const STAGES = {
 const ACTIVITY_TYPES = {
   fuerza: ['🏋️', 'Fuerza'], correr: ['🏃', 'Correr'], caminar: ['🚶', 'Caminar'], bici: ['🚴', 'Bici'], nadar: ['🏊', 'Natación'],
   yoga: ['🧘', 'Yoga'], pilates: ['🤸', 'Pilates'], movilidad: ['🧎', 'Movilidad'], casa: ['🏠', 'En casa'], deporte: ['⚽', 'Deporte'], bajo: ['🌿', 'Bajo impacto'],
-  eliptica: ['🌀', 'Elíptica'], escalera: ['🪜', 'Escaladora'], remo: ['🚣', 'Remo'], circuito: ['⏱️', 'Circuito 30 min']
+  eliptica: ['🌀', 'Elíptica'], escalera: ['🪜', 'Escaladora'], remo: ['🚣', 'Remo'], circuito: ['⏱️', 'Circuito 30 min'], reto: ['🏅', 'Reto peso corporal']
 };
 const DISTANCE_TYPES = ['correr', 'caminar', 'bici', 'nadar', 'remo'];
 const BARRIERS = {
