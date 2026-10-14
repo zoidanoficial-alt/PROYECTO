@@ -21,6 +21,8 @@ const NOTIF_ORDER = ['run', 'train', 'checkin', 'weigh', 'food', 'water', 'commi
 const NOTIF_IDS = { train: 101, run: 102, checkin: 103, weigh: 104, water: 105, food: 106, commits: 107, comeback: 108, weekly: 109, cycle: 110 };
 const QUIET = [7, 22];   // solo entre 7:00 y 22:00
 const PER_DAY = 4;
+/** Horas elegibles: de 7:00 a 21:45 cada 15 min, en formato de 24 h (el selector nativo de hora corta el a. m./p. m.). */
+const NOTIF_TIMES = Array.from({ length: 60 }, (_, i) => String(7 + Math.floor(i / 4)).padStart(2, '0') + ':' + String(i % 4 * 15).padStart(2, '0'));
 
 function notifCfg() {
   const p = DB.profile;
@@ -140,7 +142,7 @@ function notifSettingsCard() {
     <label class="habit"><input type="checkbox" id="nt-on" ${N.on ? 'checked' : ''}> <b>Recordatorios activados</b></label>
     ${N.on && st === 'off' ? `<div class="status warn"><b>Android las tiene bloqueadas</b>Actívalas en los ajustes del teléfono para que lleguen.<button class="small-btn" id="nt-settings" style="margin-top:8px">Abrir ajustes</button></div>` : ''}
     ${st === 'web' ? '<p class="small muted">Los avisos con la app cerrada funcionan en la app de Android.</p>' : ''}
-    ${N.on ? `<div class="nt-list">${NOTIF_ORDER.filter(k => k !== 'cycle' || DB.profile.cycleOn).map(k => { const x = NOTIF_TYPES[k], c = N.types[k]; return `<div class="nt-row"><label class="nt-main"><input type="checkbox" data-nt="${k}" ${c.on ? 'checked' : ''}><span><b>${x.ico} ${x.name}</b><small>${x.desc}</small></span></label>${x.time ? `<input type="time" class="nt-time" data-ntt="${k}" value="${c.time}" min="07:00" max="21:59" aria-label="Hora de ${x.name}">` : ''}</div>`; }).join('')}</div>
+    ${N.on ? `<div class="nt-list">${NOTIF_ORDER.filter(k => k !== 'cycle' || DB.profile.cycleOn).map(k => { const x = NOTIF_TYPES[k], c = N.types[k]; return `<div class="nt-row"><label class="nt-main"><input type="checkbox" data-nt="${k}" ${c.on ? 'checked' : ''}><span><b>${x.ico} ${x.name}</b><small>${x.desc}</small></span></label>${x.time ? `<select class="nt-time" data-ntt="${k}" aria-label="Hora de ${x.name}">${NOTIF_TIMES.map(h => `<option ${h === c.time ? 'selected' : ''}>${h}</option>`).join('')}</select>` : ''}</div>`; }).join('')}</div>
       <div class="small muted" style="font-weight:600;margin:12px 0 4px">Próximos avisos</div>
       ${next.length ? next.map(r => `<div class="nt-next"><span>${when(r.at)}</span><b>${esc(r.title)}</b></div>`).join('') : '<p class="small muted" style="margin:0">Nada pendiente: vas al día. ✨</p>'}
       <div class="row" style="margin-top:10px"><button class="secondary" id="nt-test" style="flex:1">Enviar una de prueba</button></div>

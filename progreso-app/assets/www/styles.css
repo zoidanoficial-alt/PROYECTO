@@ -990,7 +990,7 @@ table.facts td:first-child { width: 32%; overflow-wrap: normal; word-break: norm
 .nt-main input { margin-top: 3px; flex: none; }
 .nt-main b { display: block; font-size: 14px; }
 .nt-main small { display: block; color: var(--muted); font-size: 12px; line-height: 1.35; }
-.nt-time { flex: none; width: 104px; min-height: 40px; padding: 6px 8px; margin: 0; font-variant-numeric: tabular-nums; }
+.nt-time { flex: none; width: 96px; min-height: 40px; padding: 6px 8px; margin: 0; font-variant-numeric: tabular-nums; }
 .nt-next { display: flex; gap: 10px; font-size: 13px; padding: 4px 0; min-width: 0; }
 .nt-next span { flex: none; width: 104px; color: var(--muted); }
 .nt-next b { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

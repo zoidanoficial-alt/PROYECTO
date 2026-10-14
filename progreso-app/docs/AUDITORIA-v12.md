@@ -424,7 +424,7 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
   | Ciclo | 09:00 | Apagado por defecto. Texto discreto ("Recordatorio de tu calendario"), porque se ve en la pantalla bloqueada |
 
 - **Reglas:**
-  - Nada entre 22:00 y 7:00; el selector de hora no deja elegir fuera de ese rango.
+  - Nada entre 22:00 y 7:00. La hora se elige en una lista de 24 h, de 07:00 a 21:45 cada 15 min (el selector nativo del navegador cortaba el "p. m." y 18:00 se veía como "06:00").
   - Máximo 4 avisos al día, por prioridad: running/entreno > chequeo > peso > proteína > agua > compromisos.
   - Tono sin culpas ni rachas.
 - **Permisos:**
@@ -441,3 +441,16 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 **Limitaciones:**
 - Probado con un bridge de Android simulado y el reloj fijado. Falta comprobarlo en un teléfono real.
 - Algunas capas de Android (MIUI/HyperOS de Xiaomi, por ejemplo) bloquean las alarmas de apps en segundo plano. Si no llegan, en Ajustes → Apps → Mi Progreso → Ahorro de batería hay que elegir "Sin restricciones" y activar el inicio automático.
+
+**Verificación (`v24.mjs`, bridge de Android simulado, reloj fijado el miércoles 14/10 a las 06:00):**
+- La tarjeta de Inicio activa los avisos y pide el permiso.
+- 28 avisos programados en 7 días, 0 en horario nocturno y máximo 4 por día.
+- Hoy: 7:30 peso, 8:00 chequeo, 18:00 "Hoy toca: Pierna" y 20:30 proteína.
+- Tras pesarse, beber 3.5 L, comer la proteína, hacer el chequeo y entrenar, no queda ningún aviso de hoy.
+- Con una sesión de running hoy, solo queda "🏃 Hoy: 5 km suaves".
+- El regreso amable sale una sola vez, se conserva entre recálculos y no se repite cuando ya pasó.
+- Al apagar el agua, desaparecen sus avisos; con el peso a las 09:15, el aviso se mueve a esa hora; las horas van de 07:00 a 21:45.
+- "Enviar una de prueba" funciona y "Abrir ajustes" aparece cuando están bloqueadas.
+- Al salir de la app se recalcula la agenda, y al tocar un aviso se abre la pestaña correcta, también si la app estaba cerrada.
+- Al apagar el interruptor general, la agenda queda vacía.
+- Sin errores de consola.
