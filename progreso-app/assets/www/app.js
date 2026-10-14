@@ -1139,6 +1139,7 @@ function renderTrain() {
         </details>`).join('') : '<div class="empty">Esta rutina no tiene días.</div>'}
     </div>`}
 
+    ${weeklySetsCard()}
     ${isSimple() ? '' : heatmapCard(vol)}
 
     ${isSimple() ? '' : `<div class="card">
@@ -1173,7 +1174,7 @@ function renderTrain() {
   $('#tr-lib').onclick = () => openExercisePicker(null);
   $('#rt-sel').onchange = e => { DB.profile.routine = e.target.value; saveData(); renderTrain(); };
   if (p.routine === 'custom') bindWeekPlan();
-  foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Tu rutina', 'Días', 'Mi semana', 'Mis entrenos']], ['Tu semana', ['Mapa', 'Balance', 'actividades', 'sesiones']], ['Aprende', '*']]);
+  foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Tu rutina', 'Días', 'Mi semana', 'Mis entrenos']], ['Tu semana', ['Objetivo de series', 'Mapa', 'Balance', 'actividades', 'sesiones']], ['Aprende', '*']]);
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });
   $$('#view-train [data-sess]').forEach(tr => tr.onclick = () => openSessionDetail(tr.dataset.sess));
   bindRecovery($('#view-train'), renderTrain);
@@ -1590,6 +1591,8 @@ function logSet(s, i) {
   saveData();
   vibrate(prs.length ? 150 : 40);
   if (prs.length && gamify()) toast('🏆 ¡Récord en ' + ex + '!');
+  // 11.0: récord de fuerza estimada → celebración a pantalla completa (una vez por ejercicio y sesión)
+  if (prs.includes('1rm') && gamify() && !(s.prShown && s.prShown[ex])) { s.prShown = s.prShown || {}; s.prShown[ex] = true; saveData(); setTimeout(() => openPRCelebration(ex), 500); }
   else if (count > 1) toast('✓ ' + count + ' series guardadas');
   // Al completar las series objetivo: festejo y se abre el siguiente ejercicio pendiente.
   const n = before + count, finished = before < e[1] && n >= e[1];
@@ -1707,7 +1710,8 @@ function howToBlock(name) {
     ${h ? `<ol class="howto-steps">${h[0].map(t => `<li>${esc(t)}</li>`).join('')}</ol>
     <div class="status warn" style="margin-top:8px"><b>Error común</b>${esc(h[1])}</div>` : ''}`;
 }
-function openHowTo(name) {
+function openHowTo(name) { return techniqueSheet(name); }   // 11.0: ficha de técnica a pantalla completa
+function openHowToOld(name) {
   const x = exInfo(name);
   openModal(`
     <div class="row spread"><h3 style="margin:0">${esc(name)}</h3><button class="ghost" id="ht-close">Cerrar</button></div>
@@ -1718,7 +1722,8 @@ function openHowTo(name) {
   });
 }
 
-function openExerciseInfo(name) {
+function openExerciseInfo(name) { return techniqueSheet(name, () => openExercisePicker(null)); }
+function openExerciseInfoOld(name) {
   const x = EX[name], subs = substitutes(name);
   const sets = DB.lifts.filter(l => l.ex === name), u = unitFor(name);
   const top = sets.length ? sets.reduce((a, b) => e1rm(b.w, b.r) > e1rm(a.w, a.r) ? b : a) : null;
@@ -2231,16 +2236,16 @@ function openMealForm(date) {
 /* ------------------------------------------------------------------ *
  *  PROGRESO: peso, medidas, fuerza y fotos
  * ------------------------------------------------------------------ */
-let progMode = 'analysis';
+let progMode = 'fuerza';
 function renderProgress() {
   if (progMode === 'logros' && !gamify()) progMode = 'weight';
   if (progMode === 'ciclo' && !cycleOn()) progMode = 'analysis';
-  const seg = `<div class="seg wrap scroll">${[['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
+  const seg = `<div class="seg wrap scroll">${[['fuerza', '💪 Fuerza'], ['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   const v = $('#view-progress');
   v.innerHTML = seg + '<div id="prog-body"></div><button class="secondary block" id="prog-export" style="margin-top:4px">📄 Exportar PDF / Excel para analizar con IA</button>';
   $('#prog-export').onclick = openExport;
   $$('#view-progress .seg button').forEach(b => b.onclick = () => { progMode = b.dataset.mode; redrawChart = () => {}; renderProgress(); });
-  ({ analysis: renderAnalysis, historia: renderHistory, ciclo: renderCycle, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
+  ({ fuerza: el => { el.innerHTML = strengthScoreCard() + weeklySetsCard(); const i = $('#str-info', el); if (i) i.onclick = explainScore; }, analysis: renderAnalysis, historia: renderHistory, ciclo: renderCycle, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
 }
 
 function renderWeight(el) {
@@ -2740,7 +2745,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" id="more-foot" style="text-align:center;margin-top:20px">Mi Progreso 10.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
+    <p class="small muted" id="more-foot" style="text-align:center;margin-top:20px">Mi Progreso 11.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
