@@ -22,6 +22,9 @@ import android.os.Environment;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
+import android.webkit.GeolocationPermissions;
+import java.util.Locale;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
@@ -60,6 +63,13 @@ public class MainActivity extends Activity {
     /** La app está a la vista: el aviso de descanso lo da el cronómetro de la página. */
     static volatile boolean visible;
     private static final int REQ_NOTIF = 3;
+    private static final int REQ_LOCATION = 4;
+    /** Petición de ubicación del WebView (GPS de las carreras) en espera del permiso de Android. */
+    private GeolocationPermissions.Callback pendingGeo;
+    private String pendingGeoOrigin;
+    /** Voz para las carreras guiadas. */
+    private TextToSpeech tts;
+    private boolean ttsReady;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +85,17 @@ public class MainActivity extends Activity {
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(true);
         s.setMediaPlaybackRequiresUserGesture(false);
+        s.setGeolocationEnabled(true);
+
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status != TextToSpeech.SUCCESS) return;
+                int r = tts.setLanguage(new Locale("es", "MX"));
+                if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) r = tts.setLanguage(new Locale("es"));
+                ttsReady = r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED;
+            }
+        });
 
         web.setWebViewClient(new AssetClient());
         web.setWebChromeClient(new ChromeClient());
@@ -182,6 +203,19 @@ public class MainActivity extends Activity {
             });
         }
 
+        /** El GPS de las carreras: se concede solo a la app local y si Android ya dio el permiso. */
+        @Override
+        public void onGeolocationPermissionsShowPrompt(final String origin, final GeolocationPermissions.Callback callback) {
+            if (origin == null || !origin.contains(HOST)) { callback.invoke(origin, false, false); return; }
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                callback.invoke(origin, true, false);
+            } else {
+                pendingGeo = callback;
+                pendingGeoOrigin = origin;
+                requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, REQ_LOCATION);
+            }
+        }
+
         @Override
         public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
             if (fileCallback != null) {
@@ -225,6 +259,14 @@ public class MainActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        if (requestCode == REQ_LOCATION && pendingGeo != null) {
+            boolean ok = false;
+            for (int r : results) ok |= r == PackageManager.PERMISSION_GRANTED;
+            pendingGeo.invoke(pendingGeoOrigin, ok, false);
+            pendingGeo = null;
+            pendingGeoOrigin = null;
+            return;
+        }
         if (requestCode == REQ_CAMERA && pendingPermission != null) {
             if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) {
                 pendingPermission.grant(pendingPermission.getResources());
@@ -267,7 +309,26 @@ public class MainActivity extends Activity {
     }
 
     /** Puente expuesto a JavaScript como window.AndroidBridge. */
+    @Override
+    protected void onDestroy() {
+        if (tts != null) tts.shutdown();
+        super.onDestroy();
+    }
+
     public class Bridge {
+        /** Lee un texto en voz alta (carreras guiadas). Devuelve false si el motor de voz no está listo. */
+        @JavascriptInterface
+        public boolean speak(String text) {
+            if (tts == null || !ttsReady || text == null) return false;
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "run");
+            return true;
+        }
+
+        @JavascriptInterface
+        public boolean hasLocation() {
+            return checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        }
+
         /** Programa el aviso de fin de descanso para la hora indicada (epoch en ms). */
         @JavascriptInterface
         public void scheduleRest(String atMs, String title, String text) {

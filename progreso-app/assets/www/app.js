@@ -75,7 +75,7 @@ function defaultData() {
     // 6.1: grupos de ejercicios ("Mis entrenos") y qué entreno toca cada día (0 = lunes … 6 = domingo)
     workouts: [], plan: [null, null, null, null, null, null, null],
     goals: [], challenges: null,
-    activities: [], commits: [], events: [], hardWeeks: [], moves: {}
+    activities: [], runs: [], commits: [], events: [], hardWeeks: [], moves: {}
   };
 }
 /** Pasa los días de la rutina personalizada anterior a "Mis entrenos" y los reparte en la semana. */
@@ -109,7 +109,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {},
+        activities: d.activities || [], runs: d.runs || [], commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {},
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -805,7 +805,9 @@ function renderHome() {
 
   // Tarjeta principal: lo que toca hoy
   let hero;
-  if (act) {
+  if (RUN.st) {
+    hero = `<div class="hero"><div class="eyebrow">Carrera en curso</div><h3>${esc(RUN.st.title)}</h3><p>${fmt(RUN.st.dist / 1000, 2)} km · ${durStr(runElapsed())}</p><button id="home-run">Volver a la carrera</button></div>`;
+  } else if (act) {
     const n = DB.lifts.filter(l => l.sid === act.id).length;
     hero = `<div class="hero"><div class="eyebrow">Entreno en curso</div><h3>${esc(act.dayName)}</h3><p>${n} series registradas · ${Math.round((Date.now() - act.start) / 60000)} min</p><button id="home-train">Continuar entreno</button></div>`;
   } else if (nd && nd.rest) {
@@ -877,6 +879,7 @@ function renderHome() {
 
   const tr = $('#home-train');
   if (tr) tr.onclick = () => { if (!act) startSession(p.routine, nd.id); showTab('train'); };
+  const hr = $('#home-run'); if (hr) hr.onclick = () => showTab('train');
   const fr = $('#home-free');
   if (fr) fr.onclick = () => { startSession('libre'); showTab('train'); };
   $$('#view-home [data-q]').forEach(b => b.onclick = () => quickAction(b.dataset.q));
@@ -1124,8 +1127,18 @@ function openRecoveryForm(rerender) {
 }
 
 function renderTrain() {
+  if (RUN.st) return renderRunLive();   // 12.0: carrera en curso
   const s = activeSession();
   if (s) return renderSession(s);
+  const modeSeg = `<div class="seg mode-seg"><button data-tmode="fuerza" class="${DB.profile.trainMode !== 'running' ? 'on' : ''}">🏋️ Fuerza</button><button data-tmode="running" class="${DB.profile.trainMode === 'running' ? 'on' : ''}">🏃 Running</button></div>`;
+  const bindMode = () => $$('#view-train [data-tmode]').forEach(b => b.onclick = () => { DB.profile.trainMode = b.dataset.tmode; saveData(); renderTrain(); window.scrollTo(0, 0); });
+  if (DB.profile.trainMode === 'running') {
+    const v = $('#view-train');
+    v.innerHTML = modeSeg + runningView();
+    bindMode(); bindRunning(v);
+    foldify(v, [['Tu running', ['Esta semana', 'Récords', 'Análisis', 'Historial']], ['Más', '*']]);
+    return;
+  }
   const p = DB.profile, r = getRoutine(p.routine), nd = nextDay(p.routine);
   const vol = weekVolume(), alerts = strengthAlerts();
   const compPct = vol.total ? Math.round(vol.comp / vol.total * 100) : null;
@@ -1133,6 +1146,7 @@ function renderTrain() {
   const recent = DB.sessions.filter(x => x.end).sort((a, b) => b.start - a.start).slice(0, 8);
 
   $('#view-train').innerHTML = `
+    ${modeSeg}
     ${coachPlanCard()}
     <div class="tool-row">
       <button id="tr-free"><span>⚡</span>Libre</button>
@@ -1201,6 +1215,7 @@ function renderTrain() {
   $$('#view-train [data-sess]').forEach(tr => tr.onclick = () => openSessionDetail(tr.dataset.sess));
   bindRecovery($('#view-train'), renderTrain);
   bindCoach($('#view-train'));
+  bindMode();
   bindActivities($('#view-train'), renderTrain);
   $('#tr-act').onclick = () => openActivityForm();
   $('#tr-hotel').onclick = () => { startSession('libre'); const s = activeSession(); s.dayName = 'Sesión de hotel'; s.base = HOTEL_SESSION.map(e => e.slice()); s.env = 'hotel'; saveData(); renderTrain(); window.scrollTo(0, 0); };
@@ -3004,6 +3019,8 @@ $('#fab').onclick = openQuickSheet;
 // Si la app se cerró a mitad de un entreno, vuelve directo a la sesión con su descanso.
 showTab(DB.active && activeSession() ? 'train' : 'home');
 restoreRest();
+restoreRun();   // 12.0: recupera una carrera en curso si la app se cerró
+if (RUN.st) showTab('train');
 if (!DB.profile.onboarded) openOnboarding();
 // 12.0: quien activó el ciclo antes de existir el consentimiento lo confirma una vez (si no acepta, se desactiva).
 else if (DB.profile.cycleOn && !DB.profile.cycleConsent) setTimeout(() => openCycleConsent(() => render(currentTab)), 500);

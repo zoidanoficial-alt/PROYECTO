@@ -11,12 +11,14 @@ function weekTarget(wk) { const t = DB.profile.weeklyTarget || 3; return isHardW
 function activeDates() {
   const set = new Set(DB.sessions.filter(s => s.end).map(s => s.date));
   (DB.activities || []).forEach(a => { if ((a.min || 0) >= MIN_ACTIVE) set.add(a.date); });
+  (DB.runs || []).forEach(r => { if (r.dur >= MIN_ACTIVE * 60) set.add(r.date); });
   return set;
 }
 function activeDaysInWeek(wk) { const d = activeDates(); let n = 0; for (let i = 0; i < 7; i++) if (d.has(addDays(wk, i))) n++; return n; }
 function activeMinutes(from, to) {
   const ses = DB.sessions.filter(s => s.end && s.date >= from && s.date <= to).reduce((a, s) => a + Math.min(180, (s.end - s.start) / 60000), 0);
-  return Math.round(ses + (DB.activities || []).filter(a => a.date >= from && a.date <= to).reduce((a, x) => a + (x.min || 0), 0));
+  const runs = (DB.runs || []).filter(r => r.date >= from && r.date <= to).reduce((a, r) => a + r.dur / 60, 0);
+  return Math.round(ses + runs + (DB.activities || []).filter(a => a.date >= from && a.date <= to).reduce((a, x) => a + (x.min || 0), 0));
 }
 
 /* ------------------------------------------------------------------ *
