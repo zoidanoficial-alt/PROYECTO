@@ -733,3 +733,6 @@ details.fold:last-of-type { border-bottom: 1px solid var(--line); }
 .pr-val span { font-size: 16px; font-weight: 700; }
 .hex .hex-track { stroke: var(--line); }
 .set-cat .hex .hex-track, .set-cat .hex .hex-fill { stroke-width: 13; }
+.tag-est, .tag-reg { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 1px 6px; border-radius: 6px; vertical-align: middle; }
+.tag-est { border: 1px dashed var(--muted); color: var(--muted); }
+.tag-reg { background: var(--accent-soft); color: var(--accent); }

@@ -94,7 +94,8 @@ function openCycleDay(date, after) {
   const scale = (k, labels) => `<div class="ck-scale">${labels.map((l, i) => `<button data-cy="${k}|${i + 1}" class="${c[k] === i + 1 ? 'on' : ''}"><span>${l[0]}</span><small>${l[1]}</small></button>`).join('')}</div>`;
   const draw = m => {
     m.innerHTML = `<h3>${date === todayStr() ? '¿Cómo te sientes hoy?' : longDate(date)}</h3>
-      ${ph ? `<p class="small muted" style="margin-top:0">${CYC_PHASES[ph.key].ico} Día ${ph.n} del ciclo · ${CYC_PHASES[ph.key].name}${ph.predicted ? ' (estimado)' : ''}</p>` : ''}
+      ${ph ? `<p class="small muted" style="margin-top:0">${CYC_PHASES[ph.key].ico} Día ${ph.n} del ciclo · <span class="tag-est">fase estimada</span> ${CYC_PHASES[ph.key].name}</p>` : ''}
+      ${prev.flow != null ? '<p class="small" style="margin:-4px 0 8px"><span class="tag-reg">registrado</span> Ya tienes datos de este día; puedes corregirlos.</p>' : ''}
       <div class="ck-q">Sangrado</div>
       <div class="seg wrap">${FLOW.map((f, i) => `<button data-flow="${i}" class="${c.flow === i ? 'on' : ''}">${i ? '🩸'.repeat(Math.min(3, i)) + ' ' : ''}${f}</button>`).join('')}</div>
       <div class="ck-q">Cólicos o dolor</div>
@@ -197,7 +198,7 @@ function cyclePatterns() {
  * ------------------------------------------------------------------ */
 /** Se llama desde readiness(): solo reacciona a síntomas registrados, nunca a la fase por sí sola. */
 function cycleReadiness(add) {
-  if (!cycleOn()) return;
+  if (!cycleUseReco()) return;   // 12.0: solo con permiso explícito
   const t = todayStr(), c = cycDay(t);
   if (c) {
     if (c.pain >= 2) add(c.pain === 3 ? -20 : -10, '🌀', `Cólicos ${c.pain === 3 ? 'fuertes' : 'moderados'} hoy`, 'tu registro del ciclo');
@@ -211,16 +212,16 @@ function cycleReadiness(add) {
  *  Pantallas
  * ------------------------------------------------------------------ */
 function cycleCard() {
-  if (!cycleOn()) return '';
+  if (!cycleOnHome()) return '';
   const st = cycStats(), t = todayStr(), ph = phaseOn(t, st), c = cycDay(t);
   if (!st.last) return `<div class="card cyc-card open"><h2>Tu ciclo</h2><p class="small muted" style="margin-top:0">Registra el primer día de tu última regla para empezar. Con cada ciclo aprenderé tus patrones.</p>
     <div class="row"><button id="cy-start" style="flex:1">🩸 Me bajó hoy</button><button class="secondary" id="cy-past" style="flex:1">Fue otro día</button></div></div>`;
   const P = CYC_PHASES[ph.key], pat = cyclePatterns();
   const upcoming = ph.untilNext <= 5 ? pat.notes.filter(n => n.ico === '🌘' || n.ico === '🔁') : [];
   return `<div class="card cyc-card ${P.cls}" data-fold-title="Tu ciclo" data-fold-sum="Día ${ph.n} · ${P.name.split(' (')[0]} · próxima regla ~${shortDate(st.next)}" data-fold-ico="${P.ico}" ${upcoming.length ? '' : ''}>
-    <div class="row spread"><div><div class="small muted">Día ${ph.n} de tu ciclo</div><h2 style="margin:0">${P.ico} ${P.name}</h2></div>
+    <div class="row spread"><div><div class="small muted">Día ${ph.n} de tu ciclo · <span class="tag-reg">desde tu último registro</span></div><h2 style="margin:0">${P.ico} ${P.name}</h2><span class="tag-est">fase estimada</span></div>
       <button class="secondary small-btn" id="cy-log">${c ? '✓ Editar hoy' : '+ ¿Cómo estás?'}</button></div>
-    <p class="small" style="margin:8px 0 4px">Próxima regla: <b>${shortDate(addDays(st.next, -st.margin))} – ${shortDate(addDays(st.next, st.margin))}</b> <span class="muted">(lo más probable ${shortDate(st.next)}${st.confident ? '' : ', estimación con pocos datos'})</span></p>
+    <p class="small" style="margin:8px 0 4px">Próxima regla <span class="tag-est">estimación</span>: <b>${shortDate(addDays(st.next, -st.margin))} – ${shortDate(addDays(st.next, st.margin))}</b> <span class="muted">(lo más probable ${shortDate(st.next)}${st.confident ? '' : ', estimación con pocos datos'})</span></p>
     ${upcoming.length ? `<div class="status info"><b>Lo que has visto estos días en ciclos anteriores</b>${esc(upcoming.map(n => n.text).join(' '))} Si vuelve a pasar, puedes planear una sesión flexible. No es obligatorio bajar la intensidad: decide según cómo te sientas.</div>` : ''}
     <div class="row" style="margin-top:8px"><button class="ghost small-btn" id="cy-start">🩸 Me bajó hoy</button><button class="ghost small-btn" id="cy-cal">📅 Calendario e informe</button></div>
   </div>`;
@@ -254,7 +255,7 @@ function renderCycle(el) {
       <div class="row spread"><button class="icon-btn" id="cal-prev">‹</button><h2 style="margin:0">${MESES[mo - 1]} ${y}</h2><button class="icon-btn" id="cal-next">›</button></div>
       <div class="cal-grid cal-head">${['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(x => `<span>${x}</span>`).join('')}</div>
       <div class="cal-grid">${cells.join('')}</div>
-      <div class="legend" style="justify-content:center">${Object.keys(CYC_PHASES).map(k => `<span><i class="${CYC_PHASES[k].cls}"></i>${CYC_PHASES[k].name.replace(' (estimada)', '')}</span>`).join('')}<span><i class="pred-sw"></i>Estimado</span></div>
+      <div class="legend" style="justify-content:center">${Object.keys(CYC_PHASES).map(k => `<span><i class="${CYC_PHASES[k].cls}"></i>${CYC_PHASES[k].name.replace(' (estimada)', '')}</span>`).join('')}<span><i class="pred-sw"></i>Estimado</span><span>🩸 Registrado</span></div>
       <p class="small muted" style="margin:8px 0 0">Toca un día para registrar cómo te sentiste. ${st.last ? `Ciclo medio: <b>${Math.round(st.avg)} días</b>${st.sd != null ? ` (±${fmt(st.sd, 1)})` : ''} · regla ~${st.P} días.` : ''}</p>
     </div>
     ${ph ? `<div class="card ${CYC_PHASES[ph.key].cls}">
@@ -285,4 +286,67 @@ function renderCycle(el) {
   $('#cal-prev').onclick = () => { const d = new Date(y, mo - 2, 1); cycMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); renderProgress(); };
   $('#cal-next').onclick = () => { const d = new Date(y, mo, 1); cycMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); renderProgress(); };
   $$('[data-cday]', el).forEach(b => b.onclick = () => { if (b.dataset.cday > t) { const p = phaseOn(b.dataset.cday, st); if (p) openModal(`<h3>${CYC_PHASES[p.key].ico} ${longDate(b.dataset.cday)}</h3><p class="small">${CYC_PHASES[p.key].name} (estimado, día ${p.n}).</p><p class="small">${esc(CYC_PHASES[p.key].observe)}</p><p class="small muted">${esc(CYC_CAVEAT)}</p><button class="block" id="cx">Entendido</button>`, m => { $('#cx', m).onclick = closeModal; }); return; } openCycleDay(b.dataset.cday, renderProgress); });
+}
+
+/* ------------------------------------------------------------------ *
+ *  12.0 · Privacidad desde el diseño: consentimiento, permisos separados y borrado
+ * ------------------------------------------------------------------ */
+function cycleUseReco() { return cycleOn() && DB.profile.cycleUseReco !== false; }
+function cycleOnHome() { return cycleOn() && DB.profile.cycleHome !== false; }
+function cycleExportOn() { return cycleOn() && DB.profile.cycleExport === true; }
+function hasCycleData() { return Object.keys(DB.days).some(d => DB.days[d].cyc); }
+/** Consentimiento explícito antes de activar: qué se guarda, dónde, para qué y qué controlas. */
+function openCycleConsent(after) {
+  const p = DB.profile;
+  openModal(`<h3>🌙 Seguimiento del ciclo</h3>
+    <p class="small" style="margin-top:0">Antes de activarlo, esto es lo que hace con tus datos:</p>
+    <ul class="small" style="padding-left:18px;margin:0 0 10px">
+      <li><b>Qué guarda:</b> solo lo que tú registres: días de sangrado, cólicos, energía, sueño, ánimo, síntomas y notas.</li>
+      <li><b>Dónde:</b> únicamente en este teléfono. Sin cuenta, sin servidores, nadie más lo ve.</li>
+      <li><b>Para qué:</b> estimar tu próxima regla con su margen y mostrarte tus propios patrones.</li>
+      <li><b>Tú controlas:</b> no se incluye en exportaciones salvo que lo actives, y puedes borrarlo todo cuando quieras.</li>
+    </ul>
+    <label class="check"><input type="checkbox" id="cc-reco" ${p.cycleUseReco !== false ? 'checked' : ''}> <span>Usar mis síntomas registrados para ajustar el chequeo de entrenamiento</span></label>
+    <label class="check"><input type="checkbox" id="cc-home" ${p.cycleHome === true ? 'checked' : ''}> <span>Mostrar la tarjeta del ciclo en Inicio</span></label>
+    <p class="small muted">No es un método anticonceptivo ni una herramienta de diagnóstico.</p>
+    <div class="row"><button class="secondary" id="cc-no" style="flex:1">Ahora no</button><button id="cc-yes" style="flex:1">Activar</button></div>`, m => {
+    $('#cc-no', m).onclick = () => { DB.profile.cycleOn = false; saveData(); closeModal(); if (after) after(); };
+    $('#cc-yes', m).onclick = () => {
+      Object.assign(DB.profile, { cycleOn: true, cycleConsent: todayStr(), cycleUseReco: $('#cc-reco', m).checked, cycleHome: $('#cc-home', m).checked, cycleExport: DB.profile.cycleExport === true });
+      saveData(); closeModal(); toast('🌙 Seguimiento del ciclo activado');
+      if (after) after();
+    };
+  });
+}
+function deleteCycleData() {
+  Object.keys(DB.days).forEach(d => { delete DB.days[d].cyc; });
+  ['cycleLen', 'periodLen', 'cycleHormonal'].forEach(k => delete DB.profile[k]);
+  saveData();
+}
+function cycleSettingsCard() {
+  const p = DB.profile;
+  return `<div class="card">
+    <h2>Ciclo menstrual <small>· opcional y privado</small></h2>
+    <p class="small muted" style="margin-top:0">Tus datos del ciclo se quedan solo en este teléfono.${p.cycleConsent ? ' Activado con tu consentimiento el ' + longDate(p.cycleConsent) + '.' : ''}</p>
+    <label class="habit"><input type="checkbox" id="cy-on" ${p.cycleOn ? 'checked' : ''}> Seguimiento del ciclo activado</label>
+    ${p.cycleOn ? `<label class="habit"><input type="checkbox" id="cy-reco" ${cycleUseReco() ? 'checked' : ''}> Usar mis síntomas en el chequeo de entrenamiento</label>
+    <label class="habit"><input type="checkbox" id="cy-home" ${cycleOnHome() ? 'checked' : ''}> Mostrar en Inicio</label>
+    <label class="habit"><input type="checkbox" id="cy-exp" ${cycleExportOn() ? 'checked' : ''}> Incluir en exportaciones (PDF/Excel)</label>
+    <label class="habit"><input type="checkbox" id="cy-horm" ${p.cycleHormonal ? 'checked' : ''}> Uso anticoncepción hormonal (píldora, DIU hormonal, implante…)</label>
+    <label>Duración habitual de tu ciclo (días, mientras aprendo el tuyo)<input id="cy-len" inputmode="numeric" value="${p.cycleLen || 28}"></label>` : ''}
+    ${hasCycleData() ? '<button class="danger block" id="cy-del" style="margin-top:6px">Borrar todos mis datos del ciclo</button>' : ''}
+  </div>`;
+}
+function bindCycleSettings(root, rerender) {
+  const on = $('#cy-on', root);
+  if (on) on.onchange = () => {
+    if (on.checked) { on.checked = false; openCycleConsent(rerender); return; }
+    DB.profile.cycleOn = false; saveData();
+    if (hasCycleData() && confirm('Seguimiento desactivado. ¿Quieres borrar también tus datos del ciclo? (Cancelar = conservarlos ocultos)')) { deleteCycleData(); toast('Datos del ciclo borrados'); }
+    rerender();
+  };
+  [['cy-reco', 'cycleUseReco'], ['cy-home', 'cycleHome'], ['cy-exp', 'cycleExport'], ['cy-horm', 'cycleHormonal']].forEach(([id, k]) => { const c = $('#' + id, root); if (c) c.onchange = () => { DB.profile[k] = c.checked; saveData(); rerender(); }; });
+  const len = $('#cy-len', root); if (len) len.onchange = () => { const n = num(len.value); if (n >= 15 && n <= 60) { DB.profile.cycleLen = Math.round(n); saveData(); } };
+  const del = $('#cy-del', root);
+  if (del) del.onclick = () => { if (!confirm('¿Borrar todos tus registros del ciclo? No se puede deshacer.')) return; deleteCycleData(); toast('Datos del ciclo borrados'); rerender(); };
 }

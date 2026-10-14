@@ -1461,7 +1461,7 @@ function glanceStrip() {
     ['wk', '📅', n + '/' + g, 'días activos'],
     ['wt', '⚖️', cur ? fmt(cur) : '—', 'kg · media 7 d']
   ];
-  if (cycleOn()) { const ph = phaseOn(todayStr()); tiles.push(['cy', ph ? CYC_PHASES[ph.key].ico : '🌙', ph ? 'Día ' + ph.n : 'Ciclo', ph ? CYC_PHASES[ph.key].name.split(' (')[0].replace('Días previos a la regla', 'Premenstrual') : 'registrar']); }
+  if (cycleOnHome()) { const ph = phaseOn(todayStr()); tiles.push(['cy', ph ? CYC_PHASES[ph.key].ico : '🌙', ph ? 'Día ' + ph.n : 'Ciclo', ph ? CYC_PHASES[ph.key].name.split(' (')[0].replace('Días previos a la regla', 'Premenstrual') : 'registrar']); }
   return `<div class="glance g${tiles.length}">${tiles.map(([k, i, v, l]) => `<button data-glance="${k}"><span class="g-ico">${i}</span><b>${v}</b><small>${esc(l)}</small></button>`).join('')}</div>`;
 }
 function bindGlance(root) {
@@ -2680,13 +2680,7 @@ function renderMore() {
       <p class="small muted" style="margin:8px 0 0">La app no manda recordatorios ni avisos de racha. Las semanas en pausa no rompen tu racha.</p>
     </div>
 
-    <div class="card">
-      <h2>Ciclo menstrual <small>· opcional</small></h2>
-      <p class="small muted" style="margin-top:0">Registra tu ciclo y cómo te sientes para descubrir tus propios patrones. Tus datos se quedan solo en este teléfono.</p>
-      <label class="habit"><input type="checkbox" id="cy-on" ${p.cycleOn ? 'checked' : ''}> Activar el seguimiento del ciclo</label>
-      ${p.cycleOn ? `<label class="habit"><input type="checkbox" id="cy-horm" ${p.cycleHormonal ? 'checked' : ''}> Uso anticoncepción hormonal (píldora, DIU hormonal, implante…)</label>
-      <label>Duración habitual de tu ciclo (días, mientras aprendo el tuyo)<input id="cy-len" inputmode="numeric" value="${p.cycleLen || 28}"></label>` : ''}
-    </div>
+    ${cycleSettingsCard()}
 
     ${gearCard()}
 
@@ -2794,9 +2788,7 @@ function renderMore() {
     if (!nx.length) return;
     DB.profile.trainDays = nx; DB.profile.weeklyTarget = nx.length; saveRe();
   });
-  const cyo = $('#cy-on'); if (cyo) cyo.onchange = () => { DB.profile.cycleOn = cyo.checked; saveRe(); };
-  const cyh = $('#cy-horm'); if (cyh) cyh.onchange = () => { DB.profile.cycleHormonal = cyh.checked; saveRe(); };
-  const cyl = $('#cy-len'); if (cyl) cyl.onchange = () => { const n = num(cyl.value); if (n >= 15 && n <= 60) { DB.profile.cycleLen = Math.round(n); saveRe(); } };
+  bindCycleSettings($('#view-more'), renderMore);
   $$('#view-more [data-stage]').forEach(b => b.onclick = () => { const n = Number(b.dataset.stage); if (n !== stage()) addEvent(todayStr(), 'stage', 'Cambiaste a la etapa ' + n + ': ' + STAGES[n].name, STAGES[n].ico); DB.profile.stage = n; saveRe(); });
   $('#st-pause').onchange = e => { const k = weekKey(todayStr()); DB.pauses = DB.pauses.filter(x => x !== k).concat(e.target.checked ? [k] : []); saveData(); toast(e.target.checked ? 'Semana en pausa. Descansa tranquilo.' : 'Pausa quitada'); };
   $('#st-gamify').onchange = e => { DB.profile.gamify = e.target.checked; saveData(); };
@@ -2837,7 +2829,12 @@ function renderMore() {
 }
 
 async function exportBackup() {
-  const payload = { app: 'miprogreso', version: 4, exportedAt: new Date().toISOString(), data: DB };
+  let data = DB;
+  // 12.0: los datos del ciclo solo viajan en la copia si la usuaria lo confirma.
+  if (hasCycleData() && !confirm('¿Incluir tus datos del ciclo menstrual en esta copia de seguridad?\n\nAceptar = incluirlos · Cancelar = excluirlos')) {
+    data = JSON.parse(JSON.stringify(DB)); Object.keys(data.days).forEach(d => { delete data.days[d].cyc; });
+  }
+  const payload = { app: 'miprogreso', version: 4, exportedAt: new Date().toISOString(), data };
   if ($('#bk-photos').checked) payload.photos = await photoStore.all();
   const json = JSON.stringify(payload), name = 'miprogreso-' + todayStr() + '.json';
   if (bridge && bridge.saveFile) { if (!bridge.saveFile(name, json)) toast('No se pudo guardar la copia'); return; }
@@ -2899,7 +2896,7 @@ function openOnboarding() {
         <label>Altura (cm)<input id="ob-h" inputmode="numeric" value="${draft.height}"></label>
         <label>Edad<input id="ob-a" inputmode="numeric" value="${draft.age}"></label>
       </div>
-      <label class="check"><input type="checkbox" id="ob-cyc" ${draft.cycleOn ? 'checked' : ''}> <span>Quiero registrar mi ciclo menstrual (opcional)</span></label>`,
+      <label class="check"><input type="checkbox" id="ob-cyc" ${draft.cycleWant ? 'checked' : ''}> <span>Quiero registrar mi ciclo menstrual (opcional; te pediré permiso)</span></label>`,
     () => `<h3>Tu punto de partida</h3>
       <p class="small muted" style="margin-top:0">Sin juicios: así sé por dónde empezar contigo.</p>
       ${[1, 2, 3, 4].map(k => choice('stage', String(k), STAGES[k].ico, STAGES[k].who, 'Etapa ' + k + ': ' + STAGES[k].name)).join('')}
@@ -2940,14 +2937,15 @@ function openOnboarding() {
       if (step === 0) {
         draft.name = $('#ob-name', m).value.trim();
         draft.startWeight = num($('#ob-w', m).value); draft.goalWeight = num($('#ob-g', m).value);
-        draft.height = num($('#ob-h', m).value); draft.age = num($('#ob-a', m).value); draft.cycleOn = $('#ob-cyc', m).checked;
+        draft.height = num($('#ob-h', m).value); draft.age = num($('#ob-a', m).value); draft.cycleWant = $('#ob-cyc', m).checked;
         if (!(draft.startWeight > 30 && draft.goalWeight > 30 && draft.height > 100 && draft.age > 10)) { toast('Revisa tus datos'); return; }
       }
       if (step === total - 1) {
         Object.assign(DB.profile, { name: draft.name, startWeight: draft.startWeight, goalWeight: draft.goalWeight, height: draft.height, age: draft.age,
           phase: draft.phase, somatotype: draft.somatotype, routine: draft.routine, startDate: todayStr(), habitsStart: todayStr(), autoMacros: true, onboarded: true,
           gym: draft.gym, equip: GYM_PRESETS[draft.gym].equip.slice(), limits: draft.limits, mode: draft.mode,
-          stage: Number(draft.stage), minutes: Number(draft.minutes), weeklyTarget: Number(draft.days), trainDays: DEFAULT_DAYS[Number(draft.days)], enjoy: draft.enjoy, barriers: draft.barriers, cycleOn: !!draft.cycleOn });
+          stage: Number(draft.stage), minutes: Number(draft.minutes), weeklyTarget: Number(draft.days), trainDays: DEFAULT_DAYS[Number(draft.days)], enjoy: draft.enjoy, barriers: draft.barriers });
+        if (draft.cycleWant) setTimeout(() => openCycleConsent(() => render(currentTab)), 400);
         addEvent(todayStr(), 'stage', 'Empezaste en la etapa ' + draft.stage + ': ' + STAGES[draft.stage].name, STAGES[draft.stage].ico);
         pickerMine = true;
         if (!Object.values(DB.days).some(d => d.weight != null)) day(todayStr()).weight = draft.startWeight;
@@ -3007,3 +3005,5 @@ $('#fab').onclick = openQuickSheet;
 showTab(DB.active && activeSession() ? 'train' : 'home');
 restoreRest();
 if (!DB.profile.onboarded) openOnboarding();
+// 12.0: quien activó el ciclo antes de existir el consentimiento lo confirma una vez (si no acepta, se desactiva).
+else if (DB.profile.cycleOn && !DB.profile.cycleConsent) setTimeout(() => openCycleConsent(() => render(currentTab)), 500);

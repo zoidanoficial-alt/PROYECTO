@@ -134,7 +134,7 @@ function buildSheets(R) {
     { name: 'Medidas', rows: medidas },
     { name: 'Logros', rows: logros },
     { name: 'Antojos y digestion', rows: antojos },
-    { name: 'Ciclo', rows: [['fecha', 'dia_ciclo', 'fase_orientativa', 'sangrado_0a4', 'colicos_0a3', 'energia_1a5', 'sueno_1a5', 'animo_1a5', 'sintomas', 'nota']].concat(dates.filter(d => DB.days[d] && DB.days[d].cyc).map(d => { const c = DB.days[d].cyc, ph = phaseOn(d); return [d, ph ? ph.n : '', ph ? CYC_PHASES[ph.key].name : '', c.flow, c.pain, c.energy, c.sleepQ, c.mood, (c.sym || []).map(k => CYC_SYMPTOMS[k].replace(/^\S+ /, '')).join('; '), c.note || '']; })) },
+    ...(!cycleExportOn() ? [] : [{ name: 'Ciclo', rows: [['fecha', 'dia_ciclo', 'fase_orientativa', 'sangrado_0a4', 'colicos_0a3', 'energia_1a5', 'sueno_1a5', 'animo_1a5', 'sintomas', 'nota']].concat(dates.filter(d => DB.days[d] && DB.days[d].cyc).map(d => { const c = DB.days[d].cyc, ph = phaseOn(d); return [d, ph ? ph.n : '', ph ? CYC_PHASES[ph.key].name : '', c.flow, c.pain, c.energy, c.sleepQ, c.mood, (c.sym || []).map(k => CYC_SYMPTOMS[k].replace(/^\S+ /, '')).join('; '), c.note || '']; })) }]),
     { name: 'Actividades', rows: [['fecha', 'tipo', 'minutos', 'km', 'ritmo_min_km', 'esfuerzo_1a10']].concat((DB.activities || []).filter(a => a.date >= R.from && a.date <= R.to).sort((a, b) => a.date < b.date ? -1 : 1).map(a => [a.date, ACTIVITY_TYPES[a.type] ? ACTIVITY_TYPES[a.type][1] : a.type, a.min, a.km || '', a.km ? Math.round(a.min / a.km * 100) / 100 : '', a.rpe])) }
   ];
 }
