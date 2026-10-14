@@ -180,3 +180,46 @@ Documentado en este archivo, sin implementar en la 12.0:
 - **PIN o huella para el módulo de ciclo.**
 - **Zonas de frecuencia cardiaca:** requieren un sensor, y no se inventan.
 - **Música y atenuación de audio** durante la guía por voz.
+
+---
+
+## Resultados de la 12.0 (verificados)
+
+Cada bloque se cerró solo después de pasar sus pruebas propias y las pruebas de regresión de las versiones anteriores, en Chromium headless a 393×851.
+
+| Bloque | Mejora | Evidencia |
+|---|---|---|
+| 1 · P0-1 | Guardados agrupados | `logSet`: **200 → 15 ms** con 13,345 series. 1 serialización por acción. Los datos persisten al recargar justo después de una acción. |
+| 1 · P0-3 | Compactación y medidor | **−16 %** de almacenamiento. Las 60 técnicas especiales de la prueba se conservan. Medidor en Más y aviso al 75 %. |
+| 2 · P0-2 | Privacidad del ciclo | Consentimiento antes de activar, también para quien ya lo tenía activado. Excel sin hoja *Ciclo* por defecto y con ella al permitirlo. La copia de seguridad pregunta. El borrado deja 0 campos `cyc`. El chequeo ignora los cólicos sin permiso. |
+| 2 · P1-4 | Registrado frente a estimado | Etiquetas "fase estimada", "estimación" y "registrado" en la tarjeta, el registro del día y el calendario. |
+| 3 · P1-1 | Running con GPS | Recorrido simulado de 3.2 km con ruido: **error de 0.8 %**. Parciales de 5:32 frente a 5:33 reales. Se descartan 11 puntos imprecisos y un salto de 250 m. La carrera se recupera tras recargar. El GPX importado da la misma distancia. Se exportó un GPX de 576 puntos. Se verificó que `watchPosition` recibe la ubicación real del navegador. |
+| 4 · P1-2 | Planes y predicción | 5 planes. **Ninguna semana completa sube más del 10 %**, ni en la meta ni en la suma real de sesiones. Hay descargas y reducción previa. Riegel: 5K en 25:00 da un 10K de 52:07. Sesión guiada de 9 bloques que avanza por tiempo. Misión evaluada. Aviso de coordinación entre fuerza y running. |
+| 5 · P1-3/5 | Misiones y regreso | Con el chequeo en rojo no hay ninguna misión de progreso, solo de recuperación. Regreso suave tras 16 días: meta de 2 días y sesión reducida. Niveles de fuerza y running. Resumen del mes. Ya no se premia el exceso. |
+| 6 · P1-6 | Accesibilidad | Todos los controles de la sesión miden al menos 40 px. Ningún botón de solo símbolo queda sin `aria-label`. Sin confeti con *reducir movimiento*. |
+
+## Archivos modificados
+
+- **Nuevos:**
+  - `assets/www/running.js`: GPS, voz, parciales, récords, GPX e historial.
+  - `assets/www/runplan.js`: planes, predicción, misiones y coordinación.
+  - `assets/www/missions.js`: misiones de hoy, regreso, niveles y resumen mensual.
+- **Modificados:**
+  - `assets/www/app.js`: guardado, compactación, selector Fuerza | Running, accesibilidad, integración y consentimiento heredado.
+  - `assets/www/cycle.js`: consentimiento, permisos, borrado y etiquetas.
+  - `assets/www/coach.js`: nota de coordinación y ciclo con permiso.
+  - `assets/www/journey.js`: carreras en días activos, niveles y resumen.
+  - `assets/www/export.js`: hoja de Carreras y ciclo con permiso.
+  - `assets/www/styles.css`
+  - `assets/www/index.html`
+- **Nativo:**
+  - `src/.../MainActivity.java`: permiso de ubicación para la geolocalización del WebView y `TextToSpeech` mediante un puente.
+  - `AndroidManifest.xml`: ubicación precisa y aproximada.
+
+## Limitaciones conocidas
+
+- **Sin prueba en dispositivo:** nada de esto se ha probado en un teléfono real. El GPS y la voz se verificaron en el navegador y con datos simulados, y la parte nativa compila y declara sus permisos (comprobado con `aapt2 dump permissions`).
+- **GPS con pantalla apagada:** no funciona, porque el WebView deja de recibir ubicación. La app mantiene la pantalla encendida durante la carrera. La solución es un servicio nativo en primer plano (P2).
+- **Relojes y Health Connect:** la integración disponible es el GPX. La conexión directa requiere SDK, credenciales y revisión de permisos (P2).
+- **Predicción de carrera:** es una estimación con fórmula (Riegel) a partir de tus mejores tramos recientes. Sin carreras con GPS o GPX no se muestra.
+- **Límite de almacenamiento:** sigue existiendo, aunque se redujo y se vigila. La migración a IndexedDB es P2.
