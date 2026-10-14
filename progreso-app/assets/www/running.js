@@ -109,7 +109,7 @@ function runTick() {
 }
 function pauseRun() { const st = RUN.st; if (!st) return; if (st.pauseAt) { st.pausedMs += Date.now() - st.pauseAt; st.pauseAt = null; say('Reanudado'); } else { st.pauseAt = Date.now(); say('Pausa'); } saveRunState(); renderRunLive(); }
 function stopGps() { if (RUN.watch != null && navigator.geolocation) navigator.geolocation.clearWatch(RUN.watch); RUN.watch = null; clearInterval(RUN.timer); RUN.timer = null; }
-function discardRun() { stopGps(); RUN.st = null; saveRunState(); keepScreenOn(false); render(currentTab); }
+function discardRun() { stopGps(); RUN.st = null; saveRunState(); keepScreenOn(false); document.body.classList.remove('in-session'); render(currentTab); }
 
 /** Mejor tiempo para cubrir una distancia dentro de la ruta (ventana deslizante, interpolada). */
 function bestEffort(pts, meters) {
@@ -158,7 +158,7 @@ function finishRun() {
   const dur = runElapsed(st), km = st.dist / 1000;
   const run = { id: st.id, date: dateStr(new Date(st.start)), start: st.start, dur: Math.round(dur), km: Math.round(km * 1000) / 1000, splits: st.splits, title: st.title, source: 'gps', planRef: st.planRef, target: st.target };
   const res = saveRun(run, st.pts);
-  RUN.st = null; saveRunState(); keepScreenOn(false);
+  RUN.st = null; saveRunState(); keepScreenOn(false); document.body.classList.remove('in-session');
   say(`Carrera terminada. ${fmt(km, 2)} kilómetros en ${Math.round(dur / 60)} minutos.`);
   openRunSummary(run, res);
 }
@@ -231,6 +231,7 @@ function allRuns() {
 function renderRunLive() {
   const st = RUN.st, v = $('#view-train');
   if (!st || currentTab !== 'train' || !v) return;
+  document.body.classList.add('in-session');
   const el = runElapsed(st), km = st.dist / 1000, avg = km > 0.05 ? el / km : 0;
   // ritmo actual: últimos ~30 s de puntos
   let cur = 0; const p = st.pts, n = p.length;

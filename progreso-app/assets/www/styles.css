@@ -765,3 +765,10 @@ details.fold:last-of-type { border-bottom: 1px solid var(--line); }
 .route { width: 100%; max-height: 220px; background: var(--surface-2); border-radius: 16px; }
 .route polyline { fill: none; stroke: var(--cyan); stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
 .route .r-start { fill: var(--good); } .route .r-end { fill: var(--orange); }
+.run-plan h2 { font-size: 20px; }
+.plan-week { border: 0; background: var(--surface-2); border-radius: 12px; padding: 0 12px; margin-bottom: 6px; }
+.plan-week > summary { padding: 10px 0; justify-content: flex-start; gap: 8px; }
+.plan-week > summary small { color: var(--muted); font-weight: 500; }
+.plan-week > summary::after { margin-left: auto; }
+.pw-row { display: grid; grid-template-columns: 82px 1fr 22px; gap: 6px; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--line); }
+.pw-row.done { color: var(--good); } .pw-row.missed { color: var(--muted); }

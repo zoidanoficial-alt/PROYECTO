@@ -109,7 +109,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {},
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {},
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }

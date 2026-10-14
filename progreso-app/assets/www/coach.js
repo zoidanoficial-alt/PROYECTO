@@ -218,6 +218,7 @@ function coachPlanCard() {
   });
   return `<div class="card keep plan-card">
     <div class="row spread"><div><div class="small muted">Tu plan de hoy</div><h2 style="margin:0">${esc(nd.name.split('·').pop().trim())}</h2></div>${r ? `<span class="pill">${PLAN_INFO[plan].icon} ${PLAN_INFO[plan].name}</span>` : ''}</div>
+    ${typeof strengthCoordNote === 'function' && strengthCoordNote(nd.name) ? `<div class="adapt-note" style="margin:6px 0 0">${strengthCoordNote(nd.name)}</div>` : ''}
     <div style="margin-top:6px">${rows.slice(0, 3).join('')}</div>
     ${rows.length > 3 ? `<details class="more-rows"><summary class="small">Ver los ${rows.length} ejercicios</summary>${rows.slice(3).join('')}</details>` : ''}
     <button class="block" id="cp-start" data-day="${nd.id}" style="margin-top:12px">▶ Empezar entreno</button>
