@@ -544,7 +544,7 @@ function checkMilestones(s) {
   const done = DB.sessions.filter(x => x.end);
   [1, 10, 25, 50, 100, 200].forEach(n => { if (done.length >= n) unlock('sessions-' + n, n === 1 ? 'Primera sesión registrada' : n + ' sesiones registradas', 'Constancia'); });
   const vol = sessionVolume(s.id), prevMax = Math.max(0, ...done.filter(x => x.id !== s.id).map(x => sessionVolume(x.id)));
-  if (prevMax > 0 && vol > prevMax) DB.achievements.unshift({ id: 'vol-' + s.id, title: 'Récord de volumen en una sesión', detail: Math.round(vol).toLocaleString('es-MX') + ' kg movidos', date: s.date, t: Date.now(), pr: true });
+  // 12.0: ya no se premia el volumen máximo de una sesión (incentivaba entrenar de más).
   const total = DB.lifts.reduce((a, l) => a + l.w * l.r, 0);
   [10000, 50000, 100000, 250000, 500000].forEach(v => { if (total >= v) unlock('tonnage-' + v, (v / 1000) + ' toneladas acumuladas', 'Volumen total levantado'); });
   const wk = trainingStreakWeeks();
@@ -822,6 +822,7 @@ function renderHome() {
   const full = !isSimple();
   $('#view-home').innerHTML = `
     ${hero}
+    ${comebackCard()}
     ${glanceStrip()}
     ${full ? pwoCard() : ''}
 
@@ -855,6 +856,7 @@ function renderHome() {
       <div class="status ${adv.cls}"><b>${esc(adv.title)}</b>${esc(adv.text)}</div>
     </div>
 
+    ${missionsCard().replace('class="card missions-card"', 'class="card missions-card open"')}
     ${weekCard()}
     ${stage() >= 2 ? agendaCard() : ''}
     ${challengesCard()}
@@ -890,9 +892,9 @@ function renderHome() {
   if (full) bindRecovery($('#view-home'), renderHome);
   const ach = $('#home-ach'); if (ach) ach.onclick = () => { progMode = 'logros'; showTab('progress'); };
   const vh = $('#view-home');
-  bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
+  bindComeback(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
   bindGlance(vh);
-  foldify(vh, [['Para hoy', ['Chequeo', 'Tu ciclo', 'Comida y agua', 'Reglas de oro', 'compromisos']], ['Esta semana', ['Tu semana', 'agenda', 'Retos', 'Peso']], ['Tu camino', '*']]);
+  foldify(vh, [['Para hoy', ['Misiones de hoy', 'Chequeo', 'Tu ciclo', 'Comida y agua', 'Reglas de oro', 'compromisos']], ['Esta semana', ['Tu semana', 'agenda', 'Retos', 'Peso']], ['Tu camino', '*']]);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
   showChart(() => drawSpark($('#home-spark'), movingAvg(entries).map(e => e.y)));
 }
@@ -1006,6 +1008,7 @@ function startSession(routineKey, dayId, wid) {
   }
   const rd = readiness();
   if (rd) { s.adjust = rd.plan === 'mantener' ? null : rd.plan; s.adjustDone = true; }
+  else if (typeof inComeback === 'function' && inComeback()) { s.adjust = 'reducir'; s.adjustDone = true; }   // regreso suave
   DB.sessions.push(s);
   DB.active = s.id;
   if (DB.profile.restAlerts && !DB.profile.notifAsked) { DB.profile.notifAsked = true; requestNotifications(); }
@@ -1244,7 +1247,7 @@ const SESS_UI = { sid: null, open: 0, rir: {}, more: {}, n: {}, prog: {}, celebr
 /** Mensaje de la barra de un ejercicio: siempre en positivo, nunca lo que falta como reproche. */
 function progMsg(n, sets, beat) {
   if (!n) return '💪 ¡Vamos por la primera!';
-  if (n > sets) return `🦾 ¡Modo bestia! +${n - sets} extra`;
+  if (n > sets) return `✓ Meta cumplida · ${n - sets} serie${n - sets > 1 ? 's' : ''} extra (más no siempre es mejor)`;   // 12.0: sin premiar el exceso
   if (n === sets) return beat ? '💯 ¡Al 1000%! Superaste tu última vez' : '🏆 ¡Completado! Lo diste todo';
   if (n === sets - 1) return '⚡ ¡Última serie! Dalo todo';
   if (n / sets >= 0.5) return '🔥 ¡Mitad hecha! No aflojes';
@@ -1441,7 +1444,7 @@ function foldify(root, groups) {
     if (h && !card.dataset.foldKeepHead) h.classList.add('fold-head-hidden');
     const d = document.createElement('details');
     d.className = 'fold'; d.dataset.fold = id;
-    if (open[id] || card.classList.contains('open')) d.open = true;
+    if (open[id] === true || (open[id] !== false && card.classList.contains('open'))) d.open = true;   // 'open' = abierta salvo que la cierres
     d.innerHTML = `<summary><span class="f-ico">${ico}</span><span class="f-txt"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</span>${badge ? `<span class="f-badge">${esc(badge)}</span>` : ''}</summary><div class="fold-body"></div>`;
     card.replaceWith(d);
     d.lastChild.appendChild(card);
@@ -1463,7 +1466,7 @@ document.addEventListener('toggle', e => {
   const d = e.target;
   if (!d.classList || !d.classList.contains('fold')) return;
   DB.profile.folds = DB.profile.folds || {};
-  if (d.open) DB.profile.folds[d.dataset.fold] = true; else delete DB.profile.folds[d.dataset.fold];
+  DB.profile.folds[d.dataset.fold] = !!d.open;
   saveData();
   if (d.open) requestAnimationFrame(() => redrawChart());
 }, true);

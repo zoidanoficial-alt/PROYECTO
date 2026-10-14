@@ -318,7 +318,7 @@ function trajectory() {
   const constancy = Object.keys(weeks).filter(k => k < wk && weeks[k] >= weekTarget(k)).length;
   const prs = DB.achievements.filter(a => a.pr).length;
   const missions = DB.sessions.reduce((n, s) => n + Object.keys(s.missionOk || {}).length, 0);
-  const variety = new Set((DB.activities || []).map(a => a.type)).size + (DB.lifts.length ? 1 : 0);
+  const variety = new Set((DB.activities || []).map(a => a.type).concat((DB.runs || []).length ? ['correr'] : [])).size + (DB.lifts.length ? 1 : 0);
   const commits = (DB.commits || []).length;
   const parts = [['🗓️', 'Semanas cumplidas', constancy, 30], ['🏆', 'Récords', prs, 8], ['🎯', 'Misiones cumplidas', missions, 5], ['🧭', 'Actividades distintas', variety, 15], ['🤝', 'Compromisos activos', commits, 10], ['🌱', 'Etapa alcanzada', stage(), 20]];
   const xp = parts.reduce((a, p) => a + p[2] * p[3], 0);
@@ -377,7 +377,9 @@ function renderHistory(el) {
       <div class="xp" style="margin-top:8px"><div class="xp-track"><div class="xp-fill" style="width:${tr.pct}%"></div></div><b class="xp-num">${Math.round(tr.pct)}%</b></div>
       <p class="small muted" style="margin:4px 0 8px">Tu nivel es tu trayectoria, no los días que llevas con la app. Faltan ${Math.max(0, tr.toNext)} puntos para el siguiente.</p>
       ${tr.parts.map(([ico, n, v, w]) => `<div class="why-row"><span>${ico}</span><span>${n}: <b>${v}</b></span><b class="pos">+${v * w}</b></div>`).join('')}
+      ${(() => { const al = activityLevels(); return `<div class="act-levels">${[['🏋️', 'Fuerza', al.fuerza], ['🏃', 'Running', al.running]].map(([i, n, l]) => `<div><div class="row spread"><b>${i} ${n}</b><span class="pill">Nivel ${l.level}</span></div><div class="xp"><div class="xp-track"><div class="xp-fill" style="width:${l.pct}%"></div></div></div><small class="muted">${esc(l.parts)}</small></div>`).join('')}</div>`; })()}
     </div>
+    ${monthCard()}
     <div class="card">
       <h2>Tú vs tú</h2>
       ${show.length > 1 ? `<table><thead><tr><th></th>${show.map(([n]) => `<th class="num">${n}</th>`).join('')}</tr></thead><tbody>

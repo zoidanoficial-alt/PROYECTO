@@ -772,3 +772,16 @@ details.fold:last-of-type { border-bottom: 1px solid var(--line); }
 .plan-week > summary::after { margin-left: auto; }
 .pw-row { display: grid; grid-template-columns: 82px 1fr 22px; gap: 6px; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--line); }
 .pw-row.done { color: var(--good); } .pw-row.missed { color: var(--muted); }
+/* ---------- 12.0: misiones, regreso y niveles ---------- */
+.ms-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.ms-item:last-child { border-bottom: 0; }
+.ms-item .grow { flex: 1; min-width: 0; }
+.ms-ico { font-size: 22px; width: 30px; text-align: center; }
+.ms-goal { font-size: 14px; margin-top: 2px; }
+.ms-item.done b, .ms-item.done .ms-goal { color: var(--muted); text-decoration: line-through; }
+.ms-item.rec .ms-goal, .ms-item.rec2 .ms-goal { color: var(--warn); }
+.ms-why { border: 0; }
+.ms-why > summary { padding: 4px 0 0; color: var(--accent); font-weight: 600; justify-content: flex-start; gap: 4px; }
+.ms-why > summary::after { font-size: 16px; }
+.comeback { border: 1px solid var(--accent); }
+.act-levels { display: grid; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
