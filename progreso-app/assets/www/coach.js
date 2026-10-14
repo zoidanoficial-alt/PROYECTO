@@ -108,6 +108,7 @@ function readiness() {
   if (over.length) add(-5, '🔥', `Volumen alto esta semana en ${over.map(g => GROUPS[g] || g).join(', ')}`, 'tu historial');
   const { r1 } = weeklyRates();
   if (DB.profile.phase === 'definicion' && r1 != null && r1 < -1) add(-5, '⚖️', `Bajaste ${fmt(-r1)} kg esta semana: el déficit también cansa`, 'tu peso');
+  if (typeof cycleReadiness === 'function') cycleReadiness(add);   // 9.0: síntomas del ciclo registrados hoy
   score = Math.max(0, Math.min(100, Math.round(score)));
   const rec0 = score >= 70 ? 'mantener' : score >= 45 ? 'reducir' : 'modificar';
   return { score, why, used: Array.from(used), recommended: rec0, plan: d.plan || rec0, manual: !!d.plan, joint: !!rec.joint };
@@ -150,6 +151,7 @@ function openCheckin(after) {
         <div class="small muted" style="font-weight:600;margin:10px 0 4px">Por qué</div>
         ${r.why.length ? r.why.map(w => `<div class="why-row"><span>${w.icon}</span><span>${esc(w.text)}</span><b class="${w.pts < 0 ? 'neg' : 'pos'}">${w.pts > 0 ? '+' : ''}${w.pts}</b></div>`).join('') : '<p class="small">Todo en tu rango normal.</p>'}
         <p class="small muted" style="margin:8px 0">Datos usados: ${r.used.length ? r.used.join(', ') : 'tus respuestas'}. Es una guía, no un diagnóstico: tú decides.</p>
+        ${cycleOn() && cycDay(t) && cycDay(t).pain === 3 ? '<div class="status warn"><b>Dolor fuerte</b>Si no cede con lo habitual o es distinto a lo normal para ti, consulta a un profesional de salud. Hoy puedes elegir movilidad suave o descanso.</div>' : ''}
         ${r.joint ? '<div class="status warn"><b>Molestia articular</b>No entrenes con dolor. Usa ⇄ para cambiar los ejercicios que la provoquen, o márcala en Más → Molestias para que la app los adapte sola.</div>' : ''}
         <div class="small muted" style="font-weight:600;margin:12px 0 6px">Elige cómo entrenar hoy</div>
         <div class="plan-pick">${Object.keys(PLAN_INFO).map(k => `<button data-plan-pick="${k}" class="${k === r.recommended ? 'on' : ''}">${PLAN_INFO[k].icon}<b>${PLAN_INFO[k].name}</b></button>`).join('')}</div>`;

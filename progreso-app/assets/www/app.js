@@ -798,6 +798,7 @@ function renderHome() {
   const full = !isSimple();
   $('#view-home').innerHTML = `
     ${hero}
+    ${cycleCard()}
     ${stageCard()}
     ${full ? pwoCard() : ''}
 
@@ -863,7 +864,7 @@ function renderHome() {
   if (full) bindRecovery($('#view-home'), renderHome);
   const ach = $('#home-ach'); if (ach) ach.onclick = () => { progMode = 'logros'; showTab('progress'); };
   const vh = $('#view-home');
-  bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
+  bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
   showChart(() => drawSpark($('#home-spark'), movingAvg(entries).map(e => e.y)));
 }
@@ -2150,12 +2151,13 @@ function openMealForm(date) {
 let progMode = 'analysis';
 function renderProgress() {
   if (progMode === 'logros' && !gamify()) progMode = 'weight';
-  const seg = `<div class="seg wrap">${[['analysis', '📊 Análisis'], ['historia', '📖 Historia'], ['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']].concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
+  if (progMode === 'ciclo' && !cycleOn()) progMode = 'analysis';
+  const seg = `<div class="seg wrap">${[['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   const v = $('#view-progress');
   v.innerHTML = seg + '<div id="prog-body"></div><button class="secondary block" id="prog-export" style="margin-top:4px">📄 Exportar PDF / Excel para analizar con IA</button>';
   $('#prog-export').onclick = openExport;
   $$('#view-progress .seg button').forEach(b => b.onclick = () => { progMode = b.dataset.mode; redrawChart = () => {}; renderProgress(); });
-  ({ analysis: renderAnalysis, historia: renderHistory, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
+  ({ analysis: renderAnalysis, historia: renderHistory, ciclo: renderCycle, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
 }
 
 function renderWeight(el) {
@@ -2566,6 +2568,14 @@ function renderMore() {
       <p class="small muted" style="margin:8px 0 0">La app no manda recordatorios ni avisos de racha. Las semanas en pausa no rompen tu racha.</p>
     </div>
 
+    <div class="card">
+      <h2>Ciclo menstrual <small>· opcional</small></h2>
+      <p class="small muted" style="margin-top:0">Registra tu ciclo y cómo te sientes para descubrir tus propios patrones. Tus datos se quedan solo en este teléfono.</p>
+      <label class="habit"><input type="checkbox" id="cy-on" ${p.cycleOn ? 'checked' : ''}> Activar el seguimiento del ciclo</label>
+      ${p.cycleOn ? `<label class="habit"><input type="checkbox" id="cy-horm" ${p.cycleHormonal ? 'checked' : ''}> Uso anticoncepción hormonal (píldora, DIU hormonal, implante…)</label>
+      <label>Duración habitual de tu ciclo (días, mientras aprendo el tuyo)<input id="cy-len" inputmode="numeric" value="${p.cycleLen || 28}"></label>` : ''}
+    </div>
+
     ${gearCard()}
 
     <div class="card">
@@ -2647,7 +2657,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" style="text-align:center">Mi Progreso 8.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
+    <p class="small muted" style="text-align:center">Mi Progreso 9.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
@@ -2670,6 +2680,9 @@ function renderMore() {
     if (!nx.length) return;
     DB.profile.trainDays = nx; DB.profile.weeklyTarget = nx.length; saveRe();
   });
+  const cyo = $('#cy-on'); if (cyo) cyo.onchange = () => { DB.profile.cycleOn = cyo.checked; saveRe(); };
+  const cyh = $('#cy-horm'); if (cyh) cyh.onchange = () => { DB.profile.cycleHormonal = cyh.checked; saveRe(); };
+  const cyl = $('#cy-len'); if (cyl) cyl.onchange = () => { const n = num(cyl.value); if (n >= 15 && n <= 60) { DB.profile.cycleLen = Math.round(n); saveRe(); } };
   $$('#view-more [data-stage]').forEach(b => b.onclick = () => { const n = Number(b.dataset.stage); if (n !== stage()) addEvent(todayStr(), 'stage', 'Cambiaste a la etapa ' + n + ': ' + STAGES[n].name, STAGES[n].ico); DB.profile.stage = n; saveRe(); });
   $('#st-pause').onchange = e => { const k = weekKey(todayStr()); DB.pauses = DB.pauses.filter(x => x !== k).concat(e.target.checked ? [k] : []); saveData(); toast(e.target.checked ? 'Semana en pausa. Descansa tranquilo.' : 'Pausa quitada'); };
   $('#st-gamify').onchange = e => { DB.profile.gamify = e.target.checked; saveData(); };
@@ -2768,7 +2781,8 @@ function openOnboarding() {
         <label>Peso meta (kg)<input id="ob-g" inputmode="decimal" value="${draft.goalWeight}"></label>
         <label>Altura (cm)<input id="ob-h" inputmode="numeric" value="${draft.height}"></label>
         <label>Edad<input id="ob-a" inputmode="numeric" value="${draft.age}"></label>
-      </div>`,
+      </div>
+      <label class="check"><input type="checkbox" id="ob-cyc" ${draft.cycleOn ? 'checked' : ''}> <span>Quiero registrar mi ciclo menstrual (opcional)</span></label>`,
     () => `<h3>Tu punto de partida</h3>
       <p class="small muted" style="margin-top:0">Sin juicios: así sé por dónde empezar contigo.</p>
       ${[1, 2, 3, 4].map(k => choice('stage', String(k), STAGES[k].ico, STAGES[k].who, 'Etapa ' + k + ': ' + STAGES[k].name)).join('')}
@@ -2809,14 +2823,14 @@ function openOnboarding() {
       if (step === 0) {
         draft.name = $('#ob-name', m).value.trim();
         draft.startWeight = num($('#ob-w', m).value); draft.goalWeight = num($('#ob-g', m).value);
-        draft.height = num($('#ob-h', m).value); draft.age = num($('#ob-a', m).value);
+        draft.height = num($('#ob-h', m).value); draft.age = num($('#ob-a', m).value); draft.cycleOn = $('#ob-cyc', m).checked;
         if (!(draft.startWeight > 30 && draft.goalWeight > 30 && draft.height > 100 && draft.age > 10)) { toast('Revisa tus datos'); return; }
       }
       if (step === total - 1) {
         Object.assign(DB.profile, { name: draft.name, startWeight: draft.startWeight, goalWeight: draft.goalWeight, height: draft.height, age: draft.age,
           phase: draft.phase, somatotype: draft.somatotype, routine: draft.routine, startDate: todayStr(), habitsStart: todayStr(), autoMacros: true, onboarded: true,
           gym: draft.gym, equip: GYM_PRESETS[draft.gym].equip.slice(), limits: draft.limits, mode: draft.mode,
-          stage: Number(draft.stage), minutes: Number(draft.minutes), weeklyTarget: Number(draft.days), trainDays: DEFAULT_DAYS[Number(draft.days)], enjoy: draft.enjoy, barriers: draft.barriers });
+          stage: Number(draft.stage), minutes: Number(draft.minutes), weeklyTarget: Number(draft.days), trainDays: DEFAULT_DAYS[Number(draft.days)], enjoy: draft.enjoy, barriers: draft.barriers, cycleOn: !!draft.cycleOn });
         addEvent(todayStr(), 'stage', 'Empezaste en la etapa ' + draft.stage + ': ' + STAGES[draft.stage].name, STAGES[draft.stage].ico);
         pickerMine = true;
         if (!Object.values(DB.days).some(d => d.weight != null)) day(todayStr()).weight = draft.startWeight;

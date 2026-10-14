@@ -594,3 +594,26 @@ label.mini > input { margin-top: 3px; }
 .place-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .place { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); color: var(--text); text-decoration: none; font-size: 14px; font-weight: 600; }
 .place span { font-size: 20px; }
+
+/* ---------- 9.0: ciclo menstrual ---------- */
+:root { --ph-men: #f0527a; --ph-fol: #2fbf8f; --ph-ov: #f5b83d; --ph-lut: #8b7cf6; --ph-pre: #6b74d6; }
+.cyc-card { border-left: 4px solid var(--line); }
+.cyc-card.ph-men { border-left-color: var(--ph-men); } .cyc-card.ph-fol { border-left-color: var(--ph-fol); }
+.cyc-card.ph-ov { border-left-color: var(--ph-ov); } .cyc-card.ph-lut { border-left-color: var(--ph-lut); } .cyc-card.ph-pre { border-left-color: var(--ph-pre); }
+.card.ph-men, .card.ph-fol, .card.ph-ov, .card.ph-lut, .card.ph-pre { border-left: 4px solid var(--line); }
+.card.ph-men { border-left-color: var(--ph-men); } .card.ph-fol { border-left-color: var(--ph-fol); } .card.ph-ov { border-left-color: var(--ph-ov); } .card.ph-lut { border-left-color: var(--ph-lut); } .card.ph-pre { border-left-color: var(--ph-pre); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+.cal-head span { text-align: center; font-size: 11px; color: var(--muted); font-weight: 700; }
+.cal-d { position: relative; aspect-ratio: 1; min-height: 0; padding: 0; border-radius: 12px; background: var(--surface-2); color: var(--text); font-size: 14px; font-weight: 650; border: 2px solid transparent; }
+.cal-d i { position: absolute; bottom: 1px; left: 0; right: 0; font-size: 9px; font-style: normal; line-height: 1; }
+.cal-d i.dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text); left: calc(50% - 2.5px); bottom: 4px; opacity: .6; }
+.cal-d.ph-men { background: color-mix(in srgb, var(--ph-men) 35%, var(--surface-2)); }
+.cal-d.ph-fol { background: color-mix(in srgb, var(--ph-fol) 22%, var(--surface-2)); }
+.cal-d.ph-ov { background: color-mix(in srgb, var(--ph-ov) 30%, var(--surface-2)); }
+.cal-d.ph-lut { background: color-mix(in srgb, var(--ph-lut) 22%, var(--surface-2)); }
+.cal-d.ph-pre { background: color-mix(in srgb, var(--ph-pre) 32%, var(--surface-2)); }
+.cal-d.pred { opacity: .7; border-style: dashed; border-color: var(--line); }
+.cal-d.window { border: 2px dashed var(--ph-men); }
+.cal-d.today { box-shadow: 0 0 0 2px var(--accent); }
+.legend i.ph-men { background: var(--ph-men); } .legend i.ph-fol { background: var(--ph-fol); } .legend i.ph-ov { background: var(--ph-ov); } .legend i.ph-lut { background: var(--ph-lut); } .legend i.ph-pre { background: var(--ph-pre); }
+.legend i.pred-sw { background: transparent; border: 1.5px dashed var(--muted); }
