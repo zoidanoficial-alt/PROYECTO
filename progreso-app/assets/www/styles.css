@@ -929,3 +929,27 @@ td, th { overflow-wrap: anywhere; }
 .ob-look button[data-oblook="f"].on { border-color: #e44d8a; }
 .ella-invite { background: linear-gradient(135deg, var(--surface), var(--accent-soft)); }
 @media (prefers-reduced-motion: reduce) { .ella-toggle .et-sw, .ella-toggle .et-sw i { transition: none; } }
+
+/* ---------- 14.0 · Caminadora y Planet Fitness ---------- */
+.run-where { margin-bottom: 10px; }
+.tm-pick { margin-bottom: 8px; }
+.tm-pick .tm-ico { font-size: 26px; width: 34px; text-align: center; flex: none; }
+.tm-ctl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 10px 0; }
+.tm-ctl > div { background: var(--surface-2); border-radius: 18px; padding: 10px; text-align: center; min-width: 0; }
+.tm-ctl small { color: var(--muted); font-size: 12px; font-weight: 600; }
+.tm-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 4px 0 2px; }
+.tm-row button { width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 14px; font-size: 22px; flex: none; background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.tm-row b { font-size: 26px; font-weight: 780; font-variant-numeric: tabular-nums; min-width: 0; white-space: nowrap; }
+.tm-row b small { font-size: 12px; font-weight: 600; }
+.pf-sec { font-size: 13px; font-weight: 700; color: var(--muted); margin: 14px 0 6px; text-transform: uppercase; letter-spacing: .04em; }
+.pf-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.pf-item .grow b { display: block; font-size: 14px; }
+.pf-item .grow small { color: var(--muted); font-size: 12px; display: block; }
+.pf-conf { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 99px; margin-right: 4px; }
+.pf-conf.mx { background: var(--good-soft); color: var(--good); }
+.pf-conf.prob { background: var(--blue-soft); color: var(--blue); }
+.pf-conf.nv { background: var(--surface-2); color: var(--muted); }
+.pf-yn { display: flex; gap: 4px; flex: none; }
+.pf-yn button { min-width: 44px; min-height: 40px; padding: 0 8px; border-radius: 12px; font-size: 13px; background: var(--surface-2); color: var(--muted); border: 2px solid transparent; }
+.pf-yn button.on[data-v="si"] { border-color: var(--good); color: var(--good); background: var(--good-soft); }
+.pf-yn button.on[data-v="no"] { border-color: var(--bad); color: var(--bad); background: var(--bad-soft); }

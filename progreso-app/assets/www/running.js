@@ -44,6 +44,7 @@ function runElapsed(st) { st = st || RUN.st; const lp = st.pts[st.pts.length - 1
 function startRun(opts) {
   opts = opts || {};
   RUN.st = { id: uid(), start: Date.now(), pausedMs: 0, pauseAt: null, pts: [], dist: 0, splits: [], weak: 0, title: opts.title || 'Carrera libre', segs: opts.segs || null, seg: 0, segStart: 0, planRef: opts.planRef || null, target: opts.target || null };
+  if (opts.cinta || (opts.cinta !== false && typeof runIndoor === 'function' && runIndoor())) tmInit(RUN.st, opts);   // 14.0: caminadora
   saveRunState(); attachGps(); keepScreenOn(true);
   say(opts.segs ? 'Comienza tu sesión. ' + segText(opts.segs[0]) : 'Carrera iniciada. ¡A disfrutar!');
   showTab('train');
@@ -51,6 +52,7 @@ function startRun(opts) {
 function attachGps() {
   clearInterval(RUN.timer);
   RUN.timer = setInterval(runTick, 1000);
+  if (RUN.st && RUN.st.cinta) return;   // en caminadora no se usa el GPS
   if (navigator.geolocation && RUN.watch == null) {
     RUN.watch = navigator.geolocation.watchPosition(
       p => ingestPoint({ lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy, t: p.timestamp || Date.now() }),
@@ -95,12 +97,14 @@ function segText(s) { return s ? s.say || s.label : ''; }
 function runTick() {
   const st = RUN.st;
   if (!st) return;
+  if (st.cinta) tmTick(st);
   if (st.segs && !st.pauseAt && st.seg < st.segs.length) {
     const s = st.segs[st.seg], el = movingSec(st) - st.segStart, dEl = st.dist - (st.segDist || 0);
     const done = s.sec ? el >= s.sec : s.m ? dEl >= s.m : false;
     if (s.sec && !done && s.sec - el <= 10.5 && s.sec - el > 9.5) say('10 segundos');
     if (done) {
       st.seg++; st.segStart = movingSec(st); st.segDist = st.dist;
+      if (st.cinta && st.seg < st.segs.length) tmOnSeg(st, st.segs[st.seg]);
       if (st.seg < st.segs.length) say(segText(st.segs[st.seg])); else say('¡Sesión completada! Puedes terminar o seguir a tu ritmo.');
       saveRunState();
     }
@@ -153,6 +157,7 @@ function saveRun(run, pts) {
 function finishRun() {
   const st = RUN.st;
   if (!st) return;
+  if (st.cinta) return tmFinish();
   if (st.dist < 50 && !confirm('Casi no hay distancia registrada. ¿Guardar de todos modos?')) { if (confirm('¿Descartar esta carrera?')) discardRun(); return; }
   stopGps(); if (st.pauseAt) { st.pausedMs += Date.now() - st.pauseAt; st.pauseAt = null; }
   const dur = runElapsed(st), km = st.dist / 1000;
@@ -238,6 +243,7 @@ function renderRunLive() {
   if (n > 2) { let i = n - 1; while (i > 0 && p[n - 1][2] - p[i][2] < 30) i--; let d = 0; for (let j = i + 1; j < n; j++) d += haversine(p[j - 1], p[j]); const dt = p[n - 1][2] - p[i][2]; if (d > 20) cur = dt / (d / 1000); }
   const seg = st.segs && st.seg < st.segs.length ? st.segs[st.seg] : null;
   const segLeft = seg ? (seg.sec ? Math.max(0, seg.sec - (el - st.segStart)) : null) : null;
+  if (st.cinta) { v.innerHTML = tmLiveHtml(st, el, seg, segLeft); bindTmLive(v); $('#rl-pause').onclick = pauseRun; $('#rl-stop').onclick = finishRun; $('#rl-voice').onchange = e => { DB.profile.runVoice = e.target.checked; saveData(); }; return; }
   const html = `<div class="run-live ${st.pauseAt ? 'paused' : ''}">
     <div class="small muted">${esc(st.title)}${st.pauseAt ? ' · en pausa' : ''}</div>
     ${seg ? `<div class="run-seg ${seg.type}"><b>${esc(seg.label)}</b><span>${segLeft != null ? mmss(segLeft) : fmt(Math.max(0, (seg.m - (st.dist - (st.segDist || 0))) / 1000), 2) + ' km'}</span><small>${st.seg + 1} de ${st.segs.length}</small></div>` : ''}
@@ -263,8 +269,9 @@ function runningView() {
   const pr = withPace.length >= 4 ? linreg(withPace.map((r, i) => ({ x: i, y: r.dur / r.km }))) : null;
   return `
     ${typeof runPlanCard === 'function' ? runPlanCard() : ''}
+    <div class="seg run-where" role="group" aria-label="Dónde corres"><button data-where="calle" class="${runIndoor() ? '' : 'on'}">📡 Calle (GPS)</button><button data-where="cinta" class="${runIndoor() ? 'on' : ''}">🏃 Caminadora</button></div>
     <div class="tool-row">
-      <button id="rn-free"><span>▶</span>Correr</button>
+      <button id="rn-free"><span>${runIndoor() ? '🏃' : '▶'}</span>${runIndoor() ? 'Caminadora' : 'Correr'}</button>
       <button id="rn-manual"><span>✍️</span>Manual</button>
       <button id="rn-gpx"><span>📥</span>GPX</button>
       <button id="rn-plan"><span>🗓️</span>Plan</button>
@@ -278,19 +285,20 @@ function runningView() {
     <div class="card" data-fold-title="Récords" data-fold-sum="${Object.keys(rec).length ? Object.keys(rec).length + ' distancias' : 'aún sin récords'}" data-fold-ico="🏅">
       ${Object.keys(rec).length || longest ? `<table><tbody>${RECORD_DIST.filter(([k]) => rec[k]).map(([k, l]) => `<tr><td>${l}</td><td class="num"><b>${durStr(rec[k].t)}</b></td><td class="num small muted">${paceStr(rec[k].t / k)}/km · ${shortDate(rec[k].date)}</td></tr>`).join('')}
         ${longest ? `<tr><td>Más larga</td><td class="num"><b>${fmt(longest.km, 2)} km</b></td><td class="num small muted">${shortDate(longest.date)}</td></tr>` : ''}</tbody></table>
-        <p class="small muted" style="margin:6px 0 0">Se calculan con tu mejor tramo dentro de cada carrera con GPS o GPX.</p>` : '<p class="small muted" style="margin:0">Corre con GPS o importa un GPX y aquí aparecerán tus mejores tiempos en 1K, 5K, 10K, 21K y 42K.</p>'}
+        <p class="small muted" style="margin:6px 0 0">Se calculan con tu mejor tramo dentro de cada carrera con GPS o GPX (la caminadora no cuenta para récords: cada banda mide distinto).</p>` : '<p class="small muted" style="margin:0">Corre con GPS o importa un GPX y aquí aparecerán tus mejores tiempos en 1K, 5K, 10K, 21K y 42K.</p>'}
     </div>
     <div class="card" data-fold-title="Análisis" data-fold-sum="${pr ? (pr.slope < -1 ? 'tu ritmo mejora' : pr.slope > 1 ? 'ritmo más lento' : 'ritmo estable') : 'faltan carreras'}" data-fold-ico="📈">
       ${pr ? `<p class="small" style="margin-top:0">En tus últimas ${withPace.length} carreras tu ritmo medio ${pr.slope < -1 ? `<b style="color:var(--good)">mejora ~${Math.round(-pr.slope)} s/km por carrera</b>` : pr.slope > 1 ? `es <b>~${Math.round(pr.slope)} s/km más lento por carrera</b> (normal si estás metiendo carreras suaves o más largas)` : 'se mantiene estable'}.</p>` : '<p class="small muted" style="margin:0">Con 4 carreras de 1 km o más te muestro la tendencia de tu ritmo.</p>'}
       <p class="small muted" style="margin:6px 0 0">Recuerda: la mayoría de tus kilómetros deberían ser suaves (podrías platicar).</p>
     </div>
     <div class="card" data-fold-title="Historial" data-fold-sum="${runs.length} carreras" data-fold-ico="🕘">
-      ${runs.length ? runs.slice(0, 20).map(r => `<button class="run-row" data-run="${r.id}" data-src="${r.source}"><span class="rr-ico">${r.source === 'gpx' ? '📥' : r.source === 'manual' ? '✍️' : '📡'}</span><span class="grow"><b>${fmt(r.km, 2)} km</b> · ${durStr(r.dur)} · ${r.km ? paceStr(r.dur / r.km) + '/km' : ''}<br><small class="muted">${shortDate(r.date)} · ${esc(r.title)}${r.rpe ? ' · esfuerzo ' + r.rpe + '/10' : ''}</small></span></button>`).join('')
+      ${runs.length ? runs.slice(0, 20).map(r => `<button class="run-row" data-run="${r.id}" data-src="${r.source}"><span class="rr-ico">${r.source === 'gpx' ? '📥' : r.source === 'manual' ? '✍️' : r.source === 'cinta' ? '🏃' : '📡'}</span><span class="grow"><b>${fmt(r.km, 2)} km</b> · ${durStr(r.dur)} · ${r.km ? paceStr(r.dur / r.km) + '/km' : ''}<br><small class="muted">${shortDate(r.date)} · ${esc(r.title)}${r.rpe ? ' · esfuerzo ' + r.rpe + '/10' : ''}</small></span></button>`).join('')
         : '<div class="empty"><span class="emoji">🏃</span>Tu primera carrera te espera. Toca <b>Correr</b> para usar el GPS del teléfono.</div>'}
     </div>`;
 }
 function bindRunning(v) {
-  $('#rn-free', v).onclick = () => startRun({ title: 'Carrera libre' });
+  $('#rn-free', v).onclick = () => runIndoor() ? openTreadmillPicker() : startRun({ title: 'Carrera libre' });
+  $$('[data-where]', v).forEach(b => b.onclick = () => { DB.profile.runIndoor = b.dataset.where === 'cinta'; saveData(); keepScroll(() => render(currentTab)); });
   $('#rn-manual', v).onclick = () => openActivityForm('correr');
   $('#rn-gpx', v).onclick = () => $('#rn-gpx-file', v).click();
   $('#rn-plan', v).onclick = () => (typeof openRunPlanSetup === 'function' ? openRunPlanSetup() : toast('Pronto'));
@@ -310,12 +318,12 @@ async function openRunDetail(id, src) {
   const r = allRuns().find(x => x.id === id);
   if (!r) return;
   const pts = src === 'manual' ? null : await trackStore.get(id).catch(() => null);
-  openModal(`<h3>${esc(r.title)}</h3><p class="small muted" style="margin-top:0">${longDate(r.date)}${r.source === 'gpx' ? ' · importada de GPX' : r.source === 'manual' ? ' · registro manual' : ' · GPS del teléfono'}</p>
-    ${pts ? routeSvg(pts) : ''}
+  openModal(`<h3>${esc(r.title)}</h3><p class="small muted" style="margin-top:0">${longDate(r.date)}${r.source === 'gpx' ? ' · importada de GPX' : r.source === 'manual' ? ' · registro manual' : r.source === 'cinta' ? ' · caminadora' + (r.climb ? ' · ' + r.climb + ' m subidos' : '') : ' · GPS del teléfono'}</p>
+    ${pts && pts.length ? routeSvg(pts) : ''}
     <div class="grid3" style="margin:10px 0"><div class="stat"><div class="label">Distancia</div><div class="value">${fmt(r.km, 2)}<small> km</small></div></div><div class="stat"><div class="label">Tiempo</div><div class="value" style="font-size:18px">${durStr(r.dur)}</div></div><div class="stat"><div class="label">Ritmo</div><div class="value" style="font-size:18px">${r.km ? paceStr(r.dur / r.km) : '–'}</div></div></div>
     ${r.splits && r.splits.length ? splitsTable(r.splits) : ''}
     ${r.best && Object.keys(r.best).length ? `<p class="small">Mejores tramos: ${RECORD_DIST.filter(([k]) => r.best[k]).map(([k, l]) => l + ' ' + durStr(r.best[k])).join(' · ')}</p>` : ''}
-    <div class="row" style="margin-top:10px">${src !== 'manual' ? '<button class="danger" id="rd-del">Borrar</button><button class="secondary" id="rd-gpx" style="flex:1">Exportar GPX</button>' : ''}<button id="rd-ok" style="flex:1">Cerrar</button></div>`, m => {
+    <div class="row" style="margin-top:10px">${src !== 'manual' ? '<button class="danger" id="rd-del">Borrar</button>' + (src !== 'cinta' ? '<button class="secondary" id="rd-gpx" style="flex:1">Exportar GPX</button>' : '') : ''}<button id="rd-ok" style="flex:1">Cerrar</button></div>`, m => {
     $('#rd-ok', m).onclick = closeModal;
     const g = $('#rd-gpx', m); if (g) g.onclick = () => exportGpx(id);
     const d = $('#rd-del', m); if (d) d.onclick = () => { if (!confirm('¿Borrar esta carrera?')) return; DB.runs = DB.runs.filter(x => x.id !== id); trackStore.del(id).catch(() => {}); saveData(); closeModal(); render(currentTab); };

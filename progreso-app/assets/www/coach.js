@@ -151,6 +151,7 @@ function openCheckin(after) {
         <div class="small muted" style="font-weight:600;margin:10px 0 4px">Por qué</div>
         ${r.why.length ? r.why.map(w => `<div class="why-row"><span>${w.icon}</span><span>${esc(w.text)}</span><b class="${w.pts < 0 ? 'neg' : 'pos'}">${w.pts > 0 ? '+' : ''}${w.pts}</b></div>`).join('') : '<p class="small">Todo en tu rango normal.</p>'}
         <p class="small muted" style="margin:8px 0">Datos usados: ${r.used.length ? r.used.join(', ') : 'tus respuestas'}. Es una guía, no un diagnóstico: tú decides.</p>
+        ${r.recommended !== 'mantener' && typeof pfSpaTip === 'function' && pfSpaTip() ? `<div class="adapt-note" style="margin:0 0 8px">💆 ${esc(pfSpaTip())}</div>` : ''}
         ${cycleUseReco() && cycDay(t) && cycDay(t).pain === 3 ? '<div class="status warn"><b>Dolor fuerte</b>Si no cede con lo habitual o es distinto a lo normal para ti, consulta a un profesional de salud. Hoy puedes elegir movilidad suave o descanso.</div>' : ''}
         ${r.joint ? '<div class="status warn"><b>Molestia articular</b>No entrenes con dolor. Usa ⇄ para cambiar los ejercicios que la provoquen, o márcala en Más → Molestias para que la app los adapte sola.</div>' : ''}
         <div class="small muted" style="font-weight:600;margin:12px 0 6px">Elige cómo entrenar hoy</div>

@@ -12,7 +12,7 @@ function todayMissions() {
   // Fuerza: el día que toca de tu rutina
   const nd = nextDay(DB.profile.routine), doneStrength = DB.sessions.some(s => s.end && s.date === t);
   if (nd && !nd.rest && DB.profile.trainMode !== 'running') {
-    if (low) out.push({ ico: '🧘', kind: 'rec', title: 'Recuperación activa', goal: '15 min de movilidad o 20–30 min caminando', success: 'Moverte suave sin dolor; si prefieres descansar, también vale.', why: `Tu chequeo de hoy marca ${rd.score}/100: ${rd.why.filter(w => w.pts < 0).slice(0, 2).map(w => w.text.toLowerCase()).join(' y ') || 'te conviene recuperar'}.`, done: doneStrength || (DB.activities || []).some(a => a.date === t && ['movilidad', 'caminar', 'yoga'].includes(a.type)) });
+    if (low) out.push({ ico: '🧘', kind: 'rec', title: 'Recuperación activa', goal: '15 min de movilidad o 20–30 min caminando', success: 'Moverte suave sin dolor; si prefieres descansar, también vale.', why: `Tu chequeo de hoy marca ${rd.score}/100: ${rd.why.filter(w => w.pts < 0).slice(0, 2).map(w => w.text.toLowerCase()).join(' y ') || 'te conviene recuperar'}.` + (typeof pfSpaTip === 'function' && pfSpaTip() ? ' ' + pfSpaTip() : ''), done: doneStrength || (DB.activities || []).some(a => a.date === t && ['movilidad', 'caminar', 'yoga'].includes(a.type)) });
     else {
       const prog = nd.ex.map(e => ({ e, c: coachFor(e[0], e[2]) })).find(x => x.c.kind === 'subir' || x.c.kind === 'reps');
       const reduce = rd && rd.plan === 'reducir';

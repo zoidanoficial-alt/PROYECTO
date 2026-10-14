@@ -714,9 +714,10 @@ const STAGES = {
 };
 const ACTIVITY_TYPES = {
   fuerza: ['🏋️', 'Fuerza'], correr: ['🏃', 'Correr'], caminar: ['🚶', 'Caminar'], bici: ['🚴', 'Bici'], nadar: ['🏊', 'Natación'],
-  yoga: ['🧘', 'Yoga'], pilates: ['🤸', 'Pilates'], movilidad: ['🧎', 'Movilidad'], casa: ['🏠', 'En casa'], deporte: ['⚽', 'Deporte'], bajo: ['🌿', 'Bajo impacto']
+  yoga: ['🧘', 'Yoga'], pilates: ['🤸', 'Pilates'], movilidad: ['🧎', 'Movilidad'], casa: ['🏠', 'En casa'], deporte: ['⚽', 'Deporte'], bajo: ['🌿', 'Bajo impacto'],
+  eliptica: ['🌀', 'Elíptica'], escalera: ['🪜', 'Escaladora'], remo: ['🚣', 'Remo'], circuito: ['⏱️', 'Circuito 30 min']
 };
-const DISTANCE_TYPES = ['correr', 'caminar', 'bici', 'nadar'];
+const DISTANCE_TYPES = ['correr', 'caminar', 'bici', 'nadar', 'remo'];
 const BARRIERS = {
   tiempo: ['⏰', 'Falta de tiempo', 'Sesiones de 15–20 min y un plan de mantenimiento para semanas pesadas.'],
   motivacion: ['🔋', 'Se me va la motivación', 'Metas pequeñas, retos semanales y ver tu propio progreso.'],

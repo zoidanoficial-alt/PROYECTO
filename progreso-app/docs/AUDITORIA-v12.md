@@ -271,3 +271,59 @@ Un botón en Más → Apariencia y en el paso 1 de la bienvenida, con vista prev
 - El ícono del lanzador de Android sigue siendo el del logo original. Cambiarlo al vuelo requiere un `activity-alias` nativo y reiniciar el lanzador.
 - Las fotos y animaciones de técnica de los ejercicios vienen de una base pública y no se cambiaron.
 - No probado en un teléfono real.
+
+---
+
+## 14.0 · Planet Fitness México y caminadora (verificado)
+
+Fuente: informe "Planet Fitness México: caminadoras y catálogo completo de máquinas". Solo se usó lo que el informe respalda, con su nivel de confianza.
+
+### Caminadora (sin GPS) — `treadmill.js`
+- **Selector en Running:** "📡 Calle (GPS) | 🏃 Caminadora". Lo respetan todas las formas de empezar: libre, sesión del plan y recomendación.
+- **Entrenamientos guiados:**
+  - Caminadora libre.
+  - Intervalos 6 × 1 min.
+  - Colinas 6 × 2 min (solo cambia la inclinación).
+  - Caminata inclinada 12-3-30.
+  - Caminata activa.
+  - Las velocidades se escalan con tu trote cómodo: el que sale de tus carreras recientes (zonas de ritmo) o uno que fijas tú.
+  - Las sesiones del plan se traducen a km/h, incluido el ritmo tempo y el de intervalos.
+- **Pantalla en vivo:**
+  - Velocidad e inclinación con botones de 44 px, limitadas a los rangos de la Matrix Endurance (0.8–20 km/h, 0–15 %; modelo probable, marca confirmada).
+  - Distancia = velocidad × tiempo, más parciales por km, metros subidos y aviso por voz en cada cambio ("Pon 10.4 km/h y 1 % de inclinación").
+- **Al terminar:** "¿Qué marca la consola?" para corregir distancia y minutos con la medida real de la banda. Si la corrección pasa del 2 %, se descartan los parciales calculados.
+- **Recuperación:** la sesión se recupera si se cierra la app, sin inventar minutos (máximo 5 s por intervalo).
+- **Récords:** las sesiones de caminadora no cuentan, porque cada banda mide distinto. Tampoco exportan GPX.
+
+### Tu Planet Fitness — `pf.js`
+- **Ubicación:** Más → Dónde entrenas → "Tu Planet Fitness" (si tu gimnasio es Planet Fitness).
+- **Contenido de la hoja:**
+  - Sucursal y membresía Classic / Black Card.
+  - 33 equipos en 4 secciones: fuerza, peso libre/poleas/circuito, cardio y spa Black Card.
+  - Cada equipo lleva su etiqueta: Confirmado en México, Probable o No verificado en MX.
+- **Marcar "No hay":**
+  - En una máquina, sus ejercicios quedan fuera y las rutinas usan sustitutos con la lógica existente. Ejemplo: sin prensa, la Prensa 45° se cambia por Sentadilla en Smith.
+  - En Smith, poleas o mancuernas, se actualiza el equipo.
+  - Solo aplica cuando entrenas en Planet Fitness.
+- **Black Card:** con el chequeo bajo, la misión de recuperación y la recomendación sugieren HydroMassage o sillón de masaje, aclarando que no sustituye el sueño.
+- **Nuevas actividades:** Elíptica, Escaladora, Remo (con distancia) y Circuito 30 min.
+
+### Archivos
+- Nuevos: `treadmill.js`, `pf.js`.
+- Modificados: `running.js` (ganchos de caminadora, selector, historial), `app.js` (hasEquip, Más), `coach.js`, `missions.js`, `data.js` (actividades), `index.html`, `styles.css`, `AndroidManifest.xml` (14.0 / 18).
+
+### Verificación
+- **v21.mjs, con reloj simulado:**
+  - En intervalos, la distancia calculada coincide con la teórica (3,206.7 m) y salen 3 parciales.
+  - Los segmentos cambian la velocidad (6.8 → 10.4 → 6.4 km/h) y la pausa no suma distancia.
+  - La sesión se recupera tras recargar y la corrección con la consola funciona (6.10 km guardados).
+  - No afecta los récords; el tempo del plan sale a 9.2 km/h y el modo calle sigue usando GPS.
+  - Prensa marcada "No hay" deja fuera sus 2 ejercicios con sustitutos, sin afectar otros gimnasios. Smith "No hay" quita y devuelve el equipo.
+  - Black Card sugiere spa y aparecen las 4 actividades nuevas.
+- **Desborde con letra al 140–150 %** (incluidas la hoja PF, la caminadora y el formulario de actividades): 0 px.
+- **Regresión v9–v20 y persist:** sin errores.
+
+### Limitaciones
+- El modelo exacto de caminadora en PF México no está confirmado (el informe lo marca como "probable").
+- La app no se conecta a la consola Matrix: no hay API pública, y el Bluetooth o Apple Watch depende de la consola. La distancia se confirma a mano.
+- El catálogo es del informe; la disponibilidad real se marca por sucursal.

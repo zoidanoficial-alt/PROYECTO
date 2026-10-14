@@ -305,7 +305,7 @@ function registerCustomExercises() {
 /* Equipo disponible y molestias del usuario. */
 function hasEquip(name) {
   const s = DB.active ? activeSession() : null, env = s && s.env ? envEquip(s.env) : null;   // 8.0: casa u hotel
-  return (env || DB.profile.equip || []).includes(exInfo(name).e);
+  return (env || DB.profile.equip || []).includes(exInfo(name).e) && !(!env && typeof pfMissing === 'function' && pfMissing(name));   // 14.0: máquinas que no hay en tu club
 }
 function exIssues(name) { return (hasEquip(name) ? [] : ['equipo']).concat(limitsFor(name, DB.profile.limits)); }
 function okForMe(name) { return exIssues(name).length === 0; }
@@ -2692,6 +2692,7 @@ function renderMore() {
       <div class="chips" style="margin-bottom:10px">${Object.keys(GYM_PRESETS).map(k => `<button class="chip-btn ${p.gym === k ? 'on' : ''}" data-gym="${k}">${GYM_PRESETS[k].ico} ${GYM_PRESETS[k].name}</button>`).join('')}</div>
       ${Object.keys(EQUIP).map(e => `<label class="habit"><input type="checkbox" data-equip="${e}" ${p.equip.includes(e) ? 'checked' : ''}> ${EQUIP[e]}</label>`).join('')}
       <p class="small muted" style="margin:8px 0 0">La app solo te propone ejercicios con este equipo y adapta tus rutinas solas.</p>
+      ${p.gym === 'pf' ? `<button class="pick-row" id="mo-pf" style="margin-top:10px"><span style="font-size:24px">🟣</span><span class="grow"><b>Tu Planet Fitness</b><br><small>${esc(pfSummary())} · marca qué máquinas hay en tu sucursal</small></span><span aria-hidden="true">›</span></button>` : ''}
     </div>
 
     <div class="card">
@@ -2811,6 +2812,7 @@ function renderMore() {
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
   $$('#view-more [data-mode]').forEach(b => b.onclick = () => { DB.profile.mode = b.dataset.mode; saveData(); showTab('more'); });
+  const mpf = $('#mo-pf'); if (mpf) mpf.onclick = () => openPfSheet(renderMore);
   $$('#view-more [data-gym]').forEach(b => b.onclick = () => { DB.profile.gym = b.dataset.gym; DB.profile.equip = GYM_PRESETS[b.dataset.gym].equip.slice(); saveRe(); toast('Equipo: ' + GYM_PRESETS[b.dataset.gym].name); });
   $$('#view-more [data-equip]').forEach(cb => cb.onchange = () => {
     const e = cb.dataset.equip, set = new Set(DB.profile.equip);
