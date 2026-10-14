@@ -35,6 +35,18 @@ function toast(msg) {
   toast._t = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
+/** Aviso con acción (p. ej. "Deshacer"). Desaparece solo; tocar la acción ejecuta fn. */
+function snack(msg, action, fn, ms) {
+  let el = $('#snack');
+  if (!el) { el = document.createElement('div'); el.id = 'snack'; el.className = 'snack'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.innerHTML = `<span>${esc(msg)}</span>${action ? `<button id="snack-act">${esc(action)}</button>` : ''}`;
+  el.classList.add('show');
+  clearTimeout(snack._t);
+  const hide = () => el.classList.remove('show');
+  if (action) $('#snack-act').onclick = () => { hide(); clearTimeout(snack._t); fn(); };
+  snack._t = setTimeout(hide, ms || 6000);
+}
+
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -1024,6 +1036,46 @@ function startSession(routineKey, dayId, wid) {
   saveData();
   keepScreenOn(true);
 }
+/** 16.0 · Copia de la sesión para poder deshacer salir o reiniciar. */
+function sessionSnapshot(s) {
+  const ids = new Set(DB.lifts.filter(l => l.sid === s.id).map(l => l.id));
+  return { s: JSON.parse(JSON.stringify(s)), lifts: DB.lifts.filter(l => ids.has(l.id)), ach: DB.achievements.filter(a => [...ids].some(id => a.id.startsWith('pr-' + id))), ids };
+}
+function dropSessionData(snap) {
+  DB.lifts = DB.lifts.filter(l => !snap.ids.has(l.id));
+  DB.achievements = DB.achievements.filter(a => !snap.ach.includes(a));
+}
+function restoreSnapshot(snap) {
+  DB.sessions = DB.sessions.filter(x => x.id !== snap.s.id).concat(snap.s);
+  DB.lifts = DB.lifts.filter(l => !snap.ids.has(l.id)).concat(snap.lifts);
+  DB.achievements = snap.ach.concat(DB.achievements.filter(a => !snap.ach.some(b => b.id === a.id)));
+  DB.active = snap.s.id; SESS_UI.sid = null;
+  saveData(); keepScreenOn(true); showTab('train'); toast('↶ Sesión recuperada');
+}
+/** ⬅️ Salir de la sesión: se borra al instante (con opción de deshacer unos segundos). */
+function exitSession() {
+  const s = activeSession(); if (!s) return;
+  const snap = sessionSnapshot(s), n = snap.lifts.length;
+  dropSessionData(snap);
+  DB.sessions = DB.sessions.filter(x => x.id !== s.id);
+  closeSession(); renderTrain(); window.scrollTo(0, 0);
+  snack(n ? `Sesión borrada (${n} serie${n > 1 ? 's' : ''})` : 'Sesión cancelada', 'Deshacer', () => restoreSnapshot(snap));
+}
+/** ↺ Reiniciar la sesión: misma rutina desde cero (series, extras, cambios y reloj). */
+function resetSession() {
+  const s = activeSession(); if (!s) return;
+  const snap = sessionSnapshot(s);
+  dropSessionData(snap);
+  s.start = Date.now(); s.extra = []; s.sets = {}; s.open = null; s.prShown = {}; s.missionOk = {};
+  s.swaps = {}; s.adapt = {};
+  if (s.base) {
+    const used = s.base.map(e => e[0]).filter(okForMe);
+    s.base.forEach((e, i) => { const a = adaptFor(e[0], used); if (a && a.alt) { s.swaps[i] = a.alt; s.adapt[i] = 'En vez de ' + e[0] + ' (' + a.why + ')'; used.push(a.alt); } });
+  }
+  stopRest(); SESS_UI.sid = null;
+  saveData(); renderSession(s); window.scrollTo(0, 0); vibrate(40);
+  snack('Sesión reiniciada', 'Deshacer', () => restoreSnapshot(snap));
+}
 function closeSession() { DB.active = null; saveData(); keepScreenOn(false); stopRest(); document.body.classList.remove('in-session'); }
 function finishSession() {
   const s = activeSession();
@@ -1314,7 +1366,8 @@ function renderSession(s) {
   const targetSets = exs.reduce((a, e) => a + e[1], 0);
   $('#view-train').innerHTML = `
     <div class="card">
-      <div class="row spread"><div><div class="small muted">En curso · ${mins} min</div><div style="font-size:19px;font-weight:750">${esc(s.dayName)}</div></div>
+      <div class="row spread sess-head"><button class="icon-btn sess-back" id="ss-back" aria-label="Salir y borrar esta sesión" title="Salir y borrar">⬅️</button><div class="grow"><div class="small muted">En curso · ${mins} min</div><div style="font-size:19px;font-weight:750">${esc(s.dayName)}</div></div>
+        <button class="icon-btn sess-reset" id="ss-reset" aria-label="Reiniciar sesión desde cero" title="Reiniciar">↺</button>
         <div style="text-align:right"><div style="font-size:19px;font-weight:750">${done.length}<span class="muted" style="font-size:14px">/${targetSets || '–'}</span></div><div class="small muted">series</div></div></div>
       ${progBar(done.length, targetSets, 'all', true)}
       <div class="xp-msg">${!done.length ? '🔥 Hoy vienes por todo. ¡Primera serie!' : done.length >= targetSets ? '🏆 ¡Entreno completo! Termina cuando quieras' : done.length / targetSets >= 0.5 ? '⚡ Ya pasaste la mitad, ¡no aflojes!' : '🚀 Vas encendido, sigue sumando'}</div>
@@ -1418,12 +1471,9 @@ function renderSession(s) {
     keepScroll(() => renderSession(s)); toast('↶ Borrada la serie de ' + wFmt(last.w, unitFor(ex)) + ' × ' + last.r);
   });
   $('#ss-finish').onclick = finishSession;
-  $('#ss-cancel').onclick = () => {
-    if (!confirm('¿Descartar esta sesión y sus series?')) return;
-    DB.lifts = DB.lifts.filter(l => l.sid !== s.id);
-    DB.sessions = DB.sessions.filter(x => x.id !== s.id);
-    closeSession(); renderTrain();
-  };
+  $('#ss-cancel').onclick = exitSession;
+  $('#ss-back').onclick = exitSession;
+  $('#ss-reset').onclick = resetSession;
 }
 /* ------------------------------------------------------------------ *
  *  10.0 · Diseño minimalista: secciones plegables (revelación progresiva)

@@ -376,3 +376,25 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
   - Los 6 ejercicios de la rutina existen y la ficha no desborda.
 - **Desborde** a 320 y 393 px con letra al 140 %: 0 px.
 - **Regresión v9–v21 y persist:** sin errores.
+
+---
+
+## 16.0 · Salir (⬅️) y reiniciar (↺) una sesión sin descartar ejercicio por ejercicio (verificado)
+
+**Problema:** al empezar un entreno de rutina (p. ej. "Héroe ágil · inspirada en Tom Holland"), los ejercicios ya vienen cargados. Para cancelar, había que bajar hasta el final y tocar "Descartar sesión" con confirmación. Para empezar de nuevo, había que reiniciar ejercicio por ejercicio.
+
+**Solución (`app.js`, `styles.css`):**
+- **⬅️ en la cabecera de la sesión:** sale y borra la sesión al instante, sin diálogo. Borra sus series y los récords que generaron.
+- **↺ en la cabecera:** reinicia la misma rutina desde cero. Borra las series, quita los ejercicios añadidos, deshace las metas de series cambiadas y los cambios de ejercicio, y reinicia el reloj. Las adaptaciones automáticas a tu equipo y molestias se recalculan. Se conservan el plan del chequeo, la versión corta y el lugar (gym/casa/hotel).
+- **Red de seguridad:** ambos muestran el aviso "Sesión borrada (N series) · Deshacer" o "Sesión reiniciada · Deshacer" durante 6 s. Deshacer restaura la sesión exacta: series, récords, extras y metas.
+- **"Descartar sesión" al final:** ahora hace lo mismo que ⬅️.
+- **Botón Atrás de Android:** sigue llevando a Inicio sin borrar nada, para poder consultar algo a mitad del entreno.
+
+**Verificación (`v23.mjs`):**
+- Rutina "Héroe ágil", día 1, con 2 series: ⬅️ deja 0 sesiones, 0 series y ningún diálogo.
+- Deshacer devuelve las 2 series y la sesión activa.
+- Con un ejercicio extra y una meta de series cambiada, ↺ deja 0 series, 4 ejercicios, meta original (5) y reloj nuevo. Deshacer lo devuelve todo (2 series, extra, meta 3).
+- ⬅️ sin series muestra "Sesión cancelada".
+- Al vencer el aviso y recargar, la sesión ya no existe.
+- La cabecera cabe a 320 px con letra al 140 %.
+- Regresión v9–v22, persist y desborde: sin errores.
