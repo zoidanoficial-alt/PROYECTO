@@ -156,13 +156,13 @@ const WEEKLY_TARGET = { pecho: 16, espalda: 18, hombro: 16, biceps: 12, triceps:
 /** Por encima de esta proporción de la meta se avisa de sobreentrenamiento. */
 const OVERREACH = 1.4;
 
-/* Nivel de fuerza relativo: 1RM estimado / peso corporal (hombres, aproximado). */
+/* Nivel de fuerza relativo: 1RM estimado / peso corporal (aproximado; cutsF = referencias para mujer). */
 const STRENGTH_LEVELS = ['Principiante', 'Intermedio', 'Avanzado', 'Élite'];
 const STRENGTH_LIFTS = [
-  { name: 'Press banca', ex: ['Press banca con barra', 'Press banca en Smith'], cuts: [0.75, 1.25, 1.75] },
-  { name: 'Sentadilla', ex: ['Sentadilla con barra', 'Sentadilla en Smith'], cuts: [1.0, 1.5, 2.25] },
-  { name: 'Peso muerto', ex: ['Peso muerto'], cuts: [1.25, 1.75, 2.5] },
-  { name: 'Press militar', ex: ['Press militar con barra', 'Press militar en Smith'], cuts: [0.5, 0.8, 1.1] }
+  { name: 'Press banca', ex: ['Press banca con barra', 'Press banca en Smith'], cuts: [0.75, 1.25, 1.75], cutsF: [0.5, 0.75, 1.0] },
+  { name: 'Sentadilla', ex: ['Sentadilla con barra', 'Sentadilla en Smith'], cuts: [1.0, 1.5, 2.25], cutsF: [0.75, 1.25, 1.75] },
+  { name: 'Peso muerto', ex: ['Peso muerto'], cuts: [1.25, 1.75, 2.5], cutsF: [1.0, 1.5, 2.0] },
+  { name: 'Press militar', ex: ['Press militar con barra', 'Press militar en Smith'], cuts: [0.5, 0.8, 1.1], cutsF: [0.35, 0.55, 0.75] }
 ];
 
 /* ------------------------------------------------------------------ *
@@ -430,6 +430,26 @@ const ROUTINES = {
         ['Curl con barra de pie', 4, '15, 12, 10, 8', 75], ['Curl inclinado con mancuernas', 4, '15, 12, 10, 8', 75],
         ['Extensión de tríceps en polea', 4, '15, 12, 10, 8', 75], ['Press francés', 4, '15, 12, 10, 8', 75],
         ['Curl predicador', 4, '10–12', 75], ['Press banca agarre cerrado', 4, '10–12', 120]] }
+    ]
+  },
+  gluteo: {
+    name: 'Glúteo y tonificación · 4 días',
+    desc: 'Más glúteo y pierna, con torso para postura y hombros definidos: 2 días de glúteo/pierna y 2 de torso + abdomen.',
+    days: [
+      { id: 'g1', name: 'Día 1 · Glúteo y femoral', ex: [
+        ['Hip thrust', 4, '8–12', 120], ['Peso muerto rumano', 3, '10–12', 120], ['Zancadas / split squat búlgaro', 3, '10 por pierna', 90],
+        ['Curl femoral sentado', 3, '12–15', 75], ['Patada de glúteo (máquina)', 3, '12–15', 60]] },
+      { id: 'g2', name: 'Día 2 · Torso y postura', ex: [
+        ['Jalón al pecho', 3, '10–12', 90], ['Remo sentado (máquina)', 3, '10–12', 90], ['Press militar con mancuernas', 3, '10–12', 90],
+        ['Elevaciones laterales', 3, '12–15', 60], ['Face pull', 3, '15', 60], ['Plancha', 3, '30–45 s', 45]] },
+      { id: 'g3', name: 'Descanso activo · camina 20–30 min', rest: true, ex: [] },
+      { id: 'g4', name: 'Día 3 · Pierna y glúteo', ex: [
+        ['Sentadilla goblet con mancuerna', 4, '10–12', 90], ['Prensa 45°', 3, '12–15', 120], ['Puente de glúteo con barra', 3, '12–15', 75],
+        ['Extensión de cuádriceps', 3, '12–15', 60], ['Elevación de talones de pie', 3, '12–15', 60]] },
+      { id: 'g5', name: 'Día 4 · Torso y abdomen', ex: [
+        ['Press inclinado con mancuernas', 3, '10–12', 90], ['Remo con mancuerna', 3, '10–12', 90], ['Elevaciones laterales', 3, '12–15', 60],
+        ['Extensión de tríceps en polea', 2, '12–15', 60], ['Curl martillo', 2, '12', 60], ['Dead bug', 3, '8 por lado', 45]] },
+      { id: 'g6', name: 'Descanso', rest: true, ex: [] }
     ]
   },
   tp4: {

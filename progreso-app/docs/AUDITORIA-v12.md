@@ -223,3 +223,51 @@ Cada bloque se cerró solo después de pasar sus pruebas propias y las pruebas d
 - **Relojes y Health Connect:** la integración disponible es el GPX. La conexión directa requiere SDK, credenciales y revisión de permisos (P2).
 - **Predicción de carrera:** es una estimación con fórmula (Riegel) a partir de tus mejores tramos recientes. Sin carreras con GPS o GPX no se muestra.
 - **Límite de almacenamiento:** sigue existiendo, aunque se redujo y se vigila. La migración a IndexedDB es P2.
+
+---
+
+## 13.0 · Modo Ella 🎀 y corrección de desbordes (verificado)
+
+### Bug: pantallas que se salían por los lados
+- **Causa:** con letra grande o "tamaño de pantalla" aumentado en Android, la tira de resumen de Inicio (peso "88.0 kg · media 7 d") medía unos px más que la pantalla. El WebView ensanchaba la página y todo, incluida la hoja "¿Cómo llegas hoy?", quedaba corrido y cortado. Además, las rejillas `repeat(n, 1fr)` se estiraban con palabras largas ("Excelente").
+- **Solución (styles.css):**
+  - Las 40 rejillas pasan a `minmax(0, 1fr)`.
+  - Los hijos de grid y flex llevan `min-width: 0`, y los textos cortos tienen elipsis.
+  - Tablas y palabras largas hacen salto de línea.
+  - La hoja (`.modal`) nunca supera `100vw`.
+  - `html, body` llevan `overflow-x: clip`.
+- **Prueba (ovf.mjs):** recorre las 5 pestañas, las 8 vistas de Progreso, Running, la sesión y 5 hojas (chequeo, acciones rápidas, técnica, consentimiento, plan de running), y comprueba que ningún elemento pase del borde.
+  - Anchos de 300, 320, 360 y 393 px, con letra al 130 %, 140 % y 150 %, en modo clásico y rosa.
+  - Antes: 13 px de desborde en Inicio a 300 px. Ahora: 0 en todos los casos.
+
+### Modo Ella
+Un botón en Más → Apariencia y en el paso 1 de la bienvenida, con vista previa al instante.
+- **Colores (`look: 'rosa'`):**
+  - Paleta rosa y blanco y una variante "rosa noche" para el tema oscuro.
+  - Logo rosa/lila (`img/logo-rosa.png`, generado del original), con la barra de estado del mismo color.
+  - Hero con corazones en lugar del triángulo naranja, botones redondeados y confeti con corazones.
+  - Mapa muscular, gráficas e insignia de récord usan la paleta del tema (antes los colores estaban fijos en el código).
+- **Perfil de mujer (`sex: 'f'`):**
+  - Textos en femenino ("Agotada", "Estás lista", "descansa tranquila"...).
+  - Emojis de persona en versión mujer (🏋️‍♀️ 🏃‍♀️ 🧘‍♀️), y 💪 → 💖, 🏆 → 👑, 🔥 → ✨.
+  - Niveles de fuerza con referencias para mujer: banca 0.5/0.75/1.0×, sentadilla 0.75/1.25/1.75×, peso muerto 1.0/1.5/2.0×, press militar 0.35/0.55/0.75×.
+  - Puntaje de fuerza ajustado: ~60 % de la referencia de hombre en tren superior, 75–80 % en inferior.
+  - El Excel "para IA" dice "mujer".
+  - Invitación suave y descartable al módulo del ciclo, que nunca se activa sin consentimiento.
+- **Nueva rutina "Glúteo y tonificación · 4 días":** se sugiere al activar el modo si aún no hay entrenos.
+- **Ajustes independientes:** colores (Rosa/Logo), claro/oscuro, y textos y referencias (Mujer/Hombre). Apagar el botón vuelve al modo clásico.
+
+### Archivos
+- Nuevo `ella.js`.
+- Modificados: `app.js` (tema, Apariencia, bienvenida, niveles, observador de textos, confeti, colores), `data.js` (cutsF, rutina gluteo), `strength.js` (STR_FEM, colores), `export.js`, `index.html`, `styles.css`, `AndroidManifest.xml` (13.0 / 17).
+- Nueva imagen `img/logo-rosa.png`.
+
+### Verificación
+- `v20.mjs`: bienvenida, Inicio, chequeo, Progreso, Apariencia, rosa noche y apagado, sin errores.
+- Regresión v9–v19, persist, quota y audit: sin errores.
+- Rendimiento con 2 años de datos en modo rosa: pestañas en 12–117 ms, guardar una serie en 19 ms.
+
+### Limitaciones
+- El ícono del lanzador de Android sigue siendo el del logo original. Cambiarlo al vuelo requiere un `activity-alias` nativo y reiniciar el lanzador.
+- Las fotos y animaciones de técnica de los ejercicios vienen de una base pública y no se cambiaron.
+- No probado en un teléfono real.

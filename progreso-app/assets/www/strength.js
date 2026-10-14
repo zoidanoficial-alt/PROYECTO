@@ -15,6 +15,8 @@ const STR_REF = {
   pierna: { c: 2.8, i: 1.6 }, femoral: { c: 2.5, i: 1.0 }, gluteo: { c: 2.8, i: 1.2 }, pantorrilla: { c: 2.2, i: 2.2 }
 };
 // Ajuste por equipo: con mancuernas se mide una sola; las máquinas permiten mover más.
+// Referencias para mujer (aprox.): ~60 % del tren superior y ~75 % del inferior respecto a las de hombre.
+const STR_FEM = { pecho: .6, hombro: .6, triceps: .6, espalda: .65, biceps: .6, pierna: .75, femoral: .75, gluteo: .8, pantorrilla: .8 };
 const STR_EQUIP = { barra: 1, smith: 1.05, maq: 1.4, polea: 0.8, manc: 0.45, fija: 1.5 };
 
 function bwAt(date) { const a = weekAvg(date); return (a && a.avg) || currentWeight() || DB.profile.startWeight || 80; }
@@ -24,7 +26,7 @@ function setScore(l, bw) {
   if (!ref || !eq) return null;
   const load = x.e === 'fija' ? bw + l.w : l.w;
   if (!load) return null;
-  const v = 100 * (e1rm(load, l.r) / bw) / (ref[x.t === 'c' ? 'c' : 'i'] * eq);
+  const v = 100 * (e1rm(load, l.r) / bw) / (ref[x.t === 'c' ? 'c' : 'i'] * eq * (fem() ? STR_FEM[x.g] || .7 : 1));
   return isFinite(v) ? Math.max(0, Math.min(100, Math.round(v))) : null;
 }
 /** Fuerza por músculo, categoría y general en una fecha (mejor marca de los 60 días previos). */
@@ -63,7 +65,7 @@ const HEX_PATH = 'M50 4 L90 27 L90 73 L50 96 L10 73 L10 27 Z';
 function hexRing(pct, size, label) {
   const id = 'hg' + Math.random().toString(36).slice(2, 7);
   return `<svg class="hex" width="${size}" height="${size}" viewBox="0 0 100 100">
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1ee3e0"/><stop offset=".55" stop-color="#8af5f0"/><stop offset="1" stop-color="#ff5f0a"/></linearGradient></defs>
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--cyan)"/><stop offset=".55" style="stop-color:var(--cyan-2)"/><stop offset="1" style="stop-color:var(--orange)"/></linearGradient></defs>
     <path d="${HEX_PATH}" class="hex-track" pathLength="100"/>
     <path d="${HEX_PATH}" class="hex-fill" pathLength="100" stroke="url(#${id})" style="stroke-dasharray:100;stroke-dashoffset:${100 - Math.min(100, pct)}"/>
     ${label ? `<text x="50" y="52">${label}</text>` : ''}</svg>`;
@@ -189,7 +191,7 @@ function openPRCelebration(ex) {
   const pts = months.length >= 3 ? months.map(k => ({ date: k + '-15', y: fromKg(byM[k], u) })) : h.slice(-12).map(x => ({ date: x.date, y: fromKg(x.best, u) }));
   openModal(`<div class="pr-cel">
     <div class="pr-rays"></div>
-    <div class="pr-badge"><svg viewBox="0 0 100 100" width="104" height="104"><defs><linearGradient id="prg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient></defs><path d="${HEX_PATH}" fill="url(#prg)" stroke="#10202a" stroke-width="5"/><text x="50" y="62">🏆</text></svg></div>
+    <div class="pr-badge"><svg viewBox="0 0 100 100" width="104" height="104"><defs><linearGradient id="prg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--pr-1)"/><stop offset="1" style="stop-color:var(--pr-2)"/></linearGradient></defs><path d="${HEX_PATH}" fill="url(#prg)" stroke="#10202a" stroke-width="5"/><text x="50" y="62">🏆</text></svg></div>
     <h3>¡Nuevo récord de fuerza!</h3>
     <div class="pr-box" ${id ? `style="--bg:url(img/ex/${id}-1.jpg)"` : ''}>
       <div class="pr-ex">${esc(ex.toUpperCase())}</div><div class="small" style="opacity:.85">Fuerza estimada</div>
@@ -198,7 +200,7 @@ function openPRCelebration(ex) {
     </div>
     <button class="block" id="pr-ok" style="margin-top:14px">¡Vamos! 💪</button></div>`, m => {
     $('#pr-ok', m).onclick = closeModal;
-    setTimeout(() => { const c = $('#pr-chart', m); if (c) drawChart(c, { series: [{ points: pts, color: '#ff5f0a', dots: true, r: 4, width: 3 }], yDec: 1, minPad: 2 }); burst($('#modal')); }, 80);
+    setTimeout(() => { const c = $('#pr-chart', m); if (c) drawChart(c, { series: [{ points: pts, color: pal().b, dots: true, r: 4, width: 3 }], yDec: 1, minPad: 2 }); burst($('#modal')); }, 80);
   });
   vibrate(200);
 }

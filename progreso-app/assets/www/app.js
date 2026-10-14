@@ -562,11 +562,12 @@ function strengthLevels() {
   const bw = currentWeight();
   return STRENGTH_LIFTS.map(L => {
     const sets = DB.lifts.filter(l => L.ex.includes(l.ex));
-    if (!sets.length || !bw) return { name: L.name, level: -1, ratio: null, best: null, cuts: L.cuts };
+    const cuts = fem() ? L.cutsF : L.cuts;
+    if (!sets.length || !bw) return { name: L.name, level: -1, ratio: null, best: null, cuts };
     const top = sets.reduce((a, b) => e1rm(b.w, b.r) > e1rm(a.w, a.r) ? b : a);
     const best = e1rm(top.w, top.r), ratio = best / bw;
-    const level = L.cuts.filter(c => ratio >= c).length;
-    return { name: L.name, level, ratio, best, cuts: L.cuts, smith: top.ex.includes('Smith') };
+    const level = cuts.filter(c => ratio >= c).length;
+    return { name: L.name, level, ratio, best, cuts, smith: top.ex.includes('Smith') };
   });
 }
 
@@ -868,6 +869,7 @@ function renderHome() {
     ${challengesCard()}
     ${commitsCard()}
     ${cycleCard()}
+    ${cycleInviteCard()}
     ${stageCard()}
     ${full ? whatWorksCard() : ''}
 
@@ -899,7 +901,7 @@ function renderHome() {
   if (full) bindRecovery($('#view-home'), renderHome);
   const ach = $('#home-ach'); if (ach) ach.onclick = () => { progMode = 'logros'; showTab('progress'); };
   const vh = $('#view-home');
-  bindComeback(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
+  bindComeback(vh, renderHome); bindCycleInvite(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
   bindGlance(vh);
   foldify(vh, [['Para hoy', ['Misiones de hoy', 'Chequeo', 'Tu ciclo', 'Comida y agua', 'Reglas de oro', 'compromisos']], ['Esta semana', ['Tu semana', 'agenda', 'Retos', 'Peso']], ['Tu camino', '*']]);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
@@ -911,7 +913,7 @@ function weekCard() {
   const n = sessionsThisWeek(), target = weekTarget(), paused = DB.pauses.includes(weekKey(todayStr()));
   const days = ['L', 'M', 'M', 'J', 'V', 'S', 'D'], wk = weekKey(todayStr()), act = activeDates();
   const trained = d => act.has(addDays(wk, d));
-  const msg = paused ? 'Semana en pausa: descansa tranquilo, tu racha se conserva.' : n >= target ? '¡Meta de la semana cumplida! Lo demás es extra.' : n === 0 ? 'Cualquier día es bueno para empezar. Descansar también es parte del plan.' : `Llevas ${n} de ${target}. Vas bien.`;
+  const msg = paused ? 'Semana en pausa: descansa ' + g('tranquilo', 'tranquila') + ', tu racha se conserva.' : n >= target ? '¡Meta de la semana cumplida! Lo demás es extra.' : n === 0 ? 'Cualquier día es bueno para empezar. Descansar también es parte del plan.' : `Llevas ${n} de ${target}. Vas bien.`;
   return `<div class="card">
     <div class="row spread"><h2 style="margin:0">Tu semana</h2><span class="pill ${n >= target ? 'good' : 'gray'}">${n}/${target}</span></div>
     <div class="week-dots">${days.map((d, i) => `<span class="${trained(i) ? 'on' : ''} ${addDays(wk, i) === todayStr() ? 'today' : ''}">${d}</span>`).join('')}</div>
@@ -1062,10 +1064,10 @@ const BODY_BACK = {
 function heatColor(g, groups) {
   const n = groups[g] || 0, ratio = n / WEEKLY_TARGET[g];
   if (!n) return 'var(--line)';
-  if (ratio > OVERREACH) return '#ff5f0a';
-  if (ratio >= 0.85) return '#1ee3e0';
-  if (ratio >= 0.5) return '#0e9fae';
-  return '#4f6b7a';
+  if (ratio > OVERREACH) return 'var(--orange)';
+  if (ratio >= 0.85) return 'var(--cyan)';
+  if (ratio >= 0.5) return 'var(--blue)';
+  return 'var(--low)';
 }
 function bodySvg(parts, groups, label) {
   const silhouette = '<circle cx="50" cy="14" r="10"/><path d="M38 28H62L80 40L84 90H76L72 52L66 58L66 104L62 190H52L50 110L48 190H38L34 104L34 58L28 52L24 90H16L20 40Z"/>';
@@ -1080,8 +1082,8 @@ function heatmapCard(vol) {
     <h2>Mapa muscular <small>· series efectivas, últimos 7 días</small></h2>
     <div class="body-maps">${bodySvg(BODY_FRONT, g, 'Frente')}${bodySvg(BODY_BACK, g, 'Espalda')}</div>
     <div class="legend" style="justify-content:center;margin-bottom:8px">
-      <span><i style="background:#4f6b7a"></i>Poco</span><span><i style="background:#0e9fae"></i>Casi</span>
-      <span><i style="background:#1ee3e0"></i>Óptimo</span><span><i style="background:#ff5f0a"></i>Exceso</span></div>
+      <span><i style="background:var(--low)"></i>Poco</span><span><i style="background:var(--blue)"></i>Casi</span>
+      <span><i style="background:var(--cyan)"></i>Óptimo</span><span><i style="background:var(--orange)"></i>Exceso</span></div>
     ${Object.keys(WEEKLY_TARGET).map(k => {
       const n = g[k] || 0, t = WEEKLY_TARGET[k];
       return `<div class="vol-row"><span>${GROUPS[k]}</span><div class="bar"><div style="width:${Math.min(100, n / (t * OVERREACH) * 100)}%;background:${heatColor(k, g)}"></div></div><span style="text-align:right">${n}/${t}</span></div>`;
@@ -1282,10 +1284,10 @@ function beatLast(name, done, sid) {
 /** Confeti con los colores del logo al completar un ejercicio. */
 function burst(el) {
   if (!el || !gamify() || reduceMotion()) return;
-  const colors = ['#1ee3e0', '#8af5f0', '#ff5f0a', '#ff8a3d', '#0e9fae'];
+  const P = pal(), colors = [P.a, P.a2, P.b, P.b2, P.c], hearts = girly();
   for (let k = 0; k < 22; k++) {
     const c = document.createElement('span');
-    c.className = 'confetti';
+    c.className = 'confetti' + (hearts && k % 3 === 0 ? ' heart' : '');
     const ang = Math.random() * Math.PI * 2, dist = 60 + Math.random() * 110;
     c.style.cssText = `background:${colors[k % colors.length]};--dx:${Math.cos(ang) * dist}px;--dy:${Math.sin(ang) * dist - 30}px;--rot:${Math.random() * 720 - 360}deg;animation-delay:${Math.random() * .12}s`;
     el.appendChild(c);
@@ -1504,7 +1506,7 @@ const A11Y_LABELS = { '−': 'Menos', '+': 'Más', '✕': 'Quitar', '↑': 'Subi
 function labelButtons(root) {
   $$('button:not([aria-label])', root || document).forEach(b => { const t = b.textContent.trim(); if (A11Y_LABELS[t]) b.setAttribute('aria-label', A11Y_LABELS[t]); });
 }
-new MutationObserver(muts => { for (const m of muts) m.addedNodes.forEach(n => { if (n.nodeType === 1) labelButtons(n); }); }).observe(document.body, { childList: true, subtree: true });
+new MutationObserver(muts => { for (const m of muts) m.addedNodes.forEach(n => { if (n.nodeType === 1) labelButtons(n); if (n.nodeType === 1 || n.nodeType === 3) femify(n); }); }).observe(document.body, { childList: true, subtree: true });
 /** Si el sistema pide reducir movimiento, no hay confeti. */
 const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -2428,7 +2430,7 @@ function strengthLevelCard() {
         <div class="row spread small muted" style="font-size:11px"><span>Princ.</span><span>${l.cuts[0]}×</span><span>${l.cuts[1]}×</span><span>${l.cuts[2]}× Élite</span></div>
       </div>`;
     }).join('')}
-    <p class="small muted" style="margin:6px 0 0">Estándares generales aproximados para hombres. En Smith la barra guiada infla un poco la marca.</p>
+    <p class="small muted" style="margin:6px 0 0">Estándares generales aproximados para ${g('hombres', 'mujeres')}. En Smith la barra guiada infla un poco la marca.</p>
   </div>`;
 }
 
@@ -2731,7 +2733,12 @@ function renderMore() {
 
     <div class="card">
       <h2>Apariencia</h2>
-      <div class="seg" style="margin:0"><button data-theme="light" class="${p.theme !== 'dark' ? 'on' : ''}">☀️ Claro</button><button data-theme="dark" class="${p.theme === 'dark' ? 'on' : ''}">🌙 Oscuro</button></div>
+      <button class="ella-toggle ${girly() && fem() ? 'on' : ''}" id="ella-toggle"><span class="et-ico">🎀</span><span class="grow"><b>Modo Ella</b><small>${girly() && fem() ? 'Activado: rosa y blanco, textos en femenino y referencias para mujer' : 'Rosa y blanco, textos en femenino, rutina de glúteo y referencias para mujer'}</small></span><span class="et-sw" aria-hidden="true"><i></i></span></button>
+      <div class="rir-label" style="margin-top:12px"><span>Colores</span></div>
+      <div class="seg"><button data-look="rosa" class="${girly() ? 'on' : ''}">🌸 Rosa</button><button data-look="logo" class="${!girly() ? 'on' : ''}">⚡ Logo</button></div>
+      <div class="seg"><button data-theme="light" class="${p.theme !== 'dark' ? 'on' : ''}">☀️ Claro</button><button data-theme="dark" class="${p.theme === 'dark' ? 'on' : ''}">🌙 Oscuro</button></div>
+      <div class="rir-label"><span>Textos y referencias de fuerza para</span></div>
+      <div class="seg" style="margin:0"><button data-sex="f" class="${fem() ? 'on' : ''}">👩 Mujer</button><button data-sex="m" class="${!fem() ? 'on' : ''}">👨 Hombre</button></div>
     </div>
 
     <div class="card">
@@ -2824,10 +2831,18 @@ function renderMore() {
   });
   bindCycleSettings($('#view-more'), renderMore);
   $$('#view-more [data-stage]').forEach(b => b.onclick = () => { const n = Number(b.dataset.stage); if (n !== stage()) addEvent(todayStr(), 'stage', 'Cambiaste a la etapa ' + n + ': ' + STAGES[n].name, STAGES[n].ico); DB.profile.stage = n; saveRe(); });
-  $('#st-pause').onchange = e => { const k = weekKey(todayStr()); DB.pauses = DB.pauses.filter(x => x !== k).concat(e.target.checked ? [k] : []); saveData(); toast(e.target.checked ? 'Semana en pausa. Descansa tranquilo.' : 'Pausa quitada'); };
+  $('#st-pause').onchange = e => { const k = weekKey(todayStr()); DB.pauses = DB.pauses.filter(x => x !== k).concat(e.target.checked ? [k] : []); saveData(); toast(e.target.checked ? 'Semana en pausa. Descansa ' + g('tranquilo.', 'tranquila.') : 'Pausa quitada'); };
   $('#st-gamify').onchange = e => { DB.profile.gamify = e.target.checked; saveData(); };
   $('#st-rest').onchange = e => { DB.profile.restAlerts = e.target.checked; saveData(); if (e.target.checked) requestNotifications(); };
   $$('#view-more [data-theme]').forEach(b => b.onclick = () => { DB.profile.theme = b.dataset.theme; saveData(); applyTheme(); renderMore(); });
+  $$('#view-more [data-look]').forEach(b => b.onclick = () => { DB.profile.look = b.dataset.look; saveData(); applyTheme(); keepScroll(renderMore); });
+  $$('#view-more [data-sex]').forEach(b => b.onclick = () => { DB.profile.sex = b.dataset.sex; saveData(); keepScroll(renderMore); });
+  $('#ella-toggle').onclick = () => {
+    const on = !(girly() && fem()); setElla(on);
+    if (on && DB.profile.routine === 'pro' && !DB.sessions.some(s => s.end)) DB.profile.routine = 'gluteo';
+    saveData(); keepScroll(renderMore); toast(on ? '🎀 Modo Ella activado' : 'Modo clásico');
+    if (on) burst($('#ella-toggle'));
+  };
   $('#pr-auto').onchange = e => { $('#pr-manual').style.display = e.target.checked ? 'none' : ''; };
   $('#pr-save').onclick = () => {
     const g = id => num($(id).value);
@@ -2907,6 +2922,8 @@ function requestNotifications() { try { if (bridge && bridge.requestNotification
 function applyTheme() {
   const dark = DB.profile.theme === 'dark';
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  document.documentElement.dataset.look = girly() ? 'rosa' : 'logo';
+  $$('img.hdr-logo, img.ob-logo').forEach(i => { i.src = girly() ? 'img/logo-rosa.png' : 'img/logo.png'; });
   const bg = getVar('--bg');
   $('meta[name=theme-color]').setAttribute('content', bg);
   try { if (bridge && bridge.setBars) bridge.setBars(bg, !dark); } catch (e) {}
@@ -2922,7 +2939,8 @@ function openOnboarding() {
   const progress = () => `<div class="ob-step">Paso ${step + 1} de ${total}</div><div class="ob-progress">${Array.from({ length: total }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   const choice = (key, val, ico, title, sub) => `<button class="choice ${draft[key] === val ? 'on' : ''}" data-ch="${key}|${val}"><span class="c-ico">${ico}</span><span><b>${title}</b><small>${sub}</small></span></button>`;
   const steps = [
-    () => `<img class="ob-logo" src="img/logo.png" alt=""><h3>¡Hola! 👋 Configuremos tu app</h3><p class="small muted" style="margin-top:0">Gratis, sin anuncios, sin cuenta y sin internet. Con esto calculo tus metas; lo puedes cambiar luego en Más.</p>
+    () => `<img class="ob-logo" src="img/${girly() ? 'logo-rosa' : 'logo'}.png" alt=""><h3>¡Hola! 👋 Configuremos tu app</h3><p class="small muted" style="margin-top:0">Gratis, sin anuncios, sin cuenta y sin internet. Con esto calculo tus metas; lo puedes cambiar luego en Más.</p>
+      <div class="ob-look" role="group" aria-label="Estilo de la app"><button data-oblook="f" class="${p.look === 'rosa' ? 'on' : ''}"><span>🎀</span><b>Modo Ella</b><small>Rosa y blanco, en femenino</small></button><button data-oblook="m" class="${p.look !== 'rosa' ? 'on' : ''}"><span>⚡</span><b>Clásico</b><small>Colores del logo</small></button></div>
       <label>¿Cómo te llamas?<input id="ob-name" value="${esc(draft.name)}" placeholder="Tu nombre"></label>
       <div class="grid2">
         <label>Peso actual (kg)<input id="ob-w" inputmode="decimal" value="${draft.startWeight}"></label>
@@ -2957,6 +2975,7 @@ function openOnboarding() {
       ${choice('routine', 'inicio', '🌱', ROUTINES.inicio.name, '3 días de 20 min con tu peso: ideal para empezar')}
       ${choice('routine', 'pro', '🏆', ROUTINES.pro.name, '1 grupo muscular por día, 5 días + 2 de descanso')}
       ${choice('routine', 'tp4', '🔁', ROUTINES.tp4.name, 'Básicos pesados, ideal para definir')}
+      ${choice('routine', 'gluteo', '🍑', ROUTINES.gluteo.name, '2 días de glúteo y pierna + 2 de torso y abdomen')}
       <div class="rir-label" style="margin-top:10px"><span>¿Qué tanto quieres ver?</span></div>
       ${choice('mode', 'simple', '📒', 'Libreta simple', 'Solo rutina, series, peso y progreso')}
       ${choice('mode', 'completo', '🧩', 'App completa', 'Además nutrición, recuperación, mapa muscular y logros')}`
@@ -2966,6 +2985,13 @@ function openOnboarding() {
     $$('[data-ch]', m).forEach(b => b.onclick = () => { const [k, v] = b.dataset.ch.split('|'); draft[k] = v; if (k === 'stage') draft.routine = v === '1' ? 'inicio' : draft.routine === 'inicio' ? 'pro' : draft.routine; draw(m); });
     $$('[data-multi]', m).forEach(b => b.onclick = () => { const [k, v] = b.dataset.multi.split('|'); draft[k] = draft[k].includes(v) ? draft[k].filter(x => x !== v) : draft[k].concat(v); draw(m); });
     $$('[data-lim]', m).forEach(b => b.onclick = () => { const k = b.dataset.lim; draft.limits = draft.limits.includes(k) ? draft.limits.filter(x => x !== k) : draft.limits.concat(k); draw(m); });
+    $$('[data-oblook]', m).forEach(b => b.onclick = () => {
+      draft.name = $('#ob-name', m).value.trim();
+      ['w', 'g', 'h', 'a'].forEach(k => { const v = num($('#ob-' + k, m).value); if (v) draft[{ w: 'startWeight', g: 'goalWeight', h: 'height', a: 'age' }[k]] = v; });
+      if (b.dataset.oblook === 'f') { setElla(true); if (draft.startWeight === 88 && draft.height === 180) Object.assign(draft, { startWeight: 65, goalWeight: 60, height: 163 }); draft.routine = draft.routine === 'pro' ? 'gluteo' : draft.routine; }
+      else setElla(false);
+      draw(m);
+    });
     const back = $('#ob-back', m); if (back) back.onclick = () => { step--; draw(m); };
     $('#ob-next', m).onclick = () => {
       if (step === 0) {
@@ -3039,7 +3065,7 @@ $('#fab').onclick = openQuickSheet;
 showTab(DB.active && activeSession() ? 'train' : 'home');
 restoreRest();
 restoreRun();   // 12.0: recupera una carrera en curso si la app se cerró
-labelButtons();
+labelButtons(); femify();
 if (RUN.st) showTab('train');
 if (!DB.profile.onboarded) openOnboarding();
 // 12.0: quien activó el ciclo antes de existir el consentimiento lo confirma una vez (si no acepta, se desactiva).

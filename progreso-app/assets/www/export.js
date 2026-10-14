@@ -22,7 +22,7 @@ const r1 = v => v == null || !isFinite(v) ? '' : Math.round(v * 10) / 10;
 function aiPrompt(R) {
   const p = DB.profile;
   return `Eres un entrenador y nutriólogo experto. Analiza mis datos de entrenamiento y nutrición del ${R.from} al ${R.to}. ` +
-    `Perfil: hombre de ${p.age} años, ${p.height} cm, objetivo "${phaseName(p.phase)}" de ${p.startWeight} kg a ${p.goalWeight} kg, somatotipo ${SOMATOTYPES[p.somatotype].name}. ` +
+    `Perfil: ${fem() ? 'mujer' : 'hombre'} de ${p.age} años, ${p.height} cm, objetivo "${phaseName(p.phase)}" de ${p.startWeight} kg a ${p.goalWeight} kg, somatotipo ${SOMATOTYPES[p.somatotype].name}. ` +
     'Dime: 1) si el ritmo de cambio de peso (media de 7 días) es adecuado, 2) si las calorías y la proteína reales coinciden con el objetivo, ' +
     '3) qué ejercicios progresan o están estancados (1RM estimado y RIR), 4) el volumen semanal por grupo muscular y si hay riesgo de sobreentrenamiento, ' +
     '5) qué ajustar la próxima semana (calorías, volumen, ejercicios) con números concretos.';
