@@ -99,7 +99,7 @@ function loadData() {
         profile: Object.assign(defaultProfile(), d.profile || {}),
         days: d.days || {},
         measures: d.measures || [],
-        lifts: d.lifts || [],
+        lifts: compactLifts(d.lifts || []),
         sessions: d.sessions || [],
         active: d.active || null,
         pwo: d.pwo || null,
@@ -116,9 +116,31 @@ function loadData() {
   } catch (e) { console.error(e); }
   return def;
 }
-function saveData() {
-  try { localStorage.setItem(KEY, JSON.stringify(DB)); }
-  catch (e) { toast('No se pudo guardar: ' + e.message); }
+/**
+ * 12.0: los guardados de una misma acción se agrupan en una sola escritura (antes eran 6–7 de
+ * ~2 MB cada una). Se escribe al terminar el ciclo de eventos y siempre al minimizar o cerrar.
+ */
+let saveTimer = null;
+function saveData() { if (!saveTimer) saveTimer = setTimeout(flushSave, 0); }
+const STORAGE_MAX = 5e6;   // límite aproximado de localStorage en Chromium (caracteres)
+function flushSave() {
+  if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+  try {
+    const json = JSON.stringify(DB);
+    localStorage.setItem(KEY, json);
+    if (json.length / STORAGE_MAX >= 0.75 && !DB.profile.storageWarned) {
+      DB.profile.storageWarned = true;
+      setTimeout(() => toast('Tu espacio de datos va al ' + Math.round(json.length / STORAGE_MAX * 100) + ' %. Haz una copia de seguridad en Más.'), 600);
+    }
+  } catch (e) { toast('No se pudo guardar: ' + e.message + '. Haz una copia de seguridad en Más.'); }
+}
+function storageUsage() { try { return (localStorage.getItem(KEY) || '').length / STORAGE_MAX; } catch (e) { return 0; } }
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushSave(); });
+window.addEventListener('pagehide', flushSave);
+/** Compacta las series: sin campos por defecto y pesos con 3 decimales (los lectores asumen "normal"). */
+function compactLifts(lifts) {
+  lifts.forEach(l => { if (l.tech === 'normal' || !l.tech) delete l.tech; if (typeof l.w === 'number') l.w = Math.round(l.w * 1000) / 1000; });
+  return lifts;
 }
 function day(date) { return DB.days[date] || (DB.days[date] = {}); }
 
@@ -1549,7 +1571,8 @@ function repeatFromTimer() {
   const last = DB.lifts.filter(l => l.sid === s.id && l.ex === r.ex).sort((a, b) => b.t - a.t)[0];
   if (!last) { stopRest(); return; }
   const exs = sessionExercises(s), e = exs[r.i] && exs[r.i][0] === r.ex ? exs[r.i] : exs.find(x => x[0] === r.ex) || [r.ex, 3, '', 90];
-  const set = Object.assign({}, last, { id: uid(), t: Date.now(), tech: 'normal' });
+  const set = Object.assign({}, last, { id: uid(), t: Date.now() });
+  delete set.tech;
   DB.lifts.push(set);
   const prs = checkSetRecords(set);
   saveData(); vibrate(prs.length ? 150 : 40);
@@ -1583,7 +1606,8 @@ function logSet(s, i) {
   const count = Math.max(1, Math.min(10, SESS_UI.n[i] || 1));
   let prs = [];
   for (let k = 0; k < count; k++) {
-    const set = { id: uid(), ex, w: toKg(w, u), r: Math.round(r), rir, date: s.date, t: Date.now() + k, sid: s.id, tech: techSel ? techSel.value : 'normal' };
+    const set = { id: uid(), ex, w: toKg(w, u), r: Math.round(r), rir, date: s.date, t: Date.now() + k, sid: s.id };
+    if (techSel && techSel.value !== 'normal') set.tech = techSel.value;
     DB.lifts.push(set);
     prs = prs.concat(checkSetRecords(set));
   }
@@ -2740,6 +2764,8 @@ function renderMore() {
       <h2>Copia de seguridad</h2>
       <p class="small muted" style="margin-top:0">Los datos se guardan solo en este teléfono. Exporta una copia de vez en cuando.</p>
       <div class="grid2"><button class="secondary" id="bk-export">Exportar</button><button class="secondary" id="bk-import">Importar</button></div>
+      <div class="small muted" style="margin-top:10px">Espacio de datos usado: <b>${Math.round(storageUsage() * 100)} %</b></div>
+      <div class="bar" role="progressbar" aria-label="Espacio de datos usado" aria-valuenow="${Math.round(storageUsage() * 100)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${Math.min(100, storageUsage() * 100)}%"></div></div>
       <label class="check" style="margin-top:10px"><input type="checkbox" id="bk-photos" checked> Incluir fotos en la copia</label>
       <input type="file" id="bk-file" accept=".json,application/json" style="display:none">
     </div>
