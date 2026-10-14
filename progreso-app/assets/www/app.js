@@ -818,6 +818,12 @@ function renderHome() {
     hero = `<div class="hero"><div class="eyebrow">Entreno</div><h3>Entreno libre</h3><p>Elige ejercicios sobre la marcha.</p><button id="home-free">Empezar</button></div>`;
   }
 
+  // 12.0: si entrenas running y hoy toca sesión del plan, el inicio te lleva directo a ella.
+  if (!act && !RUN.st && DB.profile.trainMode === 'running') {
+    const rs = nextRunSession(), rec = rs ? null : runRecommendation();
+    if (rs && rs.date === t) hero = `<div class="hero"><div class="eyebrow">Hoy toca correr · ${RUN_PLANS[DB.runPlan.type].name}</div><h3>${SESSION_INFO[rs.type].ico} ${esc(rs.label)}</h3><p>${esc(runMission(rs).goal)}</p><button id="home-runplan">Ver sesión y empezar</button></div>`;
+    else if (!rs) hero = `<div class="hero"><div class="eyebrow">Running</div><h3>${esc(rec.title)}</h3><p>${esc(rec.text)}</p><button id="home-runplan">Ir a correr</button></div>`;
+  }
   if (!act && stage() === 1) hero = starterHero();
   const full = !isSimple();
   $('#view-home').innerHTML = `
@@ -882,6 +888,7 @@ function renderHome() {
   const tr = $('#home-train');
   if (tr) tr.onclick = () => { if (!act) startSession(p.routine, nd.id); showTab('train'); };
   const hr = $('#home-run'); if (hr) hr.onclick = () => showTab('train');
+  const hp = $('#home-runplan'); if (hp) hp.onclick = () => showTab('train');
   const fr = $('#home-free');
   if (fr) fr.onclick = () => { startSession('libre'); showTab('train'); };
   $$('#view-home [data-q]').forEach(b => b.onclick = () => quickAction(b.dataset.q));
@@ -1274,7 +1281,7 @@ function beatLast(name, done, sid) {
 }
 /** Confeti con los colores del logo al completar un ejercicio. */
 function burst(el) {
-  if (!el || !gamify()) return;
+  if (!el || !gamify() || reduceMotion()) return;
   const colors = ['#1ee3e0', '#8af5f0', '#ff5f0a', '#ff8a3d', '#0e9fae'];
   for (let k = 0; k < 22; k++) {
     const c = document.createElement('span');
@@ -1491,6 +1498,15 @@ function bindGlance(root) {
     else { const f = $('#view-home [data-fold^="f-mi-agenda"]') || $('#view-home [data-fold^="f-tu-semana"]'); if (f) { f.open = true; f.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
   });
 }
+
+/* 12.0 · Accesibilidad: los botones de solo símbolo reciben una etiqueta para lectores de pantalla. */
+const A11Y_LABELS = { '−': 'Menos', '+': 'Más', '✕': 'Quitar', '↑': 'Subir', '↓': 'Bajar', '▶': 'Empezar', '⇄': 'Cambiar', '‹': 'Anterior', '›': 'Siguiente', 'i': 'Información', '?': 'Ayuda', '←': 'Volver', '✏️': 'Editar', '−15': 'Restar 15 segundos', '+15': 'Sumar 15 segundos' };
+function labelButtons(root) {
+  $$('button:not([aria-label])', root || document).forEach(b => { const t = b.textContent.trim(); if (A11Y_LABELS[t]) b.setAttribute('aria-label', A11Y_LABELS[t]); });
+}
+new MutationObserver(muts => { for (const m of muts) m.addedNodes.forEach(n => { if (n.nodeType === 1) labelButtons(n); }); }).observe(document.body, { childList: true, subtree: true });
+/** Si el sistema pide reducir movimiento, no hay confeti. */
+const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function keepScroll(fn) { const y = window.scrollY; fn(); window.scrollTo(0, y); }
 
@@ -3023,6 +3039,7 @@ $('#fab').onclick = openQuickSheet;
 showTab(DB.active && activeSession() ? 'train' : 'home');
 restoreRest();
 restoreRun();   // 12.0: recupera una carrera en curso si la app se cerró
+labelButtons();
 if (RUN.st) showTab('train');
 if (!DB.profile.onboarded) openOnboarding();
 // 12.0: quien activó el ciclo antes de existir el consentimiento lo confirma una vez (si no acepta, se desactiva).
