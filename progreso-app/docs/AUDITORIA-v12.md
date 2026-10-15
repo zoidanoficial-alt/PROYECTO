@@ -454,3 +454,66 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - Al salir de la app se recalcula la agenda, y al tocar un aviso se abre la pestaña correcta, también si la app estaba cerrada.
 - Al apagar el interruptor general, la agenda queda vacía.
 - Sin errores de consola.
+
+---
+
+## 17.0.1 · Fácil de usar (respuesta al primer feedback de usuarios)
+
+**Feedback recibido:** "no se siente fácil de usar", "es un laberinto", "no motiva".
+
+**Diagnóstico (medido con una usuaria nueva, 393 px):**
+- **Inicio:** 16 bloques y 1,779 px de alto. El chequeo aparecía 3 veces y había dos cosas llamadas "Retos".
+- **Entreno:** para cambiar de rutina había que abrir un desplegable con nombres poco claros ("Pro Split · Get The Pump"). Para armar la propia había que elegir "Mi semana (personalizada)" en ese desplegable.
+- **Selector de ejercicios:** un ejercicio a la vez, filtro en menú desplegable.
+
+**Cambios:**
+1. **Modo Ella desde Inicio.**
+   - Botón 🎀 en la cabecera de Inicio: un toque activa o desactiva.
+   - Al apagarlo vuelve el tema (claro u oscuro) que tenías antes.
+2. **Inicio enfocado.**
+   - Arriba, lo que toca hoy, con los puntos de tu semana y un mensaje de ánimo dentro de la tarjeta principal ("¡Te falta 1 para cumplir tu semana! 🔥").
+   - Debajo, solo "Para hoy": comida y agua, misiones y, si aplica, tu ciclo.
+   - Todo lo demás va en una sola sección plegada, "Más para ti".
+   - Se quitó la tarjeta de chequeo duplicada y "Retos de la semana" pasó a llamarse "Metas de la semana".
+   - Alto de 1,779 a 1,046 px.
+3. **Rutinas fáciles.**
+   - **Tarjeta "Tu rutina" siempre visible en Entreno:** tus días como fichas. Tocas un día y ves sus ejercicios, empiezas o editas.
+   - **🔄 Cambiar rutina:** galería con nivel, días y vista previa de cada rutina, con "Usar" o "Usar y personalizar".
+   - **✨ Crear mi rutina en 3 pasos:**
+     - Días → enfoque de cada día (con un reparto sugerido según cuántos días eliges; en Modo Ella prioriza glúteo) → lista.
+     - La app elige ejercicios que puedes hacer con tu equipo y sin cargar tus molestias.
+     - Prioriza los que tienen foto y evita los de nivel avanzado.
+   - **✏️ Personalizar** convierte cualquier rutina de la app en "Mi rutina" editable, asignada a tus días.
+   - **Editor de la semana en una sola hoja:** cambiar el entreno de cada día, crear uno nuevo desde ahí y editar sus ejercicios.
+   - **Series con botones −/+.**
+4. **Ejercicios del Excel** (`ejercicios_pecho_peso_libre.xlsx`, 24 ejercicios PEC-001…PEC-024, en `pecho.js`).
+   - Los 7 que ya existían conservan su nombre, para no romper el historial, y reciben la ficha del archivo. Son: press banca con barra, inclinado con barra, banca con mancuernas, inclinado con mancuernas, press de piso con mancuernas, aperturas y fondos con lastre.
+   - Los 17 nuevos se suman al catálogo.
+   - 15 tienen foto de inicio y final (Free Exercise DB, dominio público, recortadas a 420×280). Los otros usan pictograma: landmine, aperturas en el suelo y pullover transversal.
+   - **Ficha de cada ejercicio:** zona del pecho, banco o ángulo, nivel, series × repeticiones · descanso, descripción y 💡 consejo clave. Los de nivel avanzado llevan aviso de spotter.
+   - Al añadir un ejercicio se usan las series, repeticiones y descanso del archivo.
+5. **Selector de ejercicios nuevo.**
+   - Fichas de músculo (incluida "🆕 Pecho peso libre") y "Mi equipo" de un toque.
+   - Búsqueda también en inglés.
+   - Selección múltiple ("Añadir 2 ejercicios") y botón ⓘ para ver la técnica sin perder lo elegido.
+6. **Guía de 4 pasos** la primera vez (también a quien ya usaba la app): Inicio, tu rutina, registrar y deshacer, y Modo Ella.
+7. **Entreno:** lo secundario (series de la semana, mapa muscular, balance, técnicas) va en una sección plegada, "Tu semana y más".
+
+**Verificación (`v25.mjs`):**
+- La guía aparece y se marca como vista.
+- **Inicio:**
+  - 2 secciones visibles más "Más para ti" plegada con 8 dentro, 0 chequeos duplicados y 3 puntos de semana.
+  - 🎀 activa rosa y femenino (con rutina de glúteo si no hay entrenos), se oculta fuera de Inicio y al desactivar vuelve el modo clásico.
+- **Entreno:**
+  - Tarjeta de rutina con 7 fichas y sin el desplegable viejo.
+  - Tocar un día → Empezar inicia "Día 1 · Pierna".
+- **Selector:** muestra los 24 de pecho con peso libre. "Añadir 2 ejercicios" añade Svend 3×10–15/60 s y aperturas inclinadas 3×10–15/75 s.
+- **Ficha:** el press declinado con barra muestra 4 datos, consejo clave y foto.
+- **Rutinas:**
+  - La galería → glúteo → Usar funciona.
+  - Personalizar crea 4 entrenos asignados a 4 días.
+  - En 3 pasos con L, X y V sugiere Empuje, Jalón y Pierna, y crea 5, 5 y 6 ejercicios: todos hacibles y ninguno avanzado.
+- **Editor de la semana:** lunes a descanso y martes con un entreno nuevo "Abdomen exprés" de 2 ejercicios; el botón + sube las series a 4.
+- **Pie de Más:** "Mi Progreso 17.0.1".
+- Desborde a 320, 360 y 393 px con letra al 130–140 %: 0 px (las tiras de días y de enfoques se desplazan de lado a propósito).
+- Regresión v9–v24 y persist: sin errores. A esas pruebas se les agregó un paso que cierra la guía nueva tras el registro inicial.

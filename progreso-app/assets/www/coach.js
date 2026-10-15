@@ -458,7 +458,7 @@ function challengesCard() {
   if (fresh) { saveData(); setTimeout(() => burst($('#ch-card')), 300); }
   const n = ch.list.filter(c => ch.done[c.id]).length;
   return `<div class="card" id="ch-card">
-    <div class="row spread"><h2 style="margin:0">Retos de la semana</h2><span class="pill ${n === ch.list.length ? 'good' : ''}">${n}/${ch.list.length}</span></div>
+    <div class="row spread"><h2 style="margin:0">Metas de la semana</h2><span class="pill ${n === ch.list.length ? 'good' : ''}">${n}/${ch.list.length}</span></div>
     <p class="small muted" style="margin:4px 0 8px">${n === ch.list.length ? '🔥 ¡Semana completa! Así se construye la disciplina.' : 'Hechos a tu medida con tu historial. Se renuevan cada lunes; si no salen, no pasa nada.'}</p>
     ${rows}
   </div>`;

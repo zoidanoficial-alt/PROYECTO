@@ -155,8 +155,11 @@ function techniqueSheet(name, back) {
         <button class="tq-speed" id="tq-spd">${speeds[spd].toFixed(1)}×</button>
         <button class="tq-back" id="tq-back">←</button></div>`
       : `<div class="ex-hero">${exIcon(name, 140)}<button class="tq-back" id="tq-back">←</button></div>`;
+    const meta = typeof EX_META === 'object' && EX_META[name];
+    const metaBox = meta ? `<div class="tq-meta"><span>📍 ${esc(meta.zone)}</span><span>🪑 ${esc(meta.bench)}</span><span>📶 ${esc(meta.level)}</span><span>🔁 ${esc(meta.sets)} × ${esc(meta.reps)} · ${meta.rest} s</span></div>` : '';
+    const tipBox = meta ? `<div class="status good" style="margin-top:10px"><b>💡 Consejo clave</b>${esc(meta.tip)}</div>${meta.level === 'Avanzado' ? '<div class="status warn" style="margin-top:8px"><b>Avanzado</b>Requiere técnica previa y de preferencia alguien que te asista (spotter).</div>' : ''}` : '';
     const body = tab === 'ins'
-      ? (h ? `<ol class="howto-steps">${h[0].map(t => `<li>${esc(t)}</li>`).join('')}</ol><div class="status warn" style="margin-top:10px"><b>Error común</b>${esc(h[1])}</div>` : '<p class="small muted">Sin instrucciones para este ejercicio.</p>')
+      ? metaBox + (meta && !meta.existing ? `<p class="small" style="margin-top:0">${esc(meta.desc)}</p>` + tipBox : '') + (meta && !meta.existing ? '' : h ? `<ol class="howto-steps">${h[0].map(t => `<li>${esc(t)}</li>`).join('')}</ol><div class="status warn" style="margin-top:10px"><b>Error común</b>${esc(h[1])}</div>${tipBox}` : '<p class="small muted">Sin instrucciones para este ejercicio.</p>')
       : tab === 'obj'
         ? `<p class="small" style="margin-top:0"><b>Principal:</b> ${esc(parts[0])}</p>${parts[1] ? `<p class="small"><b>También trabaja:</b> ${esc(parts[1])}</p>` : ''}
            <div class="body-maps">${bodySvg(BODY_FRONT, groupsHit, 'Frente')}${bodySvg(BODY_BACK, groupsHit, 'Espalda')}</div>

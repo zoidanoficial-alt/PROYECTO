@@ -47,8 +47,8 @@ function pal() {
 /** Activa o quita el Modo Ella (look rosa + perfil de mujer). */
 function setElla(on) {
   const p = DB.profile;
-  if (on) { p.look = 'rosa'; p.sex = 'f'; p.theme = 'light'; }
-  else { p.look = 'logo'; p.sex = 'm'; }
+  if (on) { if (p.look !== 'rosa') p.themeBeforeElla = p.theme; p.look = 'rosa'; p.sex = 'f'; p.theme = 'light'; }
+  else { p.look = 'logo'; p.sex = 'm'; if (p.themeBeforeElla) { p.theme = p.themeBeforeElla; delete p.themeBeforeElla; } }
   saveData(); applyTheme();
 }
 

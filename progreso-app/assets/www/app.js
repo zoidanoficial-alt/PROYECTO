@@ -47,6 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
+const APP_VERSION = '17.0.1';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -721,6 +722,7 @@ function showTab(tab) {
   redrawChart = () => {};
   document.body.classList.remove('in-session');
   render(tab);
+  updateEllaHeader();
   window.scrollTo(0, 0);
 }
 function render(tab) {
@@ -838,6 +840,7 @@ function renderHome() {
     else if (!rs) hero = `<div class="hero"><div class="eyebrow">Running</div><h3>${esc(rec.title)}</h3><p>${esc(rec.text)}</p><button id="home-runplan">Ir a correr</button></div>`;
   }
   if (!act && stage() === 1) hero = starterHero();
+  if (!act && !RUN.st) hero = hero.replace(/<\/div>\s*$/, weekDotsHtml() + '</div>');   // 17.0.1: motivación a la vista
   const full = !isSimple();
   $('#view-home').innerHTML = `
     ${hero}
@@ -886,7 +889,7 @@ function renderHome() {
     ${stageCard()}
     ${full ? whatWorksCard() : ''}
 
-    ${full ? readinessCard() + `
+    ${full ? `
     <div class="card">
       <div class="row spread" style="margin-bottom:4px"><h2 style="margin:0">Reglas de oro</h2><span class="pill ${habitsDone === habits.length ? 'good' : 'gray'}">${habitsDone}/${habits.length}</span></div>
       <p class="small muted" style="margin:0 0 4px">Semana ${habits.length} de ${HABITS.length}: un hábito nuevo cada semana.</p>
@@ -916,7 +919,7 @@ function renderHome() {
   const vh = $('#view-home');
   bindComeback(vh, renderHome); bindNotifPrompt(vh, renderHome); bindCycleInvite(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
   bindGlance(vh);
-  foldify(vh, [['Para hoy', ['Misiones de hoy', 'Chequeo', 'Tu ciclo', 'Comida y agua', 'Reglas de oro', 'compromisos']], ['Esta semana', ['Tu semana', 'agenda', 'Retos', 'Peso']], ['Tu camino', '*']]);
+  foldify(vh, [['Para hoy', ['Misiones de hoy', 'Comida y agua', 'Tu ciclo']], ['Más para ti', '*', true]]);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
   showChart(() => drawSpark($('#home-spark'), movingAvg(entries).map(e => e.y)));
 }
@@ -1213,6 +1216,7 @@ function renderTrain() {
   $('#view-train').innerHTML = `
     ${modeSeg}
     ${coachPlanCard()}
+    ${routineCard()}
     <div class="tool-row">
       <button id="tr-free"><span>⚡</span>Libre</button>
       <button id="tr-act"><span>🏃</span>Actividad</button>
@@ -1220,25 +1224,6 @@ function renderTrain() {
       <button id="tr-lib"><span>📚</span>Ejercicios</button>
     </div>
     ${isSimple() ? '' : readinessCard()}
-    <div class="card" data-fold-title="Tu rutina" data-fold-sum="${esc(p.routine === 'custom' ? 'Mi semana (personalizada)' : r.name)}" data-fold-ico="📋">
-      <label style="margin-bottom:6px">Rutina
-        <select id="rt-sel">
-          ${Object.keys(ROUTINES).map(k => `<option value="${k}" ${p.routine === k ? 'selected' : ''}>${esc(ROUTINES[k].name)}</option>`).join('')}
-          <option value="custom" ${p.routine === 'custom' ? 'selected' : ''}>⭐ Mi semana (personalizada)</option>
-        </select>
-      </label>
-      <p class="small muted" style="margin:0">${esc(r.desc || '')}</p>
-    </div>
-    ${p.routine === 'custom' ? weekPlanCard() : `<div class="card" data-fold-title="Días de la rutina" data-fold-sum="${nd ? 'Hoy: ' + esc(nd.name.split('·').pop().trim()) : ''}" data-fold-ico="🗓️">
-      <h2>Días</h2>
-      ${r.days.length ? r.days.map(d => `
-        <details ${nd && d.id === nd.id ? 'open' : ''}>
-          <summary><span>${esc(d.name)} ${nd && d.id === nd.id ? '<span class="pill">HOY</span>' : ''}</span></summary>
-          ${d.rest ? '<p class="small muted">Descanso: camina, estira y come bien. El músculo crece cuando descansas.</p>' : `
-          <div class="ex-mini-list">${d.ex.map(e => `<div class="ex-mini" data-howto="${esc(e[0])}">${exIcon(e[0], 52)}<span>${esc(e[0])}<br><small>${e[1]} × ${esc(e[2])}${exInfo(e[0]).pf ? ' · PF' : ''}</small></span></div>`).join('')}</div>
-          <button class="block" data-start="${d.id}" style="margin:8px 0 12px">Empezar ${esc(d.name.split('·').pop().trim())}</button>`}
-        </details>`).join('') : '<div class="empty">Esta rutina no tiene días.</div>'}
-    </div>`}
 
     ${weeklySetsCard()}
     ${isSimple() ? '' : heatmapCard(vol)}
@@ -1274,10 +1259,9 @@ function renderTrain() {
   $('#tr-free').onclick = () => { startSession('libre'); renderTrain(); window.scrollTo(0, 0); };
   $$('#view-train [data-howto]').forEach(b => b.onclick = () => openHowTo(b.dataset.howto));
   $('#tr-lib').onclick = () => openExercisePicker(null);
-  $('#rt-sel').onchange = e => { DB.profile.routine = e.target.value; saveData(); renderTrain(); };
-  if (p.routine === 'custom') bindWeekPlan();
+  bindRoutineCard($('#view-train'));
   bindRetos($('#view-train'));
-  foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Tu rutina', 'Días', 'Mi semana', 'Mis entrenos', 'Retos']], ['Tu semana', ['Objetivo de series', 'Mapa', 'Balance', 'actividades', 'sesiones']], ['Aprende', '*']]);
+  foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Retos']], ['Tu semana y más', '*', true]]);
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });
   $$('#view-train [data-sess]').forEach(tr => tr.onclick = () => openSessionDetail(tr.dataset.sess));
   bindRecovery($('#view-train'), renderTrain);
@@ -1436,13 +1420,14 @@ function renderSession(s) {
   $$('#view-train [data-video]').forEach(b => b.onclick = () => openVideo(exs[Number(b.dataset.video)][0]));
   $$('#view-train [data-more]').forEach(b => b.onclick = () => { const i = Number(b.dataset.more); SESS_UI.more[i] = !SESS_UI.more[i]; keepScroll(() => renderSession(s)); });
   $$('#view-train [data-info]').forEach(b => b.onclick = () => explainRir());
-  $('#ss-add').onclick = () => openExercisePicker(name => {
+  $('#ss-add').onclick = () => openExercisePicker2({ multi: true, title: 'Añadir al entreno', onDone: names => {
     s.extra = s.extra || [];
-    s.extra.push([name, 3, exInfo(name).t === 'c' ? '8–12' : '10–15', exInfo(name).t === 'c' ? 120 : 75]);
-    SESS_UI.open = sessionExercises(s).length - 1;
+    names.forEach(name => s.extra.push(exDefaults(name)));
+    SESS_UI.open = sessionExercises(s).length - names.length;
     saveData(); closeModal(); renderSession(s);
-    setTimeout(() => { const cards = $$('#view-train .ex-card'); if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
-  });
+    setTimeout(() => { const cards = $$('#view-train .ex-card'); if (cards.length) cards[cards.length - names.length].scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
+    toast('✓ ' + names.length + ' ejercicio' + (names.length > 1 ? 's añadidos' : ' añadido'));
+  } });
   $('#ss-save').onclick = () => saveSessionAsWorkout(s);
   $$('#view-train [data-env]').forEach(b => b.onclick = () => { setSessionEnv(s, b.dataset.env); s.missions = {}; keepScroll(() => renderSession(s)); toast(ENVS[b.dataset.env][0] + ' Rutina adaptada a ' + ENVS[b.dataset.env][1].toLowerCase()); });
   $$('#view-train [data-pain]').forEach(b => b.onclick = () => { const i = Number(b.dataset.pain); openPain(s, i, exs[i][0], () => keepScroll(() => renderSession(s))); });
@@ -1514,9 +1499,17 @@ function foldify(root, groups) {
   });
   if (groups) {
     const placed = new Set();
-    groups.forEach(([name, keys]) => {
+    groups.forEach(([name, keys, collapse]) => {
       const mine = made.filter(m => !placed.has(m) && (keys === '*' || keys.some(k => m.title.includes(k))));
       if (!mine.length) return;
+      if (collapse) {   // 17.0.1: lo secundario va junto en una sola sección plegada
+        const g = document.createElement('details'), id = 'grp-' + name.toLowerCase().replace(/[^a-z]+/g, '-');
+        g.className = 'more-group fold'; g.dataset.fold = id; g.open = open[id] === true;
+        g.innerHTML = `<summary><span class="f-txt"><b>${esc(name)}</b><small>${mine.map(m => m.title).slice(0, 4).join(' · ')}${mine.length > 4 ? '…' : ''}</small></span><span class="f-badge">${mine.length}</span></summary>`;
+        mine.forEach(m => { placed.add(m); g.appendChild(m.d); });
+        root.appendChild(g);
+        return;
+      }
       const t = document.createElement('div'); t.className = 'section-title'; t.textContent = name;
       root.appendChild(t);
       mine.forEach(m => { placed.add(m); root.appendChild(m.d); });
@@ -2010,7 +2003,7 @@ function openWorkoutEditor(id, draft) {
             <button class="icon-btn" data-womove="${k}|1" ${k < d.ex.length - 1 ? '' : 'disabled'} aria-label="Bajar">↓</button>
             <button class="icon-btn" data-wodel="${k}" aria-label="Quitar">✕</button></div>
           <div class="grid3" style="margin-top:6px">
-            <label class="mini">Series<input id="wo-s-${k}" inputmode="numeric" value="${e[1]}"></label>
+            <div class="mini"><span>Series</span><span class="mini-step"><button data-wos="${k}|-1" aria-label="Menos series">−</button><b>${e[1]}</b><button data-wos="${k}|1" aria-label="Más series">+</button></span><input type="hidden" id="wo-s-${k}" value="${e[1]}"></div>
             <label class="mini">Reps<input id="wo-r-${k}" value="${esc(e[2])}"></label>
             <label class="mini">Descanso (s)<input id="wo-d-${k}" inputmode="numeric" value="${e[3] || 90}"></label>
           </div>
@@ -2025,12 +2018,12 @@ function openWorkoutEditor(id, draft) {
     $$('[data-wodel]', m).forEach(b => b.onclick = () => { sync(m); d.ex.splice(Number(b.dataset.wodel), 1); draw(m); });
     $('#wo-add', m).onclick = () => {
       sync(m);
-      openExercisePicker(name => {
-        const comp = exInfo(name).t === 'c';
-        d.ex.push([name, comp ? 4 : 3, comp ? '8–12' : '10–15', comp ? 120 : 75]);
+      openExercisePicker2({ multi: true, title: 'Añadir a "' + (d.name || 'tu entreno') + '"', onCancel: () => openWorkoutEditor(d.id, d), onDone: names => {
+        names.forEach(n => d.ex.push(exDefaults(n)));
         openWorkoutEditor(d.id, d);
-      });
+      } });
     };
+    $$('[data-wos]', m).forEach(b => b.onclick = () => { sync(m); const [k, dd] = b.dataset.wos.split('|').map(Number); d.ex[k][1] = Math.max(1, Math.min(12, d.ex[k][1] + dd)); const y = m.scrollTop; draw(m); m.scrollTop = y; });
     $('#wo-cancel', m).onclick = closeModal;
     const del = $('#wo-del', m);
     if (del) del.onclick = () => {
@@ -2862,7 +2855,7 @@ function renderMore() {
     </div>
 
     <div class="card"><h2>Zona peligrosa</h2><button class="danger block" id="reset">Borrar todos los datos</button></div>
-    <p class="small muted" id="more-foot" style="text-align:center;margin-top:20px">Mi Progreso 12.0 · gratis, sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
+    <p class="small muted" id="more-foot" style="text-align:center;margin-top:20px">Mi Progreso ${APP_VERSION} · sin anuncios y sin cuenta<br>Fotos de ejercicios: Free Exercise DB (dominio público)</p>`;
 
   $('#mo-export').onclick = openExport;
   const saveRe = () => { saveData(); renderMore(); };
@@ -3064,6 +3057,7 @@ function openOnboarding() {
           gym: draft.gym, equip: GYM_PRESETS[draft.gym].equip.slice(), limits: draft.limits, mode: draft.mode,
           stage: Number(draft.stage), minutes: Number(draft.minutes), weeklyTarget: Number(draft.days), trainDays: DEFAULT_DAYS[Number(draft.days)], enjoy: draft.enjoy, barriers: draft.barriers });
         if (draft.cycleWant) setTimeout(() => openCycleConsent(() => render(currentTab)), 400);
+        else if (!DB.profile.guideSeen) setTimeout(openGuide, 700);   // 17.0.1: guía de 3 pasos
         addEvent(todayStr(), 'stage', 'Empezaste en la etapa ' + draft.stage + ': ' + STAGES[draft.stage].name, STAGES[draft.stage].ico);
         pickerMine = true;
         if (!Object.values(DB.days).some(d => d.weight != null)) day(todayStr()).weight = draft.startWeight;
@@ -3128,6 +3122,9 @@ if (RUN.st) showTab('train');
 // 17.0: si se abrió tocando un recordatorio, ir a su pestaña; y reprogramar la agenda con los datos de hoy.
 try { const nt = bridge && bridge.takeLaunchTab ? bridge.takeLaunchTab() : ''; if (nt && !RUN.st && !DB.active) window.onNotifOpen(nt); } catch (e) {}
 setTimeout(syncReminders, 1500);
+$('#hdr-ella').onclick = toggleEllaFromHeader; updateEllaHeader();
+// 17.0.1: la guía nueva se muestra una vez (también a quien ya usaba la app)
+if (DB.profile.onboarded && !DB.profile.guideSeen && !RUN.st) setTimeout(() => { if (!$('#modal-bg').classList.contains('open')) openGuide(); }, 700);
 if (!DB.profile.onboarded) openOnboarding();
 // 12.0: quien activó el ciclo antes de existir el consentimiento lo confirma una vez (si no acepta, se desactiva).
 else if (DB.profile.cycleOn && !DB.profile.cycleConsent) setTimeout(() => openCycleConsent(() => render(currentTab)), 500);
