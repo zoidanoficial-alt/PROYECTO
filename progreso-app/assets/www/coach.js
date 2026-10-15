@@ -467,43 +467,4 @@ function challengesCard() {
 /* ------------------------------------------------------------------ *
  *  Resumen al terminar la sesión: retroalimentación útil
  * ------------------------------------------------------------------ */
-function openSessionSummary(s) {
-  const sets = DB.lifts.filter(l => l.sid === s.id), exs = Array.from(new Set(sets.map(l => l.ex)));
-  const prs = DB.achievements.filter(a => a.pr && sets.some(l => a.id.startsWith('pr-' + l.id)));
-  let up = 0, same = 0, down = 0;
-  const lines = exs.map(ex => {
-    const today = Math.max(...sets.filter(l => l.ex === ex).map(l => e1rm(l.w, l.r)));
-    const prev = lastTime(ex, s.id), u = unitFor(ex);
-    if (!prev) return `<div class="sum-row"><span>🆕</span><span class="grow">${esc(ex)}</span><small class="muted">punto de partida</small></div>`;
-    const d = (today / prev.best - 1) * 100;
-    if (d > 1) up++; else if (d < -3) down++; else same++;
-    return `<div class="sum-row"><span>${d > 1 ? '📈' : d < -3 ? '📉' : '➖'}</span><span class="grow">${esc(ex)}</span><b style="color:${d > 1 ? 'var(--good)' : d < -3 ? 'var(--warn)' : 'var(--muted)'}">${signed(d, 0)} %</b></div>`;
-  }).join('');
-  const prevSame = DB.sessions.filter(x => x.end && x.id !== s.id && x.dayName === s.dayName).sort((a, b) => b.start - a.start)[0];
-  const vol = sessionVolume(s.id), pv = prevSame ? sessionVolume(prevSame.id) : null;
-  const head = prs.length ? '🏆 ¡Sesión de récords!' : up > down ? '📈 Mejoraste respecto a la última vez' : s.adjust ? '🧠 Entrenaste inteligente' : down > up ? '💪 Día duro, pero cumpliste' : '✅ Sesión sólida';
-  const sub = prs.length ? `${prs.length} récord${prs.length === 1 ? '' : 's'} nuevo${prs.length === 1 ? '' : 's'}.`
-    : s.adjust ? 'Ajustaste por cansancio: recuperar también es progreso, y protege tus próximas sesiones.'
-      : down > up ? 'Un mal día no borra tu tendencia. Revisa sueño y comida; la próxima vuelve el plan normal.' : 'La constancia es lo que construye el físico.';
-  const next = exs.map(ex => { const e = sessionExercises(s).find(x => x[0] === ex); const c = e ? coachFor(ex, e[2]) : null; return c && c.sug && c.kind === 'subir' ? `${ex}: ${c.sug.a.w} ${c.u} × ${c.sug.a.r}` : null; }).filter(Boolean).slice(0, 3);
-  openModal(`<h3>${head}</h3>
-    <p class="small" style="margin-top:0">${sub}</p>
-    <div class="grid3" style="margin-bottom:12px">
-      <div class="stat"><div class="label">Tiempo</div><div class="value">${Math.round((s.end - s.start) / 60000)}<small> min</small></div></div>
-      <div class="stat"><div class="label">Series</div><div class="value">${sets.length}</div></div>
-      <div class="stat"><div class="label">Volumen</div><div class="value" style="font-size:17px">${Math.round(vol).toLocaleString('es-MX')}<small> kg</small></div>${pv ? `<div class="small" style="color:${vol >= pv ? 'var(--good)' : 'var(--muted)'}">${signed((vol / pv - 1) * 100, 0)} % vs anterior</div>` : ''}</div>
-    </div>
-    <div class="small muted" style="font-weight:600;margin-bottom:4px">Fuerza vs la última vez (1RM estimado)</div>
-    ${lines}
-    ${next.length ? `<div class="status good" style="margin-top:12px"><b>Para la próxima: sube carga</b>${esc(next.join(' · '))}</div>` : ''}
-    <div class="small muted" style="font-weight:600;margin:12px 0 6px">¿Qué te ayudó a entrenar hoy? (aprendo tu fórmula)</div>
-    <div class="chips">${Object.keys(HELPERS).map(k => `<button class="chip-btn" data-help="${k}">${HELPERS[k]}</button>`).join('')}</div>
-    <p class="small muted">Arrancó tu ventana post-entreno de ${PWO_MINUTES} min.</p>
-    <button class="block" id="sum-ok">¡Listo!</button>`, m => {
-      $$('[data-help]', m).forEach(b => b.onclick = () => {
-        b.classList.toggle('on'); s.helped = $$('[data-help].on', m).map(x => x.dataset.help); saveData();
-      });
-      $('#sum-ok', m).onclick = () => { closeModal(); render(currentTab); };
-    });
-  if (prs.length || up > down) setTimeout(() => burst($('#modal')), 250);
-}
+/* 20.0: la pantalla final vive en decide.js (lo que hiciste, lo que mejoraste y tu siguiente objetivo). */

@@ -625,3 +625,96 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
   - El aviso de notificaciones no aparece antes del primer entreno.
   - Quien elige avanzado ve 4 rutinas para elegir y se le guarda la elegida (tp4).
 - **`v27c`:** un jueves sin entrenos, Hoy muestra "Tu primer entreno · Cuerpo completo", y Empezar abre la sesión de 6 ejercicios.
+
+---
+
+## 20.0 · Los datos se convierten en decisiones
+
+**Objetivo:** pasar de un diario de gimnasio a un entrenador. Cada dato que la persona registra se usa para responder tres preguntas: *esto hiciste, esto has mejorado y este es tu siguiente objetivo*.
+
+**1. Datos → decisiones (`decide.js`):**
+- `exStory(ejercicio)` agrupa el historial por sesión y devuelve:
+  - **Esto hiciste:** la última sesión (series y mejor serie).
+  - **Has mejorado:** el cambio desde la primera sesión, en % de fuerza estimada (1RM) o en reps si es con peso corporal. Distingue "estable" y "día bajo" sin culpa.
+  - **Siguiente objetivo:** la sobrecarga progresiva que ya existía (`suggestion`, con RIR y rango de reps), con una alternativa y el porqué. Si hay estancamiento, propone cambiar el estímulo.
+- **Dónde se ve:**
+  - **Hoy:** debajo del botón, "Objetivo clave: Sentadilla en Smith 22.5 kg × 10 (la última vez 20 kg × 12)".
+  - **Sesión:** cada ejercicio muestra su objetivo y lo deja precargado en peso y reps.
+  - **Pantalla final:** comparación con la vez anterior y los objetivos del siguiente entreno.
+  - **Progreso (principiante):** "Tus ejercicios" con la historia completa de cada uno. Ya no hay que esperar 3 entrenos para verlo.
+
+**2. Tu camino con significado:** son 4 etapas en orden, cada una desbloquea la siguiente y la recompensa es la prueba con tus números.
+
+| Etapa | Meta | Prueba que se muestra |
+|---|---|---|
+| Primer entreno | Completar la primera sesión | "Punto de partida medido en N ejercicios" |
+| Dominar tu rutina | Entre 3 y 6 sesiones (2 por cada tipo de entreno) con ≥ 80 % de las series | "N sesiones completas · haces el X % de tus series" |
+| Superar un récord | Superar la marca de inicio en cualquier ejercicio | "Sentadilla en Smith: 20 kg × 12 → 25 kg × 10 (+19 %)" |
+| Construir consistencia | Cumplir la meta semanal 4 semanas seguidas | "4 semanas seguidas cumpliendo tu plan" |
+
+- Al completar las 4 se ofrece (sin presionar) el modo avanzado.
+- Sustituye a los 5 hitos de la 19.0, que eran conteos.
+
+**3. Primer entreno guiado (principiante):**
+- Ejercicios numerados y en orden; solo uno abierto a la vez.
+- Foto animada (inicio/final), "Cómo se hace" en 3 pasos y el error a evitar, sin tener que abrir otra pantalla.
+- **Primera vez:** "Elige un peso con el que hagas 12 reps y te sobren 2–3. Si dudas, empieza ligero."
+- **Después:** "Tu objetivo: 22.5 kg × 10", precargado.
+- **Registro mínimo:** peso, reps y "¿Cómo se sintió?" con tres opciones (Fácil / Bien / Al límite), que se guardan como RIR 4 / 2 / 0. Desaparecen el contador de series iguales, la meta ±, la barra "contra tu última vez", el chequeo previo y el selector de lugar.
+- "Serie 1 de 2: hazla y anota lo que lograste"; al guardar empieza el descanso con su duración explicada.
+- **Cuándo terminaste:** aparece una tarjeta "Terminaste todos los ejercicios" y el botón cambia a "Terminar y ver mi resultado".
+
+**4. Pantalla final:**
+- Título según lo que pasó: "Primer entreno completado", "Superaste tu marca", "Mejoraste respecto a la última vez" o "Entrenaste con inteligencia".
+- Tiempo, series y ejercicios.
+- Si se completó una etapa, su prueba y la meta de la siguiente.
+- "Esto hiciste y esto cambió" ejercicio por ejercicio.
+- "Tu siguiente objetivo": cuándo (p. ej. "Lunes · Cuerpo completo") y los pesos de los 3 primeros ejercicios.
+
+**5. Los cuatro riesgos señalados:**
+- **Misión en día de descanso:**
+  - Se quitó la regla de la 19.0 que forzaba a entrenar.
+  - Ahora la misión es "Descanso activo": caminar, movilidad y dormir, más cuándo es el próximo entreno.
+  - Si aún no ha entrenado nunca, la misión es "Prepárate", con "Mira tus ejercicios" para ver cómo se hacen.
+  - "Entrenar hoy de todos modos" queda como enlace secundario.
+- **Rutinas automáticas:** además de los días, ahora usan:
+  - **Tiempo por sesión:** de 3 a 6 ejercicios, y se recorta si la estimación pasa del tiempo.
+  - **Experiencia:** 3 series en básicos y 2 en accesorios al empezar.
+  - **Objetivo:** reps y descansos según definición, volumen o mantenimiento.
+  - **Recuperación:** pregunta nueva en la bienvenida, "¿Cómo duermes y te recuperas?"; si es "Mal", una serie menos.
+  - **Equipo y molestias.**
+  - En Plan se ve **"Por qué esta rutina"** con cada variable aplicada, y el botón "Ajustar a mi tiempo y recuperación" rehace la rutina (con Deshacer).
+- **Exceso de recompensas:**
+  - Mensajes de la sesión sobrios: "Serie 2 de 3 hecha", "Completado".
+  - Sin confeti al completar un ejercicio, solo un pulso discreto; el confeti queda solo para récords reales.
+  - Los logros ya no lanzan avisos al terminar la sesión (la pantalla final lo explica).
+  - Los textos ya no usan "¡Al 1000%!".
+- **Pruebas técnicas ≠ validación:**
+  - La app no envía nada por internet, así que se agregó medición local: días de uso, entrenos empezados, terminados y cancelados, descansos hechos y horas hasta el primer entreno.
+  - Tras los 3 primeros entrenos pregunta "¿Supiste qué hacer en cada paso?" (Sí / Más o menos / No, con comentario opcional).
+  - En Explorar, "Ayúdanos a mejorar" comparte un **reporte anónimo** en JSON, sin nombre, peso, medidas, fotos ni ciclo.
+  - El protocolo para probar con personas está en `docs/VALIDACION.md`.
+
+**Archivos:**
+- Nuevo: `decide.js`.
+- Modificados:
+  - `ruta.js`: etapas, objetivo clave, Progreso y rutina con variables.
+  - `app.js`: misión de descanso, sesión guiada, mensajes, medición, bienvenida y Explorar.
+  - `coach.js`: se retiró el resumen anterior.
+  - `facil.js`: "Por qué esta rutina".
+  - `index.html`.
+  - `styles.css`: capa 20.0.
+  - `AndroidManifest.xml`: 20.0 / 25.
+
+**Verificación (`v28.mjs`), con reloj fijo:**
+- **Bienvenida:** 30 min, recuperación "Mal" y definición dan cuerpo completo L/X/V con 4 ejercicios a 2 series de 10–12 y 5 razones visibles.
+- **Jueves:** "Prepárate", sin botón de entrenar; se marca la recuperación.
+- **Viernes:**
+  - Sesión guiada: 4 tarjetas, una abierta, con "Cómo se hace" y las 3 opciones de esfuerzo, sin chequeo ni selector de lugar.
+  - Al registrar todo aparece "Terminaste todos los ejercicios".
+  - Pantalla final con la etapa 1 completada y objetivos para el lunes; se responde la pregunta de claridad.
+- **Lunes:** "Objetivo clave: Sentadilla en Smith 22.5 kg × 10 (la última vez 20 kg × 12)", y la sesión precarga ese objetivo.
+- **Progreso:** muestra la historia por ejercicio.
+- **Reporte:** no contiene el nombre.
+- **Ajustar a 4 días / 60 min / Bien:** da torso y pierna con 6 ejercicios a 3 series.
+- **Con sesiones simuladas:** "Dominar tu rutina" exige 4 sesiones con 2 tipos de entreno, y "Superar un récord" muestra "20 kg × 12 → 25 kg × 10 (+19 %)".

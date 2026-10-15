@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '19.0';
+const APP_VERSION = '20.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -88,7 +88,8 @@ function defaultData() {
     // 6.1: grupos de ejercicios ("Mis entrenos") y qué entreno toca cada día (0 = lunes … 6 = domingo)
     workouts: [], plan: [null, null, null, null, null, null, null],
     goals: [], challenges: null,
-    activities: [], runs: [], retos: [], commits: [], events: [], hardWeeks: [], moves: {}
+    activities: [], runs: [], retos: [], commits: [], events: [], hardWeeks: [], moves: {},
+    feedback: [], metrics: null
   };
 }
 /** Pasa los días de la rutina personalizada anterior a "Mis entrenos" y los reparte en la semana. */
@@ -122,7 +123,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {},
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null,
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -494,7 +495,7 @@ function isDeload() {
 function unlock(id, title, detail) {
   if (DB.achievements.some(a => a.id === id)) return false;
   DB.achievements.unshift({ id, title, detail, date: todayStr(), t: Date.now() });
-  if (gamify()) { setTimeout(() => toast('🏆 Logro desbloqueado: ' + title), 400); vibrate(150); }
+  if (gamify() && !unlock.quiet) { setTimeout(() => toast('Logro: ' + title), 400); vibrate(80); }   // 20.0: discreto; al terminar sesión lo cuenta la pantalla final
   return true;
 }
 /** Récords de una serie recién guardada: peso máximo, reps a ese peso y 1RM estimado. */
@@ -818,9 +819,7 @@ function renderHome() {
   const pct = total ? Math.max(0, Math.min(100, done / total * 100)) : 0;
   const [mTitle, mText, mSrc] = mindsetOfDay();
   const act = activeSession(), r = getRoutine(p.routine);
-  let nd = nextDay(p.routine);
-  // 19.0: quien aún no entrena nunca ve "Descanso" al abrir la app: su misión es el primer entreno.
-  if (nd && nd.rest && !DB.sessions.some(x => x.end)) nd = r.days.find(d => !d.rest && d.ex.length) || nd;
+  const nd = nextDay(p.routine);   // 20.0: en día de descanso la misión es recuperar (ya no se fuerza a entrenar)
   const habits = activeHabits(), habitsDone = habits.filter(h => habitDone(h, t)).length;
   const rec = recoveryToday(), dl = isDeload();
   const todayW = DB.days[t] && DB.days[t].weight;
@@ -833,10 +832,10 @@ function renderHome() {
     const n = DB.lifts.filter(l => l.sid === act.id).length;
     hero = `<div class="hero"><div class="eyebrow">Entreno en curso</div><h3>${esc(act.dayName)}</h3><p>${n} series registradas · ${Math.round((Date.now() - act.start) / 60000)} min</p><button id="home-train">Continuar entreno</button></div>`;
   } else if (nd && nd.rest) {
-    hero = `<div class="hero rest"><div class="eyebrow">Hoy toca</div><h3>Descanso</h3><p>El músculo crece cuando descansas. Camina, hidrátate y come bien.</p><button id="home-free">Entrenar de todos modos</button></div>`;
+    hero = restHero();
   } else if (nd) {
     const photo = (nd.ex.map(e => EX_PHOTO[e[0]]).find(Boolean));   // 18.0: la foto del primer ejercicio con foto
-    hero = `<div class="hero mission"><div class="m-top">${photo ? `<div class="m-photo" style="background-image:url('img/ex/${photo}-0.jpg')"></div>` : ''}<div class="m-body"><div class="eyebrow">${DB.sessions.some(x => x.end) ? 'Tu misión de hoy' : 'Tu primer entreno'}${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min</p><button id="home-train">${ico('play', 18)} Empezar entrenamiento</button><div class="m-out">${ico('target', 16)}<span>${esc(missionOutcome())}</span></div></div></div></div>`;
+    hero = `<div class="hero mission"><div class="m-top">${photo ? `<div class="m-photo" style="background-image:url('img/ex/${photo}-0.jpg')"></div>` : ''}<div class="m-body"><div class="eyebrow">${DB.sessions.some(x => x.end) ? 'Tu misión de hoy' : 'Tu primer entreno'}${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min</p><button id="home-train">${ico('play', 18)} Empezar entrenamiento</button><div class="m-out">${ico('target', 16)}<span>${esc(missionOutcome(nd))}</span></div></div></div></div>`;
   } else {
     hero = `<div class="hero"><div class="eyebrow">Entreno</div><h3>Entreno libre</h3><p>Elige ejercicios sobre la marcha.</p><button id="home-free">Empezar</button></div>`;
   }
@@ -931,7 +930,7 @@ function renderHome() {
   foldify(vh, [['Más de hoy', '*', true]]);   // 19.0: la primera vista es solo la misión
   if (isBeginner()) vh.insertAdjacentHTML('beforeend', `<button class="ghost block explore-link" id="home-explore">${ico('layers', 18, 'lead')}Explorar más funciones</button>`);
   const hx = $('#home-explore'); if (hx) hx.onclick = () => showTab('more');
-  bindPath(vh);
+  bindPath(vh); bindRestHero(vh, renderHome);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
   showChart(() => drawSpark($('#home-spark'), movingAvg(entries).map(e => e.y)));
 }
@@ -1048,7 +1047,7 @@ function startSession(routineKey, dayId, wid) {
   if (rd) { s.adjust = rd.plan === 'mantener' ? null : rd.plan; s.adjustDone = true; }
   else if (typeof inComeback === 'function' && inComeback()) { s.adjust = 'reducir'; s.adjustDone = true; }   // regreso suave
   DB.sessions.push(s);
-  DB.active = s.id;
+  DB.active = s.id; track('session_start');
   if (DB.profile.restAlerts && !DB.profile.notifAsked) { DB.profile.notifAsked = true; requestNotifications(); }
   saveData();
   keepScreenOn(true);
@@ -1073,7 +1072,7 @@ function restoreSnapshot(snap) {
 function exitSession() {
   const s = activeSession(); if (!s) return;
   const snap = sessionSnapshot(s), n = snap.lifts.length;
-  dropSessionData(snap);
+  dropSessionData(snap); track('session_exit');
   DB.sessions = DB.sessions.filter(x => x.id !== s.id);
   closeSession(); renderTrain(); window.scrollTo(0, 0);
   snack(n ? `Sesión borrada (${n} serie${n > 1 ? 's' : ''})` : 'Sesión cancelada', 'Deshacer', () => restoreSnapshot(snap));
@@ -1104,10 +1103,11 @@ function finishSession() {
     closeSession(); renderTrain();
     return;
   }
-  s.end = Date.now();
+  s.pathBefore = pathState().doneN;   // 20.0: para avisar si este entreno completa una etapa
+  s.end = Date.now(); track('session_done');
   day(s.date).trained = true;
   startPwo();
-  checkMilestones(s);
+  unlock.quiet = true; checkMilestones(s); unlock.quiet = false;
   closeSession();
   showTab('home');
   openSessionSummary(s);
@@ -1308,12 +1308,11 @@ const SESS_UI = { sid: null, open: 0, rir: {}, more: {}, n: {}, prog: {}, celebr
 
 /** Mensaje de la barra de un ejercicio: siempre en positivo, nunca lo que falta como reproche. */
 function progMsg(n, sets, beat) {
-  if (!n) return '💪 ¡Vamos por la primera!';
-  if (n > sets) return `✓ Meta cumplida · ${n - sets} serie${n - sets > 1 ? 's' : ''} extra (más no siempre es mejor)`;   // 12.0: sin premiar el exceso
-  if (n === sets) return beat ? '💯 ¡Al 1000%! Superaste tu última vez' : '🏆 ¡Completado! Lo diste todo';
-  if (n === sets - 1) return '⚡ ¡Última serie! Dalo todo';
-  if (n / sets >= 0.5) return '🔥 ¡Mitad hecha! No aflojes';
-  return '🚀 ¡Buen arranque! Sigue así';
+  if (!n) return 'Pendiente';
+  if (n > sets) return `Meta cumplida · ${n - sets} serie${n - sets > 1 ? 's' : ''} extra (más no siempre es mejor)`;   // 12.0: sin premiar el exceso
+  if (n === sets) return beat ? 'Completado · superaste tu última vez' : 'Completado';
+  if (n === sets - 1) return 'Última serie';
+  return `Serie ${n} de ${sets} hecha`;
 }
 /** Barra de progreso con una marca por serie; se anima desde el valor que tenía antes de guardar. */
 function progBar(n, sets, key, big) {
@@ -1362,23 +1361,25 @@ function renderSession(s) {
   const mins = Math.round((Date.now() - s.start) / 60000);
   const done = DB.lifts.filter(l => l.sid === s.id);
   const vol = done.reduce((a, l) => a + l.w * l.r, 0);
-  const targetSets = exs.reduce((a, e) => a + e[1], 0);
+  const targetSets = exs.reduce((a, e) => a + e[1], 0), guided = isBeginner();
+  const allDone = exs.length > 0 && exs.every(e => done.filter(l => l.ex === e[0]).length >= e[1]);
   $('#view-train').innerHTML = `
     <div class="card">
       <div class="row spread sess-head"><button class="icon-btn sess-back" id="ss-back" aria-label="Salir y borrar esta sesión" title="Salir y borrar">⬅️</button><div class="grow"><div class="small muted">En curso · ${mins} min</div><div style="font-size:19px;font-weight:750">${esc(s.dayName)}</div></div>
         <button class="icon-btn sess-reset" id="ss-reset" aria-label="Reiniciar sesión desde cero" title="Reiniciar">↺</button>
         <div style="text-align:right"><div style="font-size:19px;font-weight:750">${done.length}<span class="muted" style="font-size:14px">/${targetSets || '–'}</span></div><div class="small muted">series</div></div></div>
       ${progBar(done.length, targetSets, 'all', true)}
-      <div class="xp-msg">${!done.length ? '🔥 Hoy vienes por todo. ¡Primera serie!' : done.length >= targetSets ? '🏆 ¡Entreno completo! Termina cuando quieras' : done.length / targetSets >= 0.5 ? '⚡ Ya pasaste la mitad, ¡no aflojes!' : '🚀 Vas encendido, sigue sumando'}</div>
+      <div class="xp-msg">${!done.length ? 'Empieza por el primer ejercicio' : allDone ? 'Entreno completo: termina para ver tu resultado' : done.length / targetSets >= 0.5 ? 'Más de la mitad hecha' : 'Buen ritmo, sigue con el siguiente'}</div>
       <div class="small muted">${Math.round(vol).toLocaleString('es-MX')} kg movidos${isDeload() ? ' · <b style="color:var(--warn)">día de descarga</b>' : ''}</div>
     </div>
-    ${!s.adjustDone && !isSimple() ? `<div class="card ck-prompt"><b>¿Cómo llegas hoy?</b><p class="small muted" style="margin:2px 0 8px">30 s para ajustar series e intensidad a tu recuperación.</p><div class="row"><button id="ss-ck" style="flex:2">Hacer chequeo</button><button class="secondary" id="ss-ck-skip" style="flex:1">Omitir</button></div></div>`
+    ${guided ? '' : !s.adjustDone && !isSimple() ? `<div class="card ck-prompt"><b>¿Cómo llegas hoy?</b><p class="small muted" style="margin:2px 0 8px">30 s para ajustar series e intensidad a tu recuperación.</p><div class="row"><button id="ss-ck" style="flex:2">Hacer chequeo</button><button class="secondary" id="ss-ck-skip" style="flex:1">Omitir</button></div></div>`
       : s.adjust ? `<div class="adapt-note" style="margin:0 0 12px">${PLAN_INFO[s.adjust].icon} <b>Plan ${PLAN_INFO[s.adjust].name.toLowerCase()}:</b> ${PLAN_INFO[s.adjust].text} <button class="ghost" id="ss-ck" style="padding:0 4px">Cambiar</button></div>` : ''}
-    <div class="env-row"><span class="small muted">📍 Hoy entreno en</span>${Object.keys(ENVS).map(k => `<button class="chip-btn ${(s.env || 'gym') === k ? 'on' : ''}" data-env="${k}">${ENVS[k][0]} ${ENVS[k][1]}</button>`).join('')}</div>
+    ${guided ? `<div class="g-intro">${ico('list-checks', 18)}<span>${exs.length} ejercicios, en orden. Toca uno para ver cómo se hace; al guardar cada serie empieza tu descanso.</span></div>` : `<div class="env-row"><span class="small muted">📍 Hoy entreno en</span>${Object.keys(ENVS).map(k => `<button class="chip-btn ${(s.env || 'gym') === k ? 'on' : ''}" data-env="${k}">${ENVS[k][0]} ${ENVS[k][1]}</button>`).join('')}</div>`}
     ${s.short ? '<div class="adapt-note" style="margin:0 0 12px">⏱️ <b>Versión corta:</b> 4 ejercicios y 2 series. Hecho es mejor que perfecto.</div>' : ''}
-    ${exs.length ? exs.map((e, i) => exerciseCard(s, e, i)).join('') : '<div class="card"><div class="empty"><span class="emoji">🏋️</span>Añade tu primer ejercicio.</div></div>'}
-    <div class="grid2" style="margin-bottom:10px"><button class="secondary" id="ss-add">+ Añadir ejercicio</button><button class="secondary" id="ss-save">⭐ Guardar como entreno</button></div>
-    <button class="block" id="ss-finish">Terminar entreno</button>
+    ${exs.length ? exs.map((e, i) => guided ? guidedCard(s, e, i) : exerciseCard(s, e, i)).join('') : '<div class="card"><div class="empty"><span class="emoji">🏋️</span>Añade tu primer ejercicio.</div></div>'}
+    ${allDone ? `<div class="card all-done">${ico('check', 20)}<div><b>Terminaste todos los ejercicios</b><small>Toca el botón para guardar el entreno y ver qué mejoraste y tu siguiente objetivo.</small></div></div>` : ''}
+    <div class="grid2" style="margin-bottom:10px"><button class="secondary" id="ss-add">+ Añadir ejercicio</button>${guided ? '' : '<button class="secondary" id="ss-save">⭐ Guardar como entreno</button>'}</div>
+    <button class="block ${allDone ? 'pulse' : ''}" id="ss-finish">${allDone ? 'Terminar y ver mi resultado' : 'Terminar entreno'}</button>
     <button class="ghost block" id="ss-cancel" style="margin-top:6px">Descartar sesión</button>`;
 
   $$('#view-train [data-howto]').forEach(b => b.onclick = ev => { ev.stopPropagation(); openHowTo(b.dataset.howto); });
@@ -1404,7 +1405,7 @@ function renderSession(s) {
   // Las barras crecen desde donde estaban hasta el nuevo avance.
   const fills = $$('#view-train .xp-fill[data-to]');
   if (fills.length) { void fills[0].offsetWidth; requestAnimationFrame(() => fills.forEach(f => { f.style.width = f.dataset.to + '%'; })); }
-  if (SESS_UI.celebrate != null) { const c = $(`#view-train [data-card="${SESS_UI.celebrate}"]`); SESS_UI.celebrate = null; setTimeout(() => burst(c), 350); }
+  if (SESS_UI.celebrate != null) { const c = $(`#view-train [data-card="${SESS_UI.celebrate}"]`); SESS_UI.celebrate = null; setTimeout(() => { if (c) { c.classList.add('done-pulse'); setTimeout(() => c.classList.remove('done-pulse'), 900); } }, 300); }   // 20.0: festejo discreto
   $$('#view-train [data-step]').forEach(b => b.onclick = () => {
     const [i, field, dir] = b.dataset.step.split('|'), ex = exs[Number(i)][0];
     const inp = $('#' + field + '-' + i), v = num(inp.value) || 0;
@@ -1442,7 +1443,7 @@ function renderSession(s) {
     setTimeout(() => { const cards = $$('#view-train .ex-card'); if (cards.length) cards[cards.length - names.length].scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 50);
     toast('✓ ' + names.length + ' ejercicio' + (names.length > 1 ? 's añadidos' : ' añadido'));
   } });
-  $('#ss-save').onclick = () => saveSessionAsWorkout(s);
+  const sv = $('#ss-save'); if (sv) sv.onclick = () => saveSessionAsWorkout(s);
   $$('#view-train [data-env]').forEach(b => b.onclick = () => { setSessionEnv(s, b.dataset.env); s.missions = {}; keepScroll(() => renderSession(s)); toast(ENVS[b.dataset.env][0] + ' Rutina adaptada a ' + ENVS[b.dataset.env][1].toLowerCase()); });
   $$('#view-train [data-pain]').forEach(b => b.onclick = () => { const i = Number(b.dataset.pain); openPain(s, i, exs[i][0], () => keepScroll(() => renderSession(s))); });
   const ck = $('#ss-ck'); if (ck) ck.onclick = () => openCheckin(() => { SESS_UI.prog = {}; renderSession(s); });
@@ -1721,8 +1722,8 @@ function logSet(s, i) {
   if (mis && !(s.missionOk && s.missionOk[i]) && missionMet(s, mis)) { s.missionOk = s.missionOk || {}; s.missionOk[i] = true; saveData(); setTimeout(() => toast('🎯 ¡Misión cumplida en ' + ex + '!'), 900); }
   if (n >= e[1]) {
     const next = exs.findIndex((x, k) => k > i && DB.lifts.filter(l => l.sid === s.id && l.ex === x[0]).length < x[1]);
-    if (next >= 0) { SESS_UI.open = next; toast(prs.length ? '🏆 ¡Récord! Siguiente: ' + exs[next][0] : '✓ ¡Ejercicio completo! Siguiente: ' + exs[next][0]); }
-    else if (finished) toast('🏆 ¡' + ex + ' completo!');
+    if (next >= 0) { SESS_UI.open = next; toast((prs.length ? 'Récord · siguiente: ' : '✓ Completo · siguiente: ') + exs[next][0]); }
+    else if (finished) toast('✓ ' + ex + ' completo');
   }
   startRest(e[3] || 90, 'Descanso · ' + ex, n < e[1] ? { sid: s.id, i, ex } : null);
   keepScroll(() => renderSession(s));
@@ -2740,6 +2741,7 @@ function renderMore() {
   $('#view-more').innerHTML = `
     ${explorarCard()}
     ${levelCard()}
+    ${feedbackCard()}
     <div class="card">
       <h2>Exportar progreso</h2>
       <p class="small muted" style="margin-top:0">PDF o Excel para guardarlo o pedirle un análisis a una IA.</p>
@@ -2903,7 +2905,7 @@ function renderMore() {
   $('#st-pause').onchange = e => { const k = weekKey(todayStr()); DB.pauses = DB.pauses.filter(x => x !== k).concat(e.target.checked ? [k] : []); saveData(); toast(e.target.checked ? 'Semana en pausa. Descansa ' + g('tranquilo.', 'tranquila.') : 'Pausa quitada'); };
   $('#st-gamify').onchange = e => { DB.profile.gamify = e.target.checked; saveData(); };
   bindNotifSettings($('#view-more'), renderMore);
-  bindExplore($('#view-more'));
+  bindExplore($('#view-more')); bindFeedbackCard($('#view-more'));
   $('#st-rest').onchange = e => { DB.profile.restAlerts = e.target.checked; saveData(); if (e.target.checked) requestNotifications(); };
   $$('#view-more [data-theme]').forEach(b => b.onclick = () => { DB.profile.theme = b.dataset.theme; saveData(); applyTheme(); renderMore(); });
   $$('#view-more [data-look]').forEach(b => b.onclick = () => { DB.profile.look = b.dataset.look; saveData(); applyTheme(); keepScroll(renderMore); });
@@ -3005,7 +3007,7 @@ function openOnboarding() {
   const p = DB.profile, total = 7;
   let step = 0;
   const draft = { name: p.name, startWeight: p.startWeight, height: p.height, age: p.age, goalWeight: p.goalWeight, phase: p.phase, somatotype: p.somatotype, routine: p.routine, gym: 'pf', limits: [], mode: 'completo',
-    stage: '2', minutes: '45', days: '3', enjoy: ['fuerza'], barriers: [], level: 'principiante' };
+    stage: '2', minutes: '45', days: '3', recovery: 'normal', enjoy: ['fuerza'], barriers: [], level: 'principiante' };
   const multi = (key, map) => `<div class="chips">${Object.keys(map).map(k => `<button class="chip-btn ${draft[key].includes(k) ? 'on' : ''}" data-multi="${key}|${k}">${map[k][0]} ${map[k][1]}</button>`).join('')}</div>`;
   const progress = () => `<div class="ob-step">Paso ${step + 1} de ${total}</div><div class="ob-progress">${Array.from({ length: total }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   const choice = (key, val, ico, title, sub) => `<button class="choice ${draft[key] === val ? 'on' : ''}" data-ch="${key}|${val}"><span class="c-ico">${ico}</span><span><b>${title}</b><small>${sub}</small></span></button>`;
@@ -3026,7 +3028,9 @@ function openOnboarding() {
       <div class="rir-label" style="margin-top:6px"><span>¿Cuánto tiempo tienes por sesión?</span></div>
       <div class="seg">${['15', '30', '45', '60'].map(v => `<button data-ch="minutes|${v}" class="${draft.minutes === v ? 'on' : ''}">${v === '60' ? '60+' : v} min</button>`).join('')}</div>
       <div class="rir-label"><span>¿Cuántos días a la semana puedes?</span></div>
-      <div class="seg">${['2', '3', '4', '5'].map(v => `<button data-ch="days|${v}" class="${draft.days === v ? 'on' : ''}">${v}</button>`).join('')}</div>`,
+      <div class="seg">${['2', '3', '4', '5'].map(v => `<button data-ch="days|${v}" class="${draft.days === v ? 'on' : ''}">${v}</button>`).join('')}</div>
+      <div class="rir-label"><span>¿Cómo duermes y te recuperas?</span></div>
+      <div class="seg">${RECOVERY_OPTS.map(([v, l]) => `<button data-ch="recovery|${v}" class="${draft.recovery === v ? 'on' : ''}">${l}</button>`).join('')}</div>`,
     () => `<h3>¿Qué disfrutas?</h3>
       <p class="small muted" style="margin-top:0">No todos quieren músculos grandes o un maratón. Elige lo que te gusta (varias).</p>
       ${multi('enjoy', ACTIVITY_TYPES)}
@@ -3045,7 +3049,7 @@ function openOnboarding() {
     () => `<h3>¿Cuánta guía quieres?</h3>
       ${choice('level', 'principiante', '🌱', 'Guíame (principiante)', 'Te digo qué hacer cada día; lo demás se desbloquea al avanzar')}
       ${choice('level', 'avanzado', '⚙️', 'Control total (avanzado)', 'Personalizas rutinas, ves tendencias, récords y cada variable')}
-      ${draft.level === 'principiante' ? `<div class="adapt-note" style="margin-top:12px">${ico('sparkles', 18, 'lead')}<b>Tu rutina la armo yo:</b> ${draft.stage === '1' ? '3 días de 20 min con tu propio peso.' : `cuerpo completo para tus ${draft.days} días, con tu equipo y cuidando tus molestias.`} La cambias cuando quieras en Plan.</div>`
+      ${draft.level === 'principiante' ? `<div class="adapt-note" style="margin-top:12px">${ico('sparkles', 18, 'lead')}<b>Tu rutina la armo yo:</b> ${draft.stage === '1' ? '3 días de 20 min con tu propio peso.' : `${Number(draft.days) <= 3 ? 'cuerpo completo' : 'torso y pierna'} para tus ${draft.days} días de ${draft.minutes} min, según tu experiencia, tu objetivo, tu recuperación, tu equipo y tus molestias.`} En Plan verás por qué y la puedes ajustar.</div>`
       : `<div class="rir-label" style="margin-top:12px"><span>Elige tu rutina</span></div>
       ${choice('routine', 'inicio', '🌱', ROUTINES.inicio.name, '3 días de 20 min con tu peso: ideal para empezar')}
       ${choice('routine', 'pro', '🏆', ROUTINES.pro.name, '1 grupo muscular por día, 5 días + 2 de descanso')}
@@ -3076,13 +3080,13 @@ function openOnboarding() {
         Object.assign(DB.profile, { name: draft.name, startWeight: draft.startWeight, goalWeight: draft.goalWeight, height: draft.height, age: draft.age,
           phase: draft.phase, somatotype: draft.somatotype, routine: draft.routine, startDate: todayStr(), habitsStart: todayStr(), autoMacros: true, onboarded: true,
           gym: draft.gym, equip: GYM_PRESETS[draft.gym].equip.slice(), limits: draft.limits, mode: 'completo', level: draft.level,
-          stage: Number(draft.stage), minutes: Number(draft.minutes), weeklyTarget: Number(draft.days), trainDays: DEFAULT_DAYS[Number(draft.days)], enjoy: draft.enjoy, barriers: draft.barriers });
+          stage: Number(draft.stage), minutes: Number(draft.minutes), recovery: draft.recovery, weeklyTarget: Number(draft.days), trainDays: DEFAULT_DAYS[Number(draft.days)], enjoy: draft.enjoy, barriers: draft.barriers });
         if (draft.level === 'principiante' && draft.stage !== '1') beginnerRoutine();   // 19.0: rutina adecuada sin tener que elegir
         else if (draft.level === 'principiante') DB.profile.routine = 'inicio';
         if (draft.cycleWant) setTimeout(() => openCycleConsent(() => render(currentTab)), 400);
         else if (!DB.profile.guideSeen) setTimeout(openGuide, 700);   // 17.0.1: guía de 3 pasos
         addEvent(todayStr(), 'stage', 'Empezaste en la etapa ' + draft.stage + ': ' + STAGES[draft.stage].name, STAGES[draft.stage].ico);
-        pickerMine = true;
+        pickerMine = true; track('onboarded');
         if (!Object.values(DB.days).some(d => d.weight != null)) day(todayStr()).weight = draft.startWeight;
         saveData(); closeModal(true); showTab('home');
         toast(`¡Listo${draft.name ? ', ' + draft.name : ''}! Tu objetivo: ${targets().kcal.toLocaleString('es-MX')} kcal al día`);
@@ -3138,6 +3142,7 @@ if (DB.active) keepScreenOn(true);
 $('#fab').onclick = openQuickSheet;
 // Si la app se cerró a mitad de un entreno, vuelve directo a la sesión con su descanso.
 showTab(DB.active && activeSession() ? 'train' : 'home');
+track();   // 20.0: días de uso (local)
 restoreRest();
 restoreRun();   // 12.0: recupera una carrera en curso si la app se cerró
 labelButtons(); femify(); iconify(document.body);

@@ -1282,3 +1282,138 @@ nav.tabs button.on svg { background: color-mix(in srgb, var(--hl) 14%, transpare
 .bp-lock b { color: var(--text); display: block; font-weight: 600; }
 .bp-lock svg { color: var(--accent); flex: none; }
 .retos-sheet { display: grid; gap: 4px; }
+
+/* ------------------------------------------------------------------ *
+ *  20.0 · Datos que deciden, etapas con significado, primer entreno guiado
+ * ------------------------------------------------------------------ */
+/* Esto hiciste · Has mejorado · Siguiente objetivo */
+.story { display: grid; gap: 8px; margin: 4px 0 2px; }
+.st-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; font-size: 14px; line-height: 1.35; }
+.st-row .st-k { color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding-top: 2px; }
+.st-row small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.st-row.up > span:last-child { color: var(--good); }
+.st-row.next b { color: var(--accent); font-size: 16px; }
+.bp-ex { border-bottom: 1px solid var(--line); padding: 2px 0; }
+.bp-ex summary { display: flex; align-items: center; gap: 10px; padding: 10px 0; cursor: pointer; list-style: none; }
+.bp-ex summary::-webkit-details-marker { display: none; }
+.bp-ex summary b { display: block; font-size: 15px; }
+.bp-ex summary small { display: block; color: var(--muted); font-size: 13px; }
+.bp-ex[open] summary { padding-bottom: 4px; }
+.bp-ex .story { padding: 4px 0 12px; }
+.grow { flex: 1; min-width: 0; }
+.rs-tag { flex: none; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
+.rs-tag.up { background: var(--good-soft); color: var(--good); }
+.rs-tag.start { background: var(--accent-soft); color: var(--accent); }
+.rs-tag.down { color: var(--warn); }
+
+/* Tu camino por etapas */
+.pc-stages { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 0; }
+.pc-stages li { display: flex; gap: 12px; padding: 8px 0; position: relative; }
+.pc-stages li:not(:last-child)::before { content: ''; position: absolute; left: 13px; top: 36px; bottom: -4px; width: 2px; background: var(--line); }
+.pc-stages li.done:not(:last-child)::before { background: var(--accent); }
+.pc-stages i { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 13px; font-weight: 600; background: var(--surface-2); color: var(--muted); }
+.pc-stages li.done i { background: var(--accent); color: var(--on-accent); }
+.pc-stages li.now i { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.pc-stages li > div { flex: 1; min-width: 0; padding-top: 3px; }
+.pc-stages b { display: block; font-size: 15px; font-weight: 600; }
+.pc-stages small { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; margin-top: 2px; }
+.pc-stages li.done small { color: var(--text); opacity: .85; }
+.pc-stages li.lock b { color: var(--muted); font-weight: 500; }
+.pc-bar { height: 6px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin: 8px 0 2px; }
+.pc-bar span { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+.pc-stages .pc-n { font-size: 12px; }
+
+/* Día de descanso: misión de recuperación */
+.hero.rest-mission .m-body { max-width: none; }
+.recov { display: grid; gap: 8px; margin: 0 0 14px; }
+.hero.mission .recov button.rv { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 0; padding: 10px 12px; border-radius: 14px; justify-content: flex-start; text-align: left;
+  background: var(--surface-2); color: var(--text); border: 1px solid transparent; font-weight: 500; }
+.hero.mission .recov button.rv svg { color: var(--accent); }
+.hero.mission .recov button.rv b { display: block; font-size: 14px; font-weight: 600; }
+.hero.mission .recov button.rv small { display: block; font-size: 12.5px; color: var(--muted); font-weight: 400; }
+.hero.mission .recov button.rv.on { border-color: var(--accent); background: var(--accent-soft); }
+.hero.rest-mission button.m-alt.ghost { display: block; background: transparent; color: var(--muted); min-height: 40px; padding: 0; margin-top: 8px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+.hero.rest-mission .m-out { margin-top: 0; }
+
+/* Sesión guiada */
+.g-intro { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--muted); margin: 0 2px 12px; line-height: 1.4; }
+.g-intro svg { color: var(--accent); margin-top: 1px; }
+.ex-card.guided .g-head { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.g-num { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--surface-2); color: var(--text); }
+.g-num.ok { background: var(--accent); color: var(--on-accent); }
+.ex-card.guided.open .g-num:not(.ok) { box-shadow: inset 0 0 0 2px var(--accent); color: var(--accent); background: transparent; }
+.g-count { flex: none; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ex-card.guided .ex-body { margin-top: 12px; }
+button.g-photo { display: block; position: relative; width: 100%; aspect-ratio: 3 / 2; padding: 0; border-radius: 14px; overflow: hidden; background: var(--surface-2); min-height: 0; }
+.g-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.g-photo img.b { animation: gswap 2.6s ease-in-out infinite; }
+@keyframes gswap { 0%, 40% { opacity: 0; } 50%, 90% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .g-photo img.b { animation: none; opacity: 0; } }
+.g-how { margin: 12px 0; font-size: 14px; line-height: 1.45; }
+.g-how ol { margin: 6px 0 0; padding-left: 20px; }
+.g-how li { margin-bottom: 4px; }
+.g-how p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+.g-goal { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 14px; background: var(--accent-soft); margin-bottom: 12px; }
+.g-goal svg { color: var(--accent); margin-top: 1px; }
+.g-goal b { display: block; font-size: 15px; font-weight: 600; }
+.g-goal small { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; line-height: 1.4; }
+.g-step { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; margin: 4px 0 10px; }
+.g-step svg { color: var(--good); }
+.eff-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+.eff-row button { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 58px; padding: 8px 4px; border-radius: 14px; background: var(--surface-2); color: var(--text); border: 1.5px solid transparent; }
+.eff-row button b { font-size: 14px; font-weight: 600; }
+.eff-row button small { font-size: 11.5px; color: var(--muted); font-weight: 400; line-height: 1.25; text-align: center; }
+.eff-row button.on { border-color: var(--accent); background: var(--accent-soft); }
+.g-rest { display: flex; gap: 6px; align-items: flex-start; font-size: 13px; color: var(--muted); margin: 10px 0; line-height: 1.4; }
+.g-rest svg { margin-top: 2px; flex: none; }
+.all-done { display: flex; gap: 12px; align-items: flex-start; border-color: var(--accent); }
+.all-done svg { color: var(--accent); margin-top: 2px; flex: none; }
+.all-done b { display: block; font-size: 15px; }
+.all-done small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; line-height: 1.4; }
+.ex-card.done-pulse { animation: dpulse .9s ease-out; }
+@keyframes dpulse { 0% { box-shadow: 0 0 0 0 var(--accent-soft); } 40% { box-shadow: 0 0 0 6px var(--accent-soft); } 100% { box-shadow: 0 0 0 0 transparent; } }
+button.pulse { box-shadow: 0 0 0 4px var(--accent-soft); }
+
+/* Pantalla final */
+.rs-head { display: flex; gap: 12px; align-items: flex-start; }
+.rs-head > svg { flex: none; color: var(--accent); margin-top: 4px; }
+.rs-head h3 { margin: 0 0 4px; font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+.rs-head p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
+.rs-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; margin: 16px 0; }
+.rs-stats div { background: var(--surface-2); border-radius: 14px; padding: 10px 12px; min-width: 0; }
+.rs-stats b { display: block; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.rs-stats small { color: var(--muted); font-size: 12px; }
+.rs-stage { border: 1px solid var(--accent); border-radius: 14px; padding: 12px; margin-bottom: 8px; display: grid; gap: 4px; }
+.rs-stage small { color: var(--accent); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.rs-stage b { font-size: 15px; }
+.rs-stage span { font-size: 13px; color: var(--muted); }
+.rs-h { margin: 16px 0 6px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.rs-row, .rs-next { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.rs-row b { display: block; font-size: 14px; font-weight: 600; }
+.rs-row small { display: block; color: var(--muted); font-size: 12.5px; }
+.rs-next b { color: var(--accent); flex: none; }
+.rs-when { display: flex; gap: 10px; align-items: center; padding: 10px 12px; background: var(--surface-2); border-radius: 14px; margin-bottom: 4px; }
+.rs-when svg { color: var(--accent); flex: none; }
+.rs-when b { display: block; font-size: 15px; }
+.rs-when small { color: var(--muted); font-size: 12.5px; }
+.rs-fb { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+.rs-fb b { display: block; font-size: 14px; margin-bottom: 8px; }
+.rs-fb .seg { margin-bottom: 0; }
+
+/* Plan: por qué esta rutina */
+.rc-why { margin-top: 12px; border: 1px solid var(--line); border-radius: 14px; padding: 0 12px; }
+.rc-why summary { display: flex; align-items: center; gap: 8px; padding: 12px 0; font-size: 14px; font-weight: 600; cursor: pointer; }
+.rc-why summary svg { color: var(--accent); }
+.rc-why ul { margin: 0 0 12px; padding-left: 18px; font-size: 13.5px; line-height: 1.45; }
+.rc-why li { margin-bottom: 6px; }
+.rc-why button { margin-bottom: 12px; }
+
+/* Validación */
+.fb-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.fb-stats div { background: var(--surface-2); border-radius: 14px; padding: 10px; min-width: 0; }
+.fb-stats b { display: block; font-size: 18px; font-weight: 700; }
+.fb-stats small { color: var(--muted); font-size: 12px; }
+
+/* El botón flotante no tapa lo último de la pantalla */
+#view-home { padding-bottom: 72px; }
+.rc-why summary { justify-content: flex-start; text-align: left; }

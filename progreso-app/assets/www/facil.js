@@ -59,7 +59,7 @@ function routineMeta(key) {
   return { r, n: work.length, ico: ROUTINE_ICO[key] || '📋' };
 }
 function routineCard() {
-  const p = DB.profile, key = p.routine, { r, n, ico } = routineMeta(key), nd = nextDay(key);
+  const p = DB.profile, key = p.routine, { r, n, ico: rIco } = routineMeta(key), nd = nextDay(key);
   let days;
   if (key === 'custom') {
     const today = weekdayIdx(todayStr());
@@ -68,14 +68,16 @@ function routineCard() {
     days = r.days.map(d => `<button class="rd-chip ${d.rest ? 'rest' : 'work'} ${nd && d.id === nd.id ? 'today' : ''}" data-rday="${d.id}"><b>${esc(d.name.split('·')[0].trim())}</b><small>${esc(d.rest ? 'Descanso' : d.name.split('·').pop().trim())}</small></button>`).join('');
   }
   return `<div class="card keep routine-card">
-    <div class="rc-head"><span class="rc-ico">${ico}</span><div class="grow"><div class="small muted">Tu rutina</div><b class="rc-name">${esc(key === 'custom' ? 'Mi rutina' : r.name)}</b><div class="small muted">${n} día${n === 1 ? '' : 's'} de entreno${key === 'custom' ? ' por semana' : ' por ciclo'}</div></div></div>
+    <div class="rc-head"><span class="rc-ico">${rIco}</span><div class="grow"><div class="small muted">Tu rutina</div><b class="rc-name">${esc(key === 'custom' ? 'Mi rutina' : r.name)}</b><div class="small muted">${n} día${n === 1 ? '' : 's'} de entreno${key === 'custom' ? ' por semana' : ' por ciclo'}</div></div></div>
     <div class="rd-strip" role="list">${days}</div>
+    ${key === 'custom' && p.planWhy && p.planWhy.length ? `<details class="rc-why"><summary>${ico('lightbulb', 16)} Por qué esta rutina</summary><ul>${p.planWhy.map(t => `<li>${esc(t)}</li>`).join('')}</ul><button class="secondary block" id="rc-tune">Ajustar a mi tiempo y recuperación</button></details>` : ''}
     <div class="rc-actions"><button class="secondary" id="rc-change">🔄 Cambiar rutina</button><button class="secondary" id="rc-edit">✏️ ${key === 'custom' ? 'Editar' : 'Personalizar'}</button></div>
   </div>`;
 }
 function bindRoutineCard(v) {
   const c = $('#rc-change', v); if (!c) return;
   c.onclick = openRoutineGallery;
+  const tu = $('#rc-tune', v); if (tu) tu.onclick = openPlanTune;
   $('#rc-edit', v).onclick = () => DB.profile.routine === 'custom' ? openWeekEditor() : personalizeRoutine(DB.profile.routine);
   $$('[data-rday]', v).forEach(b => b.onclick = () => openRoutineDay(b.dataset.rday));
 }

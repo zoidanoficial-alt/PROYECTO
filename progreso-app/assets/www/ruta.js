@@ -23,44 +23,67 @@ function setLevel(l) {
   toast(l === 'avanzado' ? 'Modo avanzado: todas las herramientas a la vista' : 'Modo principiante: solo lo que necesitas');
 }
 
-/* ---------- Tu camino: hitos que explican qué consigues ---------- */
+/* ---------- Tu camino (20.0): etapas que demuestran que mejoras ---------- */
 const doneSessions = () => DB.sessions.filter(s => s.end).length;
 function weekCompletedEver() {
   const weeks = {}; activeDates().forEach(d => { const k = weekKey(d); weeks[k] = (weeks[k] || 0) + 1; });
   return Object.keys(weeks).some(k => weeks[k] >= weekTarget(k));
 }
-const MILESTONES = [
-  { k: 'first', t: 'Primer entreno', reward: 'Conoces tu punto de partida', ok: () => doneSessions() >= 1, need: () => 1 - doneSessions() },
-  { k: 'three', t: '3 entrenos', reward: 'Desbloqueas tus récords y tu progreso', ok: () => doneSessions() >= 3, need: () => 3 - doneSessions() },
-  { k: 'week', t: 'Semana cumplida', reward: 'Desbloqueas tu progreso semanal', ok: weekCompletedEver, need: () => Math.max(1, weekTarget() - sessionsThisWeek()) },
-  { k: 'pr', t: 'Primer récord', reward: 'La app empieza a subirte el peso sola', ok: () => DB.achievements.some(a => a.pr), need: () => 1 },
-  { k: 'ten', t: '10 entrenos', reward: 'Listo para el modo avanzado', ok: () => doneSessions() >= 10, need: () => 10 - doneSessions() }
+/** Sesión completa: hiciste al menos el 80 % de las series planeadas. */
+function sessionCompletion(s) {
+  const plan = sessionExercises(s).reduce((a, e) => a + e[1], 0), n = DB.lifts.filter(l => l.sid === s.id).length;
+  return plan ? Math.min(1, n / plan) : n ? 1 : 0;
+}
+const fullSessions = () => DB.sessions.filter(s => s.end && sessionCompletion(s) >= 0.8).length;
+function masterTarget() {
+  const r = getRoutine(DB.profile.routine), kinds = new Set((r.days || []).filter(d => !d.rest && d.ex.length).map(d => d.name.split('·').pop().trim()));
+  return Math.min(6, Math.max(3, kinds.size * 2));
+}
+function completionPct() {
+  const ss = DB.sessions.filter(s => s.end); if (!ss.length) return 0;
+  return Math.round(ss.reduce((a, s) => a + sessionCompletion(s), 0) / ss.length * 100);
+}
+/** Cada etapa desbloquea la siguiente; la recompensa es la prueba, con tus números, de que mejoras. */
+const PATH = [
+  { k: 'start', t: 'Primer entreno', goal: 'Completa tu primera sesión guiada', prog: () => [Math.min(1, doneSessions()), 1],
+    proof: () => `Punto de partida medido en ${new Set(DB.lifts.map(l => l.ex)).size} ejercicios` },
+  { k: 'master', t: 'Dominar tu rutina', goal: () => `Completa ${masterTarget()} sesiones con al menos el 80 % de tus series`, prog: () => [Math.min(fullSessions(), masterTarget()), masterTarget()],
+    proof: () => `${fullSessions()} sesiones completas · haces el ${completionPct()} % de tus series` },
+  { k: 'record', t: 'Superar un récord', goal: 'Supera tu marca de inicio en cualquier ejercicio', prog: () => [bestImprovement() ? 1 : 0, 1],
+    proof: () => { const b = bestImprovement(); return b ? b.txt : 'Superaste tu marca de inicio'; } },
+  { k: 'consist', t: 'Construir consistencia', goal: () => `Cumple tu meta de ${weekTarget()} días por semana durante 4 semanas seguidas`, prog: () => [Math.min(4, trainingStreakWeeks()), 4], ok: () => bestStreakWeeks() >= 4,
+    proof: () => `${bestStreakWeeks()} semanas seguidas cumpliendo tu plan` }
 ];
-function nextMilestone() { return MILESTONES.find(m => !m.ok()) || null; }
-const unlocked = k => { const m = MILESTONES.find(x => x.k === k); return !isBeginner() || (m && m.ok()); };
+const stageGoal = st => typeof st.goal === 'function' ? st.goal() : st.goal;
+function pathState() {
+  let doneN = 0;
+  for (const st of PATH) { const [a, b] = st.prog(); if (!(st.ok ? st.ok() : a >= b)) break; doneN++; }
+  return { doneN, cur: PATH[doneN] || null };
+}
+/** Compatibilidad 19.0: el principiante ve récords y logros después de su primer entreno. */
+const unlocked = () => !isBeginner() || doneSessions() >= 1;
 
 function pathCard() {
-  const nx = nextMilestone(), doneN = MILESTONES.filter(m => m.ok()).length;
-  if (!nx) return `<div class="card keep path-card"><div class="pc-head"><b>Tu camino</b><span>${doneN}/${MILESTONES.length}</span></div>
-    <p class="small" style="margin:0 0 10px">Completaste el camino de inicio. El modo avanzado te deja personalizar rutinas, ver tendencias y ajustar cada variable.</p>
-    <button class="block" id="pc-adv">Activar modo avanzado</button></div>`;
-  const left = nx.need();
+  const { doneN, cur } = pathState();
   return `<div class="card keep path-card">
-    <div class="pc-head"><b>Tu camino</b><span>${doneN} de ${MILESTONES.length}</span></div>
-    <div class="pc-steps">${MILESTONES.map(m => `<span class="pc-step ${m.ok() ? 'done' : m === nx ? 'now' : ''}"><i>${m.ok() ? ico('check', 14) : ''}</i><small>${esc(m.t)}</small></span>`).join('')}</div>
-    <div class="pc-next">${ico('target', 18)}<div><b>Siguiente: ${esc(nx.t)}</b>${left > 0 && ['first', 'three', 'ten', 'week'].includes(nx.k) ? ` · te falta${left > 1 ? 'n' : ''} ${left}` : ''}<small>${esc(nx.reward)}</small></div></div>
+    <div class="pc-head"><b>Tu camino</b><span>${cur ? `Etapa ${doneN + 1} de ${PATH.length}` : 'Completado'}</span></div>
+    <ol class="pc-stages">${PATH.map((st, i) => {
+      if (i < doneN) return `<li class="done"><i>${ico('check', 14)}</i><div><b>${esc(st.t)}</b><small>${esc(st.proof())}</small></div></li>`;
+      if (i === doneN) { const [a, b] = st.prog(); return `<li class="now"><i>${i + 1}</i><div><b>${esc(st.t)}</b><small>${esc(stageGoal(st))}</small>${b > 1 ? `<div class="pc-bar"><span style="width:${Math.round(a / b * 100)}%"></span></div><small class="pc-n">${a} de ${b}</small>` : ''}</div></li>`; }
+      return `<li class="lock"><i>${i + 1}</i><div><b>${esc(st.t)}</b></div></li>`;
+    }).join('')}</ol>
+    ${cur ? '' : `<p class="small" style="margin:10px 0">Ya entrenas con constancia y mejoras con datos. El modo avanzado te deja personalizar rutinas, ver tendencias y ajustar cada variable.</p><button class="secondary block" id="pc-adv">Pasar a modo avanzado</button>`}
   </div>`;
 }
 function bindPath(root) { const b = $('#pc-adv', root); if (b) b.onclick = () => setLevel('avanzado'); }
 
-/** Qué vas a conseguir con la misión de hoy (una línea concreta). */
-function missionOutcome() {
-  const n = sessionsThisWeek(), g = weekTarget(), nx = nextMilestone(), d = doneSessions();
-  if (nx && nx.k === 'first') return 'Al terminar: conoces tu punto de partida y la app ajusta tus pesos.';
-  if (nx && nx.k === 'three' && d === 2) return 'Al terminar: completas 3 entrenos y desbloqueas tus récords.';
+/** Lo que consigues con la misión de hoy: una decisión concreta basada en tu historial. */
+function missionOutcome(nd) {
+  const n = sessionsThisWeek(), g = weekTarget(), kt = keyTarget(nd);
+  if (!doneSessions()) return 'Al terminar: conoces tu punto de partida y la app calcula tu siguiente objetivo en cada ejercicio.';
+  if (kt) return `Objetivo clave: ${kt.ex} ${kt.st.next.txt} (la última vez ${setTxt(kt.st.last.top, kt.st.u)})`;
   if (n + 1 >= g && n < g) return `Al terminar: cumples tu semana (${g} de ${g}).`;
-  if (nx && nx.k === 'ten' && d === 9) return 'Al terminar: llegas a 10 entrenos y puedes pasar a modo avanzado.';
-  return `Al terminar: sesión ${Math.min(n + 1, g)} de ${g} esta semana${DB.lifts.length ? ' y la app ajusta tu siguiente peso' : ''}.`;
+  return `Al terminar: sesión ${Math.min(n + 1, g)} de ${g} esta semana.`;
 }
 /** Tu objetivo en una línea (lo que persigues con todo esto). */
 function goalLine() {
@@ -117,7 +140,7 @@ function openStatsGate() {
       });
 }
 
-/* ---------- Progreso para principiantes ---------- */
+/* ---------- Progreso para principiantes: tus ejercicios con su siguiente objetivo ---------- */
 function bestMarks(n) {
   const best = {};
   DB.lifts.forEach(l => { const v = e1rm(l.w, l.r); if (!best[l.ex] || v > best[l.ex].v) best[l.ex] = { v, l }; });
@@ -126,30 +149,54 @@ function bestMarks(n) {
 function renderBeginnerProgress(el) {
   const d = doneSessions(), cur = currentWeight(), p = DB.profile, wk = sessionsThisWeek(), g = weekTarget();
   const ch = cur && p.startWeight ? Math.round((cur - p.startWeight) * 10) / 10 : null;
-  const marks = unlocked('three') ? bestMarks(5) : [];
+  const recent = Array.from(new Set(DB.lifts.slice().sort((a, b) => b.t - a.t).map(l => l.ex))).slice(0, 8);
+  const stories = recent.map(ex => exStory(ex)).filter(Boolean);
   el.innerHTML = `
     <div class="card keep bp-sum">
       <div class="bp-row"><div><b>${d}</b><small>entrenos en total</small></div><div><b>${wk}/${g}</b><small>esta semana</small></div><div><b>${ch == null ? '—' : (ch > 0 ? '+' : '') + fmt(ch)}</b><small>kg desde el inicio</small></div></div>
     </div>
     <div class="card keep">
-      <h2>Tus mejores marcas</h2>
-      ${marks.length ? marks.map(({ l }) => `<div class="bp-mark"><span class="grow"><b>${esc(l.ex)}</b><small>${shortDate(l.date)}</small></span><b>${wFmt(l.w, unitFor(l.ex))} × ${l.r}</b></div>`).join('')
-        : `<div class="bp-lock">${ico('shield', 22)}<div><b>Se desbloquean con 3 entrenos</b><small>Te faltan ${Math.max(0, 3 - d)}. Cada entreno guarda tus pesos y aquí verás cómo suben.</small></div></div>`}
+      <h2>Tus ejercicios</h2>
+      ${stories.length ? `<p class="small muted" style="margin-top:0">Esto hiciste, esto has mejorado y este es tu siguiente objetivo.</p>` + stories.map(st => `<details class="bp-ex"><summary><span class="grow"><b>${esc(st.ex)}</b><small>${st.next ? 'Siguiente: ' + esc(st.next.txt) : esc(st.did)}</small></span>${st.trend === 'up' ? `<span class="rs-tag up">${st.bw ? '+' + (st.last.top.r - st.first.top.r) + ' reps' : '+' + Math.round(st.pct) + ' %'}</span>` : st.trend === 'start' ? '<span class="rs-tag start">Inicio</span>' : ''}</summary>${storyHtml(st)}</details>`).join('')
+        : `<div class="bp-lock">${ico('target', 22)}<div><b>Aquí verás cómo mejoras</b><small>Después de tu primer entreno cada ejercicio te dirá qué hiciste, cuánto mejoraste y tu siguiente objetivo.</small></div></div>`}
     </div>
     <button class="ghost block" id="bp-adv">${ico('trending-up', 18, 'lead')}Ver estadísticas completas</button>`;
   $('#bp-adv', el).onclick = openStatsGate;
 }
 
-/** Rutina de inicio para principiantes con gimnasio: cuerpo completo (o torso/pierna con 4+ días),
-    armada con su equipo y sus molestias, asignada a sus días. */
-function beginnerRoutine() {
-  const p = DB.profile, days = (p.trainDays || plannedDays()).slice().sort(), n = days.length;
+/** 20.0 · Rutina de inicio armada con varias variables: días, tiempo, experiencia, objetivo,
+    recuperación, equipo y molestias. Guarda el porqué para mostrarlo en Plan. */
+function beginnerRoutine(rebuild) {
+  const p = DB.profile, days = (p.trainDays || plannedDays()).slice().sort((a, b) => a - b), n = days.length;
+  const mins = p.minutes || 45, exp = p.stage || 2, goal = p.phase || 'mantener', rec = p.recovery || 'normal';
+  if (rebuild) {   // quita los entrenos que armó la app antes (los tuyos se quedan)
+    const names = new Set(Object.values(FOCUS).map(f => f[1]));
+    DB.workouts = DB.workouts.filter(w => !(w.auto || (DB.plan.includes(w.id) && names.has(w.name))));
+  }
   const focus = n <= 3 ? days.map(() => 'full') : days.map((_, i) => fem() ? ['gluteo', 'torso', 'pierna', 'torso', 'full', 'full', 'full'][i] : ['torso', 'pierna', 'torso', 'pierna', 'full', 'full', 'full'][i]);
+  const want = mins <= 15 ? 3 : mins <= 30 ? 4 : mins <= 45 ? 5 : 6;
+  const R = { definicion: [['10–12', 90], ['12–15', 60]], volumen: [['8–12', 120], ['10–12', 75]], mantener: [['8–12', 90], ['12–15', 60]] }[goal] || [['8–12', 90], ['12–15', 60]];
+  const setsFor = comp => Math.max(2, (comp ? 3 : exp >= 3 ? 3 : 2) - (rec === 'mal' ? 1 : 0));
+  const est = ex => Math.round(5 + ex.reduce((a, e) => a + e[1] * (e[3] + 40), 0) / 60);
   const plan = Array(7).fill(null), made = {};
+  let sample = null;
   days.forEach((d, i) => {
-    const f = focus[i], key = f + (made[f] ? '' : '');
-    if (!made[f]) { const w = { id: uid(), name: FOCUS[f][1], ex: autoWorkout(f, p.minutes).map(e => [e[0], Math.min(3, e[1]), e[2], e[3]]) }; DB.workouts.push(w); made[f] = w.id; }
-    plan[d] = made[key];
+    const f = focus[i];
+    if (!made[f]) {
+      let ex = autoWorkout(f, 60).slice(0, want).map(e => { const comp = exInfo(e[0]).t === 'c'; return [e[0], setsFor(comp), comp ? R[0][0] : R[1][0], comp ? R[0][1] : R[1][1]]; });
+      while (ex.length > 3 && est(ex) > mins + 5) ex = ex.slice(0, -1);
+      const w = { id: uid(), name: FOCUS[f][1], ex, auto: true }; DB.workouts.push(w); made[f] = w.id; sample = sample || ex;
+    }
+    plan[d] = made[f];
   });
   DB.plan = plan; p.routine = 'custom';
+  const consec = days.some((d, i) => i && d - days[i - 1] === 1);
+  p.planWhy = [
+    n <= 3 ? `${n} día${n > 1 ? 's' : ''} por semana → cuerpo completo: cada músculo se trabaja ${n} ${n > 1 ? 'veces' : 'vez'} por semana.` : `${n} días por semana → torso y pierna alternados: cada músculo 2 veces por semana sin sobrecargarte.`,
+    `${mins >= 60 ? '60 min o más' : mins + ' min'} por sesión → ${sample ? sample.length : want} ejercicios (≈${sample ? est(sample) : mins} min con calentamiento).`,
+    exp >= 3 ? 'Ya tienes experiencia → 3 series por ejercicio.' : 'Vas empezando → 3 series en los básicos y 2 en accesorios: primero la técnica.',
+    goal === 'definicion' ? 'Perder grasa → 10–15 reps y descansos cortos (60–90 s).' : goal === 'volumen' ? 'Ganar músculo → 8–12 reps y descansos de 75–120 s.' : 'Mantenerte → 8–15 reps con descansos de 60–90 s.',
+    rec === 'mal' ? 'Duermes o descansas poco → una serie menos por ejercicio. Súbela cuando duermas mejor.' : rec === 'bien' ? 'Te recuperas bien → volumen completo.' : 'Recuperación normal → si un día llegas cansado, la app te propone reducir.'
+  ].concat((p.limits || []).length ? [`Cuidando: ${p.limits.map(k => LIMITS[k] ? LIMITS[k].name.toLowerCase() : k).join(', ')} → sin ejercicios que lo carguen.`] : [])
+   .concat(consec && n <= 3 ? ['Tienes días seguidos: si el segundo día llegas cansado, baja un poco el peso.'] : []);
 }
