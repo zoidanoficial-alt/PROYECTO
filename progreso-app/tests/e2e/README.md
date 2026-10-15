@@ -5,7 +5,8 @@ Las pruebas usan Playwright con Chromium y cargan la app web (`assets/www`) en u
 ```bash
 cd tests/e2e
 npm init -y && npm i playwright && npx playwright install chromium
-./run-all.sh
+./run-all.sh                      # todas
+TESTS="v28 v28r" ./run-all.sh     # solo algunas
 ```
 
 - `v9`–`v28`: un archivo por versión con los flujos que esa versión agregó. Todos se vuelven a correr en cada versión (regresión).
