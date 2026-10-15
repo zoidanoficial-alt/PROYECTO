@@ -18,7 +18,7 @@ cp dist/MiProgreso.apk "$PKG/apk/MiProgreso-$VER.apk"
 git ls-files -z . | grep -zv -e '^keystore/' -e '^dist/' -e '^venta/' -e '^build/' \
   | xargs -0 -I{} cp --parents "{}" "$PKG/codigo/"
 mkdir -p "$PKG/codigo/keystore"
-echo "La llave de firma no se incluye. Genera la tuya (ver 05-TRANSFERENCIA.md) y pásala a build.sh con KEYSTORE, KEY_ALIAS y KEY_PASS." > "$PKG/codigo/keystore/LEEME.txt"
+echo "La llave de firma original no se incluye. Si esta carpeta está vacía, build.sh genera una llave nueva aquí al compilar. Para publicar usa tu propia llave (KEYSTORE, KEY_ALIAS y KEY_PASS) y Play App Signing; ver 05-TRANSFERENCIA.md." > "$PKG/codigo/keystore/LEEME.txt"
 
 cp dist/captura-$VER-*.png "$PKG/capturas/" 2>/dev/null || true
 
