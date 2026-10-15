@@ -516,4 +516,6 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - **Editor de la semana:** lunes a descanso y martes con un entreno nuevo "Abdomen exprés" de 2 ejercicios; el botón + sube las series a 4.
 - **Pie de Más:** "Mi Progreso 17.0.1".
 - Desborde a 320, 360 y 393 px con letra al 130–140 %: 0 px (las tiras de días y de enfoques se desplazan de lado a propósito).
-- Regresión v9–v24 y persist: sin errores. A esas pruebas se les agregó un paso que cierra la guía nueva tras el registro inicial.
+- Regresión v9–v24 y persist: sin errores de la app.
+  - A esas pruebas se les agregó un paso que cierra la guía nueva tras el registro inicial. v11 y v13 ahora abren "Más para ti" antes de buscar la agenda.
+  - v14 muestra un aviso de Chrome ("navigator.vibrate bloqueado sin un toque previo"). Lo provoca la vibración de un logro al dibujar Inicio justo después de recargar, sin que la prueba haya tocado la pantalla. En Android la vibración pasa por el puente nativo y no tiene esa restricción.
