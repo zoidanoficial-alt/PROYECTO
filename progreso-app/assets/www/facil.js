@@ -14,7 +14,7 @@ function updateEllaHeader() {
   b.hidden = currentTab !== 'home' || !DB.profile.onboarded;
   b.classList.toggle('on', on);
   b.setAttribute('aria-pressed', on ? 'true' : 'false');
-  b.innerHTML = on ? '🎀 <span>Ella</span>' : '🎀 <span>Modo Ella</span>';
+  b.innerHTML = ico('award', 18) + (on ? ' <span>Ella</span>' : ' <span>Modo Ella</span>');
 }
 function toggleEllaFromHeader() {
   const on = !(girly() && fem());
@@ -22,19 +22,34 @@ function toggleEllaFromHeader() {
   if (on && DB.profile.routine === 'pro' && !DB.sessions.some(s => s.end)) DB.profile.routine = 'gluteo';
   saveData(); render(currentTab); updateEllaHeader();
   toast(on ? '🎀 Modo Ella activado' : 'Modo clásico');
-  if (on && typeof burst === 'function') burst($('#hdr-ella'));
 }
 
 /* ---------- Motivación: tu semana en la tarjeta principal ---------- */
+/** 18.0: los 7 días de la semana (relleno = entrenaste) y "3 de 5 sesiones esta semana". */
 function weekDotsHtml() {
-  if (typeof weekAgenda !== 'function') return '';
-  const ag = weekAgenda(), done = ag.filter(a => a.done).length, goal = ag.length || weekTarget();
-  if (!goal) return '';
-  const left = Math.max(0, goal - done);
-  const msg = done >= goal ? '¡Semana cumplida! Todo lo demás es extra 🏆' : done === 0 ? 'Tu semana empieza con el primer entreno 💪' : left === 1 ? '¡Te falta 1 para cumplir tu semana! 🔥' : `Vas ${done} de ${goal}: ¡sigue así! ⚡`;
-  return `<div class="week-dots-hero" aria-label="${done} de ${goal} entrenos esta semana">
-    <span class="wd-dots">${ag.map(a => `<i class="${a.done ? 'done' : a.today ? 'today' : a.past ? 'missed' : ''}" title="${esc(WEEKDAYS[a.k])}">${a.done ? '✓' : WEEKDAYS[a.k][0]}</i>`).join('')}</span>
-    <span class="wd-msg">${msg}</span></div>`;
+  if (typeof activeDates !== 'function') return '';
+  const wk = weekKey(todayStr()), act = activeDates(), t = todayStr(), goal = weekTarget();
+  const days = WEEKDAYS.map((n, k) => { const d = addDays(wk, k); return { n, d, done: act.has(d), today: d === t }; });
+  const done = days.filter(x => x.done).length;
+  return `<div class="week-dots-hero" aria-label="${done} de ${goal} sesiones esta semana">
+    <span class="wd-dots">${days.map(x => `<span class="wd ${x.done ? 'done' : ''} ${x.today ? 'today' : ''}"><i></i><small>${x.n[0]}</small></span>`).join('')}</span>
+    <span class="wd-msg"><b>${Math.min(done, 99)} de ${goal} sesiones</b><small>${done >= goal ? 'semana cumplida' : 'esta semana'}</small></span></div>`;
+}
+/** 18.0: tres indicadores — puntos, días activos y peso medio. */
+function statsRow() {
+  const lv = typeof activityLevels === 'function' ? activityLevels() : null;
+  const pts = lv ? Math.round((lv.fuerza.xp || 0) + (lv.running.xp || 0)) : 0;
+  const n = sessionsThisWeek(), g = weekTarget(), cur = currentWeight();
+  const tile = (k, icon, v, l) => `<button class="stat-tile" data-stat="${k}">${ico(icon, 20)}<b>${v}</b><small>${l}</small></button>`;
+  return `<div class="stats3">${tile('pts', 'star', pts, 'puntos')}${tile('wk', 'calendar', n + '/' + g, 'días activos')}${tile('wt', 'weight', cur ? fmt(cur) : '—', 'kg · peso medio')}</div>`;
+}
+function bindStats(root) {
+  $$('[data-stat]', root).forEach(b => b.onclick = () => {
+    const k = b.dataset.stat;
+    if (k === 'pts') { progMode = 'logros'; showTab('progress'); }
+    else if (k === 'wt') openWeightQuick();
+    else { const g = $('#view-home .more-group'); if (g) g.open = true; const f = $('#view-home [data-fold^="f-mi-agenda"]') || $('#view-home [data-fold^="f-tu-semana"]'); if (f) { f.open = true; f.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
+  });
 }
 
 /* ---------- Tarjeta "Tu rutina" (Entreno) ---------- */
@@ -205,7 +220,6 @@ function openRoutineWizard() {
         saveData(); closeModal();
         if (currentTab === 'train') renderTrain(); else showTab('train');
         window.scrollTo(0, 0); toast('✨ ¡Rutina creada! Toca un día para verlo o editarlo');
-        if (typeof burst === 'function') setTimeout(() => burst($('.routine-card')), 150);
       };
     }
   };

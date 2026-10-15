@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '17.0.1';
+const APP_VERSION = '18.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -718,7 +718,9 @@ function showTab(tab) {
   $$('section.view').forEach(s => s.classList.toggle('active', s.id === 'view-' + tab));
   $('#tabs').classList.toggle('four', isSimple());
   $('[data-tab=food]').hidden = isSimple();
-  $('#hdr-title').textContent = tab === 'home' ? greeting() + (DB.profile.name ? ', ' + DB.profile.name : '') : TITLES[tab];
+  const ht = $('#hdr-title');
+  if (tab === 'home') ht.innerHTML = DB.profile.name ? `<span class="hi">${esc(greeting())},</span><b>${esc(DB.profile.name)}</b>` : esc(greeting()); else ht.textContent = TITLES[tab];
+  document.body.dataset.tab = tab;
   redrawChart = () => {};
   document.body.classList.remove('in-session');
   render(tab);
@@ -828,7 +830,8 @@ function renderHome() {
   } else if (nd && nd.rest) {
     hero = `<div class="hero rest"><div class="eyebrow">Hoy toca</div><h3>Descanso</h3><p>El músculo crece cuando descansas. Camina, hidrátate y come bien.</p><button id="home-free">Entrenar de todos modos</button></div>`;
   } else if (nd) {
-    hero = `<div class="hero"><div class="eyebrow">Hoy toca${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ~${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min · ${esc(r.name)}</p><button id="home-train">Empezar entreno</button></div>`;
+    const photo = (nd.ex.map(e => EX_PHOTO[e[0]]).find(Boolean));   // 18.0: la foto del primer ejercicio con foto
+    hero = `<div class="hero mission"><div class="m-top">${photo ? `<div class="m-photo" style="background-image:url('img/ex/${photo}-0.jpg')"></div>` : ''}<div class="m-body"><div class="eyebrow">Tu misión de hoy${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min</p><button id="home-train">${ico('play', 18)} Empezar entrenamiento</button></div></div></div>`;
   } else {
     hero = `<div class="hero"><div class="eyebrow">Entreno</div><h3>Entreno libre</h3><p>Elige ejercicios sobre la marcha.</p><button id="home-free">Empezar</button></div>`;
   }
@@ -846,15 +849,16 @@ function renderHome() {
     ${hero}
     ${comebackCard()}
     ${notifPromptCard()}
-    ${glanceStrip()}
+    ${statsRow()}
     ${full ? pwoCard() : ''}
 
-    <div class="quick">
-      <button data-q="weight"><span class="q-ico" style="background:var(--accent-soft)">⚖️</span>${todayW ? fmt(todayW) + ' kg' : 'Peso'}</button>
-      ${full ? `<button data-q="water"><span class="q-ico" style="background:var(--blue-soft)">💧</span>+250 ml</button>
-      <button data-q="meal"><span class="q-ico" style="background:var(--good-soft)">🍽️</span>Comida</button>` : `<button data-q="train"><span class="q-ico" style="background:var(--good-soft)">🏋️</span>Libre</button>
-      <button data-q="history"><span class="q-ico" style="background:var(--blue-soft)">📒</span>Historial</button>`}
-      <button data-q="photo"><span class="q-ico" style="background:var(--warn-soft)">📷</span>Foto</button>
+    <div class="qa-title">Accesos rápidos</div>
+    <div class="quick qa">
+      <button data-q="weight">${ico('weight', 22)}<span>${todayW ? fmt(todayW) + ' kg' : 'Peso'}</span>${ico('chevron-right', 16, 'qa-chev')}</button>
+      ${full ? `<button data-q="water">${ico('droplet', 22)}<span>Agua</span>${ico('chevron-right', 16, 'qa-chev')}</button>
+      <button data-q="meal">${ico('utensils', 22)}<span>Comida</span>${ico('chevron-right', 16, 'qa-chev')}</button>` : `<button data-q="train">${ico('dumbbell', 22)}<span>Libre</span>${ico('chevron-right', 16, 'qa-chev')}</button>
+      <button data-q="history">${ico('notebook-pen', 22)}<span>Historial</span>${ico('chevron-right', 16, 'qa-chev')}</button>`}
+      <button data-q="log">${ico('clipboard-list', 22)}<span>Registro</span>${ico('chevron-right', 16, 'qa-chev')}</button>
     </div>
 
     ${full ? `<div class="card" data-fold-title="Comida y agua" data-fold-ico="🍽️" data-fold-sum="${tot.kcal.toLocaleString('es-MX')} de ${tg.kcal.toLocaleString('es-MX')} kcal · ${Math.round(tot.p)} g proteína · ${fmt(tot.water / 1000, 1)} L">
@@ -918,7 +922,7 @@ function renderHome() {
   const ach = $('#home-ach'); if (ach) ach.onclick = () => { progMode = 'logros'; showTab('progress'); };
   const vh = $('#view-home');
   bindComeback(vh, renderHome); bindNotifPrompt(vh, renderHome); bindCycleInvite(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
-  bindGlance(vh);
+  bindGlance(vh); bindStats(vh);
   foldify(vh, [['Para hoy', ['Misiones de hoy', 'Comida y agua', 'Tu ciclo']], ['Más para ti', '*', true]]);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
   showChart(() => drawSpark($('#home-spark'), movingAvg(entries).map(e => e.y)));
@@ -967,6 +971,7 @@ function quickAction(k) {
   if (k === 'activity') return openActivityForm();
   if (k === 'export') return openExport();
   if (k === 'history') { progMode = 'strength'; return showTab('progress'); }
+  if (k === 'log') return openQuickSheet();
 }
 function openQuickSheet() {
   openModal(`
@@ -1552,7 +1557,7 @@ const A11Y_LABELS = { '−': 'Menos', '+': 'Más', '✕': 'Quitar', '↑': 'Subi
 function labelButtons(root) {
   $$('button:not([aria-label])', root || document).forEach(b => { const t = b.textContent.trim(); if (A11Y_LABELS[t]) b.setAttribute('aria-label', A11Y_LABELS[t]); });
 }
-new MutationObserver(muts => { for (const m of muts) m.addedNodes.forEach(n => { if (n.nodeType === 1) labelButtons(n); if (n.nodeType === 1 || n.nodeType === 3) femify(n); }); }).observe(document.body, { childList: true, subtree: true });
+new MutationObserver(muts => { for (const m of muts) m.addedNodes.forEach(n => { if (n.nodeType === 1) labelButtons(n); if (n.nodeType === 1 || n.nodeType === 3) femify(n); if (n.nodeType === 1) iconify(n); }); }).observe(document.body, { childList: true, subtree: true });
 /** Si el sistema pide reducir movimiento, no hay confeti. */
 const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -3117,7 +3122,7 @@ $('#fab').onclick = openQuickSheet;
 showTab(DB.active && activeSession() ? 'train' : 'home');
 restoreRest();
 restoreRun();   // 12.0: recupera una carrera en curso si la app se cerró
-labelButtons(); femify();
+labelButtons(); femify(); iconify(document.body);
 if (RUN.st) showTab('train');
 // 17.0: si se abrió tocando un recordatorio, ir a su pestaña; y reprogramar la agenda con los datos de hoy.
 try { const nt = bridge && bridge.takeLaunchTab ? bridge.takeLaunchTab() : ''; if (nt && !RUN.st && !DB.active) window.onNotifOpen(nt); } catch (e) {}

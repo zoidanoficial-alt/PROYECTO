@@ -519,3 +519,51 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - Regresión v9–v24 y persist: sin errores de la app.
   - A esas pruebas se les agregó un paso que cierra la guía nueva tras el registro inicial. v11 y v13 ahora abren "Más para ti" antes de buscar la agenda.
   - v14 muestra un aviso de Chrome ("navigator.vibrate bloqueado sin un toque previo"). Lo provoca la vibración de un logro al dibujar Inicio justo después de recargar, sin que la prueba haya tocado la pantalla. En Android la vibración pasa por el puente nativo y no tiene esa restricción.
+
+---
+
+## 18.0 · Diseño de alto rendimiento
+
+**Objetivo:** que se sienta como un entrenador personal de alto rendimiento, no como un juego infantil. Sigue la maqueta y los 5 cambios del brief del usuario.
+
+**Paleta** (tokens en `styles.css`, capa 18.0):
+
+| Token | Valor | Uso |
+|---|---|---|
+| Midnight | `#111C23` | Fondo del modo oscuro, la identidad principal y el tema por defecto |
+| Performance | `#25D8D0` | Botón principal, datos y semana |
+| Ivory | `#FAF7F5` | Fondo del modo claro |
+| Ella | `#E94F83` | Acento del modo claro (navegación activa, línea de "Tu misión de hoy", botón Modo Ella) y color principal del Modo Ella |
+
+**Los 5 cambios:**
+1. **Menos emojis.**
+   - Iconos lineales coherentes: 72 iconos de Lucide (licencia ISC, `fonts/LICENSE-Lucide.txt`) en `icons.js`.
+   - `iconify()` cambia los emojis de la interfaz (títulos de sección, barras de herramientas, botones, fichas de rutina, selectores) por su icono. Lo hace al dibujar cada pantalla y en todas las pestañas.
+   - Los emojis quedan en mensajes y celebraciones (avisos breves, récords).
+2. **Jerarquía clara en Inicio:**
+   - Una misión principal, tres indicadores (puntos, días activos, peso medio) y accesos rápidos (Peso, Agua, Comida, Registro).
+   - Debajo, "Para hoy" y "Más para ti" plegado.
+   - El botón flotante (+) no aparece en Inicio porque los accesos rápidos ya cubren eso.
+3. **Tipografía:**
+   - Inter (variable, `fonts/InterVariable.woff2`, licencia OFL) incluida en la app, así que funciona sin internet.
+   - Títulos en semibold. Saludo en dos líneas: "Buenas tardes," normal y el nombre en negrita.
+4. **Gamificación sobria:**
+   - Sin decoraciones de corazones ni el triángulo naranja en la tarjeta principal.
+   - Sin confeti al activar Modo Ella ni al crear una rutina (queda para récords y entrenos terminados).
+   - Barras de un solo color y mensajes en gris.
+5. **El entreno como protagonista:**
+   - Tarjeta "Tu misión de hoy" con la foto del primer ejercicio del día fundida a la derecha.
+   - Botón "▶ Empezar entrenamiento" en píldora turquesa.
+   - Semana L–D con puntos rellenos para los días entrenados y "3 de 5 sesiones esta semana".
+
+**Se conserva:** el turquesa, la identidad de Modo Ella (ahora ivory + rosa), la navegación inferior y el registro de la semana.
+
+**Archivos:**
+- Nuevos: `icons.js`, `fonts/InterVariable.woff2`, `fonts/LICENSE-Inter.txt`, `fonts/LICENSE-Lucide.txt`.
+- Modificados: `styles.css` (capa 18.0), `app.js` (misión, indicadores, accesos, saludo, iconos al dibujar), `facil.js` (semana de 7 días, indicadores, botón Ella con icono), `index.html`, `AndroidManifest.xml` (18.0 / 23).
+
+**Verificación (`v26.mjs`):**
+- Inicio en oscuro, claro y Modo Ella, Entreno y Más.
+- Inter cargada.
+- Ningún emoji en la interfaz de las 5 pestañas, según el recorrido de `v26c`.
+- Sin errores de consola.
