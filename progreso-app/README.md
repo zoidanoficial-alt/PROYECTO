@@ -1,4 +1,6 @@
-# Mi Progreso 6.0 (app Android)
+# Mi Progreso 20.0 (app Android)
+
+> Para evaluarla o adquirirla, ver `venta/00-LEEME.md`. El historial técnico por versión está en `docs/AUDITORIA-v12.md`.
 
 App de entrenamiento y progreso físico. Gratis, sin anuncios, sin cuenta y sin internet:
 todo se guarda en el teléfono y se exporta cuando quieras.

@@ -1,0 +1,23 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2, reducedMotion: 'reduce' });
+const page = await ctx.newPage(); const errors = [];
+page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+page.on('dialog', d => d.accept());
+await page.goto('http://127.0.0.1:8765/index.html');
+await page.fill('#ob-name', 'Dan'); for (let k = 0; k < 7; k++) await page.click('#ob-next'); await page.waitForTimeout(900); await page.evaluate(() => { /*__guideFix*/ /*__lvlFix*/ DB.profile.guideSeen = true; DB.profile.level = 'avanzado'; if (DB.profile.routine === 'custom') DB.profile.routine = 'pro'; saveData(); showTab(currentTab); if (document.querySelector('.guide')) closeModal(); });
+await page.waitForTimeout(300);
+await page.click('nav button[data-tab=train]'); await page.click('#cp-start'); await page.waitForTimeout(300);
+const sizes = await page.evaluate(() => Array.from(document.querySelectorAll('#view-train .stepper button, #view-train .mini-step button, #view-train .icon-btn')).filter(b => b.offsetParent).map(b => { const r = b.getBoundingClientRect(); return Math.min(r.width, r.height); })); const small = await page.evaluate(() => Array.from(document.querySelectorAll('#view-train .stepper button, #view-train .mini-step button, #view-train .icon-btn')).filter(b => b.offsetParent && Math.min(b.getBoundingClientRect().width, b.getBoundingClientRect().height) < 40).map(b => b.className + ':' + b.textContent.trim() + ':' + Math.round(b.getBoundingClientRect().height))); console.log('small:', JSON.stringify(small));
+await page.screenshot({ path: 'v19-session.png' }); console.log('interactive controls measured:', sizes.length, '| min size px:', Math.min(...sizes));
+const unlabeled = await page.evaluate(() => Array.from(document.querySelectorAll('button')).filter(b => b.offsetParent && !b.getAttribute('aria-label') && b.textContent.trim().length <= 2).map(b => b.textContent.trim()));
+console.log('symbol-only buttons without label:', JSON.stringify(unlabeled));
+await page.fill('#w-0', '60'); await page.fill('#r-0', '10');
+await page.evaluate(() => { SESS_UI.n[0] = 4; }); await page.click('#save-0'); await page.waitForTimeout(800);
+console.log('confetti with reduced motion:', await page.locator('.confetti').count());
+// home hero for running plan
+await page.click('#ss-cancel'); await page.evaluate(() => { DB.profile.trainMode = 'running'; DB.runPlan = buildRunPlan('5k', 3, null, null, 8); DB.runPlan.weeks[0].sessions[0].date = todayStr(); });
+await page.click('nav button[data-tab=home]'); await page.waitForTimeout(200);
+console.log('home hero:', (await page.textContent('.hero')).replace(/\s+/g, ' ').slice(0, 120));
+await page.screenshot({ path: 'v19-home-run.png' });
+console.log('ERRORS', JSON.stringify(errors)); await b.close();
