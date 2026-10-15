@@ -567,3 +567,8 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - Inter cargada.
 - Ningún emoji en la interfaz de las 5 pestañas, según el recorrido de `v26c`.
 - Sin errores de consola.
+- **Desborde:** a 320, 360 y 393 px con letra al 130–150 %, en clásico y rosa, da 0 px. El botón de la misión y el texto de la semana bajan de línea solo cuando no caben.
+- **Regresión v9–v26 y persist:** sin errores de la app.
+  - v11 y v15 abrían "Registrar" con el botón + de Inicio, que ahora está oculto; usan la misma hoja de Registro.
+  - v13 abría el chequeo desde el recuadro de Inicio, que ya no existe; el chequeo sigue en Entreno ("Chequeo de hoy") y en las misiones.
+  - v14 conserva el aviso de Chrome sobre `navigator.vibrate` explicado en la 17.0.1.
