@@ -1232,3 +1232,6 @@ body[data-tab="home"] .fab { display: none; }
 .quick.qa .qa-chev { bottom: 13px; right: 8px; }
 .quick.qa button > span { padding-right: 0; font-size: 14px; }
 .quick.qa .qa-chev { top: 15px; bottom: auto; right: 10px; }
+.hero button { white-space: normal; max-width: 100%; text-align: center; }
+.week-dots-hero { flex-wrap: wrap; }
+.wd-msg { min-width: 0; }
