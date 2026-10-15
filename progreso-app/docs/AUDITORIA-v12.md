@@ -572,3 +572,56 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
   - v11 y v15 abrían "Registrar" con el botón + de Inicio, que ahora está oculto; usan la misma hoja de Registro.
   - v13 abría el chequeo desde el recuadro de Inicio, que ya no existe; el chequeo sigue en Entreno ("Chequeo de hoy") y en las misiones.
   - v14 conserva el aviso de Chrome sobre `navigator.vibrate` explicado en la 17.0.1.
+
+---
+
+## 19.0 · Arquitectura de producto: un camino claro
+
+**Problema (del usuario):** la app tenía muchas funciones que competían por la atención. Alguien nuevo no entendía en cinco segundos qué puede hacer, qué debería hacer ahora ni qué consigue si lo hace.
+
+**Tres niveles:**
+
+| Nivel | Dónde | Contenido |
+|---|---|---|
+| 1 · Lo que debo hacer ahora | **Hoy** | Tu objetivo en una línea ("Objetivo: bajar a 81 kg · te faltan 7 kg"), una sola misión con un solo botón y **qué vas a conseguir** al hacerla ("Al terminar: completas 3 entrenos y desbloqueas tus récords"). Debajo, la semana. Todo lo demás va en "Más de hoy", plegado. |
+| 2 · Lo que necesito para avanzar | **Plan** | Tu plan del día, tu rutina (días, cambiar, personalizar, crear en 3 pasos) y el registro de la sesión. |
+| 3 · Lo que quiero explorar | **Explorar** | Nutrición, estadísticas, running, retos, ejercicios, otras actividades y ajustes. |
+
+**Qué salió de la primera vista de Hoy:** los tres indicadores, los cuatro accesos rápidos (el registro rápido queda en el botón +) y el aviso de notificaciones (ahora se ofrece después del primer entreno: "¿Te aviso para el siguiente entreno?").
+
+**Navegación:** Hoy · Plan · (Nutrición) · Progreso · Explorar.
+- **Principiante:** 4 pestañas. Nutrición vive en Explorar porque no es lo primero que necesita para empezar.
+- **Avanzado:** 5 pestañas, porque ahí nutrición es una necesidad propia y diaria.
+
+**Dos experiencias.** Se eligen en la bienvenida ("¿Cuánta guía quieres?") y se cambian en Explorar → "Tu experiencia".
+
+- **Principiante:**
+  - **Rutina adecuada:** no se le pide elegir entre rutinas que no conoce. La app arma cuerpo completo para sus días (torso/pierna o glúteo con 4 o más), con su equipo y sus molestias, a 3 series. Si empieza desde cero (etapa 1), le da "Primeros pasos".
+  - **Primer día:** si aún no tiene entrenos, Hoy nunca muestra "Descanso". La misión es **"Tu primer entreno"**, sea el día que sea.
+  - **Tu camino:** primer entreno → 3 entrenos → semana cumplida → primer récord → 10 entrenos. Cada hito dice qué desbloquea, y el último propone el modo avanzado.
+  - **Plan:** solo el plan del día, la rutina y el chequeo, sin barra de herramientas, retos ni análisis semanales.
+  - **Progreso:** "Resumen" con entrenos totales, semana, kg desde el inicio y tus mejores marcas (se desbloquean con 3 entrenos), más Peso y Fotos. Logros aparece al desbloquear el hito de 3 entrenos.
+  - **Estadísticas completas:** se piden desde Explorar o Progreso y ofrecen pasar a avanzado.
+- **Avanzado:** todo lo anterior a la vista: personalizar rutinas, progresión por ejercicio, tendencias, récords, variables (series, RIR, técnicas) y las 8 vistas de Progreso.
+- **Quien ya usaba la app:** se le asigna avanzado si tiene 5 o más entrenos, rutina propia o etapa 3 o más; si no, principiante. Lo puede cambiar en un toque.
+
+**Corrección incluida:** desde la 18.0 el `<body>` lleva `data-tab`. El código que ocultaba la pestaña Nutrición tomaba "el primer elemento con data-tab=food", que en Nutrición era el propio `<body>`, y dejaba la página en blanco. Ahora se busca solo dentro de la barra de navegación.
+
+**Archivos:**
+- Nuevo: `ruta.js` (niveles, hitos, objetivo, resultado de la misión, Explorar, Progreso de principiante, rutina de inicio).
+- Modificados: `app.js` (Hoy, Plan, Progreso, Explorar, navegación, bienvenida), `facil.js` (guía nueva), `notif.js`, `icons.js`, `index.html` (Hoy, Plan, Explorar), `styles.css` (capa 19.0), `AndroidManifest.xml` (19.0 / 24).
+
+**Verificación:**
+- **`v27.mjs`:**
+  - La bienvenida propone principiante.
+  - **Hoy:** 4 pestañas; la primera vista es objetivo + misión + Tu camino; sin indicadores ni accesos rápidos; "Más de hoy" plegado.
+  - **Plan:** sin barra de herramientas ni análisis.
+  - **Progreso:** Resumen, Peso y Fotos, con marcas bloqueadas.
+  - **Explorar:** Nutrición abre su pestaña y Estadísticas ofrece pasar a avanzado.
+  - **Con 3 entrenos:** se cumplen 3 hitos, aparecen las mejores marcas y la pestaña Logros.
+  - **En avanzado:** 5 pestañas, Plan completo y las 8 vistas de Progreso.
+- **`v27b`:**
+  - Una principiante recibe cuerpo completo L/X/V con 6 ejercicios a 3 series.
+  - El aviso de notificaciones no aparece antes del primer entreno.
+  - Quien elige avanzado ve 4 rutinas para elegir y se le guarda la elegida (tp4).
+- **`v27c`:** un jueves sin entrenos, Hoy muestra "Tu primer entreno · Cuerpo completo", y Empezar abre la sesión de 6 ejercicios.

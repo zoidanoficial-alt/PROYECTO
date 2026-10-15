@@ -120,9 +120,9 @@ window.onNotifOpen = tab => { if (['home', 'train', 'food', 'progress', 'more'].
 /** Tarjeta de Inicio para activarlas (una sola vez). */
 function notifPromptCard() {
   const N = notifCfg();
-  if (N.on || N.asked) return '';
+  if (N.on || N.asked || (typeof doneSessions === 'function' && doneSessions() < 1)) return '';   // 19.0: se ofrece después del primer entreno
   return `<div class="card keep notif-prompt">
-    <h2 style="margin:0 0 4px">🔔 ¿Te aviso a tiempo?</h2>
+    <h2 style="margin:0 0 4px">¿Te aviso para el siguiente entreno?</h2>
     <p class="small" style="margin:0 0 10px">Te recuerdo tu entreno, el chequeo, pesarte, el agua y la proteína, solo cuando haga falta: si ya lo hiciste, no hay aviso. Nada de noche y máximo 4 al día.</p>
     <div class="row"><button id="np-yes" style="flex:2">Activar notificaciones</button><button class="secondary" id="np-no" style="flex:1">Ahora no</button></div>
   </div>`;

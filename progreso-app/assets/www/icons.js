@@ -19,14 +19,14 @@ const EMOJI_ICON = {
   '🎀': 'award', '⭐': 'star', '🌱': 'sprout', '🍑': 'heart', '🔁': 'refresh-cw', '🕸': 'trophy', '▶': 'play', '📡': 'map-pin', '✍': 'pencil', '📥': 'download',
   '🗒': 'notebook-pen', '🚶': 'footprints', '🧘': 'person-standing', '🚴': 'bike', '🤸': 'person-standing', '🧎': 'person-standing', '🏠': 'house', '⚽': 'goal',
   '🌿': 'sprout', '🌀': 'activity', '🪜': 'mountain', '🚣': 'activity', '🍗': 'utensils', '📊': 'trending-up', '👋': 'hand-heart', '📒': 'notebook-pen',
-  '🦵': 'footprints', '💪': 'dumbbell', '💖': 'heart', '👑': 'trophy', '🔒': 'shield', '🛡': 'shield', '⬅': 'arrow-left', '↺': 'rotate-ccw', '🎁': 'award', '🧱': 'layers', '🦅': 'activity', '🏔': 'mountain', '➡': 'arrow-left', '🧗': 'mountain', '🥗': 'utensils', '🍳': 'utensils', '🥤': 'droplet', '🍫': 'utensils', '🚫': 'x', '🎉': 'party-popper', '🤖': 'sparkles', '🔬': 'brain', '🧪': 'pill', '📸': 'camera', '🥇': 'medal', '🗽': 'trophy', '🧬': 'activity', '🌅': 'sun', '🛌': 'bed', '😮': 'activity', '🩸': 'heart-pulse', '📐': 'ruler', '🦶': 'footprints', '🫁': 'activity', '🍎': 'utensils', '🥑': 'utensils', '📖': 'book-open', '🚀': 'zap', '🌎': 'map', '☀': 'sun', '👩': 'user', '👨': 'user', '📶': 'gauge'
+  '🦵': 'footprints', '💪': 'dumbbell', '💖': 'heart', '👑': 'trophy', '🔒': 'shield', '🛡': 'shield', '⬅': 'arrow-left', '↺': 'rotate-ccw', '🎁': 'award', '🧱': 'layers', '🦅': 'activity', '🏔': 'mountain', '➡': 'arrow-left', '🧗': 'mountain', '🥗': 'utensils', '🍳': 'utensils', '🥤': 'droplet', '🍫': 'utensils', '🚫': 'x', '🎉': 'party-popper', '🤖': 'sparkles', '🔬': 'brain', '🧪': 'pill', '📸': 'camera', '🥇': 'medal', '🗽': 'trophy', '🧬': 'activity', '🌅': 'sun', '🛌': 'bed', '😮': 'activity', '🩸': 'heart-pulse', '📐': 'ruler', '🦶': 'footprints', '🫁': 'activity', '🍎': 'utensils', '🥑': 'utensils', '📖': 'book-open', '🚀': 'zap', '🌎': 'map', '☀': 'sun', '👩': 'user', '👨': 'user', '📶': 'gauge', '⚙': 'settings', '🐻': 'activity', '🦒': 'activity', '🐆': 'activity', '🧸': 'activity', '🟣': 'map-pin', '🏡': 'house'
 };
 const EMOJI_LEAD = /^\s*(\p{Extended_Pictographic}|[⬡↺])(?:️|‍[♀♂]️?|‍\p{Extended_Pictographic}️?)*\s*/u;
 function emojiIcon(text) {
   const m = (text || '').match(EMOJI_LEAD); if (!m) return null;
   const name = EMOJI_ICON[m[1]]; return name ? { name, rest: text.slice(m[0].length) } : null;
 }
-const ICON_SPANS = '.f-ico, .tool-row button > span:first-child, .q-ico, .rc-ico, .rg-ico, .tm-ico, .sheet-grid button > span:first-child, .act-grid button > span:first-child, .et-ico';
+const ICON_SPANS = '.c-ico, .f-ico, .tool-row button > span:first-child, .q-ico, .rc-ico, .rg-ico, .tm-ico, .sheet-grid button > span:first-child, .act-grid button > span:first-child, .et-ico';
 const ICON_LEADS = '.seg button, .rc-actions button, .hdr-ella, .chip-btn, button.secondary, button.block, .rd-chip b, .section-icon';
 /** Cambia los emojis de la interfaz por iconos lineales (se llama al dibujar cada pantalla). */
 function iconify(root) {

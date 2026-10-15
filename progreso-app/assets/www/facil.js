@@ -296,10 +296,10 @@ function exDefaults(name) {
 /* ---------- Guía de 3 pasos (una sola vez) ---------- */
 function openGuide() {
   const S = [
-    ['🏠', 'Inicio: lo que toca hoy', 'Arriba ves tu entreno de hoy y cómo va tu semana. Un toque en <b>Empezar entreno</b> y listo.'],
-    ['🏋️', 'Entreno: tu rutina', 'En <b>Tu rutina</b> ves tus días. Toca uno para verlo, <b>🔄 Cambiar</b> para elegir otra o <b>✨ Crear mi rutina en 3 pasos</b>.'],
-    ['✅', 'Registrar es un toque', 'En el entreno, pon peso y reps y toca <b>✓</b>. ¿Te equivocaste? <b>↶ Última</b>. ¿Quieres salir? <b>⬅️</b> arriba.'],
-    ['🎀', 'Hazla tuya', 'El botón <b>🎀</b> de arriba cambia la app a Modo Ella (rosa y blanco, en femenino). El <b>＋</b> naranja registra peso, agua o comida rápido.']
+    ['🎯', 'Hoy: una sola cosa', 'En <b>Hoy</b> ves tu objetivo y tu misión del día. Un toque en <b>Empezar entrenamiento</b> y la app te guía serie por serie.'],
+    ['📈', 'Qué vas a conseguir', 'Cada misión te dice qué logras al terminarla. ' + (typeof isBeginner === 'function' && isBeginner() ? 'En <b>Tu camino</b> ves tu siguiente hito: al avanzar se desbloquean tus récords y estadísticas.' : 'Tus tendencias y récords están en <b>Progreso</b>.')],
+    ['📋', 'Plan: tu rutina', 'En <b>Plan</b> está tu rutina. Toca un día para verlo, <b>Cambiar</b> para elegir otra o <b>Crear mi rutina en 3 pasos</b>.'],
+    ['🧭', 'Explorar, cuando quieras', 'Nutrición, running, retos y ajustes viven en <b>Explorar</b>. Ahí también eliges <b>Principiante</b> o <b>Avanzado</b>, y el botón de arriba activa Modo Ella.']
   ];
   let i = 0;
   const draw = m => {

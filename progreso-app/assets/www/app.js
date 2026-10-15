@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '18.0';
+const APP_VERSION = '19.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -710,14 +710,16 @@ function bar(value, goal) { return `<div class="bar"><div style="width:${goal ? 
 /* ------------------------------------------------------------------ *
  *  Navegación y modales
  * ------------------------------------------------------------------ */
-const TITLES = { home: 'Inicio', train: 'Entreno', food: 'Nutrición', progress: 'Progreso', more: 'Más' };
+const TITLES = { home: 'Hoy', train: 'Plan', food: 'Nutrición', progress: 'Progreso', more: 'Explorar' };
 let currentTab = 'home';
 function showTab(tab) {
   currentTab = tab;
   $$('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   $$('section.view').forEach(s => s.classList.toggle('active', s.id === 'view-' + tab));
-  $('#tabs').classList.toggle('four', isSimple());
-  $('[data-tab=food]').hidden = isSimple();
+  const fourTabs = isSimple() || isBeginner();   // 19.0: principiante → Nutrición vive en Explorar
+  $('#tabs').classList.toggle('four', fourTabs);
+  $('#tabs [data-tab=food]').hidden = fourTabs;
+  $('#tabs [data-tab=food]').classList.toggle('on', tab === 'food');
   const ht = $('#hdr-title');
   if (tab === 'home') ht.innerHTML = DB.profile.name ? `<span class="hi">${esc(greeting())},</span><b>${esc(DB.profile.name)}</b>` : esc(greeting()); else ht.textContent = TITLES[tab];
   document.body.dataset.tab = tab;
@@ -815,7 +817,10 @@ function renderHome() {
   const total = p.startWeight - p.goalWeight, done = cur == null ? 0 : p.startWeight - cur;
   const pct = total ? Math.max(0, Math.min(100, done / total * 100)) : 0;
   const [mTitle, mText, mSrc] = mindsetOfDay();
-  const act = activeSession(), nd = nextDay(p.routine), r = getRoutine(p.routine);
+  const act = activeSession(), r = getRoutine(p.routine);
+  let nd = nextDay(p.routine);
+  // 19.0: quien aún no entrena nunca ve "Descanso" al abrir la app: su misión es el primer entreno.
+  if (nd && nd.rest && !DB.sessions.some(x => x.end)) nd = r.days.find(d => !d.rest && d.ex.length) || nd;
   const habits = activeHabits(), habitsDone = habits.filter(h => habitDone(h, t)).length;
   const rec = recoveryToday(), dl = isDeload();
   const todayW = DB.days[t] && DB.days[t].weight;
@@ -831,7 +836,7 @@ function renderHome() {
     hero = `<div class="hero rest"><div class="eyebrow">Hoy toca</div><h3>Descanso</h3><p>El músculo crece cuando descansas. Camina, hidrátate y come bien.</p><button id="home-free">Entrenar de todos modos</button></div>`;
   } else if (nd) {
     const photo = (nd.ex.map(e => EX_PHOTO[e[0]]).find(Boolean));   // 18.0: la foto del primer ejercicio con foto
-    hero = `<div class="hero mission"><div class="m-top">${photo ? `<div class="m-photo" style="background-image:url('img/ex/${photo}-0.jpg')"></div>` : ''}<div class="m-body"><div class="eyebrow">Tu misión de hoy${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min</p><button id="home-train">${ico('play', 18)} Empezar entrenamiento</button></div></div></div>`;
+    hero = `<div class="hero mission"><div class="m-top">${photo ? `<div class="m-photo" style="background-image:url('img/ex/${photo}-0.jpg')"></div>` : ''}<div class="m-body"><div class="eyebrow">${DB.sessions.some(x => x.end) ? 'Tu misión de hoy' : 'Tu primer entreno'}${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min</p><button id="home-train">${ico('play', 18)} Empezar entrenamiento</button><div class="m-out">${ico('target', 16)}<span>${esc(missionOutcome())}</span></div></div></div></div>`;
   } else {
     hero = `<div class="hero"><div class="eyebrow">Entreno</div><h3>Entreno libre</h3><p>Elige ejercicios sobre la marcha.</p><button id="home-free">Empezar</button></div>`;
   }
@@ -846,14 +851,14 @@ function renderHome() {
   if (!act && !RUN.st) hero = hero.replace(/<\/div>\s*$/, weekDotsHtml() + '</div>');   // 17.0.1: motivación a la vista
   const full = !isSimple();
   $('#view-home').innerHTML = `
+    ${!act && !RUN.st ? `<div class="goal-line">${ico('goal', 16)}<span>${esc(goalLine())}</span></div>` : ''}
     ${hero}
     ${comebackCard()}
     ${notifPromptCard()}
-    ${statsRow()}
+    ${isBeginner() ? pathCard() : ''}
     ${full ? pwoCard() : ''}
 
-    <div class="qa-title">Accesos rápidos</div>
-    <div class="quick qa">
+    <div class="quick qa" hidden>
       <button data-q="weight">${ico('weight', 22)}<span>${todayW ? fmt(todayW) + ' kg' : 'Peso'}</span>${ico('chevron-right', 16, 'qa-chev')}</button>
       ${full ? `<button data-q="water">${ico('droplet', 22)}<span>Agua</span>${ico('chevron-right', 16, 'qa-chev')}</button>
       <button data-q="meal">${ico('utensils', 22)}<span>Comida</span>${ico('chevron-right', 16, 'qa-chev')}</button>` : `<button data-q="train">${ico('dumbbell', 22)}<span>Libre</span>${ico('chevron-right', 16, 'qa-chev')}</button>
@@ -923,7 +928,10 @@ function renderHome() {
   const vh = $('#view-home');
   bindComeback(vh, renderHome); bindNotifPrompt(vh, renderHome); bindCycleInvite(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
   bindGlance(vh); bindStats(vh);
-  foldify(vh, [['Para hoy', ['Misiones de hoy', 'Comida y agua', 'Tu ciclo']], ['Más para ti', '*', true]]);
+  foldify(vh, [['Más de hoy', '*', true]]);   // 19.0: la primera vista es solo la misión
+  if (isBeginner()) vh.insertAdjacentHTML('beforeend', `<button class="ghost block explore-link" id="home-explore">${ico('layers', 18, 'lead')}Explorar más funciones</button>`);
+  const hx = $('#home-explore'); if (hx) hx.onclick = () => showTab('more');
+  bindPath(vh);
   const entries = weightEntries().filter(e => e.date >= addDays(t, -60));
   showChart(() => drawSpark($('#home-spark'), movingAvg(entries).map(e => e.y)));
 }
@@ -1275,6 +1283,7 @@ function renderTrain() {
   bindActivities($('#view-train'), renderTrain);
   $('#tr-act').onclick = () => openActivityForm();
   $('#tr-hotel').onclick = () => { startSession('libre'); const s = activeSession(); s.dayName = 'Sesión de hotel'; s.base = HOTEL_SESSION.map(e => e.slice()); s.env = 'hotel'; saveData(); renderTrain(); window.scrollTo(0, 0); };
+  if (isBeginner()) $$('#view-train .tool-row, #view-train .more-group, #view-train [data-fold^="f-retos"], #view-train .section-title').forEach(e => e.remove());   // 19.0: nivel 2 sin extras
 }
 
 /** Ejercicios de la sesión: los del día (con los cambios por máquina ocupada) más los añadidos. */
@@ -2351,12 +2360,15 @@ let progMode = 'fuerza';
 function renderProgress() {
   if (progMode === 'logros' && !gamify()) progMode = 'weight';
   if (progMode === 'ciclo' && !cycleOn()) progMode = 'analysis';
-  const seg = `<div class="seg wrap scroll">${[['fuerza', '💪 Fuerza'], ['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', 'Logros']] : []).map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
+  const tabs = isBeginner() ? [['resumen', 'Resumen'], ['weight', 'Peso']].concat(cycleOn() ? [['ciclo', 'Ciclo']] : []).concat([['photos', 'Fotos']]).concat(gamify() && unlocked('three') ? [['logros', 'Logros']] : [])
+    : [['fuerza', '💪 Fuerza'], ['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', 'Logros']] : []);
+  if (!tabs.some(([k]) => k === progMode)) progMode = tabs[0][0];   // 19.0: principiante ve un resumen sencillo
+  const seg = `<div class="seg wrap scroll">${tabs.map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   const v = $('#view-progress');
   v.innerHTML = seg + '<div id="prog-body"></div><button class="secondary block" id="prog-export" style="margin-top:4px">📄 Exportar PDF / Excel para analizar con IA</button>';
   $('#prog-export').onclick = openExport;
   $$('#view-progress .seg button').forEach(b => b.onclick = () => { progMode = b.dataset.mode; redrawChart = () => {}; renderProgress(); });
-  ({ fuerza: el => { el.innerHTML = strengthScoreCard() + weeklySetsCard(); const i = $('#str-info', el); if (i) i.onclick = explainScore; }, analysis: renderAnalysis, historia: renderHistory, ciclo: renderCycle, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
+  ({ resumen: renderBeginnerProgress, fuerza: el => { el.innerHTML = strengthScoreCard() + weeklySetsCard(); const i = $('#str-info', el); if (i) i.onclick = explainScore; }, analysis: renderAnalysis, historia: renderHistory, ciclo: renderCycle, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
 }
 
 function renderWeight(el) {
@@ -2726,6 +2738,8 @@ function shrinkImage(file, maxSide, quality) {
 function renderMore() {
   const p = DB.profile, tg = targets(), t = todayStr(), s = (DB.days[t] && DB.days[t].supps) || {};
   $('#view-more').innerHTML = `
+    ${explorarCard()}
+    ${levelCard()}
     <div class="card">
       <h2>Exportar progreso</h2>
       <p class="small muted" style="margin-top:0">PDF o Excel para guardarlo o pedirle un análisis a una IA.</p>
@@ -2889,6 +2903,7 @@ function renderMore() {
   $('#st-pause').onchange = e => { const k = weekKey(todayStr()); DB.pauses = DB.pauses.filter(x => x !== k).concat(e.target.checked ? [k] : []); saveData(); toast(e.target.checked ? 'Semana en pausa. Descansa ' + g('tranquilo.', 'tranquila.') : 'Pausa quitada'); };
   $('#st-gamify').onchange = e => { DB.profile.gamify = e.target.checked; saveData(); };
   bindNotifSettings($('#view-more'), renderMore);
+  bindExplore($('#view-more'));
   $('#st-rest').onchange = e => { DB.profile.restAlerts = e.target.checked; saveData(); if (e.target.checked) requestNotifications(); };
   $$('#view-more [data-theme]').forEach(b => b.onclick = () => { DB.profile.theme = b.dataset.theme; saveData(); applyTheme(); renderMore(); });
   $$('#view-more [data-look]').forEach(b => b.onclick = () => { DB.profile.look = b.dataset.look; saveData(); applyTheme(); keepScroll(renderMore); });
@@ -2990,7 +3005,7 @@ function openOnboarding() {
   const p = DB.profile, total = 7;
   let step = 0;
   const draft = { name: p.name, startWeight: p.startWeight, height: p.height, age: p.age, goalWeight: p.goalWeight, phase: p.phase, somatotype: p.somatotype, routine: p.routine, gym: 'pf', limits: [], mode: 'completo',
-    stage: '2', minutes: '45', days: '3', enjoy: ['fuerza'], barriers: [] };
+    stage: '2', minutes: '45', days: '3', enjoy: ['fuerza'], barriers: [], level: 'principiante' };
   const multi = (key, map) => `<div class="chips">${Object.keys(map).map(k => `<button class="chip-btn ${draft[key].includes(k) ? 'on' : ''}" data-multi="${key}|${k}">${map[k][0]} ${map[k][1]}</button>`).join('')}</div>`;
   const progress = () => `<div class="ob-step">Paso ${step + 1} de ${total}</div><div class="ob-progress">${Array.from({ length: total }, (_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
   const choice = (key, val, ico, title, sub) => `<button class="choice ${draft[key] === val ? 'on' : ''}" data-ch="${key}|${val}"><span class="c-ico">${ico}</span><span><b>${title}</b><small>${sub}</small></span></button>`;
@@ -3027,18 +3042,19 @@ function openOnboarding() {
       ${Object.keys(GYM_PRESETS).map(k => choice('gym', k, GYM_PRESETS[k].ico, GYM_PRESETS[k].name, GYM_PRESETS[k].equip.map(e => EQUIP[e]).join(', '))).join('')}
       <div class="rir-label" style="margin-top:10px"><span>¿Alguna molestia o lesión? (opcional)</span></div>
       <div class="chips">${Object.keys(LIMITS).map(k => `<button class="chip-btn ${draft.limits.includes(k) ? 'on' : ''}" data-lim="${k}">${LIMITS[k].ico} ${LIMITS[k].name}</button>`).join('')}</div>`,
-    () => `<h3>¿Cómo quieres entrenar?</h3>
+    () => `<h3>¿Cuánta guía quieres?</h3>
+      ${choice('level', 'principiante', '🌱', 'Guíame (principiante)', 'Te digo qué hacer cada día; lo demás se desbloquea al avanzar')}
+      ${choice('level', 'avanzado', '⚙️', 'Control total (avanzado)', 'Personalizas rutinas, ves tendencias, récords y cada variable')}
+      ${draft.level === 'principiante' ? `<div class="adapt-note" style="margin-top:12px">${ico('sparkles', 18, 'lead')}<b>Tu rutina la armo yo:</b> ${draft.stage === '1' ? '3 días de 20 min con tu propio peso.' : `cuerpo completo para tus ${draft.days} días, con tu equipo y cuidando tus molestias.`} La cambias cuando quieras en Plan.</div>`
+      : `<div class="rir-label" style="margin-top:12px"><span>Elige tu rutina</span></div>
       ${choice('routine', 'inicio', '🌱', ROUTINES.inicio.name, '3 días de 20 min con tu peso: ideal para empezar')}
       ${choice('routine', 'pro', '🏆', ROUTINES.pro.name, '1 grupo muscular por día, 5 días + 2 de descanso')}
       ${choice('routine', 'tp4', '🔁', ROUTINES.tp4.name, 'Básicos pesados, ideal para definir')}
-      ${choice('routine', 'gluteo', '🍑', ROUTINES.gluteo.name, '2 días de glúteo y pierna + 2 de torso y abdomen')}
-      <div class="rir-label" style="margin-top:10px"><span>¿Qué tanto quieres ver?</span></div>
-      ${choice('mode', 'simple', '📒', 'Libreta simple', 'Solo rutina, series, peso y progreso')}
-      ${choice('mode', 'completo', '🧩', 'App completa', 'Además nutrición, recuperación, mapa muscular y logros')}`
+      ${choice('routine', 'gluteo', '🍑', ROUTINES.gluteo.name, '2 días de glúteo y pierna + 2 de torso y abdomen')}`}`
   ];
   const draw = m => {
     m.innerHTML = progress() + steps[step]() + `<div class="row" style="margin-top:14px">${step ? '<button class="secondary" id="ob-back" style="flex:1">Atrás</button>' : ''}<button id="ob-next" style="flex:2">${step === total - 1 ? 'Empezar 🚀' : 'Siguiente'}</button></div>`;
-    $$('[data-ch]', m).forEach(b => b.onclick = () => { const [k, v] = b.dataset.ch.split('|'); draft[k] = v; if (k === 'stage') draft.routine = v === '1' ? 'inicio' : draft.routine === 'inicio' ? 'pro' : draft.routine; draw(m); });
+    $$('[data-ch]', m).forEach(b => b.onclick = () => { const [k, v] = b.dataset.ch.split('|'); draft[k] = v; if (k === 'stage') { draft.routine = v === '1' ? 'inicio' : draft.routine === 'inicio' ? 'pro' : draft.routine; if (!draft.levelPicked) draft.level = Number(v) >= 3 ? 'avanzado' : 'principiante'; } if (k === 'level') draft.levelPicked = true; draw(m); });
     $$('[data-multi]', m).forEach(b => b.onclick = () => { const [k, v] = b.dataset.multi.split('|'); draft[k] = draft[k].includes(v) ? draft[k].filter(x => x !== v) : draft[k].concat(v); draw(m); });
     $$('[data-lim]', m).forEach(b => b.onclick = () => { const k = b.dataset.lim; draft.limits = draft.limits.includes(k) ? draft.limits.filter(x => x !== k) : draft.limits.concat(k); draw(m); });
     $$('[data-oblook]', m).forEach(b => b.onclick = () => {
@@ -3059,8 +3075,10 @@ function openOnboarding() {
       if (step === total - 1) {
         Object.assign(DB.profile, { name: draft.name, startWeight: draft.startWeight, goalWeight: draft.goalWeight, height: draft.height, age: draft.age,
           phase: draft.phase, somatotype: draft.somatotype, routine: draft.routine, startDate: todayStr(), habitsStart: todayStr(), autoMacros: true, onboarded: true,
-          gym: draft.gym, equip: GYM_PRESETS[draft.gym].equip.slice(), limits: draft.limits, mode: draft.mode,
+          gym: draft.gym, equip: GYM_PRESETS[draft.gym].equip.slice(), limits: draft.limits, mode: 'completo', level: draft.level,
           stage: Number(draft.stage), minutes: Number(draft.minutes), weeklyTarget: Number(draft.days), trainDays: DEFAULT_DAYS[Number(draft.days)], enjoy: draft.enjoy, barriers: draft.barriers });
+        if (draft.level === 'principiante' && draft.stage !== '1') beginnerRoutine();   // 19.0: rutina adecuada sin tener que elegir
+        else if (draft.level === 'principiante') DB.profile.routine = 'inicio';
         if (draft.cycleWant) setTimeout(() => openCycleConsent(() => render(currentTab)), 400);
         else if (!DB.profile.guideSeen) setTimeout(openGuide, 700);   // 17.0.1: guía de 3 pasos
         addEvent(todayStr(), 'stage', 'Empezaste en la etapa ' + draft.stage + ': ' + STAGES[draft.stage].name, STAGES[draft.stage].ico);
