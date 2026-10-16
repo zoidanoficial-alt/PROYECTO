@@ -167,6 +167,8 @@ function guidedCard(s, e, i) {
       : `<b>${bodyweight ? `Haz ${lo}–${hi} reps con buena técnica` : `Elige un peso con el que hagas ${hi} reps y te sobren 2–3`}</b><small>Si dudas, empieza ligero. Hoy mides tu punto de partida; después la app te dice cuánto subir.</small>`}</span></div>
     ${done.length ? `<div class="done-sets">${done.map((d, k) => `<span class="set-chip" data-edit="${d.id}">${k + 1}. <b>${wFmt(d.w, u)} × ${d.r}</b></span>`).join('')}</div>` : ''}
     <div class="g-step">${complete ? `${ico('check', 16)} Ejercicio completado. Pasa al siguiente o haz una serie extra.` : `Serie ${done.length + 1} de ${sets}: hazla y anota lo que lograste`}</div>
+    ${typeof painNote === 'function' ? painNote(s, name) : ''}
+    ${typeof warmupHtml === 'function' ? warmupHtml(s, e, i) : ''}
     <div class="steppers">
       <div class="stepper"><div class="s-label">${bodyweight ? 'Peso extra' : 'Peso'} <button class="unit-toggle" data-unit="${i}">${u} ⇄</button></div>
         <div class="s-row"><button data-step="${i}|w|-1">−</button><input id="w-${i}" inputmode="decimal" value="${preW}" placeholder="0"><button data-step="${i}|w|1">+</button></div></div>

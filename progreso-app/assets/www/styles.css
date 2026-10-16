@@ -1488,3 +1488,16 @@ nav.tabs button svg { padding: 2px 10px; }
 .cb-tip { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0 0; padding: 10px; border-radius: 12px; background: var(--accent-soft); line-height: 1.4; }
 .cb-tip svg { color: var(--accent); flex: none; margin-top: 2px; }
 .cb-extip { font-size: 13.5px; line-height: 1.4; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); margin-bottom: 10px; }
+
+/* 24.0 · Protección del rendimiento, calentamiento y molestias */
+.pg-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; background: var(--muted); }
+.pg-dot.ok { background: var(--good); } .pg-dot.watch, .pg-dot.watch2 { background: var(--warn); } .pg-dot.alert { background: var(--bad); }
+.pg-card.alert { border-color: var(--bad); }
+.pg-rec { border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-bottom: 8px; }
+.pg-rec b { display: block; font-size: 15px; } .pg-rec small { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; margin-top: 2px; }
+.warm { border: 1px dashed var(--line); border-radius: 14px; padding: 10px 12px; margin-bottom: 12px; }
+.warm-h { display: flex; align-items: center; gap: 8px; } .warm-h svg { color: var(--orange); } .warm-h small { color: var(--muted); margin-left: auto; font-size: 12px; }
+.warm-sets { display: flex; flex-wrap: wrap; gap: 8px; }
+.warm-sets .ws { min-height: 40px; padding: 0 14px; border-radius: 99px; background: var(--surface-2); color: var(--text); font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
+.warm-sets .ws.on { background: var(--accent-soft); color: var(--accent); }
+.pain-card b { font-size: 15px; }

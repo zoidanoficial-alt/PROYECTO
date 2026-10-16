@@ -897,3 +897,59 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - **Miércoles:** "Entrenas como Tom Holland".
 - **Sesión suelta del kit:** también entra en modo CBUM.
 - **Con zoom de 130 %:** ninguna etiqueta de la barra inferior se desborda.
+
+---
+
+## 24.0 · Principios aplicados a tus datos: protección del rendimiento y calentamiento adaptativo
+
+**Idea de producto:** el valor de las entrevistas y rutinas de atletas no está en copiarlas, sino en aplicar sus principios. La app convierte datos en la siguiente decisión correcta para cada persona. Ver `venta/01-RESUMEN-PRODUCTO.md`.
+
+**Protección del rendimiento en definición (`protect.js`):** se activa con el objetivo de definición o en la preparación para un show.
+
+*Qué observa:*
+- **Rendimiento:** las 3 últimas sesiones de cada ejercicio contra su mejor marca de las 6 semanas previas (fuerza estimada, o reps si es con peso corporal). Una caída cuenta si es de más del 5 %, y se necesitan al menos 4 sesiones por ejercicio.
+- **Recuperación:** últimos 7 días contra los 7 anteriores en sueño, calidad del sueño, energía, dolor muscular y estrés del chequeo diario, más los check-ins semanales.
+- **Ritmo de pérdida:** si pasa del 1 % del peso por semana.
+
+*Qué concluye:*
+
+| Situación | Resultado | Qué hace la app |
+|---|---|---|
+| Menos de 2 ejercicios con datos | Juntando datos | Nada |
+| Sin caídas | Estable | No cambiar nada |
+| Una caída aislada | A vigilar | Recuerda que no es pérdida muscular y no cambia nada |
+| Caídas repetidas en 2 o más ejercicios, con buena recuperación | Bajó en varios ejercicios | Revisar técnica, sueño y comida; observar una semana más |
+| Caídas repetidas en 2 o más ejercicios, con peor recuperación o pérdida de más de 1 %/sem | Tendencia a revisar | Propone las acciones de abajo |
+
+*Acciones que propone cuando la tendencia es a revisar:*
+- **Semana de menos fatiga:** mismos pesos, una serie menos y 2–3 reps en reserva. Se activa con un toque y se aplica sola a las sesiones.
+- **Subir 150 kcal:** solo si bajas más de 1 % por semana.
+- **Priorizar el sueño.**
+- **Si sigue 2 semanas más, buscar orientación profesional.**
+
+**Nunca baja pesos ni suma cardio automáticamente.** La tarjeta aparece en Plan y en el kit del competidor.
+
+**Calentamiento adaptativo:** aparece en cada ejercicio compuesto con carga, antes de la primera serie, y no cuenta como serie.
+
+| Caso | Calentamiento |
+|---|---|
+| Pesado (≥ 60 kg o ≤ 6 reps) | 3 series: 40 % × 8, 60 % × 5, 80 % × 2 del objetivo de hoy |
+| Moderado | 2 series: 50 % × 8, 75 % × 4 |
+| Ese músculo ya trabajó en la sesión | 1 serie de ajuste |
+| Primera vez (sin historial) | 1–2 series ligeras |
+| Aislamiento o peso corporal | Nada |
+
+- Las series se marcan con un toque.
+- No hay rutina larga de bandas: el calentamiento prepara para el trabajo que viene.
+
+**Molestias:** al empezar, la pregunta "¿Alguna molestia hoy?" se responde con un toque ("No, todo bien" o la zona).
+- Si eliges una zona, los ejercicios que la cargan muestran "Hoy cuidas tu rodilla: empieza ligero y en un rango sin dolor".
+- Un botón cambia esos ejercicios por compuestos que no la cargan. Por ejemplo, con la rodilla: sentadilla → peso muerto rumano.
+- Sigue disponible "Me duele" en cada ejercicio.
+
+**Verificación (`v32.mjs`, con historial simulado):**
+- **Los cuatro diagnósticos salen bien:** caídas con mal sueño y energía da "tendencia a revisar"; caídas con buena recuperación, "bajó en varios"; una caída, "a vigilar"; sin caídas, "estable".
+- **El detalle** muestra los 3 ejercicios con −12 % y el sueño de 7.5 → 5.5 h.
+- **La semana de menos fatiga** hace que la sesión siguiente empiece en "reducir".
+- **Calentamiento:** con la sentadilla a 70 kg da 27.5 × 8, 42.5 × 5 y 55 × 2; el curl, nada; la prensa después de la sentadilla, 1 serie.
+- **Molestia en la rodilla:** marca 2 ejercicios y los cambia por compuestos sin carga en la rodilla.

@@ -12,6 +12,15 @@ La mayoría de las apps de gimnasio son un diario: registras y te muestran tu r�
 
 El ciclo **registrar → entender → saber qué sigue** es el producto. Todo lo demás existe para que la persona entre a ese ciclo y no lo abandone.
 
+## Por qué es defendible
+Una colección de rutinas, consejos o frases se copia en una tarde. Lo difícil de copiar es **el sistema que convierte los datos de cada persona en su siguiente decisión correcta**, aplicando principios de entrenamiento y nutrición de forma comprensible, individualizada y consistente:
+- **Sobrecarga progresiva** con el rango de reps, el esfuerzo (RIR) y el historial de cada ejercicio.
+- **Protección del rendimiento en definición (24.0):** no baja pesos ni suma cardio por reflejo. Cruza la tendencia de fuerza con el sueño, la energía, el dolor y el ritmo de pérdida, distingue una caída aislada de una tendencia, y solo entonces propone reducir fatiga, revisar el déficit o buscar a un profesional.
+- **Calentamiento adaptativo (24.0):** series de aproximación según el ejercicio, la carga de hoy y si ese músculo ya está caliente, más una pregunta breve sobre molestias que adapta la sesión.
+- **Recuperación y día de descanso**, rutina armada con 7 variables y adaptación al equipo real del gimnasio.
+
+Las rutinas de atletas conocidos son una puerta de entrada atractiva; el valor de largo plazo es el motor de decisiones.
+
 ## Para quién
 - **Principal:** principiantes y personas que buscan constancia en el gimnasio, en México y Latinoamérica (español, kg y lb).
 - **Secundario:** usuarios avanzados que quieren control total (rutinas propias, tendencias, récords, variables de entrenamiento).

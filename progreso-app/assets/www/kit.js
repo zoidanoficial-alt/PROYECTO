@@ -356,7 +356,8 @@ function openCompete() {
     ['check', 'clipboard-list', 'Check-in semanal', 'Peso, cintura, sensaciones y fotos'],
     ['mx', 'map-pin', 'Competir en México', 'Federaciones, inscripción y eventos'],
     ['caps', 'ruler', 'Tope de Classic Physique', 'Peso máximo para tu estatura'],
-    ['day', 'list-checks', 'Semana y día del show', 'Qué hacer, qué evitar y qué llevar']
+    ['day', 'list-checks', 'Semana y día del show', 'Qué hacer, qué evitar y qué llevar'],
+    ['perf', 'shield', 'Protección del rendimiento', 'Si bajas grasa, vigila que no pierdas fuerza']
   ];
   const back = openCompete;
   openModal(`<h3>Kit del competidor</h3><p class="small muted" style="margin-top:0">Todo para empezar en el fisicoculturismo, del primer entreno a la tarima.</p>
@@ -365,7 +366,7 @@ function openCompete() {
     <button class="ghost block" id="kit-x">Cerrar</button>`, m => {
     $$('[data-kit]', m).forEach(b => b.onclick = () => ({
       programs: () => openCompPrograms(back), cbum: () => openCbumSessions(back), show: () => openCompSetup(() => { render(currentTab); openCompete(); }),
-      poses: () => openPoseGuide(back), food: () => openCompNutrition(back), check: () => openCheckinWeekly(back), mx: () => openCompeteMexico(back), caps: () => openCpCaps(back), day: () => openShowDay(back)
+      poses: () => openPoseGuide(back), food: () => openCompNutrition(back), check: () => openCheckinWeekly(back), mx: () => openCompeteMexico(back), caps: () => openCpCaps(back), day: () => openShowDay(back), perf: () => openPerfGuard(back)
     })[b.dataset.kit]());
     $('#kit-x', m).onclick = closeModal;
   });

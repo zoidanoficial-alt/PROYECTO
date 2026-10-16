@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '23.0';
+const APP_VERSION = '24.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -1049,7 +1049,8 @@ function startSession(routineKey, dayId, wid) {
   }
   const rd = readiness();
   if (rd) { s.adjust = rd.plan === 'mantener' ? null : rd.plan; s.adjustDone = true; }
-  else if (typeof inComeback === 'function' && inComeback()) { s.adjust = 'reducir'; s.adjustDone = true; }   // regreso suave
+  else if (typeof inComeback === 'function' && inComeback()) { s.adjust = 'reducir'; s.adjustDone = true; }
+  else if (typeof fatigueWeekActive === 'function' && fatigueWeekActive()) { s.adjust = 'reducir'; s.adjustDone = true; }   // 24.0: semana de menos fatiga   // regreso suave
   DB.sessions.push(s);
   DB.active = s.id; track('session_start');
   if (DB.profile.restAlerts && !DB.profile.notifAsked) { DB.profile.notifAsked = true; requestNotifications(); }
@@ -1235,6 +1236,7 @@ function renderTrain() {
     ${coachPlanCard()}
     ${routineCard()}
     ${compPlanCard()}
+    ${typeof perfGuardCard === 'function' ? perfGuardCard() : ''}
     <div class="tool-row">
       <button id="tr-free"><span>⚡</span>Libre</button>
       <button id="tr-act"><span>🏃</span>Actividad</button>
@@ -1277,7 +1279,7 @@ function renderTrain() {
   $('#tr-free').onclick = () => { startSession('libre'); renderTrain(); window.scrollTo(0, 0); };
   $$('#view-train [data-howto]').forEach(b => b.onclick = () => openHowTo(b.dataset.howto));
   $('#tr-lib').onclick = () => openExercisePicker(null);
-  bindRoutineCard($("#view-train")); bindCompPlan($("#view-train"), renderTrain);
+  bindRoutineCard($("#view-train")); bindCompPlan($("#view-train"), renderTrain); if (typeof bindPerfGuard === "function") bindPerfGuard($("#view-train"), renderTrain);
   bindRetos($('#view-train'));
   foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Retos']], ['Tu semana y más', '*', true]]);
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });
@@ -1378,6 +1380,7 @@ function renderSession(s) {
       <div class="small muted">${Math.round(vol).toLocaleString('es-MX')} kg movidos${isDeload() ? ' · <b style="color:var(--warn)">día de descarga</b>' : ''}</div>
     </div>
     ${typeof coachBanner === 'function' ? coachBanner(s) : ''}
+    ${typeof painAskCard === 'function' ? painAskCard(s) : ''}
     ${guided ? '' : !s.adjustDone && !isSimple() ? `<div class="card ck-prompt"><b>¿Cómo llegas hoy?</b><p class="small muted" style="margin:2px 0 8px">30 s para ajustar series e intensidad a tu recuperación.</p><div class="row"><button id="ss-ck" style="flex:2">Hacer chequeo</button><button class="secondary" id="ss-ck-skip" style="flex:1">Omitir</button></div></div>`
       : s.adjust ? `<div class="adapt-note" style="margin:0 0 12px">${PLAN_INFO[s.adjust].icon} <b>Plan ${PLAN_INFO[s.adjust].name.toLowerCase()}:</b> ${PLAN_INFO[s.adjust].text} <button class="ghost" id="ss-ck" style="padding:0 4px">Cambiar</button></div>` : ''}
     ${guided ? `<div class="g-intro">${ico('list-checks', 18)}<span>${exs.length} ejercicios, en orden. Toca uno para ver cómo se hace; al guardar cada serie empieza tu descanso.</span></div>` : `<div class="env-row"><span class="small muted">📍 Hoy entreno en</span>${Object.keys(ENVS).map(k => `<button class="chip-btn ${(s.env || 'gym') === k ? 'on' : ''}" data-env="${k}">${ENVS[k][0]} ${ENVS[k][1]}</button>`).join('')}</div>`}
@@ -1481,6 +1484,7 @@ function renderSession(s) {
   $('#ss-cancel').onclick = exitSession;
   $('#ss-back').onclick = exitSession;
   $('#ss-reset').onclick = resetSession;
+  if (typeof bindSessionExtras === 'function') bindSessionExtras(s);
 }
 /* ------------------------------------------------------------------ *
  *  10.0 · Diseño minimalista: secciones plegables (revelación progresiva)
@@ -1630,6 +1634,8 @@ function exerciseCard(s, e, i) {
     ${head}
     <div class="ex-body">
       ${tip}
+      ${typeof painNote === 'function' ? painNote(s, name) : ''}
+      ${typeof warmupHtml === 'function' ? warmupHtml(s, e, i) : ''}
       <div class="mission ${mis.kind} ${misOk ? 'ok' : ''}">${misOk ? '✅ ' : ''}${esc(mis.text)}</div>
       ${sug ? `<div class="suggest"><b>Para superarte hoy:</b><br>
         <button class="chip-btn" data-sug="${i}|${sug.a.w}|${sug.a.r}">${sug.a.w} ${u} × ${sug.a.r}</button>${sug.b ? ` o <button class="chip-btn" data-sug="${i}|${sug.b.w}|${sug.b.r}">${sug.b.w} ${u} × ${sug.b.r}</button>` : ''}
