@@ -16,7 +16,7 @@ const probe = async label => {
     const vw = document.documentElement.clientWidth, bad = [];
     const roots = [document.querySelector('.modal-bg.open .modal'), document.querySelector('section.view.active')].filter(Boolean);
     const lim = roots[0] && roots[0].classList.contains('modal') ? roots[0].getBoundingClientRect().right : vw;
-    for (const el of roots[0].querySelectorAll('*')) { const rc = el.getBoundingClientRect(); if (rc.width && rc.right > lim + 1 && !el.closest('.seg.scroll,.scroll-x,[data-hscroll],.rd-strip,.wz-focus,.p2-chips')) { const cs = getComputedStyle(el); bad.push((el.id ? '#' + el.id : el.tagName.toLowerCase() + '.' + [...el.classList].join('.')) + ' +' + Math.round(rc.right - lim) + (el.textContent || '').trim().slice(0, 25)); } }
+    for (const el of roots[0].querySelectorAll('*')) { const rc = el.getBoundingClientRect(); if (rc.width && rc.right > lim + 1 && !el.closest('.seg.scroll,.scroll-x,[data-hscroll],.rd-strip,.wz-focus,.p2-chips,.cp-strip,.we-fcards')) { const cs = getComputedStyle(el); bad.push((el.id ? '#' + el.id : el.tagName.toLowerCase() + '.' + [...el.classList].join('.')) + ' +' + Math.round(rc.right - lim) + (el.textContent || '').trim().slice(0, 25)); } }
     return { doc: document.documentElement.scrollWidth - vw, modal: roots[0].classList.contains('modal') ? roots[0].scrollWidth - roots[0].clientWidth : null, bad: bad.slice(0, 6) };
   }, Z);
   if (r.doc > 0 || r.modal > 0 || r.bad.length) console.log('OVF', label, JSON.stringify(r));

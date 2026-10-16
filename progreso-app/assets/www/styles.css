@@ -1462,3 +1462,29 @@ tr.hl td { color: var(--accent); font-weight: 700; }
 .pp-name { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 4px; }
 .pp-time { font-size: 72px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); line-height: 1; margin: 8px 0 12px; }
 .pp-time.switch { color: var(--muted); }
+
+/* 23.0 · Barra inferior: las etiquetas no se juntan con letra grande */
+nav.tabs button { min-width: 0; overflow: hidden; }
+nav.tabs .tl { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; letter-spacing: -.01em; }
+nav.tabs button svg { padding: 2px 10px; }
+
+/* 23.0 · Tu plan de hoy: tira desplazable */
+.cp-strip { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 10px -16px 0; padding: 2px 16px 6px; scrollbar-width: none; }
+.cp-strip::-webkit-scrollbar { display: none; }
+.cp-item { flex: 0 0 min(230px, 72%); scroll-snap-align: start; border-radius: 16px; background: var(--surface-2); overflow: hidden; display: flex; flex-direction: column; }
+.cp-item img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+.cp-ph { aspect-ratio: 16 / 9; display: grid; place-items: center; color: var(--muted); }
+.cp-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; min-width: 0; }
+.cp-body b { font-size: 15px; line-height: 1.25; }
+.cp-body small { font-size: 13px; line-height: 1.35; }
+.cp-body .coach-tag { margin-top: 4px; white-space: normal; }
+.cp-hint { margin: 4px 0 0; text-align: center; }
+
+/* 23.0 · Modo coach */
+.coach-banner { border-color: var(--accent); }
+.cb-head { display: flex; align-items: center; gap: 10px; }
+.cb-ico { font-size: 22px; line-height: 1; }
+.cb-head b { font-size: 16px; }
+.cb-tip { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0 0; padding: 10px; border-radius: 12px; background: var(--accent-soft); line-height: 1.4; }
+.cb-tip svg { color: var(--accent); flex: none; margin-top: 2px; }
+.cb-extip { font-size: 13.5px; line-height: 1.4; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); margin-bottom: 10px; }

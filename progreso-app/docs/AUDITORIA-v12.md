@@ -857,3 +857,43 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - **México, topes y día del show:** abren.
 - **Rotaciones:** prep `5,5,7,R,6,6,7,R` y off-season `7,7,7,R,6,7,6,5,R`.
 - **`v29`:** actualizada porque Competir ahora abre el kit.
+
+---
+
+## 23.0 · Tu semana a tu manera y modo coach
+
+**"Tu plan de hoy" desplazable (`coach.js`):**
+- Los ejercicios del día se ven como tarjetas con foto en una tira horizontal que se desliza, con todos los ejercicios.
+- Antes eran 3 filas más "Ver los N ejercicios", y la tarjeta se hacía muy larga.
+
+**Mi rutina, día por día (`facil.js`, `kit.js`):**
+- El selector de cada día tiene grupos:
+  - **Crear mi propio entreno…**
+  - **Mis entrenos**
+  - **Entrena como CBUM**: 15 sesiones.
+  - **Entrena como Tom Holland**: circuito de fuerza y día de peso corporal.
+  - **Entrena como Arnold**: Golden Six, días del nivel I y de la era dorada.
+  - **Descanso**
+- Al elegir uno famoso se crea una vez como entreno (con sus ejercicios, series y orden) y se reutiliza si lo pones en otro día.
+- Ejemplo verificado: Lun Pierna (propio) · Mar CBUM · Mié Tom Holland · Jue Descanso · Vie Arnold.
+
+**Modo coach:** si entrenas una rutina, un día o una sesión de CBUM, Tom Holland o Arnold:
+- **En Hoy:** la misión dice "Entrenas como CBUM" (o Tom Holland o Arnold).
+- **En "Tu plan de hoy":** aparece el mismo aviso con su ícono.
+- **En la sesión:**
+  - Una tarjeta con la nota de esa sesión (por ejemplo, "Belt squat primero para cuidar las rodillas…").
+  - Un **tip del día** de su forma de entrenar, que cambia cada día.
+- **En cada ejercicio:** su **tip** propio. Si en tu gimnasio se cambió por un sustituto sin tip propio, se usa el del original. Ejemplos:
+  - "Él hace las laterales sentado porque de pie le molesta el hombro"
+  - "Codos altos y junta los omóplatos (indicación de Justin King)"
+- Los tips vienen de la misma investigación de la 22.0. **No se usan fotos ni la imagen de ellos**, porque sus derechos de imagen están protegidos.
+
+**Barra inferior:** las etiquetas van en su propio elemento con recorte ("…"), para que no se junten con letra grande. En tu captura se veía "NutriciónProgreso".
+
+**Verificación (`v31.mjs`):**
+- **Plan:** la tira tiene 8 ejercicios y se desliza.
+- **Selector de días:** muestra los grupos Mis entrenos (5), CBUM (15), Tom Holland (2) y Arnold (7). La semana armada queda como se eligió, y poner CBUM otra vez el sábado reutiliza el mismo entreno.
+- **Martes:** Hoy dice "Entrenas como CBUM". La sesión muestra la tarjeta con la nota y el tip, y el tip del ejercicio.
+- **Miércoles:** "Entrenas como Tom Holland".
+- **Sesión suelta del kit:** también entra en modo CBUM.
+- **Con zoom de 130 %:** ninguna etiqueta de la barra inferior se desborda.

@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '22.0';
+const APP_VERSION = '23.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -839,7 +839,7 @@ function renderHome() {
     hero = restHero();
   } else if (nd) {
     const photo = (nd.ex.map(e => EX_PHOTO[e[0]]).find(Boolean));   // 18.0: la foto del primer ejercicio con foto
-    hero = `<div class="hero mission"><div class="m-top">${photo ? `<div class="m-photo" style="background-image:url('img/ex/${photo}-0.jpg')"></div>` : ''}<div class="m-body"><div class="eyebrow">${DB.sessions.some(x => x.end) ? 'Tu misión de hoy' : 'Tu primer entreno'}${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min</p><button id="home-train">${ico('play', 18)} Empezar entrenamiento</button><div class="m-out">${ico('target', 16)}<span>${esc(missionOutcome(nd))}</span></div></div></div></div>`;
+    hero = `<div class="hero mission"><div class="m-top">${photo ? `<div class="m-photo" style="background-image:url('img/ex/${photo}-0.jpg')"></div>` : ''}<div class="m-body"><div class="eyebrow">${typeof dayCoach === 'function' && dayCoach(nd) ? COACHES[dayCoach(nd)].tag : DB.sessions.some(x => x.end) ? 'Tu misión de hoy' : 'Tu primer entreno'}${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min</p><button id="home-train">${ico('play', 18)} Empezar entrenamiento</button><div class="m-out">${ico('target', 16)}<span>${esc(missionOutcome(nd))}</span></div></div></div></div>`;
   } else {
     hero = `<div class="hero"><div class="eyebrow">Entreno</div><h3>Entreno libre</h3><p>Elige ejercicios sobre la marcha.</p><button id="home-free">Empezar</button></div>`;
   }
@@ -1377,6 +1377,7 @@ function renderSession(s) {
       <div class="xp-msg">${!done.length ? 'Empieza por el primer ejercicio' : allDone ? 'Entreno completo: termina para ver tu resultado' : done.length / targetSets >= 0.5 ? 'Más de la mitad hecha' : 'Buen ritmo, sigue con el siguiente'}</div>
       <div class="small muted">${Math.round(vol).toLocaleString('es-MX')} kg movidos${isDeload() ? ' · <b style="color:var(--warn)">día de descarga</b>' : ''}</div>
     </div>
+    ${typeof coachBanner === 'function' ? coachBanner(s) : ''}
     ${guided ? '' : !s.adjustDone && !isSimple() ? `<div class="card ck-prompt"><b>¿Cómo llegas hoy?</b><p class="small muted" style="margin:2px 0 8px">30 s para ajustar series e intensidad a tu recuperación.</p><div class="row"><button id="ss-ck" style="flex:2">Hacer chequeo</button><button class="secondary" id="ss-ck-skip" style="flex:1">Omitir</button></div></div>`
       : s.adjust ? `<div class="adapt-note" style="margin:0 0 12px">${PLAN_INFO[s.adjust].icon} <b>Plan ${PLAN_INFO[s.adjust].name.toLowerCase()}:</b> ${PLAN_INFO[s.adjust].text} <button class="ghost" id="ss-ck" style="padding:0 4px">Cambiar</button></div>` : ''}
     ${guided ? `<div class="g-intro">${ico('list-checks', 18)}<span>${exs.length} ejercicios, en orden. Toca uno para ver cómo se hace; al guardar cada serie empieza tu descanso.</span></div>` : `<div class="env-row"><span class="small muted">📍 Hoy entreno en</span>${Object.keys(ENVS).map(k => `<button class="chip-btn ${(s.env || 'gym') === k ? 'on' : ''}" data-env="${k}">${ENVS[k][0]} ${ENVS[k][1]}</button>`).join('')}</div>`}
@@ -1611,6 +1612,7 @@ function exerciseCard(s, e, i) {
     </div>
     ${s.adapt && s.adapt[i] && s.swaps && s.swaps[i] === name ? `<div class="adapt-note">✨ Adaptado: ${esc(s.adapt[i])}</div>` : ''}
     ${exIssues(name).length ? `<div class="adapt-note warn">⚠ ${esc(issueText(exIssues(name), name))}. Toca ⇄ para cambiarlo.</div>` : ''}`;
+  const tip = open && typeof coachTip === 'function' ? coachTip(s, name, i) : '';
   if (!open) return `<div class="ex-card ${complete ? 'done' : ''}" data-card="${i}">${head}</div>`;
 
   const lastSet = done[done.length - 1];
@@ -1627,6 +1629,7 @@ function exerciseCard(s, e, i) {
   return `<div class="ex-card" data-card="${i}">
     ${head}
     <div class="ex-body">
+      ${tip}
       <div class="mission ${mis.kind} ${misOk ? 'ok' : ''}">${misOk ? '✅ ' : ''}${esc(mis.text)}</div>
       ${sug ? `<div class="suggest"><b>Para superarte hoy:</b><br>
         <button class="chip-btn" data-sug="${i}|${sug.a.w}|${sug.a.r}">${sug.a.w} ${u} × ${sug.a.r}</button>${sug.b ? ` o <button class="chip-btn" data-sug="${i}|${sug.b.w}|${sug.b.r}">${sug.b.w} ${u} × ${sug.b.r}</button>` : ''}

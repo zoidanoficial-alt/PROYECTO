@@ -215,13 +215,14 @@ function coachPlanCard() {
   const rows = nd.ex.map(e => {
     const c = coachFor(e[0], e[2]), sets = adjSets(e[1], plan);
     const target = c.sug ? (plan === 'modificar' ? `${roundTo(c.sug.a.w * 0.9, stepFor(e[0], c.u))} ${c.u} × ${Math.min(c.sug.a.r, c.hi)}` : c.sug.a.w ? `${c.sug.a.w} ${c.u} × ${c.sug.a.r}` : `${c.sug.a.r} reps`) : e[2] + (/^[\d\s–\-,/]+$/.test(e[2]) ? ' reps' : '');
-    return `<div class="coach-row"><div class="grow"><b>${esc(e[0])}</b><br><small class="muted">${sets} × ${esc(target)}</small></div><span class="coach-tag ${c.kind}" data-coach="${esc(e[0])}|${esc(e[2])}">${c.label}</span></div>`;
+    const ph = EX_PHOTO[e[0]];   // 23.0: tarjeta para la tira desplazable
+    return `<div class="cp-item">${ph ? `<img src="img/ex/${ph}-0.jpg" alt="" loading="lazy">` : `<div class="cp-ph">${exIcon(e[0], 48)}</div>`}<div class="cp-body"><b>${esc(e[0])}</b><small class="muted">${sets} × ${esc(target)}</small><span class="coach-tag ${c.kind}" data-coach="${esc(e[0])}|${esc(e[2])}">${c.label}</span></div></div>`;
   });
   return `<div class="card keep plan-card">
-    <div class="row spread"><div><div class="small muted">Tu plan de hoy</div><h2 style="margin:0">${esc(nd.name.split('·').pop().trim())}</h2></div>${r ? `<span class="pill">${PLAN_INFO[plan].icon} ${PLAN_INFO[plan].name}</span>` : ''}</div>
+    <div class="row spread"><div><div class="small muted">${typeof dayCoach === 'function' && dayCoach(nd) ? COACHES[dayCoach(nd)].ico + ' ' + COACHES[dayCoach(nd)].tag : 'Tu plan de hoy'}</div><h2 style="margin:0">${esc(nd.name.split('·').pop().trim())}</h2></div>${r ? `<span class="pill">${PLAN_INFO[plan].icon} ${PLAN_INFO[plan].name}</span>` : ''}</div>
     ${typeof strengthCoordNote === 'function' && strengthCoordNote(nd.name) ? `<div class="adapt-note" style="margin:6px 0 0">${strengthCoordNote(nd.name)}</div>` : ''}
-    <div style="margin-top:6px">${rows.slice(0, 3).join('')}</div>
-    ${rows.length > 3 ? `<details class="more-rows"><summary class="small">Ver los ${rows.length} ejercicios</summary>${rows.slice(3).join('')}</details>` : ''}
+    <div class="cp-strip" role="list" aria-label="Ejercicios de hoy">${rows.join('')}</div>
+    <p class="small muted cp-hint">${rows.length} ejercicios · desliza para verlos</p>
     <button class="block" id="cp-start" data-day="${nd.id}" style="margin-top:12px">▶ Empezar entreno</button>
     <p class="small muted" style="margin:8px 0 0;text-align:center">Toca una etiqueta para ver por qué te lo recomiendo.</p>
   </div>`;

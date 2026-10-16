@@ -160,6 +160,7 @@ function guidedCard(s, e, i) {
   const eff = rir >= 4 ? 4 : rir >= 2 ? 2 : 0;
   return `<div class="ex-card guided open" data-card="${i}">${head}<div class="ex-body">
     ${id ? `<button class="g-photo" data-howto="${esc(name)}" aria-label="Ver la técnica completa"><img src="img/ex/${id}-0.jpg" alt=""><img src="img/ex/${id}-1.jpg" alt="" class="b"></button>` : ''}
+    ${typeof coachTip === 'function' ? coachTip(s, name, i) : ''}
     <div class="g-how"><b>Cómo se hace</b><ol>${how.steps.map(t => `<li>${esc(t)}</li>`).join('')}</ol>${how.avoid ? `<p><b>Evita:</b> ${esc(how.avoid)}</p>` : ''}</div>
     <div class="g-goal">${ico('target', 18)}<span>${st && st.next
       ? `<b>Tu objetivo: ${esc(st.next.txt)}</b><small>La última vez: ${esc(setTxt(st.last.top, u))}. ${esc(st.why)}</small>`

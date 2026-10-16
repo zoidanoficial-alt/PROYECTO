@@ -126,9 +126,9 @@ COMP_KEYS.splice(COMP_KEYS.indexOf('cbum') + 1, 0, 'cbum24');
 FAMOUS_KEYS.splice(1, 0, 'cbum24'); FAMOUS_SHORT.cbum = 'CBUM · prep Olympia'; FAMOUS_SHORT.cbum24 = 'CBUM · off-season 2024';
 
 /** Empieza hoy una sesión suelta (sin cambiar tu rutina). */
-function startNamedSession(name, ex) {
+function startNamedSession(name, ex, coach, famId) {
   startSession('libre'); const s = activeSession(); if (!s) return;
-  s.dayName = name; s.base = ex.map(e => e.slice()); s.swaps = {}; s.adapt = {};
+  s.dayName = name; if (coach) { s.coach = coach; s.famId = famId; } s.base = ex.map(e => e.slice()); s.swaps = {}; s.adapt = {};
   const used = s.base.map(e => e[0]).filter(okForMe);
   s.base.forEach((e, i) => { const a = adaptFor(e[0], used); if (a && a.alt) { s.swaps[i] = a.alt; s.adapt[i] = 'En vez de ' + e[0] + ' (' + a.why + ')'; used.push(a.alt); } });
   saveData(); closeModal(); showTab('train'); window.scrollTo(0, 0);
@@ -150,7 +150,7 @@ function previewCbumSession(id, back) {
     <ol class="cbs-list">${(al => s.ex.map((e, i) => { const a = al[i]; return `<li><b>${esc(a)}</b><small>${e[1]} × ${esc(e[2])}${e[3] ? ' · descanso ' + mmss(e[3]) : ' · sin descanso: sigue al siguiente'}</small>${a !== e[0] ? `<small class="rp-swap">en vez de ${esc(e[0])}</small>` : ''}</li>`; }).join(''))(adaptList(s.ex))}</ol>
     <button class="block" id="cbs-go">${ico('play', 18)} Empezar esta sesión</button>
     <button class="ghost block" id="cbs-b" style="margin-top:6px">← Otras sesiones</button>`, m => {
-    $('#cbs-go', m).onclick = () => startNamedSession('CBUM · ' + s.t, s.ex);
+    $('#cbs-go', m).onclick = () => startNamedSession('CBUM · ' + s.t, s.ex, 'cbum', s.id);
     $('#cbs-b', m).onclick = () => openCbumSessions(back);
   });
 }
@@ -383,4 +383,101 @@ function openCompPrograms(back) {
     const pb = $('#cmp-pf', m); if (pb) pb.onclick = () => openPfSheet(() => openCompPrograms(back));
     $('#cmp-x', m).onclick = () => back();
   });
+}
+
+/* ------------------------------------------------------------------ *
+ *  23.0 · Mi rutina día por día: tu entreno, CBUM, Tom Holland o Arnold
+ * ------------------------------------------------------------------ */
+const FAM_GROUPS = [
+  { who: 'cbum', label: 'Entrena como CBUM', items: () => CBUM_SESSIONS.map(s => ({ v: 'cbs:' + s.id, n: s.t, ex: s.ex, note: s.note })) },
+  { who: 'tom', label: 'Entrena como Tom Holland', items: () => uniqDays('heroe') },
+  { who: 'arnold', label: 'Entrena como Arnold', items: () => uniqDays('golden6').concat(uniqDays('arnold1'), uniqDays('arnold2', 'Era dorada · ')) }
+];
+function uniqDays(key, prefix) {
+  const seen = {}, r = ROUTINES[key];
+  return r ? r.days.filter(d => !d.rest && d.ex.length).filter(d => { const n = d.name.split('·').pop().trim(); if (seen[n]) return false; seen[n] = 1; return true; })
+    .map(d => ({ v: 'rd:' + key + ':' + d.id, n: (prefix || (key === 'golden6' ? 'Golden Six · ' : key === 'heroe' ? '' : '')) + d.name.split('·').pop().trim(), ex: d.ex })) : [];
+}
+const COACH_NAMES = { cbum: 'CBUM', tom: 'Tom Holland', arnold: 'Arnold' };
+/** Opciones del selector de cada día (optgroups) y cuál está elegida. */
+function famousDayOptions(cur) {
+  const w = workoutById(cur), sel = w && w.fam;
+  return FAM_GROUPS.map(g => `<optgroup label="${esc(g.label)}">${g.items().map(it => `<option value="fam|${it.v}" ${sel === it.v ? 'selected' : ''}>${esc(COACH_NAMES[g.who] + ' · ' + it.n)}</option>`).join('')}</optgroup>`).join('');
+}
+/** Pone en ese día el entreno famoso (lo crea una vez y lo reutiliza). */
+function assignFamousDay(k, v) {
+  let w = DB.workouts.find(x => x.fam === v);
+  if (!w) {
+    const g = FAM_GROUPS.find(gr => gr.items().some(it => it.v === v)), it = g.items().find(x => x.v === v);
+    w = { id: uid(), name: COACH_NAMES[g.who] + ' · ' + it.n, ex: it.ex.map(e => e.slice()), coach: g.who, fam: v };
+    DB.workouts.push(w);
+  }
+  DB.plan[k] = w.id;
+  DB.profile.trainDays = DB.plan.map((x, j) => x ? j : null).filter(x => x != null); DB.profile.weeklyTarget = Math.max(1, DB.profile.trainDays.length);
+  saveData();
+}
+
+/* ------------------------------------------------------------------ *
+ *  23.0 · Modo coach: si entrenas como CBUM, Tom Holland o Arnold, te lo dice y te da sus tips
+ * ------------------------------------------------------------------ */
+const COACHES = {
+  cbum: { tag: 'Entrenas como CBUM', ico: '💎',
+    tips: ['Pocas series de trabajo (normalmente 2), muy cerca del fallo; la última muchas veces con drop set.', 'Calienta con 1–2 series de aproximación antes de la serie fuerte.',
+      'Controla la bajada y haz una pausa en el estiramiento: así entrena con Justin King y Hany Rambod.', 'Anota tus pesos: él insiste en la sobrecarga progresiva.',
+      'Cambia el ejercicio si te lastima: él elige máquinas y variantes que cuidan sus rodillas y hombros.', 'Duerme 8 h o más y toma 2 días de descanso por semana.'],
+    ex: {
+      'Press inclinado con mancuernas': 'Casi siempre es su primer o segundo ejercicio de pecho. Bajada de 3–4 s y pausa de 1 s abajo.',
+      'Chest press (máquina)': 'Bajada lenta; en la última serie, rest-pause con 15 s de descanso.', 'Press de pecho Magnum (discos)': 'Bajada lenta; en la última serie, rest-pause con 15 s de descanso.',
+      'Press inclinado (máquina)': 'Pausa larga abajo, en el estiramiento.', 'Press declinado en máquina': 'Controla la bajada y aprieta arriba.',
+      'Remo en T (Magnum)': 'Codos altos y junta los omóplatos (indicación de su coach Justin King).', 'Remo con pecho apoyado (mancuernas)': 'Codos altos y junta los omóplatos (indicación de su coach Justin King).',
+      'Jalón al pecho': 'Pausa abajo con el dorsal apretado; cambia de agarre entre sesiones.',
+      'Pullover en máquina': 'Lo usa para calentar la espalda antes de los remos.', 'Pullover en polea (brazos rectos)': 'Lo usa para calentar la espalda antes de los remos.', 'Pullover con mancuerna (banco transversal)': 'Estira bien el dorsal en la bajada.',
+      'Elevaciones laterales': 'Él las hace sentado porque de pie le molesta el hombro. Baja el peso en cada serie.', 'Elevaciones laterales sentado': 'Así las prefiere él: de pie le molesta el hombro.',
+      'Extensión de cuádriceps': 'La pone primero para calentar las rodillas; pausa arriba y, a veces, a una pierna.',
+      'Hack squat': 'Pies abajo en la plataforma para cargar más el cuádriceps; pausa abajo.', 'Pendulum squat': 'Pausa abajo; a veces hace repeticiones de 1¼.',
+      'Belt squat': 'Lo pone primero porque cuida la espalda y las rodillas.', 'Sentadilla en Smith': 'Rango completo y control; en su pierna de 2022 hizo 2 series de 11–12 al fallo.',
+      'Curl femoral tumbado': 'Bajada lenta y rango completo; al fallo, repeticiones forzadas (método de Hany Rambod).', 'Curl femoral sentado': 'Bajada lenta y rango completo.', 'Curl femoral de pie': 'Lento y completo; al fallo, repeticiones forzadas.',
+      'Curl predicador': 'Drop set en la última serie.', 'Extensión de tríceps en polea': 'Con cuerda y doble drop set al final.',
+      'Elevación de talones sentado': 'Siempre al final del día de pierna.', 'Pájaro posterior (reverse pec deck)': 'En súper serie con laterales sentado.' } },
+  tom: { tag: 'Entrenas como Tom Holland', ico: '🕸️',
+    tips: ['En el circuito pasa de un ejercicio al siguiente con solo 30 s de descanso.', 'Busca moverte como atleta: técnica limpia y explosiva, no solo cargar más.', 'No te saltes el cardio de la semana.'],
+    ex: { 'Peso muerto': 'Técnica antes que peso: espalda neutra y la barra pegada a las piernas.', 'Dominadas / chin-ups': 'Si te salen más de 10 limpias, añade lastre.', 'Fondos en paralelas (con lastre)': 'Baja controlado y sube explosivo.' } },
+  arnold: { tag: 'Entrenas como Arnold', ico: '🏆',
+    tips: ['Haz pecho y espalda en súper serie: él los alternaba sin descanso.', 'Pirámide: sube el peso y baja las repeticiones en cada serie (10, 8, 6, 4).', 'Concéntrate en el músculo que trabajas y apriétalo en la contracción.', 'Cuando te estanques, cambia el estímulo: su "principio de choque".'],
+    ex: { 'Pullover con mancuerna (banco transversal)': 'Respira hondo y estira el pecho en la bajada: era uno de sus favoritos.', 'Curl concentrado': 'Aprieta arriba 1 s, como en sus fotos clásicas.', 'Press Arnold': 'Gira las palmas mientras subes, sin arquear la espalda.' } }
+};
+const ROUTINE_COACH = { cbum: 'cbum', cbum24: 'cbum', heroe: 'tom', golden6: 'arnold', arnold1: 'arnold', arnold2: 'arnold' };
+/** ¿Con quién entrenas en esta sesión? (rutina famosa, día famoso de tu semana o sesión suelta) */
+function sessionCoach(s) {
+  if (!s) return null;
+  if (s.coach) return s.coach;
+  if (ROUTINE_COACH[s.routine]) return ROUTINE_COACH[s.routine];
+  if (s.routine === 'custom' && s.dayId) { const d = weekRoutine().days.find(x => x.id === s.dayId), w = d && workoutById(d.wid); return w && w.coach || null; }
+  return null;
+}
+function dayCoach(nd) {
+  if (!nd) return null;
+  if (ROUTINE_COACH[DB.profile.routine]) return ROUTINE_COACH[DB.profile.routine];
+  const w = nd.wid && workoutById(nd.wid); return w && w.coach || null;
+}
+function sessionNote(s) {
+  const id = s.famId || (s.dayId && String(s.dayId).startsWith('cb_') ? String(s.dayId).slice(3) : null);
+  if (id && cbSess(id)) return cbSess(id).note;
+  const d = s.routine === 'custom' && s.dayId ? weekRoutine().days.find(x => x.id === s.dayId) : null, w = d && workoutById(d.wid);
+  if (w && w.fam && w.fam.startsWith('cbs:') && cbSess(w.fam.slice(4))) return cbSess(w.fam.slice(4)).note;
+  return '';
+}
+/** Tarjeta "Entrenas como CBUM" arriba de la sesión, con un tip que cambia cada día. */
+function coachBanner(s) {
+  const who = sessionCoach(s); if (!who) return '';
+  const c = COACHES[who], k = (daysBetween('2026-01-01', todayStr()) % c.tips.length + c.tips.length) % c.tips.length, note = sessionNote(s);
+  return `<div class="card coach-banner"><div class="cb-head"><span class="cb-ico">${c.ico}</span><b>${esc(c.tag)}</b></div>
+    ${note ? `<p class="small" style="margin:6px 0 0">${esc(note)}</p>` : ''}
+    <p class="small cb-tip">${ico('lightbulb', 15)}<span><b>Tip:</b> ${esc(c.tips[k])}</span></p></div>`;
+}
+/** Tip del ejercicio (también si en tu gimnasio se cambió por un sustituto). */
+function coachTip(s, name, i) {
+  const who = sessionCoach(s); if (!who) return '';
+  const orig = s.base && s.base[i] ? s.base[i][0] : name, t = COACHES[who].ex[name] || COACHES[who].ex[orig];
+  return t ? `<div class="cb-extip">${COACHES[who].ico} <b>Tip de ${COACH_NAMES[who]}:</b> ${esc(t)}</div>` : '';
 }

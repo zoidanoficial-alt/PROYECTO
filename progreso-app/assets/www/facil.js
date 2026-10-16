@@ -259,14 +259,17 @@ function openWeekEditor(focusDay) {
         <div class="we-fcards">${fam.map(k => { const { n, ico: ri } = routineMeta(k); return `<button class="we-fc" data-wef="${k}"><span class="we-fi">${ri}</span><b>${esc(FAMOUS_SHORT[k] || ROUTINES[k].name)}</b><small>${n} entrenos${ROUTINES[k].days.length !== 7 && ROUTINES[k].days.length > n ? ' · ciclo de ' + ROUTINES[k].days.length + ' días' : ' por semana'} · ${esc(ROUTINE_LEVEL[k] || '')}</small></button>`; }).join('')}</div>
         <p class="small muted" style="margin:6px 0 0">Vienen con sus ejercicios, series y orden. Tócala para verla y empezar hoy.</p></div>` : ''}
       <div class="we-fh" style="margin-top:14px">O arma tu semana</div>
-      <p class="small muted" style="margin:0 0 4px">Toca un día para cambiar su entreno, o el lápiz para cambiar sus ejercicios.</p>
+      <p class="small muted" style="margin:0 0 4px">En cada día elige: tu propio entreno, entrenar como CBUM, Tom Holland o Arnold, o descanso. El lápiz cambia sus ejercicios.</p>
       ${WEEKDAYS.map((n, k) => { const w = workoutById(DB.plan[k]); return `<div class="we-row ${focusDay === k ? 'focus' : ''}"><b title="${n}">${short(n)}</b>
-        <select data-wep="${k}" aria-label="Entreno del ${n}"><option value="">Descanso</option>${DB.workouts.map(x => `<option value="${x.id}" ${w && w.id === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}<option value="__new">＋ Nuevo entreno…</option></select>
+        <select data-wep="${k}" aria-label="Entreno del ${n}"><option value="">Descanso</option><option value="__new">＋ Crear mi propio entreno…</option>
+          ${DB.workouts.some(x => !x.fam) ? `<optgroup label="Mis entrenos">${DB.workouts.filter(x => !x.fam).map(x => `<option value="${x.id}" ${w && w.id === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</optgroup>` : ''}
+          ${typeof famousDayOptions === 'function' ? famousDayOptions(DB.plan[k]) : ''}</select>
         ${w ? `<button class="icon-btn" data-wee="${w.id}" aria-label="Editar ${esc(w.name)}">${ico('pencil', 18)}</button>` : '<span class="icon-btn-sp"></span>'}</div>`; }).join('')}
       <div class="row" style="margin-top:12px"><button class="secondary" id="we-wz" style="flex:1">${ico('sparkles', 18, 'lead')}Rehacer en 3 pasos</button><button id="we-ok" style="flex:1">Listo</button></div>`;
     $$('[data-wef]', m).forEach(b => b.onclick = () => previewRoutine(b.dataset.wef));
     $$('[data-wep]', m).forEach(s => s.onchange = () => {
       const k = Number(s.dataset.wep);
+      if (s.value.startsWith('fam|')) { assignFamousDay(k, s.value.slice(4)); draw(m); if (currentTab === 'train') keepScroll(renderTrain); return; }
       if (s.value === '__new') { openWorkoutEditor(null, { id: uid(), isNew: true, name: '', ex: [], days: WEEKDAYS.map((_, j) => j === k) }); return; }
       DB.plan[k] = s.value || null;
       DB.profile.trainDays = DB.plan.map((x, j) => x ? j : null).filter(x => x != null); DB.profile.weeklyTarget = Math.max(1, DB.profile.trainDays.length);
