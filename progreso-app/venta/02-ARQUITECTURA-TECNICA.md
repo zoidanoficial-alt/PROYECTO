@@ -81,4 +81,4 @@ KEYSTORE=/ruta/llave.p12 KEY_ALIAS=x KEY_PASS=y ./build.sh   # con otra llave
 - Para Google Play se recomienda generar un **Android App Bundle (AAB)** con Gradle y usar Play App Signing (ver riesgos).
 
 ## Pruebas
-27 pruebas de extremo a extremo con Playwright (`tests/e2e/run-all.sh`) que recorren los flujos de cada versión, más una sonda de desbordamiento con letra grande. Resultado en la versión 20.0: sin errores. No hay pruebas unitarias ni pruebas en dispositivos físicos automatizadas.
+27 pruebas de extremo a extremo con Playwright (`tests/e2e/run-all.sh`) que recorren los flujos de cada versión, más una sonda de desbordamiento con letra grande. Resultado en la versión 21.0: sin errores. No hay pruebas unitarias ni pruebas en dispositivos físicos automatizadas.
