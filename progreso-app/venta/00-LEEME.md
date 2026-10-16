@@ -1,6 +1,6 @@
 # Mi Progreso · Paquete para desarrolladoras interesadas
 
-**Versión:** 20.0 (versionCode 25) · **Paquete Android:** `com.zoidan.progreso` · **Plataforma:** Android 8.0+ (API 26–34)
+**Versión:** 21.0 (versionCode 26) · **Paquete Android:** `com.zoidan.progreso` · **Plataforma:** Android 8.0+ (API 26–34)
 
 Este paquete reúne todo lo necesario para evaluar, compilar, probar y continuar la app sin depender de su creador.
 
@@ -15,9 +15,9 @@ Este paquete reúne todo lo necesario para evaluar, compilar, probar y continuar
 | `05-TRANSFERENCIA.md` | Lista de pasos para traspasar la app (código, firma, marca, tienda) |
 | `apk/` | APK firmado listo para instalar y su huella SHA-256 |
 | `codigo/` | Código fuente completo de la app (web + Android) con su script de compilación |
-| `codigo/tests/e2e/` | 26 pruebas automáticas de extremo a extremo (Playwright) |
+| `codigo/tests/e2e/` | 27 pruebas automáticas de extremo a extremo (Playwright) |
 | `codigo/docs/` | Historial técnico versión por versión y protocolo de validación con usuarios |
-| `capturas/` | Capturas de la versión 20.0 (tema oscuro y Modo Ella) |
+| `capturas/` | Capturas de la versión actual (tema oscuro y Modo Ella) |
 
 ## Evaluarla en 10 minutos
 

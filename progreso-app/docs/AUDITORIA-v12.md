@@ -792,3 +792,4 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - **Hoja de máquinas:** 42 elementos (34 de fuerza y peso libre, más 8 de cardio) en 4 secciones. El spa solo aparece con Black Card.
 - **Preparación:** con show el 8 ene 2027 y Classic Physique, la fase sale "Preparación · 12 sem".
 - **Gimnasio completo (no PF):** 0 cambios en era dorada.
+- **Corrección antes de entregar:** al agregar la tarjeta de preparación se perdió por error el enlace de los botones de la tarjeta de rutina (Cambiar rutina, Editar, días). La prueba `v25` lo detectó y se restauró.

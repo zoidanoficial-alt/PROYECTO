@@ -1276,7 +1276,7 @@ function renderTrain() {
   $('#tr-free').onclick = () => { startSession('libre'); renderTrain(); window.scrollTo(0, 0); };
   $$('#view-train [data-howto]').forEach(b => b.onclick = () => openHowTo(b.dataset.howto));
   $('#tr-lib').onclick = () => openExercisePicker(null);
-  bindCompPlan($("#view-train"), renderTrain);
+  bindRoutineCard($("#view-train")); bindCompPlan($("#view-train"), renderTrain);
   bindRetos($('#view-train'));
   foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Retos']], ['Tu semana y más', '*', true]]);
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });

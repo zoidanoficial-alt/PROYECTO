@@ -41,7 +41,7 @@ R.comp = await page.evaluate(() => { const c = document.querySelector('.comp-car
 await page.evaluate(() => document.querySelector('.comp-card').scrollIntoView({ block: 'center' })); await pause(400); await page.screenshot({ path: D + 'v29-preparacion.png' });
 R.cbumDays = await page.evaluate(() => getRoutine('cbum').days.map(d => d.rest ? 'R' : d.ex.length).join(','));
 // Galería
-await page.evaluate(() => openRoutineGallery()); await page.clock.runFor(300);
+await page.click('#rc-change'); await page.clock.runFor(300);
 R.gallery = await page.evaluate(() => ({ sec: document.querySelector('.rg-sec') && document.querySelector('.rg-sec').textContent, comp: [...document.querySelectorAll('.rg-sec ~ .rg-card')].length }));
 await page.evaluate(() => closeModal());
 // Gimnasio completo: sin cambios a Magnum

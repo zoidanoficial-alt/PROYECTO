@@ -20,7 +20,7 @@ git ls-files -z . | grep -zv -e '^keystore/' -e '^dist/' -e '^venta/' -e '^build
 mkdir -p "$PKG/codigo/keystore"
 echo "La llave de firma original no se incluye. Si esta carpeta está vacía, build.sh genera una llave nueva aquí al compilar. Para publicar usa tu propia llave (KEYSTORE, KEY_ALIAS y KEY_PASS) y Play App Signing; ver 05-TRANSFERENCIA.md." > "$PKG/codigo/keystore/LEEME.txt"
 
-cp dist/captura-$VER-*.png "$PKG/capturas/" 2>/dev/null || true
+cp dist/captura-20.0-*.png dist/captura-$VER-*.png "$PKG/capturas/" 2>/dev/null || true
 
 rm -f "dist/$NAME.zip"
 ( cd "$TMP" && zip -qr9 "$ROOT/dist/$NAME.zip" "$NAME" )
