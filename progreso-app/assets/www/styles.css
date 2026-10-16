@@ -1417,3 +1417,14 @@ button.pulse { box-shadow: 0 0 0 4px var(--accent-soft); }
 /* El botón flotante no tapa lo último de la pantalla */
 #view-home { padding-bottom: 72px; }
 .rc-why summary { justify-content: flex-start; text-align: left; }
+
+/* ------------------------------------------------------------------ *
+ *  21.0 · Fisicoculturismo para competir
+ * ------------------------------------------------------------------ */
+.pf-conf.var { background: rgba(245, 158, 11, .14); color: var(--warn); }
+.rg-sec { margin: 16px 2px 8px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.rp-swap { display: block; color: var(--muted); font-size: 12px; text-decoration: line-through; text-decoration-color: rgba(127, 127, 127, .5); }
+.rp-src { color: var(--muted); margin: 0 0 10px; }
+.comp-list { list-style: none; margin: 4px 0 12px; padding: 0; display: grid; gap: 8px; }
+.comp-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.4; }
+.comp-list svg { color: var(--accent); flex: none; margin-top: 2px; }

@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '20.0';
+const APP_VERSION = '21.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -341,6 +341,9 @@ function smartSubs(name) {
 function adaptFor(name, avoid) {
   const iss = exIssues(name);
   if (!iss.length) return null;
+  // 21.0: en Planet Fitness, primero el sustituto curado más fiel (no cualquiera del mismo patrón)
+  const pfAlt = typeof pfSwapFor === 'function' ? pfSwapFor(name, avoid) : null;
+  if (pfAlt) return { alt: pfAlt, why: 'adaptado a Planet Fitness' + (PF_WHY[pfAlt] ? ': ' + PF_WHY[pfAlt] : ''), pf: true };
   const subs = smartSubs(name), calf = exInfo(name).g === 'pantorrilla';
   const cand = subs.filter(n => (EX[n].g === 'pantorrilla') === calf);   // no cambiar una sentadilla por pantorrilla
   return { alt: cand.find(n => !(avoid || []).includes(n)) || cand[0] || subs[0] || null, why: issueText(iss, name) };
@@ -1230,6 +1233,7 @@ function renderTrain() {
     ${modeSeg}
     ${coachPlanCard()}
     ${routineCard()}
+    ${compPlanCard()}
     <div class="tool-row">
       <button id="tr-free"><span>⚡</span>Libre</button>
       <button id="tr-act"><span>🏃</span>Actividad</button>
@@ -1272,7 +1276,7 @@ function renderTrain() {
   $('#tr-free').onclick = () => { startSession('libre'); renderTrain(); window.scrollTo(0, 0); };
   $$('#view-train [data-howto]').forEach(b => b.onclick = () => openHowTo(b.dataset.howto));
   $('#tr-lib').onclick = () => openExercisePicker(null);
-  bindRoutineCard($('#view-train'));
+  bindCompPlan($("#view-train"), renderTrain);
   bindRetos($('#view-train'));
   foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Retos']], ['Tu semana y más', '*', true]]);
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });
@@ -3132,6 +3136,9 @@ setInterval(() => {
 
 DB = loadData();
 registerCustomExercises();
+// 21.0: barras de peso fijo (rectas y EZ) en Planet Fitness y gimnasio completo
+if (!DB.profile.v21 && ['pf', 'completo'].includes(DB.profile.gym) && DB.profile.equip && !DB.profile.equip.includes('bfija')) DB.profile.equip.push('bfija');
+DB.profile.v21 = true;
 // 6.0: los colores del logo son oscuros; se aplica una sola vez el tema oscuro (luego se puede volver a Claro).
 if (!DB.profile.logoTheme) { DB.profile.theme = 'dark'; DB.profile.logoTheme = true; }
 // Quien ya usaba la app (tiene registros) no ve la bienvenida.

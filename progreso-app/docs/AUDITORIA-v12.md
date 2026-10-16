@@ -718,3 +718,77 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - **Reporte:** no contiene el nombre.
 - **Ajustar a 4 días / 60 min / Bien:** da torso y pierna con 6 ejercicios a 3 series.
 - **Con sesiones simuladas:** "Dominar tu rutina" exige 4 sesiones con 2 tipos de entreno, y "Superar un récord" muestra "20 kg × 12 → 25 kg × 10 (+19 %)".
+
+---
+
+## 21.0 · Fisicoculturismo para competir, adaptado a Planet Fitness
+
+**Objetivo:** programas de competencia ya armados, para que la persona solo elija uno y empiece, y que se adapten solos a lo que tiene su Planet Fitness.
+
+**Programas (`compite.js`):** cuatro, cada uno con su fuente.
+
+| Programa | Días | Nivel | Contenido |
+|---|---|---|---|
+| Golden Six · inspirado en Arnold | 3 | Principiante–intermedio | Cuerpo completo |
+| Arnold split · nivel I | 6 | Intermedio | Pecho+espalda / hombro+brazo / pierna ×2, 3–4 × 10 |
+| Era dorada · volumen de competencia | 6 | Avanzado | Pirámides 10/8/6/4; súper series de antagonistas; condensa la doble sesión de los 70 |
+| Classic Physique · inspirado en Chris Bumstead | 6 de 8 | Avanzado | Rotación 3-1-3-1 de su preparación 2023 |
+
+**Dónde están:**
+- Explorar → **Competir**.
+- Plan → Cambiar rutina, en la sección "Fisicoculturismo · para competir".
+
+**Cómo se usan:**
+- La vista previa muestra el ejercicio que harás y, tachado, el original.
+- **"Empezar hoy"** elige el programa y abre la sesión del día 1 en un toque.
+
+**Planet Fitness revisado (`pf.js`):**
+- **Catálogo:** 34 máquinas y equipos de fuerza (antes 21), en 3 secciones:
+  - Placas.
+  - Discos Matrix Magnum: hack squat, press supino, pantorrilla sentado, Glute Trainer, prensa 45° y remo en T.
+  - Peso libre: half rack, bancos, barras fijas, zona PF 360 y paralelas.
+- **Cuatro niveles de confianza:** confirmado en México, estándar de la cadena, varía por club y no verificado. Lo que varía o no está verificado solo entra a las rutinas si marcas "Sí".
+- **Half rack:** anunciado en 2026 para 7 clubes. Si lo marcas, la app deja la sentadilla, el press y el peso muerto con barra.
+
+**Adaptación curada:**
+- `PF_SWAP` define, para cada ejercicio, el sustituto más fiel en orden de preferencia. Ejemplos:
+  - Sentadilla con barra → hack squat → Smith.
+  - Peso muerto → rumano en Smith.
+  - Press banca → press Magnum → Smith.
+  - Remo en T → remo con pecho apoyado.
+- En la sesión el cambio se explica, por ejemplo: "adaptado a Planet Fitness: press plano de discos, lo más parecido a la barra".
+- Fuera de PF se usa el sustituto genérico de siempre.
+
+**Ejercicios nuevos (14):**
+- Press Arnold, curl concentrado, encogimientos, curl de muñeca.
+- Curl y press francés con barra EZ: equipo nuevo "barra de peso fijo"; se agrega solo a PF y a gimnasio completo.
+- Press Magnum, press inclinado en máquina, elevaciones laterales en máquina.
+- Remo en T Magnum, remo con pecho apoyado, pullover en polea.
+- Glute drive Magnum, sit-ups.
+- Llevan foto de Free Exercise DB (dominio público) y ficha "Cómo se hace".
+
+**Preparación para competir:** tarjeta en Plan con la fecha del show y la categoría (Classic, Bodybuilding, Men's Physique, Bikini, Wellness, Figura).
+
+| Fase | Cuándo | Cardio | Poses | Nutrición |
+|---|---|---|---|---|
+| Fuera de temporada | Más de 20 semanas antes del show | 20 min, 3–5 días | 2 veces por semana | Volumen |
+| Preparación | De 20 semanas a 8 días antes | 30 min diarios, que suben hasta ~45 si la pérdida de peso se estanca | 10–15 min diarios | Definición |
+| Semana del show | Últimos 7 días | Suave, sin experimentos | Ensayo diario de poses y entrada | Sin cambios drásticos; la guía el coach |
+| Después del show | — | Suave | Descanso de poses | Regreso gradual al mantenimiento |
+
+- En todas las fases: foto semanal de frente, lado y espalda.
+- **Límite de seguridad:** la app no da protocolos de deshidratación, diuréticos ni sustancias, y lo dice.
+
+**Fuentes y límites:** `docs/FUENTES-v21.md`. Las cifras vienen de fuentes secundarias que difieren entre sí.
+
+**Riesgo de marca:** "CBUM" es marca registrada y él tiene una app que compite con esta. Los nombres visibles están en `COMP_NAMES`, en un solo lugar, para renombrarlos antes de vender o publicar.
+
+**Verificación (`tests/e2e/v29.mjs`):**
+- Usuario de Planet Fitness avanzado:
+  - Competir muestra 4 programas con sus cambios: Golden Six 12, nivel I 20, era dorada 24, Classic 6.
+  - La vista previa de nivel I muestra press Magnum, press inclinado en Smith, remo en Smith y rumano en Smith en vez de los de barra.
+  - "Empezar hoy" abre el día 1 con 4 adaptaciones explicadas.
+- **Con half rack marcado:** la sentadilla, el peso muerto y el press banca con barra se quedan.
+- **Hoja de máquinas:** 42 elementos (34 de fuerza y peso libre, más 8 de cardio) en 4 secciones. El spa solo aparece con Black Card.
+- **Preparación:** con show el 8 ene 2027 y Classic Physique, la fase sale "Preparación · 12 sem".
+- **Gimnasio completo (no PF):** 0 cambios en era dorada.

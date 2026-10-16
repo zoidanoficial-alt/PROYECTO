@@ -112,8 +112,9 @@ function explorarCard() {
     ['food', 'utensils', 'Nutrición', 'Calorías, proteína, agua y comidas'],
     ['stats', 'trending-up', 'Estadísticas', isBeginner() ? 'Tendencias y fuerza por músculo (avanzado)' : 'Tendencias, fuerza y balance'],
     ['run', 'footprints', 'Running', 'Planes, GPS y caminadora'],
-    ['retos', 'trophy', 'Retos', 'Pruebas de peso corporal'],
+    ['retos', 'medal', 'Retos', 'Pruebas de peso corporal'],
     ['ex', 'book-open', 'Ejercicios', 'Técnica de cada ejercicio'],
+    ['compite', 'trophy', 'Competir', 'Programas de fisicoculturismo listos'],
     ['act', 'activity', 'Otra actividad', 'Caminar, yoga, bici…']
   ];
   return `<div class="card keep explore-card"><h2>Explorar</h2>
@@ -129,6 +130,7 @@ function bindExplore(root) {
     else if (k === 'act') openActivityForm();
     else if (k === 'retos') openModal(retosCard().replace('class="card"', 'class="retos-sheet"') + '<button class="ghost block" id="rs-x">Cerrar</button>', m => { bindRetos(m); $('#rs-x', m).onclick = closeModal; });
     else if (k === 'stats') openStatsGate();
+    else if (k === 'compite') openCompete();
   });
 }
 function openStatsGate() {

@@ -109,11 +109,13 @@ function openRoutineDay(dayKey) {
 const ROUTINE_LEVEL = { inicio: 'Principiante', pro: 'Avanzado', tp4: 'Intermedio', gluteo: 'Principiante–intermedio', heroe: 'Intermedio' };
 function openRoutineGallery() {
   const cur = DB.profile.routine;
-  const keys = Object.keys(ROUTINES);
+  const keys = Object.keys(ROUTINES).filter(k => !ROUTINES[k].comp), comp = Object.keys(ROUTINES).filter(k => ROUTINES[k].comp);
+  const card = k => { const { n, ico } = routineMeta(k); return `<button class="rg-card ${cur === k ? 'on' : ''}" data-rg="${k}"><span class="rg-ico">${ico}</span><span class="grow"><b>${esc(ROUTINES[k].name)}</b><small>${n} días · ${ROUTINE_LEVEL[k] || 'Todos los niveles'}${cur === k ? ' · <b>la que usas</b>' : ''}</small></span><span aria-hidden="true">›</span></button>`; };
   if (fem()) keys.sort((a, b) => (b === 'gluteo') - (a === 'gluteo'));
   openModal(`<h3>Elige tu rutina</h3>
     <button class="rg-card rg-make" id="rg-wizard"><span class="rg-ico">✨</span><span class="grow"><b>Crear mi rutina en 3 pasos</b><small>Eliges tus días y qué entrenas cada uno. La app pone los ejercicios.</small></span><span aria-hidden="true">›</span></button>
-    ${keys.map(k => { const { n, ico } = routineMeta(k); return `<button class="rg-card ${cur === k ? 'on' : ''}" data-rg="${k}"><span class="rg-ico">${ico}</span><span class="grow"><b>${esc(ROUTINES[k].name)}</b><small>${n} días · ${ROUTINE_LEVEL[k] || 'Todos los niveles'}${cur === k ? ' · <b>la que usas</b>' : ''}</small></span><span aria-hidden="true">›</span></button>`; }).join('')}
+    ${keys.map(card).join('')}
+    ${comp.length ? `<div class="rg-sec">Fisicoculturismo · para competir</div>${comp.map(card).join('')}` : ''}
     ${DB.workouts.length ? `<button class="rg-card ${cur === 'custom' ? 'on' : ''}" data-rg="custom"><span class="rg-ico">⭐</span><span class="grow"><b>Mi rutina</b><small>${DB.workouts.length} entreno${DB.workouts.length > 1 ? 's' : ''} armados por ti${cur === 'custom' ? ' · <b>la que usas</b>' : ''}</small></span><span aria-hidden="true">›</span></button>` : ''}
     <button class="ghost block" id="rg-x" style="margin-top:6px">Cerrar</button>`, m => {
     $('#rg-x', m).onclick = closeModal;
@@ -122,13 +124,19 @@ function openRoutineGallery() {
   });
 }
 function previewRoutine(key) {
-  const r = ROUTINES[key], { ico } = routineMeta(key);
-  openModal(`<h3>${ico} ${esc(r.name)}</h3><p class="small muted" style="margin-top:0">${esc(r.desc || '')}</p>
-    ${r.days.map(d => d.rest ? `<div class="rp-day rest">😴 ${esc(d.name)}</div>` : `<details class="rp-day"><summary><b>${esc(d.name)}</b> <small class="muted">· ${d.ex.length} ejercicios</small></summary><ul>${d.ex.map(e => `<li>${esc(e[0])} <small class="muted">${e[1]} × ${esc(e[2])}</small></li>`).join('')}</ul></details>`).join('')}
-    <button class="block" id="rp-use" style="margin-top:12px">✓ Usar esta rutina</button>
+  const r = ROUTINES[key], { ico: rIco } = routineMeta(key);
+  const alt = n => typeof adaptedName === 'function' ? adaptedName(n) : n, swaps = r.comp ? routineAdaptCount(key) : 0;
+  const first = r.days.find(d => !d.rest && d.ex.length);
+  openModal(`<h3>${rIco} ${esc(r.name)}</h3><p class="small muted" style="margin-top:0">${esc(r.desc || '')}</p>
+    ${r.comp ? `<p class="small rp-src"><b>Fuentes:</b> ${esc(COMP_ROUTINES[key].src)}. Sin afiliación; las cifras varían entre fuentes.</p>` : ''}
+    ${swaps ? `<div class="adapt-note">${ico('sparkles', 16, 'lead')}<b>${swaps} cambio${swaps > 1 ? 's' : ''} para ${isPF() ? 'tu Planet Fitness' : 'tu equipo'}:</b> verás el ejercicio que harás y, debajo, el original.</div>` : ''}
+    ${r.days.map(d => d.rest ? `<div class="rp-day rest">😴 ${esc(d.name)}</div>` : `<details class="rp-day"${d === first && r.comp ? ' open' : ''}><summary><b>${esc(d.name)}</b> <small class="muted">· ${d.ex.length} ejercicios</small></summary><ul>${d.ex.map(e => { const a = alt(e[0]); return `<li>${esc(a)} <small class="muted">${e[1]} × ${esc(e[2])}</small>${a !== e[0] ? `<small class="rp-swap">en vez de ${esc(e[0])}</small>` : ''}</li>`; }).join('')}</ul></details>`).join('')}
+    ${r.comp && first ? `<button class="block" id="rp-start" style="margin-top:12px">${ico('play', 18)} Empezar hoy: ${esc(first.name.split('·').pop().trim())}</button>` : ''}
+    <button class="${r.comp ? 'secondary ' : ''}block" id="rp-use" style="margin-top:${r.comp ? 8 : 12}px">✓ Usar esta rutina</button>
     <button class="secondary block" id="rp-custom" style="margin-top:8px">✏️ Usarla y personalizarla</button>
     <button class="ghost block" id="rp-back" style="margin-top:6px">← Ver otras rutinas</button>`, m => {
     $('#rp-use', m).onclick = () => useRoutine(key);
+    const st = $('#rp-start', m); if (st) st.onclick = () => { DB.profile.routine = key; saveData(); closeModal(); startSession(key, first.id); showTab('train'); window.scrollTo(0, 0); };
     $('#rp-custom', m).onclick = () => personalizeRoutine(key);
     $('#rp-back', m).onclick = openRoutineGallery;
   });
