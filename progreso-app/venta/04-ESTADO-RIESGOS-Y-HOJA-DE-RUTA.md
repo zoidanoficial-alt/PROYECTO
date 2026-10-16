@@ -2,7 +2,7 @@
 
 ## Verificado
 - Compila y firma con `build.sh` (versión 20.0, versionCode 25, minSdk 26, targetSdk 34).
-- 27 pruebas de extremo a extremo pasan sin errores: los flujos de las versiones 9 a 21 (incluida la adaptación a Planet Fitness), Modo Ella, la persistencia de datos y que nada se salga de la pantalla con letra grande en 320, 360 y 393 px.
+- 28 pruebas de extremo a extremo pasan sin errores: los flujos de las versiones 9 a 22 (incluidas la adaptación a Planet Fitness y el kit del competidor), Modo Ella, la persistencia de datos y que nada se salga de la pantalla con letra grande en 320, 360 y 393 px.
 - Flujo principal 20.0 probado con reloj simulado: bienvenida → descanso → primer entreno guiado → resultado → objetivo calculado el siguiente día → progreso → ajuste de rutina.
 
 ## No verificado
