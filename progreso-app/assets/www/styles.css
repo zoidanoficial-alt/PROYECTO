@@ -1066,7 +1066,7 @@ header { position: sticky; }
 .wz-focus button.on { border-color: var(--accent); background: var(--accent-soft); }
 
 /* Editor de la semana */
-.we-row { display: grid; grid-template-columns: 88px minmax(0, 1fr) 40px; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.we-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) 44px; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
 .we-row select { margin: 0; min-height: 44px; }
 .we-row.focus { background: var(--accent-soft); border-radius: 12px; padding-inline: 8px; }
 .icon-btn-sp { width: 40px; }
@@ -1428,3 +1428,14 @@ button.pulse { box-shadow: 0 0 0 4px var(--accent-soft); }
 .comp-list { list-style: none; margin: 4px 0 12px; padding: 0; display: grid; gap: 8px; }
 .comp-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.4; }
 .comp-list svg { color: var(--accent); flex: none; margin-top: 2px; }
+
+/* 22.0 · Mi rutina: rutinas famosas listas y filas que no se cortan */
+.we-fh { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 4px 2px 8px; }
+.we-fcards { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
+.we-fc { flex: 0 0 156px; scroll-snap-align: start; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; padding: 12px; border-radius: 16px;
+  background: var(--surface-2); color: var(--text); border: 1px solid var(--line); min-height: 0; font-weight: 500; }
+.we-fc .we-fi { font-size: 22px; line-height: 1; }
+.we-fc b { font-size: 14px; font-weight: 600; line-height: 1.25; }
+.we-fc small { color: var(--muted); font-size: 12px; font-weight: 400; }
+.we-row b { font-size: 15px; }
+.we-row select { min-width: 0; text-overflow: ellipsis; }

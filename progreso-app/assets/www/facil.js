@@ -131,9 +131,9 @@ function previewRoutine(key) {
     ${r.comp ? `<p class="small rp-src"><b>Fuentes:</b> ${esc(COMP_ROUTINES[key].src)}. Sin afiliación; las cifras varían entre fuentes.</p>` : ''}
     ${swaps ? `<div class="adapt-note">${ico('sparkles', 16, 'lead')}<b>${swaps} cambio${swaps > 1 ? 's' : ''} para ${isPF() ? 'tu Planet Fitness' : 'tu equipo'}:</b> verás el ejercicio que harás y, debajo, el original.</div>` : ''}
     ${r.days.map(d => d.rest ? `<div class="rp-day rest">😴 ${esc(d.name)}</div>` : `<details class="rp-day"${d === first && r.comp ? ' open' : ''}><summary><b>${esc(d.name)}</b> <small class="muted">· ${d.ex.length} ejercicios</small></summary><ul>${d.ex.map(e => { const a = alt(e[0]); return `<li>${esc(a)} <small class="muted">${e[1]} × ${esc(e[2])}</small>${a !== e[0] ? `<small class="rp-swap">en vez de ${esc(e[0])}</small>` : ''}</li>`; }).join('')}</ul></details>`).join('')}
-    ${r.comp && first ? `<button class="block" id="rp-start" style="margin-top:12px">${ico('play', 18)} Empezar hoy: ${esc(first.name.split('·').pop().trim())}</button>` : ''}
-    <button class="${r.comp ? 'secondary ' : ''}block" id="rp-use" style="margin-top:${r.comp ? 8 : 12}px">✓ Usar esta rutina</button>
-    <button class="secondary block" id="rp-custom" style="margin-top:8px">✏️ Usarla y personalizarla</button>
+    ${(r.comp || r.famous) && first ? `<button class="block" id="rp-start" style="margin-top:12px">${ico('play', 18)} Empezar hoy: ${esc(first.name.split('·').pop().trim())}</button>` : ''}
+    <button class="${r.comp || r.famous ? 'secondary ' : ''}block" id="rp-use" style="margin-top:${r.comp || r.famous ? 8 : 12}px">✓ Usar esta rutina tal cual</button>
+    <button class="secondary block" id="rp-custom" style="margin-top:8px">${ico("pencil", 18, "lead")}Ponerla en mi semana y editarla</button>
     <button class="ghost block" id="rp-back" style="margin-top:6px">← Ver otras rutinas</button>`, m => {
     $('#rp-use', m).onclick = () => useRoutine(key);
     const st = $('#rp-start', m); if (st) st.onclick = () => { DB.profile.routine = key; saveData(); closeModal(); startSession(key, first.id); showTab('train'); window.scrollTo(0, 0); };
@@ -149,6 +149,19 @@ function useRoutine(key) {
 }
 /** Copia una rutina de la app a "Mi rutina" (entrenos editables asignados a tus días). */
 function personalizeRoutine(key) {
+  const r0 = ROUTINES[key];
+  if (r0.days.length >= 7) {   // 22.0: rutinas de 7 u 8 días: se respeta su orden y sus descansos de lunes a domingo
+    const plan = Array(7).fill(null), made = {};
+    r0.days.slice(0, 7).forEach((d, i) => {
+      if (d.rest || !d.ex.length) return;
+      const nm = d.name.split('·').pop().trim();
+      if (!made[nm]) { const w = { id: uid(), name: nm, ex: d.ex.map(e => e.slice()), from: key }; DB.workouts.push(w); made[nm] = w.id; }
+      plan[i] = made[nm];
+    });
+    DB.plan = plan; DB.profile.routine = 'custom'; DB.profile.trainDays = plan.map((x, j) => x ? j : null).filter(x => x != null); DB.profile.weeklyTarget = DB.profile.trainDays.length;
+    saveData(); closeModal(); if (currentTab === 'train') renderTrain(); else showTab('train'); window.scrollTo(0, 0);
+    toast('✓ En tu semana de lunes a domingo: toca un día para editarlo'); return;
+  }
   const r = ROUTINES[key], work = r.days.filter(d => !d.rest && d.ex.length);
   const days = (plannedDays().length === work.length ? plannedDays() : DEFAULT_DAYS[Math.min(7, work.length)] || plannedDays()).slice().sort();
   const plan = Array(7).fill(null), made = [];
@@ -238,12 +251,20 @@ function openRoutineWizard() {
 
 /* ---------- Editor de la semana (Mi rutina) en una hoja ---------- */
 function openWeekEditor(focusDay) {
+  const short = n => n.slice(0, 3);
   const draw = m => {
-    m.innerHTML = `<h3>✏️ Mi rutina</h3><p class="small muted" style="margin-top:0">Toca un día para cambiar su entreno, o edita un entreno para cambiar sus ejercicios.</p>
-      ${WEEKDAYS.map((n, k) => { const w = workoutById(DB.plan[k]); return `<div class="we-row ${focusDay === k ? 'focus' : ''}"><b>${n}</b>
-        <select data-wep="${k}" aria-label="Entreno del ${n}"><option value="">😴 Descanso</option>${DB.workouts.map(x => `<option value="${x.id}" ${w && w.id === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}<option value="__new">＋ Nuevo entreno…</option></select>
-        ${w ? `<button class="icon-btn" data-wee="${w.id}" aria-label="Editar ${esc(w.name)}">✏️</button>` : '<span class="icon-btn-sp"></span>'}</div>`; }).join('')}
-      <div class="row" style="margin-top:12px"><button class="secondary" id="we-wz" style="flex:1">✨ Rehacer en 3 pasos</button><button id="we-ok" style="flex:1">Listo</button></div>`;
+    const fam = typeof FAMOUS_KEYS === 'object' ? FAMOUS_KEYS.filter(k => ROUTINES[k]) : [];
+    m.innerHTML = `<h3>Mi rutina</h3>
+      ${fam.length ? `<div class="we-fam"><div class="we-fh">¿Sin ganas de armarla? Entrena como…</div>
+        <div class="we-fcards">${fam.map(k => { const { n, ico: ri } = routineMeta(k); return `<button class="we-fc" data-wef="${k}"><span class="we-fi">${ri}</span><b>${esc(FAMOUS_SHORT[k] || ROUTINES[k].name)}</b><small>${n} días · ${esc(ROUTINE_LEVEL[k] || '')}</small></button>`; }).join('')}</div>
+        <p class="small muted" style="margin:6px 0 0">Vienen con sus ejercicios, series y orden. Tócala para verla y empezar hoy.</p></div>` : ''}
+      <div class="we-fh" style="margin-top:14px">O arma tu semana</div>
+      <p class="small muted" style="margin:0 0 4px">Toca un día para cambiar su entreno, o el lápiz para cambiar sus ejercicios.</p>
+      ${WEEKDAYS.map((n, k) => { const w = workoutById(DB.plan[k]); return `<div class="we-row ${focusDay === k ? 'focus' : ''}"><b title="${n}">${short(n)}</b>
+        <select data-wep="${k}" aria-label="Entreno del ${n}"><option value="">Descanso</option>${DB.workouts.map(x => `<option value="${x.id}" ${w && w.id === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}<option value="__new">＋ Nuevo entreno…</option></select>
+        ${w ? `<button class="icon-btn" data-wee="${w.id}" aria-label="Editar ${esc(w.name)}">${ico('pencil', 18)}</button>` : '<span class="icon-btn-sp"></span>'}</div>`; }).join('')}
+      <div class="row" style="margin-top:12px"><button class="secondary" id="we-wz" style="flex:1">${ico('sparkles', 18, 'lead')}Rehacer en 3 pasos</button><button id="we-ok" style="flex:1">Listo</button></div>`;
+    $$('[data-wef]', m).forEach(b => b.onclick = () => previewRoutine(b.dataset.wef));
     $$('[data-wep]', m).forEach(s => s.onchange = () => {
       const k = Number(s.dataset.wep);
       if (s.value === '__new') { openWorkoutEditor(null, { id: uid(), isNew: true, name: '', ex: [], days: WEEKDAYS.map((_, j) => j === k) }); return; }

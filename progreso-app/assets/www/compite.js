@@ -261,3 +261,8 @@ function openCompete() {
     $('#cmp-x', m).onclick = closeModal;
   });
 }
+
+/* ---------- 22.0 · "Entrena como…": rutinas famosas listas en Mi rutina ---------- */
+const FAMOUS_KEYS = ['cbum', 'heroe', 'arnold1', 'golden6', 'arnold2'];
+const FAMOUS_SHORT = { cbum: 'CBUM · Classic Physique', heroe: 'Tom Holland · Spider-Man', arnold1: 'Arnold split', golden6: 'Golden Six', arnold2: 'Arnold · era dorada' };
+FAMOUS_KEYS.forEach(k => { if (ROUTINES[k]) ROUTINES[k].famous = true; });
