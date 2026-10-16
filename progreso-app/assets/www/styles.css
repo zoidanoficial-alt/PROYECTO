@@ -1439,3 +1439,26 @@ button.pulse { box-shadow: 0 0 0 4px var(--accent-soft); }
 .we-fc small { color: var(--muted); font-size: 12px; font-weight: 400; }
 .we-row b { font-size: 15px; }
 .we-row select { min-width: 0; text-overflow: ellipsis; }
+
+/* 22.0 · Kit del competidor */
+.kit-list { display: grid; gap: 8px; }
+.kit-item { display: flex; align-items: center; gap: 12px; padding: 12px; min-height: 0; border-radius: 14px; background: var(--surface-2); color: var(--text); text-align: left; font-weight: 500; }
+.kit-item > svg:first-child { color: var(--accent); flex: none; }
+.kit-item b { display: block; font-size: 15px; font-weight: 600; }
+.kit-item small { display: block; color: var(--muted); font-size: 12.5px; font-weight: 400; }
+.cbs-list, .pose-list { margin: 12px 0; padding-left: 22px; display: grid; gap: 10px; }
+.cbs-list li b, .pose-list li b { display: block; font-size: 15px; }
+.cbs-list li small, .pose-list li small { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; }
+.cn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 8px; margin: 12px 0; }
+.cn-grid div { background: var(--surface-2); border-radius: 14px; padding: 10px; min-width: 0; }
+.cn-grid b { display: block; font-size: 18px; font-weight: 700; }
+.cn-grid small { color: var(--muted); font-size: 12px; }
+.ck-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.ck-row b { display: block; font-size: 14px; } .ck-row small { display: block; color: var(--muted); font-size: 12.5px; }
+.mx-fed { border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+.mx-fed b { font-size: 15px; } .mx-fed p { margin: 6px 0 0; }
+tr.hl td { color: var(--accent); font-weight: 700; }
+.pp-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; font-weight: 600; }
+.pp-name { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin: 14px 0 4px; }
+.pp-time { font-size: 72px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); line-height: 1; margin: 8px 0 12px; }
+.pp-time.switch { color: var(--muted); }

@@ -149,7 +149,7 @@ function guidedCard(s, e, i) {
   const done = DB.lifts.filter(l => l.sid === s.id && l.ex === name).sort((a, b) => a.t - b.t);
   const complete = done.length >= sets, open = SESS_UI.open === i;
   const head = `<div class="ex-head g-head" data-open="${i}"><span class="g-num ${complete ? 'ok' : ''}">${complete ? ico('check', 16) : i + 1}</span>
-      <div class="grow"><h4>${esc(name)}</h4><div class="ex-meta">${sets} series × ${esc(reps)} reps · descanso ${mmss(rest || 90)}</div></div>
+      <div class="grow"><h4>${esc(name)}</h4><div class="ex-meta">${sets} series × ${esc(reps)}${/^[\d\s–\-,/]+$/.test(reps) ? ' reps' : ''} · descanso ${mmss(rest || 90)}</div></div>
       <b class="g-count">${Math.min(done.length, sets)}/${sets}</b></div>`;
   if (!open) return `<div class="ex-card guided ${complete ? 'done' : ''}" data-card="${i}">${head}</div>`;
   const st = exStory(name, reps, s.id), id = EX_PHOTO[name], how = howSteps(name), [lo, hi] = repRange(reps);

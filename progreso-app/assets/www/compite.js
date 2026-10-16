@@ -191,8 +191,13 @@ const isCompRoutine = k => COMP_KEYS.includes(k);
 
 /** Cómo queda un ejercicio en tu gimnasio (para la vista previa del programa). */
 function adaptedName(name) { const a = okForMe(name) ? null : adaptFor(name); return a && a.alt ? a.alt : name; }
+/** 22.0: lo que harás en cada ejercicio de un día, con la misma regla que al empezar la sesión (sin repetir máquina). */
+function adaptList(exs) {
+  const used = exs.map(e => e[0]).filter(okForMe);
+  return exs.map(e => { const a = adaptFor(e[0], used); if (a && a.alt) { used.push(a.alt); return a.alt; } return e[0]; });
+}
 function routineAdaptCount(key) {
-  return ROUTINES[key].days.reduce((a, d) => a + d.ex.filter(e => adaptedName(e[0]) !== e[0]).length, 0);
+  return ROUTINES[key].days.reduce((a, d) => { const al = adaptList(d.ex); return a + d.ex.filter((e, i) => al[i] !== e[0]).length; }, 0);
 }
 
 /* ---------- Plan de preparación ---------- */
@@ -243,22 +248,6 @@ function openCompSetup(after) {
     $$('[data-cc]', m).forEach(b => b.onclick = () => { c.cat = b.dataset.cc; $$('[data-cc]', m).forEach(x => x.classList.toggle('on', x === b)); });
     $('#cs-ok', m).onclick = () => { c.date = $('#cs-date', m).value; DB.profile.comp = c; saveData(); closeModal(); if (after) after(); };
     const d = $('#cs-del', m); if (d) d.onclick = () => { delete DB.profile.comp; saveData(); closeModal(); if (after) after(); };
-  });
-}
-
-/** Explorar → Competir: los programas con su adaptación a tu gimnasio. */
-function openCompete() {
-  const pf = isPF();
-  openModal(`<h3>Entrenar para competir</h3>
-    <p class="small muted" style="margin-top:0">Programas listos: elige uno y empieza hoy. ${pf ? 'Ya vienen adaptados a tu Planet Fitness: lo que tu club no tiene se cambia por el sustituto más parecido.' : 'Si algo no está en tu gimnasio, se cambia por el sustituto más parecido.'}</p>
-    ${COMP_KEYS.map(k => { const c = COMP_ROUTINES[k], n = ROUTINES[k].days.filter(d => !d.rest).length, a = routineAdaptCount(k);
-      return `<button class="rg-card ${DB.profile.routine === k ? 'on' : ''}" data-cmp="${k}"><span class="rg-ico">${c.ico}</span><span class="grow"><b>${esc(COMP_NAMES[k])}</b><small>${n} días · ${esc(c.level)} · ${esc(c.weeks)}${a ? ` · ${a} cambios para ${pf ? 'Planet Fitness' : 'tu equipo'}` : ''}</small></span><span aria-hidden="true">›</span></button>`; }).join('')}
-    ${pf ? '<button class="secondary block" id="cmp-pf" style="margin-top:10px">Revisar las máquinas de mi club</button>' : ''}
-    <p class="small muted" style="margin-top:12px">Inspirados en lo publicado sobre cómo entrenaban; no hay afiliación con ellos ni con sus marcas. Las cifras varían entre fuentes.</p>
-    <button class="ghost block" id="cmp-x">Cerrar</button>`, m => {
-    $$('[data-cmp]', m).forEach(b => b.onclick = () => previewRoutine(b.dataset.cmp));
-    const pb = $('#cmp-pf', m); if (pb) pb.onclick = () => openPfSheet(openCompete);
-    $('#cmp-x', m).onclick = closeModal;
   });
 }
 

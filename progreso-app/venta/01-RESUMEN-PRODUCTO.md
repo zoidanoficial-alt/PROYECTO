@@ -23,6 +23,7 @@ El ciclo **registrar → entender → saber qué sigue** es el producto. Todo lo
 - **Entreno guiado:** qué ejercicio, cómo se hace, qué peso, cuánto descansar y cuándo terminaste.
 - **Resultado:** lo que hiciste, lo que mejoraste y el siguiente objetivo con fecha y pesos.
 - **Tu camino:** 4 etapas (primer entreno → dominar la rutina → superar un récord → consistencia) cuya recompensa es la prueba numérica de mejora.
+- **Kit del competidor (22.0):** 15 sesiones reales de CBUM, rotaciones de preparación y off-season, poses obligatorias con práctica cronometrada, nutrición para naturales (Helms 2014, Iraki 2019), check-in semanal, federaciones y eventos en México, topes de Classic Physique y guía segura del día del show.
 - **Competir (21.0):** programas de fisicoculturismo listos (Golden Six, Arnold split, volumen de la era dorada y Classic Physique moderno) que se adaptan solos al equipo de cada Planet Fitness, con plan de preparación por fases hasta el día del show.
 - **Explorar:** nutrición (calorías, proteína, agua), peso, medidas, fotos con silueta, running con GPS y planes, caminadora, retos, estadísticas, notificaciones locales, exportación PDF/Excel/CSV (compatible con Strong y Hevy).
 

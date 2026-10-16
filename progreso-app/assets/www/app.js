@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '21.0';
+const APP_VERSION = '22.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -123,7 +123,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null,
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [],
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -261,8 +261,9 @@ function targets() {
   // Lo que no es proteína se reparte entre carbohidratos y grasa en la proporción del somatotipo.
   const rest = Math.max(0, kcal - protein * 4);
   const cShare = s.c / (s.c + s.f);
-  const carbs = Math.round(rest * cShare / 4);
-  const fat = Math.round(rest * (1 - cShare) / 9);
+  let carbs = Math.round(rest * cShare / 4);
+  let fat = Math.round(rest * (1 - cShare) / 9);
+  if (!p.autoMacros && p.fatG) { fat = p.fatG; carbs = Math.max(0, Math.round((kcal - protein * 4 - fat * 9) / 4)); }   // 22.0: grasa del kit del competidor
   return { kcal, protein, carbs, fat, lb, factor, soma: s, water: p.waterGoal, sugar: p.sugarMax };
 }
 function dayTotals(date) {

@@ -793,3 +793,67 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - **Preparación:** con show el 8 ene 2027 y Classic Physique, la fase sale "Preparación · 12 sem".
 - **Gimnasio completo (no PF):** 0 cambios en era dorada.
 - **Corrección antes de entregar:** al agregar la tarjeta de preparación se perdió por error el enlace de los botones de la tarjeta de rutina (Cambiar rutina, Editar, días). La prueba `v25` lo detectó y se restauró.
+
+---
+
+## 22.0 · CBUM a fondo y kit del competidor
+
+**Mi rutina sin ganas de armarla:**
+- El editor de la semana (Plan → Editar) empieza con **"¿Sin ganas de armarla? Entrena como…"**. Hay seis tarjetas:
+  - CBUM · prep Olympia
+  - CBUM · off-season 2024
+  - Tom Holland · Spider-Man
+  - Arnold split
+  - Golden Six
+  - Arnold · era dorada
+- Cada tarjeta abre la vista previa con sus ejercicios, adaptados a tu gimnasio. Desde ahí hay tres opciones:
+  - **Empezar hoy**
+  - **Usar esta rutina tal cual**
+  - **Ponerla en mi semana y editarla**: respeta su orden y sus descansos de lunes a domingo; CBUM queda Cuádriceps, Pecho, Espalda, Descanso, Hombro, Femoral, Brazo.
+- Las filas usan días abreviados (Lun…Dom) y un lápiz lineal, para que no se corten con letra grande. Era el problema de tus capturas.
+
+**CBUM a fondo (`kit.js`):**
+- **15 sesiones documentadas** (2022–2025) con el orden real de ejercicios y sus técnicas (tempo 3-1-1, volumen alemán, tri-sets, isométricos, rest-pause, drop sets). Cada una dice:
+  - de qué video o newsletter viene,
+  - su nivel de confianza,
+  - si las series son del video o aproximadas.
+- **"Entrena como CBUM hoy"** empieza una sesión suelta sin cambiar tu rutina.
+- La rotación de preparación ahora usa sus sesiones reales. Hay una rotación nueva: **off-season 2024 de 9 días**.
+- **14 ejercicios nuevos:**
+  - Pendulum y belt squat, sentadilla sissy, curl femoral de pie
+  - Fondos en máquina, press JM, remo alto, press declinado en máquina
+  - Pullover en máquina, extensión sobre la cabeza en polea, curl araña
+  - Aperturas inclinadas en polea, pájaro en polea, elevación tibial
+- **Corrección para Planet Fitness:** las máquinas que PF no tiene en su catálogo ahora se cambian por un sustituto (antes se daban por disponibles). Ejemplos:
+  - Pendulum → hack squat
+  - Belt squat → Smith
+  - Hammer Strength → press Magnum
+  - Remo alto → remo sentado
+
+**Kit del competidor (Explorar → Competir), 9 herramientas:**
+1. Programas completos.
+2. Entrena como CBUM hoy.
+3. **Mi show:** fecha, categoría (se suma Women's Physique) y fase.
+4. **Poses obligatorias** por categoría y federación (NPC/Pro League o IFBB/FMFF), con cómo hacer cada una. Incluye práctica cronometrada: cada pose 20–60 s, 10 s para cambiar, 2 vueltas, vibración y minutos acumulados.
+5. **Nutrición del competidor** (Helms 2014 en preparación, Iraki 2019 en off-season):
+   - Calorías y macros con explicación, suplementos con evidencia y aviso de salud mental.
+   - "Usar estas metas en la app" fija calorías, proteína y grasa (nuevo `fatG` en `targets()`).
+6. **Check-in semanal:** peso promedio, cintura, energía, hambre, sueño, minutos de poses y notas, con historial y ritmo en %/semana.
+7. **Competir en México:** FMFF/IFBB, NPC Worldwide/Pro League, WNBF México y Naturalmanía, con inscripción, cuotas reportadas y eventos 2026.
+8. **Tope de Classic Physique** para tu estatura (Pro League 2023, NPC amateur y fórmula aproximada de la IFBB).
+9. **Semana y día del show:** qué no hacer (agua, sodio, diuréticos), carga de carbohidratos con evidencia y qué llevar.
+
+**Otras correcciones:**
+- "Tu plan de hoy" y la sesión guiada ya no agregan "reps" a indicaciones de texto.
+
+**Fuentes:** `docs/FUENTES-v22.md`.
+
+**Verificación (`v30.mjs`):**
+- **Editor:** 6 rutinas famosas y días "Lun…Dom". La vista previa de CBUM prep muestra su día de cuádriceps 2022. "Ponerla en mi semana" deja Cuádriceps, Pecho, Espalda, Descanso, Hombro, Femoral, Brazo.
+- **Kit y sesiones:** el kit tiene 9 herramientas y las sesiones de CBUM son 15. En Planet Fitness, cuádriceps 2024 cambia belt squat por Smith y pendulum por sentadilla goblet, sin repetir máquina; la vista previa y la sesión coinciden.
+- **Poses:** Classic (NPC) da 6 elementos; la práctica corre y registra minutos.
+- **Nutrición:** con show en febrero de 2027 da 2,180 kcal, 202 g de proteína, 224 g de carbohidratos y 53 g de grasa, y se aplican a las metas.
+- **Check-in:** se guarda.
+- **México, topes y día del show:** abren.
+- **Rotaciones:** prep `5,5,7,R,6,6,7,R` y off-season `7,7,7,R,6,7,6,5,R`.
+- **`v29`:** actualizada porque Competir ahora abre el kit.

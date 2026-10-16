@@ -77,7 +77,8 @@ function pfHas(m) { const v = pfMarks()[m.id]; return v === 'si' || (v !== 'no' 
 function pfMissing(name) {
   if (!isPF()) return false;
   const ms = PF_MACHINES.filter(m => m.ex && m.ex.includes(name));
-  return ms.length > 0 && !ms.some(pfHas);
+  if (!ms.length) { const x = EX[name]; return !!(x && x.e === 'maq' && !x.pf); }   // 22.0: máquinas que PF no tiene (pendulum, belt squat…)
+  return !ms.some(pfHas);
 }
 const pfBlack = () => isPF() && DB.profile.pfMember === 'black';
 

@@ -114,7 +114,7 @@ function explorarCard() {
     ['run', 'footprints', 'Running', 'Planes, GPS y caminadora'],
     ['retos', 'medal', 'Retos', 'Pruebas de peso corporal'],
     ['ex', 'book-open', 'Ejercicios', 'Técnica de cada ejercicio'],
-    ['compite', 'trophy', 'Competir', 'Programas de fisicoculturismo listos'],
+    ['compite', 'trophy', 'Competir', 'Kit del fisicoculturista: programas, poses y nutrición'],
     ['act', 'activity', 'Otra actividad', 'Caminar, yoga, bici…']
   ];
   return `<div class="card keep explore-card"><h2>Explorar</h2>

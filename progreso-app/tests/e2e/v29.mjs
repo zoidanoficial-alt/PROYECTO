@@ -13,7 +13,7 @@ await page.clock.runFor(900); for (let i = 0; i < 4; i++) await page.click('#gd-
 R.gym = await page.evaluate(() => ({ gym: DB.profile.gym, bfija: DB.profile.equip.includes('bfija'), barra: DB.profile.equip.includes('barra') }));
 // Explorar → Competir
 await page.click('#tabs [data-tab=more]'); await page.clock.runFor(300);
-await page.click('[data-explore="compite"]'); await page.clock.runFor(300);
+await page.click('[data-explore="compite"]'); await page.clock.runFor(300); await page.click('[data-kit="programs"]'); await page.clock.runFor(300);
 R.list = await page.evaluate(() => [...document.querySelectorAll('[data-cmp]')].map(b => b.innerText.replace(/\s+/g, ' ').trim()));
 await pause(400); await page.screenshot({ path: D + 'v29-competir.png' });
 await page.click('[data-cmp="arnold1"]'); await page.clock.runFor(300);

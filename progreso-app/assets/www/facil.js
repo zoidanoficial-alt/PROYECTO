@@ -125,12 +125,12 @@ function openRoutineGallery() {
 }
 function previewRoutine(key) {
   const r = ROUTINES[key], { ico: rIco } = routineMeta(key);
-  const alt = n => typeof adaptedName === 'function' ? adaptedName(n) : n, swaps = r.comp ? routineAdaptCount(key) : 0;
+  const alt = n => typeof adaptedName === 'function' ? adaptedName(n) : n, swaps = (r.comp || r.famous) && typeof routineAdaptCount === "function" ? routineAdaptCount(key) : 0;
   const first = r.days.find(d => !d.rest && d.ex.length);
   openModal(`<h3>${rIco} ${esc(r.name)}</h3><p class="small muted" style="margin-top:0">${esc(r.desc || '')}</p>
     ${r.comp ? `<p class="small rp-src"><b>Fuentes:</b> ${esc(COMP_ROUTINES[key].src)}. Sin afiliación; las cifras varían entre fuentes.</p>` : ''}
     ${swaps ? `<div class="adapt-note">${ico('sparkles', 16, 'lead')}<b>${swaps} cambio${swaps > 1 ? 's' : ''} para ${isPF() ? 'tu Planet Fitness' : 'tu equipo'}:</b> verás el ejercicio que harás y, debajo, el original.</div>` : ''}
-    ${r.days.map(d => d.rest ? `<div class="rp-day rest">😴 ${esc(d.name)}</div>` : `<details class="rp-day"${d === first && r.comp ? ' open' : ''}><summary><b>${esc(d.name)}</b> <small class="muted">· ${d.ex.length} ejercicios</small></summary><ul>${d.ex.map(e => { const a = alt(e[0]); return `<li>${esc(a)} <small class="muted">${e[1]} × ${esc(e[2])}</small>${a !== e[0] ? `<small class="rp-swap">en vez de ${esc(e[0])}</small>` : ''}</li>`; }).join('')}</ul></details>`).join('')}
+    ${r.days.map(d => d.rest ? `<div class="rp-day rest">😴 ${esc(d.name)}</div>` : `<details class="rp-day"${d === first && r.comp ? ' open' : ''}><summary><b>${esc(d.name)}</b> <small class="muted">· ${d.ex.length} ejercicios</small></summary><ul>${(al => d.ex.map((e, i) => { const a = al[i]; return `<li>${esc(a)} <small class="muted">${e[1]} × ${esc(e[2])}</small>${a !== e[0] ? `<small class="rp-swap">en vez de ${esc(e[0])}</small>` : ''}</li>`; }).join(''))(typeof adaptList === 'function' ? adaptList(d.ex) : d.ex.map(e => e[0]))}</ul></details>`).join('')}
     ${(r.comp || r.famous) && first ? `<button class="block" id="rp-start" style="margin-top:12px">${ico('play', 18)} Empezar hoy: ${esc(first.name.split('·').pop().trim())}</button>` : ''}
     <button class="${r.comp || r.famous ? 'secondary ' : ''}block" id="rp-use" style="margin-top:${r.comp || r.famous ? 8 : 12}px">✓ Usar esta rutina tal cual</button>
     <button class="secondary block" id="rp-custom" style="margin-top:8px">${ico("pencil", 18, "lead")}Ponerla en mi semana y editarla</button>
@@ -256,7 +256,7 @@ function openWeekEditor(focusDay) {
     const fam = typeof FAMOUS_KEYS === 'object' ? FAMOUS_KEYS.filter(k => ROUTINES[k]) : [];
     m.innerHTML = `<h3>Mi rutina</h3>
       ${fam.length ? `<div class="we-fam"><div class="we-fh">¿Sin ganas de armarla? Entrena como…</div>
-        <div class="we-fcards">${fam.map(k => { const { n, ico: ri } = routineMeta(k); return `<button class="we-fc" data-wef="${k}"><span class="we-fi">${ri}</span><b>${esc(FAMOUS_SHORT[k] || ROUTINES[k].name)}</b><small>${n} días · ${esc(ROUTINE_LEVEL[k] || '')}</small></button>`; }).join('')}</div>
+        <div class="we-fcards">${fam.map(k => { const { n, ico: ri } = routineMeta(k); return `<button class="we-fc" data-wef="${k}"><span class="we-fi">${ri}</span><b>${esc(FAMOUS_SHORT[k] || ROUTINES[k].name)}</b><small>${n} entrenos${ROUTINES[k].days.length !== 7 && ROUTINES[k].days.length > n ? ' · ciclo de ' + ROUTINES[k].days.length + ' días' : ' por semana'} · ${esc(ROUTINE_LEVEL[k] || '')}</small></button>`; }).join('')}</div>
         <p class="small muted" style="margin:6px 0 0">Vienen con sus ejercicios, series y orden. Tócala para verla y empezar hoy.</p></div>` : ''}
       <div class="we-fh" style="margin-top:14px">O arma tu semana</div>
       <p class="small muted" style="margin:0 0 4px">Toca un día para cambiar su entreno, o el lápiz para cambiar sus ejercicios.</p>

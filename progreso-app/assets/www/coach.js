@@ -214,7 +214,7 @@ function coachPlanCard() {
   const r = readiness(), plan = r ? r.plan : 'mantener';
   const rows = nd.ex.map(e => {
     const c = coachFor(e[0], e[2]), sets = adjSets(e[1], plan);
-    const target = c.sug ? (plan === 'modificar' ? `${roundTo(c.sug.a.w * 0.9, stepFor(e[0], c.u))} ${c.u} × ${Math.min(c.sug.a.r, c.hi)}` : c.sug.a.w ? `${c.sug.a.w} ${c.u} × ${c.sug.a.r}` : `${c.sug.a.r} reps`) : e[2] + ' reps';
+    const target = c.sug ? (plan === 'modificar' ? `${roundTo(c.sug.a.w * 0.9, stepFor(e[0], c.u))} ${c.u} × ${Math.min(c.sug.a.r, c.hi)}` : c.sug.a.w ? `${c.sug.a.w} ${c.u} × ${c.sug.a.r}` : `${c.sug.a.r} reps`) : e[2] + (/^[\d\s–\-,/]+$/.test(e[2]) ? ' reps' : '');
     return `<div class="coach-row"><div class="grow"><b>${esc(e[0])}</b><br><small class="muted">${sets} × ${esc(target)}</small></div><span class="coach-tag ${c.kind}" data-coach="${esc(e[0])}|${esc(e[2])}">${c.label}</span></div>`;
   });
   return `<div class="card keep plan-card">
