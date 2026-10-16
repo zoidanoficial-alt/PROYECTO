@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message));
+await page.goto('http://127.0.0.1:8765/index.html');
+await page.fill('#ob-name', 'Ana'); for (let k = 0; k < 7; k++) await page.click('#ob-next');
+await page.waitForTimeout(900); for (let i = 0; i < 4; i++) await page.click('#gd-next'); await page.waitForTimeout(2600);
+await page.evaluate(() => scrollTo(0, 0));
+await page.screenshot({ path: './out/v27c-hoy.png' });
+const h = await page.evaluate(() => ({ eyebrow: document.querySelector('.hero .eyebrow').textContent, title: document.querySelector('.hero h3').textContent }));
+await page.click(await page.$('#home-train') ? '#home-train' : '#home-anyway'); await page.waitForTimeout(300);
+const s = await page.evaluate(() => ({ tab: currentTab, sess: activeSession() && activeSession().dayName, ex: activeSession() && sessionExercises(activeSession()).length }));
+console.log(JSON.stringify({ h, s }), errors);
+await b.close();
