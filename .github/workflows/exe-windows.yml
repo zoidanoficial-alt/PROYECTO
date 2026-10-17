@@ -53,8 +53,22 @@ jobs:
           path: CIFRAS-Consultores-windows.zip
           retention-days: 30
 
-      - name: Publicar Release (solo en etiquetas v*)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Leer versión
+        id: version
+        shell: bash
+        run: echo "v=$(python -c 'import analista_financiero as a; print(a.__version__)')" >> "$GITHUB_OUTPUT"
+
+      # Publica (o actualiza) la Release "v<versión>": enlace de descarga permanente.
+      # Para sacar una versión nueva basta con subir __version__ en analista_financiero/__init__.py.
+      - name: Publicar Release
+        if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: v${{ steps.version.outputs.v }}
+          target_commitish: ${{ github.sha }}
+          name: CIFRAS Consultores ${{ steps.version.outputs.v }}
+          body: |
+            Descarga **CIFRAS-Consultores-windows.zip**, descomprímelo y abre `CIFRAS.exe`.
+            Incluye la guía `LEEME.txt`, la plantilla de Excel para clientes y un archivo de ejemplo.
           files: CIFRAS-Consultores-windows.zip
+          make_latest: true
