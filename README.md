@@ -1,3 +1,80 @@
+# PROYECTO
+
+Este repositorio contiene dos herramientas independientes:
+
+- **[Analista financiero guiado](#analista-financiero-guiado)** (`analista_financiero/`):
+  convierte un Excel/CSV de ventas, costos y gastos en un diagnóstico que una
+  persona sin formación financiera puede entender, comprobar y presentar.
+- **[Casandra BMV](#casandra-bmv)** (`cassandra_bmv/`): alertas de valuación
+  estirada en la Bolsa Mexicana de Valores.
+
+## Analista financiero guiado
+
+> *"Tengo una empresa, vendo bastante, pero nunca sé cuánto dinero estoy
+> ganando realmente."* — *"Vamos a averiguarlo."*
+
+El sistema recorre ocho etapas, y en cada una dice cuál es el siguiente
+paso, qué información falta y por qué:
+
+1. **Carga** Excel (todas las hojas), CSV o cifras capturadas a mano.
+2. **Identifica columnas** y pregunta solo cuando no entiende un campo.
+3. **Valida**: fechas inválidas, duplicados, monedas mezcladas, filas de
+   "total" que no cuadran, signos, meses sin datos, partidas inusuales.
+   Nunca presenta datos dudosos como definitivos (marca resultados como
+   *provisionales*).
+4. **Calcula** con código determinista: ventas, márgenes, utilidad, punto
+   de equilibrio, rentabilidad por producto, flujo de efectivo, días de cobro.
+5. **Explica** en lenguaje sencillo ("de cada $100 que vendes te quedan…").
+6. **Investiga**: si las ventas suben y la utilidad baja, arma un puente que
+   explica peso por peso el cambio (volumen, mezcla, precio, costo unitario,
+   cada gasto) y contrasta hipótesis, separando hechos de suposiciones.
+7. **Propone acciones y las simula** (utilidad, caja, sensibilidad, riesgos),
+   y permite simular escenarios de precio, volumen, costos, gastos y plazos.
+8. **Genera un informe** para presentar a un director, con la trazabilidad
+   de cada cifra hasta la fila del Excel original.
+
+La IA (Claude) solo entiende preguntas y explica: **toda cifra viene del
+motor de cálculo**. Diseño completo, principios y fuentes en
+[`docs/analista_financiero.md`](docs/analista_financiero.md).
+
+### Uso
+
+```bash
+pip install -r requirements.txt
+
+# Demo completa: genera datos de ejemplo (con errores a propósito) y su informe
+python -m analista_financiero demo --salida demo_analista
+
+# Modo guiado, conversación paso a paso en la terminal
+python -m analista_financiero guiar mis_ventas.xlsx
+
+# Análisis automático con informe y trazabilidad
+python -m analista_financiero analizar mis_ventas.xlsx --tc USD=18.5 \
+    --informe informe.html --json trazabilidad.json --empresa "Mi empresa"
+
+# Pregunta en lenguaje natural
+python -m analista_financiero preguntar mis_ventas.xlsx "¿por qué bajó mi utilidad?"
+
+# Aplicación web
+streamlit run analista_financiero/app.py
+```
+
+Para el asistente con IA, define `ANTHROPIC_API_KEY`; sin ella funciona en
+modo local con las mismas herramientas de cálculo.
+
+**Formato de datos.** Sirve un archivo con una hoja por tipo (p. ej.
+"Ventas", "Costo de ventas", "Gastos") o una sola tabla con columna "Tipo".
+Columnas reconocidas: fecha, importe/monto, producto, cantidad, categoría,
+concepto, moneda, folio, cliente/proveedor y fecha de cobro/pago. Con
+producto y cantidad el diagnóstico separa precio, costo y mezcla; con fecha
+de cobro/pago calcula el efectivo real.
+
+> El análisis no sustituye a un contador ni a un asesor: en impuestos,
+> crédito, inversiones importantes o información para terceros, el sistema lo
+> indica y prepara la información para la revisión profesional.
+
+---
+
 # Casandra BMV
 
 Un script que jala precios de emisoras de la Bolsa Mexicana de Valores,

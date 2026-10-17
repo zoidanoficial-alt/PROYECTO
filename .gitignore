@@ -18,3 +18,8 @@ run_cassandra*.sh
 *.local.ps1
 *.local.sh
 .env
+
+# Analista financiero: datos de ejemplo e informes generados
+demo_analista/
+informe_financiero*.html
+informe_financiero*.json
