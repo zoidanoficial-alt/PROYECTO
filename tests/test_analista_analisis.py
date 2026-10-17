@@ -206,3 +206,19 @@ def test_captura_manual():
     assert lib.valor("utilidad_operativa.actual") == 100
     assert s.investigar().modo_puente == "global"
     assert coherente(s.investigar().puente)
+
+
+def test_resultados_viejos_no_sobreviven_a_confirmar(tmp_path):
+    """La interfaz puede dejar guardado un resultado calculado antes de confirmar los problemas."""
+    s = Sesion(hoy=date(2026, 10, 17))
+    s.cargar_archivo(generar_excel(tmp_path / "d.xlsx"))
+    s.aceptar_sugerencias()
+    s.fijar_tipo_cambio("USD", 18.5)
+    viejo = s.analizar()
+    inv_vieja = s.investigar()
+    assert viejo.confianza == "provisional"
+    s.confirmar_problemas()
+    s.resultados, s.investigacion = viejo, inv_vieja  # escritura tardía de una ejecución anterior
+    assert s.analizar().confianza == "confiable"
+    assert s.investigar() is not inv_vieja
+    assert s.recomendar() and s.base_mensual() is s.base_mensual()

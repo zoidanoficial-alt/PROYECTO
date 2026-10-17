@@ -6,4 +6,5 @@ requests>=2.31
 # Analista financiero
 openpyxl>=3.1
 streamlit>=1.40      # interfaz web (opcional)
+jinja2>=3.1          # lo usan las gráficas de la interfaz
 anthropic>=1.0       # asistente con Claude (opcional; sin clave funciona en modo local)

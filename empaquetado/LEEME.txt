@@ -1,37 +1,50 @@
-ANALISTA FINANCIERO - Guía rápida
-=================================
+CIFRAS CONSULTORES - Guía rápida
+================================
 
-1. Doble clic en AnalistaFinanciero.exe.
-   - Se abre una ventana negra (déjala abierta: es el motor de la aplicación)
-     y, unos segundos después, la aplicación en tu navegador.
-   - La primera vez tarda más (hasta ~30 segundos) porque se descomprime.
-   - Si Windows muestra "Windows protegió su PC", haz clic en
-     "Más información" > "Ejecutar de todas formas". Aparece porque el
-     programa todavía no está firmado digitalmente.
+ABRIR EL PROGRAMA
+1. Doble clic en CIFRAS.exe.
+   - Se abre una ventana negra (déjala abierta: es el motor del programa) y,
+     unos segundos después, la aplicación en tu navegador.
+   - La primera vez tarda más (hasta ~30 segundos).
+   - Si Windows muestra "Windows protegió su PC": "Más información" >
+     "Ejecutar de todas formas". Aparece porque el programa aún no está
+     firmado digitalmente.
+2. Para cerrar el programa, cierra la ventana negra.
 
-2. En la pestaña "1 · Datos":
-   - Sube tu Excel o CSV de ventas, costos y gastos, o
-   - prueba con el archivo ejemplo_cafe_la_montana.xlsx incluido, o con el
-     botón "Cargar datos de ejemplo".
+PRIMERA VEZ (2 minutos)
+- Pestaña "Configuración": escribe tu nombre, correo, teléfono y web.
+  Aparecerán en el pie de cada informe.
+- Ahí mismo descarga la "Plantilla para clientes" (también viene en este
+  zip) para enviársela a tus clientes.
 
-3. Sigue el "Siguiente paso" de la barra lateral: confirmar columnas,
-   revisar problemas de datos, diagnóstico, investigación, decisiones e
-   informe.
+ATENDER A UN CLIENTE
+1. Pestaña "Clientes": crea el expediente del cliente (empresa, contacto, giro).
+2. Pestaña "1 · Datos": sube el Excel o CSV que te envió. Se guarda una copia
+   en su expediente.
+3. Sigue el "Siguiente paso" de la barra lateral: confirmar columnas, revisar
+   problemas de datos, diagnóstico, investigación y decisiones.
+4. Pestaña "6 · Informe": "Generar informe". Queda guardado en el expediente
+   y lo puedes descargar. Para PDF: ábrelo en el navegador > Imprimir >
+   Guardar como PDF.
+5. En "Clientes" verás el historial de archivos e informes de cada cliente.
 
-4. Para cerrar la aplicación, cierra la ventana negra.
+DÓNDE SE GUARDA TU TRABAJO
+  Documentos\CIFRAS Consultores\
+     configuracion.json     tus datos de contacto
+     Clientes\<Cliente>\    datos recibidos e informes entregados
+Respalda esa carpeta con frecuencia (OneDrive, Google Drive o un USB).
+Contiene información confidencial de tus clientes: protégela.
 
-Tus datos no salen de tu computadora. Solo si activas el asistente con IA
-(pestaña "Asistente", con tu propia clave de Anthropic) se envían a la API
-las cifras que el asistente consulta para responder.
+PROBAR SIN UN CLIENTE REAL
+En "1 · Datos" usa "Cargar datos de ejemplo", o sube el archivo
+"Ejemplo - Cafe La Montana.xlsx" incluido en este zip.
 
-Formato recomendado del Excel
------------------------------
-Una hoja por tipo ("Ventas", "Costo de ventas", "Gastos") o una sola hoja con
-columna "Tipo". Columnas útiles: Fecha, Importe, Producto, Cantidad,
-Categoría, Concepto, Moneda, Fecha de cobro / Fecha de pago.
-Con Producto y Cantidad el diagnóstico separa precio, costo y mezcla; con las
-fechas de cobro/pago calcula el efectivo real.
+ASISTENTE CON IA (OPCIONAL)
+En la pestaña "Asistente" puedes pegar una clave de API de Anthropic para
+hacer preguntas en lenguaje natural. Sin clave funciona en modo local.
+Con clave, las cifras que el asistente consulta se envían a la API.
 
-Este programa no sustituye a un contador: en impuestos, créditos,
-inversiones importantes o información para terceros, valida las decisiones
-con un profesional.
+LÍMITES
+El análisis no sustituye a un contador público: en impuestos, créditos,
+inversiones importantes o estados financieros para terceros, valida las
+decisiones con un profesional.

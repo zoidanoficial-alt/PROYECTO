@@ -19,6 +19,7 @@ import pandas as pd
 
 from .diagnostico import ESTADOS_TEXTO
 from .escenarios import Palancas
+from . import marca
 from .explicar import GLOSARIO
 from .limites import LIMITES_GENERALES, revisiones_requeridas
 from .modelos import fmt_dinero, fmt_pct, fmt_pts
@@ -128,9 +129,9 @@ def _combinar(palancas: list[Palancas]) -> Palancas:
 
 CSS = """
 :root{--fondo:#ffffff;--texto:#1f2937;--suave:#6b7280;--linea:#e5e7eb;--panel:#f9fafb;
---acento:#c2410c;--contexto:#9ca3af;--pos:#64748b;--total:#334155;--ok:#15803d;--aviso:#b45309}
+--acento:#B4532A;--contexto:#9ca3af;--pos:#64748b;--total:#0E1A2B;--ok:#15803d;--aviso:#b45309}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fondo:#111318;--texto:#e5e7eb;--suave:#9ca3af;
---linea:#2a2f3a;--panel:#181b22;--acento:#fb923c;--contexto:#6b7280;--pos:#94a3b8;--total:#cbd5e1;--ok:#4ade80;--aviso:#fbbf24}}
+--linea:#2a2f3a;--panel:#181b22;--acento:#E0874F;--contexto:#6b7280;--pos:#94a3b8;--total:#cbd5e1;--ok:#4ade80;--aviso:#fbbf24}}
 *{box-sizing:border-box}body{margin:0;background:var(--fondo);color:var(--texto);
 font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:920px;margin:0 auto;padding:32px 16px 64px}
@@ -155,11 +156,28 @@ th{color:var(--suave);font-weight:600;font-size:13px}td.n{text-align:right;white
 .tabla{overflow-x:auto}details{margin:6px 0}summary{cursor:pointer;color:var(--suave)}
 .aviso{border:1px solid var(--aviso);border-radius:8px;padding:12px 14px;margin:12px 0}
 code{font-size:12px;color:var(--suave)}
+.marca{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;
+padding-bottom:14px;margin-bottom:22px;border-bottom:2px solid var(--total)}
+.marca img{height:46px;width:auto;display:block}.marca .para{text-align:right;font-size:13px;color:var(--suave)}
+.marca .para strong{display:block;font-size:15px;color:var(--texto)}
+.logo-oscuro{display:none!important}
+@media (prefers-color-scheme:dark){.logo-claro{display:none!important}.logo-oscuro{display:block!important}}
+.pie{margin-top:48px;padding-top:14px;border-top:1px solid var(--linea);font-size:12px;color:var(--suave)}
+@media print{.logo-oscuro{display:none!important}.logo-claro{display:block!important}}
 @media print{main{max-width:none;padding:0}h2{break-after:avoid}.hip,.kpi,tr{break-inside:avoid}}
 """
 
 
-def generar_informe(sesion, ruta: str | Path, empresa: str = "Tu empresa") -> Path:
+def _pie(contacto: dict | None) -> str:
+    datos = marca.linea_contacto(contacto or {})
+    return (f'<footer class="pie"><strong>{e(marca.NOMBRE)}</strong> · {e(marca.LEMA)}'
+            + (f"<br>{e(datos)}" if datos else "")
+            + "<br>Documento confidencial, preparado exclusivamente para el cliente indicado. "
+              "No sustituye la opinión de un contador público en materia fiscal o de estados financieros.</footer>")
+
+
+def generar_informe(sesion, ruta: str | Path, empresa: str = "Tu empresa", contacto: dict | None = None) -> Path:
+    """`contacto`: datos del consultor (ver marca.CAMPOS_CONTACTO) para el pie del informe."""
     val = sesion.validar()
     res = sesion.analizar()
     inv = sesion.investigar()
@@ -174,6 +192,9 @@ def generar_informe(sesion, ruta: str | Path, empresa: str = "Tu empresa") -> Pa
         titulo += f". El mayor golpe: {top['etiqueta'].lower()}"
 
     s: list[str] = []
+    s.append(f'<header class="marca"><div><img class="logo-claro" alt="{e(marca.NOMBRE)}" src="{marca.svg_data_uri("logo-claro")}">'
+             f'<img class="logo-oscuro" alt="{e(marca.NOMBRE)}" src="{marca.svg_data_uri("logo-oscuro")}"></div>'
+             f'<div class="para"><strong>Diagnóstico financiero</strong>Preparado para {e(empresa)}</div></header>')
     s.append(f'<p class="meta">{e(empresa)} · Periodo {e(res.periodos.etiqueta("total"))} · '
              f'Generado {date.today().isoformat()} · '
              + ('<span class="badge prov">Resultado provisional</span>' if provisional
@@ -313,8 +334,9 @@ def generar_informe(sesion, ruta: str | Path, empresa: str = "Tu empresa") -> Pa
 
     doc = (f'<!doctype html><html lang="es"><head><meta charset="utf-8">'
            f'<meta name="viewport" content="width=device-width,initial-scale=1">'
-           f"<title>Diagnóstico financiero — {e(empresa)}</title><style>{CSS}</style></head>"
+           f"<title>Diagnóstico financiero — {e(empresa)} · {e(marca.NOMBRE)}</title><style>{CSS}</style></head>"
            f"<body><main>{''.join(s)}</main></body></html>")
+    doc = doc.replace("</main>", _pie(contacto) + "</main>")
     ruta = Path(ruta)
     ruta.parent.mkdir(parents=True, exist_ok=True)
     ruta.write_text(doc, encoding="utf-8")

@@ -55,9 +55,18 @@ python -m analista_financiero analizar mis_ventas.xlsx --tc USD=18.5 \
 # Pregunta en lenguaje natural
 python -m analista_financiero preguntar mis_ventas.xlsx "¿por qué bajó mi utilidad?"
 
-# Aplicación web
+# Aplicación web (la misma que abre CIFRAS.exe)
 streamlit run analista_financiero/app.py
 ```
+
+### Versión de escritorio: CIFRAS Consultores
+
+`CIFRAS.exe` (Windows) es la aplicación de trabajo de CIFRAS Consultores:
+expedientes por cliente guardados en `Documentos/CIFRAS Consultores/Clientes`,
+informes con la marca y los datos de contacto del consultor, plantilla de
+Excel para clientes y la aplicación web completa. Se compila en GitHub
+Actions (`.github/workflows/exe-windows.yml`) con `empaquetado/CIFRAS.spec`;
+cada etiqueta `v*` publica el zip como Release.
 
 Para el asistente con IA, define `ANTHROPIC_API_KEY`; sin ella funciona en
 modo local con las mismas herramientas de cálculo.

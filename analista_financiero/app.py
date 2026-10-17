@@ -1,4 +1,4 @@
-"""Aplicación web (Streamlit) del analista financiero guiado.
+"""Aplicación de trabajo de CIFRAS Consultores (Streamlit).
 
     streamlit run analista_financiero/app.py
 
@@ -14,9 +14,11 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from streamlit.delta_generator import DeltaGenerator
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from analista_financiero import expedientes, marca  # noqa: E402
 from analista_financiero.asistente import Asistente  # noqa: E402
 from analista_financiero.diagnostico import ESTADOS_TEXTO  # noqa: E402
 from analista_financiero.escenarios import Palancas  # noqa: E402
@@ -25,9 +27,29 @@ from analista_financiero.informe import CSS, _svg_puente  # noqa: E402
 from analista_financiero.ingesta import CAMPOS, IGNORAR  # noqa: E402
 from analista_financiero.limites import LIMITES_GENERALES  # noqa: E402
 from analista_financiero.modelos import fmt_dinero, fmt_pct, fmt_pts  # noqa: E402
+from analista_financiero.plantilla import generar_plantilla  # noqa: E402
 from analista_financiero.sesion import BIENVENIDA, Sesion  # noqa: E402
 
-st.set_page_config(page_title="Analista financiero", page_icon="📊", layout="wide")
+def _sin_formulas(metodo):
+    """Streamlit interpreta "$...$" como fórmula matemática; aquí $ siempre es dinero."""
+    def envoltura(self, body, *args, **kwargs):
+        if isinstance(body, str) and not kwargs.get("unsafe_allow_html"):
+            body = body.replace("\\$", "$").replace("$", "\\$")
+        return metodo(self, body, *args, **kwargs)
+    return envoltura
+
+
+for _nombre in ("markdown", "caption", "info", "warning", "success", "error"):
+    _original = getattr(DeltaGenerator, _nombre)
+    if not getattr(_original, "_sin_formulas", False):
+        _nuevo = _sin_formulas(_original)
+        _nuevo._sin_formulas = True
+        setattr(DeltaGenerator, _nombre, _nuevo)
+        # st.info, st.markdown... son métodos ya ligados al contenedor principal: se vuelven a ligar.
+        setattr(st, _nombre, getattr(st._main, _nombre))
+
+_ICONO = Path(__file__).resolve().parent / "recursos" / "icono.png"
+st.set_page_config(page_title=marca.NOMBRE, page_icon=str(_ICONO) if _ICONO.exists() else "📊", layout="wide")
 
 ETAPAS = ["Cargar datos", "Confirmar columnas", "Validar", "Analizar", "Explicar", "Investigar", "Decidir", "Informe"]
 ICONO_ESTADO = {"respaldada": "🔴", "parcial": "🟠", "descartada": "⚪", "sin_datos": "❔"}
@@ -40,8 +62,17 @@ def sesion() -> Sesion:
 
 
 def reiniciar() -> None:
-    for k in ("sesion", "asistente", "chat"):
+    for k in ("sesion", "asistente", "chat", "archivo_cargado", "ultima_entrega"):
         st.session_state.pop(k, None)
+
+
+def cliente_actual() -> expedientes.Cliente | None:
+    ruta = st.session_state.get("cliente")
+    return expedientes.abrir(Path(ruta)) if ruta else None
+
+
+def logo(variante: str = "logo-claro", alto: int = 40, destino=st) -> None:
+    destino.markdown(f'<img src="{marca.svg_data_uri(variante)}" style="height:{alto}px;width:auto">', unsafe_allow_html=True)
 
 
 def como_se_calculo(clave: str) -> None:
@@ -68,10 +99,12 @@ def como_se_calculo(clave: str) -> None:
 def barra_lateral() -> None:
     s = sesion()
     p = s.siguiente_paso()
-    st.sidebar.title("📊 Analista financiero")
+    logo("logo-claro", 44, st.sidebar)
+    c = cliente_actual()
+    st.sidebar.caption(f"Cliente: **{c.nombre}**" if c else "Sin cliente seleccionado (pestaña Clientes)")
     for i, nombre in enumerate(ETAPAS, 1):
-        marca = "✅" if i < p.etapa else ("➡️" if i == p.etapa else "◻️")
-        st.sidebar.write(f"{marca} {i}. {nombre}")
+        estado = "✅" if i < p.etapa else ("➡️" if i == p.etapa else "◻️")
+        st.sidebar.write(f"{estado} {i}. {nombre}")
     st.sidebar.divider()
     st.sidebar.subheader("Siguiente paso")
     st.sidebar.write(f"**{p.titulo}**")
@@ -85,7 +118,7 @@ def barra_lateral() -> None:
         g = GLOSARIO[clave]
         st.write(f"**Qué es:** {g['que_es']}\n\n**Cómo se calcula:** {g['calculo']}\n\n"
                  f"**Por qué importa:** {g['importa']}\n\n**Qué revisar:** {g['revisar']}")
-    if st.sidebar.button("Empezar de nuevo"):
+    if st.sidebar.button("Nuevo análisis (mismo cliente)"):
         reiniciar()
         st.rerun()
 
@@ -101,8 +134,12 @@ def tab_datos() -> None:
     with c1:
         archivo = st.file_uploader("Sube un Excel o CSV", type=["xlsx", "xls", "csv"])
         if archivo is not None and st.session_state.get("archivo_cargado") != archivo.name:
-            ruta = Path(tempfile.mkdtemp()) / archivo.name
-            ruta.write_bytes(archivo.getvalue())
+            c = cliente_actual()
+            if c:  # copia en el expediente del cliente
+                ruta = expedientes.guardar_archivo(c, archivo.name, archivo.getvalue())
+            else:
+                ruta = Path(tempfile.mkdtemp()) / archivo.name
+                ruta.write_bytes(archivo.getvalue())
             s.cargar_archivo(ruta)
             st.session_state.archivo_cargado = archivo.name
             st.rerun()
@@ -124,6 +161,10 @@ def tab_datos() -> None:
             st.rerun()
 
     if not s.tablas:
+        st.divider()
+        st.write("**¿Tu cliente todavía no te manda sus datos?** Envíale esta plantilla de Excel: "
+                 "si la llena, el archivo se lee sin preguntas.")
+        boton_plantilla("datos")
         return
     st.subheader("Así leí tus datos")
     st.caption("Revisa que cada columna signifique lo que creo. Las dudosas están marcadas.")
@@ -172,6 +213,8 @@ def tab_validacion() -> None:
     c[1].metric("Filas analizadas", r["filas_analizadas"])
     c[2].metric("Filas excluidas", r["filas_excluidas"])
     c[3].metric("Importe excluido", fmt_pct(r["pct_importe_excluido"]))
+    if not v.problemas:
+        st.success("No encontré problemas en los datos: fechas, importes, monedas y totales están en orden.")
     for p in v.problemas:
         caja = {"bloqueante": st.error, "advertencia": st.warning, "info": st.info}[p.severidad]
         caja(f"**{p.titulo}.** {p.explicacion}  \n→ {p.accion_tomada or p.sugerencia}")
@@ -326,13 +369,32 @@ def tab_decisiones() -> None:
 
 def tab_informe() -> None:
     s = sesion()
-    empresa = st.text_input("Nombre de la empresa", "Mi empresa")
-    destino = Path(tempfile.mkdtemp())
+    c = cliente_actual()
+    empresa = st.text_input("Nombre del cliente en el informe", c.nombre if c else "Mi cliente")
+    config = marca.cargar_config()
+    if not marca.linea_contacto(config):
+        st.info("Tip: captura tus datos de contacto en la pestaña «Configuración» para que aparezcan en el informe.")
     if st.button("Generar informe", type="primary"):
-        html_ruta = s.informe(destino / "informe.html", empresa)
-        json_ruta = s.exportar_json(destino / "trazabilidad.json")
-        st.download_button("Descargar informe (HTML, imprimible a PDF)", html_ruta.read_bytes(), "informe_financiero.html", "text/html")
+        if c:
+            destino = expedientes.registrar_entrega(c, s, empresa, config)
+        else:
+            destino = Path(tempfile.mkdtemp())
+            s.informe(destino / "informe.html", empresa, config)
+            s.exportar_json(destino / "trazabilidad.json")
+        st.session_state.ultima_entrega = {"carpeta": str(destino), "empresa": empresa, "expediente": bool(c)}
+        st.rerun()  # vuelve a dibujar todo, incluida la lista de entregas del expediente
+    ultima = st.session_state.get("ultima_entrega")
+    if ultima and (Path(ultima["carpeta"]) / "informe.html").exists():
+        destino = Path(ultima["carpeta"])
+        if ultima["expediente"]:
+            st.success(f"Informe guardado en el expediente: {destino}")
+        else:
+            st.warning("No hay cliente seleccionado: el informe no se guardó en ningún expediente. Descárgalo.")
+        html_ruta, json_ruta = destino / "informe.html", destino / "trazabilidad.json"
+        st.download_button("Descargar informe (HTML, imprimible a PDF)", html_ruta.read_bytes(),
+                           f"Diagnostico - {ultima['empresa']}.html", "text/html")
         st.download_button("Descargar trazabilidad (JSON)", json_ruta.read_bytes(), "trazabilidad.json", "application/json")
+        st.caption("Para PDF: abre el informe en el navegador y usa Imprimir → Guardar como PDF.")
         st.iframe(html_ruta, height=900)
     st.subheader("Límites de este análisis")
     for x in LIMITES_GENERALES:
@@ -365,18 +427,113 @@ def tab_asistente() -> None:
         st.rerun()
 
 
+def boton_plantilla(clave: str) -> None:
+    ruta = generar_plantilla(Path(tempfile.mkdtemp()) / "Plantilla CIFRAS Consultores.xlsx")
+    st.download_button("⬇️ Descargar plantilla de Excel para clientes", ruta.read_bytes(),
+                       "Plantilla CIFRAS Consultores.xlsx",
+                       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key=f"plantilla-{clave}")
+
+
+def tab_clientes() -> None:
+    clientes = expedientes.listar()
+    actual = cliente_actual()
+    c1, c2 = st.columns([2, 1])
+    with c1:
+        st.subheader("Tus clientes")
+        if clientes:
+            nombres = [c.nombre for c in clientes]
+            indice = nombres.index(actual.nombre) if actual and actual.nombre in nombres else 0
+            elegido = st.selectbox("Cliente", nombres, index=indice)
+            cliente = clientes[nombres.index(elegido)]
+            if not actual or actual.carpeta != cliente.carpeta:
+                if st.button(f"Trabajar con {cliente.nombre}", type="primary"):
+                    st.session_state.cliente = str(cliente.carpeta)
+                    reiniciar()
+                    st.rerun()
+        else:
+            st.info("Aún no tienes clientes. Crea el primero →")
+    with c2:
+        with st.form("nuevo_cliente", clear_on_submit=True):
+            st.subheader("Nuevo cliente")
+            nombre = st.text_input("Empresa")
+            contacto = st.text_input("Contacto (nombre, correo o teléfono)")
+            giro = st.text_input("Giro del negocio")
+            if st.form_submit_button("Crear expediente") and nombre.strip():
+                nuevo = expedientes.crear(nombre, contacto, giro)
+                st.session_state.cliente = str(nuevo.carpeta)
+                reiniciar()
+                st.rerun()
+
+    if not actual:
+        return
+    st.divider()
+    st.subheader(f"Expediente: {actual.nombre}")
+    st.caption(" · ".join(x for x in (actual.giro, actual.contacto, str(actual.carpeta)) if x))
+    a, b = st.columns(2)
+    with a:
+        st.write("**Archivos recibidos**")
+        archivos = expedientes.archivos(actual)
+        if not archivos:
+            st.caption("Ninguno todavía. Súbelos en la pestaña «Datos».")
+        for i, ruta in enumerate(archivos[:10]):
+            col1, col2 = st.columns([3, 1])
+            col1.write(f"📄 {ruta.name}")
+            if col2.button("Analizar", key=f"analizar-{i}"):
+                reiniciar()
+                sesion().cargar_archivo(ruta)
+                st.session_state.archivo_cargado = ruta.name
+                st.success(f"Cargado {ruta.name}. Continúa en la pestaña «Datos».")
+    with b:
+        st.write("**Informes entregados**")
+        entregas = expedientes.entregas(actual)
+        if not entregas:
+            st.caption("Ninguno todavía.")
+        for i, carpeta in enumerate(entregas[:10]):
+            fecha = carpeta.name.replace("_", " ")
+            st.download_button(f"⬇️ Informe {fecha}", (carpeta / "informe.html").read_bytes(),
+                               f"Diagnostico - {actual.nombre} - {carpeta.name}.html", "text/html", key=f"entrega-{i}")
+
+
+def tab_configuracion() -> None:
+    st.subheader("Tus datos (aparecen en el pie de cada informe)")
+    config = marca.cargar_config()
+    with st.form("config"):
+        nuevos = {k: st.text_input(etiqueta, config.get(k, "")) for k, etiqueta in marca.CAMPOS_CONTACTO.items()}
+        if st.form_submit_button("Guardar", type="primary"):
+            marca.guardar_config(nuevos)
+            st.success("Guardado.")
+    st.subheader("Plantilla para clientes")
+    st.write("Envía esta plantilla a tus clientes para que te entreguen ventas, costos y gastos en el formato correcto.")
+    boton_plantilla("config")
+    st.subheader("Dónde se guarda tu trabajo")
+    st.code(str(marca.carpeta_trabajo()))
+    st.caption("Cada cliente tiene su carpeta con los archivos que te entregó y los informes generados. "
+               "Respalda esta carpeta periódicamente (por ejemplo, en OneDrive o Google Drive).")
+
+
 def main() -> None:
     s = sesion()
-    st.title("Analista financiero guiado")
-    nombres = ["1 · Datos", "2 · Validación", "3 · Diagnóstico", "4 · Investigación", "5 · Decisiones", "6 · Informe", "💬 Asistente"]
-    tabs = st.tabs(nombres)
+    logo("logo-claro", 56)
+    c = cliente_actual()
+    st.caption(f"Expediente activo: **{c.nombre}**" if c else "Elige o crea un cliente en la pestaña «Clientes» para guardar su expediente.")
+    nombres = ["🗂 Clientes", "1 · Datos", "2 · Validación", "3 · Diagnóstico", "4 · Investigación", "5 · Decisiones",
+               "6 · Informe", "💬 Asistente", "⚙️ Configuración"]
+    todas = st.tabs(nombres)
+    with todas[0]:
+        tab_clientes()
+    with todas[-1]:
+        tab_configuracion()
+    tabs = todas[1:-1]
     with tabs[0]:
         tab_datos()
     listo = bool(s.tablas) and not s.preguntas_pendientes()
     if listo:
         listo = s.validar().calidad != "insuficiente" and not s.preguntas_pendientes()
     with tabs[1]:
-        tab_validacion() if s.tablas and not [p for p in s.preguntas_pendientes() if p.tipo != "tipo_cambio"] else st.info("Primero carga y confirma tus datos.")
+        if s.tablas and not [p for p in s.preguntas_pendientes() if p.tipo != "tipo_cambio"]:
+            tab_validacion()
+        else:
+            st.info("Primero carga y confirma tus datos.")
     for tab, fn in zip(tabs[2:], (tab_diagnostico, tab_investigacion, tab_decisiones, tab_informe, tab_asistente)):
         with tab:
             if listo:

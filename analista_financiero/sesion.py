@@ -71,8 +71,12 @@ class Sesion:
 
     def _agregar_tablas(self, tablas: list[ingesta.TablaCruda]) -> list[Pregunta]:
         for t in tablas:
-            self.tablas.append(t)
             prop = ingesta.proponer_mapeo(t)
+            # Hojas sin fecha ni importe (instrucciones, portadas, notas) no son datos.
+            if len(tablas) > 1 and {"fecha", "importe"} <= set(prop.faltantes):
+                self.bitacora.append(f"Hoja ignorada por no tener fechas ni importes: {t.nombre}")
+                continue
+            self.tablas.append(t)
             self.mapeos[t.nombre] = prop
             self.preguntas += ingesta.preguntas_de_mapeo(prop, t)
         self._invalidar()
@@ -152,29 +156,37 @@ class Sesion:
             return "confiable"
         return cal
 
+    # Cada resultado derivado recuerda de qué resultado salió: si la interfaz (que puede
+    # correr dos veces en paralelo) dejó guardado algo de un estado anterior, se recalcula.
     def analizar(self) -> Resultados:
-        if self.resultados is None:
-            val = self.validar()
+        val = self.validar()
+        confianza = self._confianza()
+        if self.resultados is None or self.resultados.confianza != confianza:
             if val.calidad == "insuficiente":
                 raise ValueError("Los datos no alcanzan para analizar: " +
                                  "; ".join(p.titulo for p in val.bloqueantes))
-            self.resultados = calcular(val.limpio, self._confianza(), val.supuestos, self.moneda_base)
+            self.resultados = calcular(val.limpio, confianza, val.supuestos, self.moneda_base)
         return self.resultados
 
     def investigar(self) -> Investigacion:
-        if self.investigacion is None:
-            self.investigacion = investigar(self.analizar(), self.validar())
+        res = self.analizar()
+        if self.investigacion is None or getattr(self, "_inv_origen", None) is not res:
+            self.investigacion = investigar(res, self.validar())
+            self._inv_origen = res
         return self.investigacion
 
     def base_mensual(self) -> BaseMensual:
-        if self.base is None:
-            self.base = base_desde_resultados(self.analizar())
+        res = self.analizar()
+        if self.base is None or getattr(self, "_base_origen", None) is not res:
+            self.base = base_desde_resultados(res)
+            self._base_origen = res
         return self.base
 
     def recomendar(self) -> list[Accion]:
-        if not self.acciones:
-            inv = self.investigar()
+        inv = self.investigar()
+        if not self.acciones or getattr(self, "_acc_origen", None) is not inv:
             self.acciones = recomendar(inv, self.base_mensual(), self.analizar().flujo is not None)
+            self._acc_origen = inv
         return self.acciones
 
     def simular(self, palancas: Palancas, nombre: str = "Escenario") -> Escenario:
@@ -186,9 +198,9 @@ class Sesion:
     def comparar(self, escenarios: list[tuple[str, Palancas]]) -> pd.DataFrame:
         return comparar(self.base_mensual(), escenarios)
 
-    def informe(self, ruta: str | Path, empresa: str = "Tu empresa") -> Path:
+    def informe(self, ruta: str | Path, empresa: str = "Tu empresa", contacto: dict | None = None) -> Path:
         from .informe import generar_informe
-        return generar_informe(self, ruta, empresa)
+        return generar_informe(self, ruta, empresa, contacto)
 
     def exportar_json(self, ruta: str | Path) -> Path:
         """Todas las cifras con su trazabilidad completa, para auditoría."""

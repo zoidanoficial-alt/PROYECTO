@@ -1,12 +1,12 @@
-"""Punto de entrada del ejecutable (AnalistaFinanciero.exe).
+"""Punto de entrada del ejecutable (CIFRAS.exe, CIFRAS Consultores).
 
 Doble clic: arranca la aplicación web en esta computadora y abre el
 navegador. Nada sale de la máquina (salvo el asistente con IA, si el usuario
 pone su clave de Anthropic).
 
-    AnalistaFinanciero.exe            # abre la aplicación
-    AnalistaFinanciero.exe --prueba   # verificación rápida sin interfaz (la usa la compilación)
-    AnalistaFinanciero.exe --version
+    CIFRAS.exe            # abre la aplicación
+    CIFRAS.exe --prueba   # verificación rápida sin interfaz (la usa la compilación)
+    CIFRAS.exe --version
 """
 
 from __future__ import annotations
@@ -64,6 +64,12 @@ def prueba() -> int:
     informe = s.informe(destino / "informe.html", "Prueba")
     assert inv.puente and informe.stat().st_size > 10_000
     assert _ruta_app().exists(), f"No encuentro {_ruta_app()}"
+    from analista_financiero import marca
+    from analista_financiero.plantilla import generar_plantilla
+    assert "<svg" in marca.svg("logo-claro") and "CIFRAS" in informe.read_text(encoding="utf-8")
+    generar_plantilla(destino / "plantilla.xlsx")
+    import altair  # noqa: F401  (las gráficas de la interfaz)
+    import jinja2  # noqa: F401
     import streamlit  # noqa: F401  (confirma que la interfaz quedó empaquetada)
     print(f"OK analista_financiero {__version__}: {inv.hallazgo_inicial.titulo}; informe {informe}")
     return 0
@@ -82,7 +88,7 @@ def main() -> int:
 
     puerto = _puerto_libre()
     print("=" * 64)
-    print(" Analista financiero")
+    print(" CIFRAS Consultores")
     print(f" Abriendo http://localhost:{puerto} en tu navegador...")
     print(" Deja esta ventana abierta mientras uses la aplicación.")
     print(" Para salir, cierra esta ventana.")
@@ -98,8 +104,11 @@ def main() -> int:
         f"--server.port={puerto}",
         "--server.address=127.0.0.1",
         "--server.fileWatcherType=none",
+        "--runner.fastReruns=false",  # evita dos ejecuciones simultáneas sobre la misma sesión
         "--browser.gatherUsageStats=false",
-        "--theme.primaryColor=#c2410c",
+        "--theme.base=light",
+        "--theme.primaryColor=#B4532A",
+        "--theme.textColor=#0E1A2B",
         "--client.toolbarMode=minimal",
     ]
     return stcli.main()

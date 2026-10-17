@@ -1,6 +1,6 @@
-# Especificación de PyInstaller para AnalistaFinanciero.exe
-#   pyinstaller --noconfirm empaquetado/AnalistaFinanciero.spec
-# Genera un solo archivo en dist/ (en Windows: dist/AnalistaFinanciero.exe).
+# Especificación de PyInstaller para CIFRAS.exe (CIFRAS Consultores)
+#   pyinstaller --noconfirm empaquetado/CIFRAS.spec
+# Genera un solo archivo en dist/ (en Windows: dist/CIFRAS.exe).
 
 from pathlib import Path
 
@@ -19,8 +19,9 @@ datas += copy_metadata("streamlit")
 datas += [(str(raiz / "analista_financiero"), "analista_financiero")]
 ocultos += ["analista_financiero." + m for m in (
     "asistente", "calculos", "demo", "diagnostico", "escenarios", "explicar", "informe",
-    "ingesta", "limites", "modelos", "recomendaciones", "sesion", "validacion", "cli")]
-ocultos += ["openpyxl", "anthropic"]
+    "ingesta", "limites", "modelos", "recomendaciones", "sesion", "validacion", "cli",
+    "marca", "expedientes", "plantilla")]
+ocultos += ["openpyxl", "anthropic", "jinja2"]
 
 a = Analysis(  # noqa: F821
     [str(raiz / "analista_financiero" / "lanzador.py")],
@@ -37,7 +38,8 @@ exe = EXE(  # noqa: F821
     a.binaries,
     a.datas,
     [],
-    name="AnalistaFinanciero",
+    name="CIFRAS",
+    icon=str(raiz / "empaquetado" / "cifras.ico"),
     console=True,  # la ventana negra indica que la app sigue abierta; cerrarla la apaga
     upx=False,
 )
