@@ -7,4 +7,5 @@ requests>=2.31
 openpyxl>=3.1
 streamlit>=1.40      # interfaz web (opcional)
 jinja2>=3.1          # lo usan las gráficas de la interfaz
+pywebview>=5.0       # ventana de escritorio (CIFRAS.exe)
 anthropic>=1.0       # asistente con Claude (opcional; sin clave funciona en modo local)

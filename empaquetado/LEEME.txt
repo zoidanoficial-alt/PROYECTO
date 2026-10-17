@@ -2,14 +2,16 @@ CIFRAS CONSULTORES - Guía rápida
 ================================
 
 ABRIR EL PROGRAMA
-1. Doble clic en CIFRAS.exe.
-   - Se abre una ventana negra (déjala abierta: es el motor del programa) y,
-     unos segundos después, la aplicación en tu navegador.
-   - La primera vez tarda más (hasta ~30 segundos).
+1. Doble clic en CIFRAS.exe. Se abre la ventana de CIFRAS Consultores
+   (la primera vez puede tardar hasta ~30 segundos).
    - Si Windows muestra "Windows protegió su PC": "Más información" >
      "Ejecutar de todas formas". Aparece porque el programa aún no está
      firmado digitalmente.
-2. Para cerrar el programa, cierra la ventana negra.
+   - Sugerencia: clic derecho en CIFRAS.exe > "Enviar a" > "Escritorio
+     (crear acceso directo)" para tenerlo a mano.
+2. Para cerrar el programa, cierra su ventana como cualquier otro.
+3. Si la ventana no abriera, ejecuta "CIFRAS.exe --navegador" o revisa el
+   archivo registro.log en Documentos\CIFRAS Consultores.
 
 PRIMERA VEZ (2 minutos)
 - Pestaña "Configuración": escribe tu nombre, correo, teléfono y web.
@@ -24,8 +26,8 @@ ATENDER A UN CLIENTE
 3. Sigue el "Siguiente paso" de la barra lateral: confirmar columnas, revisar
    problemas de datos, diagnóstico, investigación y decisiones.
 4. Pestaña "6 · Informe": "Generar informe". Queda guardado en el expediente
-   y lo puedes descargar. Para PDF: ábrelo en el navegador > Imprimir >
-   Guardar como PDF.
+   y lo puedes descargar. Para PDF: botón "Abrir informe para imprimir o
+   guardar en PDF" > Imprimir (Ctrl+P) > Guardar como PDF.
 5. En "Clientes" verás el historial de archivos e informes de cada cliente.
 
 DÓNDE SE GUARDA TU TRABAJO

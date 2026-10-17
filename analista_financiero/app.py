@@ -8,6 +8,8 @@ solo muestra, pregunta y deja profundizar ("¿cómo se calculó?").
 
 from __future__ import annotations
 
+import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -69,6 +71,19 @@ def reiniciar() -> None:
 def cliente_actual() -> expedientes.Cliente | None:
     ruta = st.session_state.get("cliente")
     return expedientes.abrir(Path(ruta)) if ruta else None
+
+
+def abrir_en_sistema(ruta: Path) -> None:
+    """Abre un archivo o carpeta con el programa de Windows correspondiente (la app corre en esta PC)."""
+    try:
+        if sys.platform.startswith("win"):
+            os.startfile(str(ruta))  # noqa: S606
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", str(ruta)])
+        else:
+            subprocess.Popen(["xdg-open", str(ruta)])
+    except OSError as exc:
+        st.error(f"No pude abrirlo automáticamente ({exc}). Está en: {ruta}")
 
 
 def logo(variante: str = "logo-claro", alto: int = 40, destino=st) -> None:
@@ -394,7 +409,12 @@ def tab_informe() -> None:
         st.download_button("Descargar informe (HTML, imprimible a PDF)", html_ruta.read_bytes(),
                            f"Diagnostico - {ultima['empresa']}.html", "text/html")
         st.download_button("Descargar trazabilidad (JSON)", json_ruta.read_bytes(), "trazabilidad.json", "application/json")
-        st.caption("Para PDF: abre el informe en el navegador y usa Imprimir → Guardar como PDF.")
+        a, b = st.columns(2)
+        if a.button("🖨️ Abrir informe para imprimir o guardar en PDF", type="primary"):
+            abrir_en_sistema(html_ruta)
+        if b.button("📂 Abrir carpeta del informe"):
+            abrir_en_sistema(destino)
+        st.caption("El informe se abre en tu navegador: usa Imprimir (Ctrl+P) → Guardar como PDF.")
         st.iframe(html_ruta, height=900)
     st.subheader("Límites de este análisis")
     for x in LIMITES_GENERALES:
@@ -468,7 +488,9 @@ def tab_clientes() -> None:
         return
     st.divider()
     st.subheader(f"Expediente: {actual.nombre}")
-    st.caption(" · ".join(x for x in (actual.giro, actual.contacto, str(actual.carpeta)) if x))
+    st.caption(" · ".join(x for x in (actual.giro, actual.contacto) if x))
+    if st.button("📂 Abrir carpeta del expediente"):
+        abrir_en_sistema(actual.carpeta)
     a, b = st.columns(2)
     with a:
         st.write("**Archivos recibidos**")
@@ -507,6 +529,8 @@ def tab_configuracion() -> None:
     boton_plantilla("config")
     st.subheader("Dónde se guarda tu trabajo")
     st.code(str(marca.carpeta_trabajo()))
+    if st.button("📂 Abrir carpeta de trabajo"):
+        abrir_en_sistema(marca.carpeta_trabajo())
     st.caption("Cada cliente tiene su carpeta con los archivos que te entregó y los informes generados. "
                "Respalda esta carpeta periódicamente (por ejemplo, en OneDrive o Google Drive).")
 

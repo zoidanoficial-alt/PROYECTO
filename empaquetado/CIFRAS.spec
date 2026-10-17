@@ -14,6 +14,15 @@ for paquete in ("streamlit", "altair", "pyarrow", "pydeck"):
     datas += d
     binaries += b
     ocultos += h
+# Ventana de escritorio (WebView2 vía pywebview + pythonnet). Solo existen en la compilación de Windows.
+for paquete in ("webview", "clr_loader", "pythonnet", "bottle", "proxy_tools"):
+    try:
+        d, b, h = collect_all(paquete)
+    except Exception:
+        continue
+    datas += d
+    binaries += b
+    ocultos += h
 datas += copy_metadata("streamlit")
 # app.py se ejecuta como script con `streamlit run`: debe viajar como archivo.
 datas += [(str(raiz / "analista_financiero"), "analista_financiero")]
@@ -40,6 +49,6 @@ exe = EXE(  # noqa: F821
     [],
     name="CIFRAS",
     icon=str(raiz / "empaquetado" / "cifras.ico"),
-    console=True,  # la ventana negra indica que la app sigue abierta; cerrarla la apaga
+    console=False,  # app de ventana: sin consola negra (lo técnico va a registro.log)
     upx=False,
 )

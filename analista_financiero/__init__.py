@@ -8,6 +8,6 @@ Regla de diseño central: los cálculos los hace código determinista
 (`explicar`, `asistente`) solo traduce y explica cifras ya calculadas.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 from .sesion import Sesion  # noqa: E402,F401  (API pública)

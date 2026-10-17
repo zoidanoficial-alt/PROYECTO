@@ -23,7 +23,7 @@ jobs:
       - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
-          pip install pandas numpy openpyxl jinja2 streamlit anthropic pyinstaller pytest
+          pip install pandas numpy openpyxl jinja2 streamlit anthropic pywebview pyinstaller pytest
 
       - name: Pruebas del analista
         run: python -m pytest -q tests/test_analista_datos.py tests/test_analista_analisis.py tests/test_analista_salidas.py tests/test_analista_consultoria.py
@@ -31,11 +31,21 @@ jobs:
       - name: Compilar el ejecutable
         run: pyinstaller --noconfirm empaquetado/CIFRAS.spec
 
+      # CIFRAS.exe es una app de ventana (sin consola): se espera a que termine y se lee su registro.
       - name: Verificar que el .exe funciona
+        shell: pwsh
         run: |
-          dist\CIFRAS.exe --version
-          dist\CIFRAS.exe --prueba
-        shell: cmd
+          $p = Start-Process dist\CIFRAS.exe -ArgumentList "--prueba" -Wait -PassThru
+          Get-Content "$env:USERPROFILE\Documents\CIFRAS Consultores\registro.log" -Tail 5
+          if ($p.ExitCode -ne 0) { throw "CIFRAS.exe --prueba terminó con código $($p.ExitCode)" }
+
+      - name: Verificar la ventana de escritorio
+        shell: pwsh
+        timeout-minutes: 5
+        run: |
+          $p = Start-Process dist\CIFRAS.exe -ArgumentList "--prueba-ventana" -Wait -PassThru
+          Get-Content "$env:USERPROFILE\Documents\CIFRAS Consultores\registro.log" -Tail 25
+          if ($p.ExitCode -ne 0) { throw "La ventana no cargó la aplicación (código $($p.ExitCode))" }
 
       - name: Preparar paquete
         shell: pwsh
