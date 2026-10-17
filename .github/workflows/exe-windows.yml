@@ -1,0 +1,59 @@
+name: Compilar AnalistaFinanciero.exe
+
+on:
+  push:
+    branches: ["claude/optimistic-albattani-4uvfwm", "main"]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write  # para publicar el .exe como Release al crear una etiqueta v*
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy openpyxl streamlit anthropic pyinstaller pytest
+
+      - name: Pruebas del analista
+        run: python -m pytest -q tests/test_analista_datos.py tests/test_analista_analisis.py tests/test_analista_salidas.py
+
+      - name: Compilar el ejecutable
+        run: pyinstaller --noconfirm empaquetado/AnalistaFinanciero.spec
+
+      - name: Verificar que el .exe funciona
+        run: |
+          dist\AnalistaFinanciero.exe --version
+          dist\AnalistaFinanciero.exe --prueba
+        shell: cmd
+
+      - name: Preparar paquete
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force paquete | Out-Null
+          Copy-Item dist\AnalistaFinanciero.exe paquete\
+          Copy-Item empaquetado\LEEME.txt paquete\
+          python -c "from analista_financiero.demo import generar_excel; generar_excel('paquete/ejemplo_cafe_la_montana.xlsx')"
+          Compress-Archive -Path paquete\* -DestinationPath AnalistaFinanciero-windows.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AnalistaFinanciero-windows
+          path: AnalistaFinanciero-windows.zip
+          retention-days: 30
+
+      - name: Publicar Release (solo en etiquetas v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: AnalistaFinanciero-windows.zip

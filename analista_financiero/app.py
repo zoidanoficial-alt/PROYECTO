@@ -341,6 +341,14 @@ def tab_informe() -> None:
 
 def tab_asistente() -> None:
     s = sesion()
+    with st.expander("Activar el asistente con IA (opcional)"):
+        st.caption("Sin clave, el asistente responde en modo local. La clave solo se usa en esta computadora "
+                   "mientras la aplicación esté abierta.")
+        clave = st.text_input("Clave de API de Anthropic", type="password")
+        if st.button("Usar esta clave") and clave:
+            import os
+            os.environ["ANTHROPIC_API_KEY"] = clave.strip()
+            st.session_state.pop("asistente", None)
     if "asistente" not in st.session_state:
         st.session_state.asistente = Asistente(s)
         st.session_state.chat = []

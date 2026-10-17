@@ -23,3 +23,5 @@ run_cassandra*.sh
 demo_analista/
 informe_financiero*.html
 informe_financiero*.json
+build/
+dist/

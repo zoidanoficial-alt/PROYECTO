@@ -1,0 +1,37 @@
+ANALISTA FINANCIERO - Guía rápida
+=================================
+
+1. Doble clic en AnalistaFinanciero.exe.
+   - Se abre una ventana negra (déjala abierta: es el motor de la aplicación)
+     y, unos segundos después, la aplicación en tu navegador.
+   - La primera vez tarda más (hasta ~30 segundos) porque se descomprime.
+   - Si Windows muestra "Windows protegió su PC", haz clic en
+     "Más información" > "Ejecutar de todas formas". Aparece porque el
+     programa todavía no está firmado digitalmente.
+
+2. En la pestaña "1 · Datos":
+   - Sube tu Excel o CSV de ventas, costos y gastos, o
+   - prueba con el archivo ejemplo_cafe_la_montana.xlsx incluido, o con el
+     botón "Cargar datos de ejemplo".
+
+3. Sigue el "Siguiente paso" de la barra lateral: confirmar columnas,
+   revisar problemas de datos, diagnóstico, investigación, decisiones e
+   informe.
+
+4. Para cerrar la aplicación, cierra la ventana negra.
+
+Tus datos no salen de tu computadora. Solo si activas el asistente con IA
+(pestaña "Asistente", con tu propia clave de Anthropic) se envían a la API
+las cifras que el asistente consulta para responder.
+
+Formato recomendado del Excel
+-----------------------------
+Una hoja por tipo ("Ventas", "Costo de ventas", "Gastos") o una sola hoja con
+columna "Tipo". Columnas útiles: Fecha, Importe, Producto, Cantidad,
+Categoría, Concepto, Moneda, Fecha de cobro / Fecha de pago.
+Con Producto y Cantidad el diagnóstico separa precio, costo y mezcla; con las
+fechas de cobro/pago calcula el efectivo real.
+
+Este programa no sustituye a un contador: en impuestos, créditos,
+inversiones importantes o información para terceros, valida las decisiones
+con un profesional.
