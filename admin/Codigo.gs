@@ -70,7 +70,12 @@ function preparar() {
   sembrar(ss);
   var hoja1 = ss.getSheetByName("Hoja 1") || ss.getSheetByName("Sheet1");
   if (hoja1 && hoja1.getLastRow() === 0 && ss.getSheets().length > 1) ss.deleteSheet(hoja1);
-  SpreadsheetApp.getUi().alert("Listo. Ahora publica el programa: Implementar > Nueva implementación > Aplicación web (ver instrucciones).");
+  try {
+    SpreadsheetApp.getUi().alert("Listo. Ahora publica el programa: Implementar > Nueva implementación > Aplicación web (ver instrucciones).");
+  } catch (e) {
+    // Ejecutado desde el editor de Apps Script (por ejemplo, en el celular): no hay ventana, pero ya quedó listo
+    console.log("Listo: hojas preparadas.");
+  }
 }
 
 function sembrar(ss) {
