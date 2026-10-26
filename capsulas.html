@@ -222,6 +222,7 @@ textarea.control { min-height: 150px; resize: vertical; }
     <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
   </footer>
 </div>
+<script src="api.js"></script>
 <script>
 (function () {
   // Menú en celular
@@ -294,6 +295,16 @@ textarea.control { min-height: 150px; resize: vertical; }
   }
   render("list-tg", CAPSULAS_TG, "Cápsula TG");
   render("list-tf", REELS_TRANSFORMA, "Reel Transforma");
+  // Con el panel activo, las cápsulas vienen de la hoja «Cápsulas» del Google Sheet
+  TDG.get("capsulas").then(function (d) {
+    var tg = [], tf = [];
+    (d.capsulas || []).forEach(function (c) {
+      var it = { url: String(c.url), titulo: String(c.titulo || "") };
+      (/transforma/i.test(c.seccion) ? tf : tg).push(it);
+    });
+    render("list-tg", tg, "Cápsula TG");
+    render("list-tf", tf, "Reel Transforma");
+  }).catch(function () {});
 
   // Pestañas y deslizamiento sincronizados
   var slider = document.getElementById("slider");

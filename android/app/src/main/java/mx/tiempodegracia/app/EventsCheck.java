@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Revisa eventos.json del sitio y avisa de los eventos que no había visto.
+ * Revisa los eventos (del panel de Google Sheets o de eventos.json) y avisa de los que no había visto.
  * La primera vez solo guarda los que ya existen, para no avisar de eventos viejos.
  */
 final class EventsCheck {
@@ -52,7 +52,22 @@ final class EventsCheck {
 
     /** Se ejecuta en segundo plano (nunca en el hilo principal). */
     static void run(Context ctx) throws Exception {
-        JSONArray eventos = new JSONObject(fetch(JSON_URL + "?t=" + System.currentTimeMillis())).getJSONArray("eventos");
+        JSONArray eventos = null;
+        // Con panel activo (config.json → api), los eventos vienen del Google Sheet; si no, de eventos.json
+        String api = "";
+        try {
+            api = new JSONObject(fetch(MainActivity.SITE + "config.json?t=" + System.currentTimeMillis())).optString("api", "").trim();
+        } catch (Exception ignored) {
+        }
+        if (!api.isEmpty()) {
+            try {
+                eventos = new JSONObject(fetch(api + "?tipo=eventos")).getJSONArray("eventos");
+            } catch (Exception ignored) {
+            }
+        }
+        if (eventos == null) {
+            eventos = new JSONObject(fetch(JSON_URL + "?t=" + System.currentTimeMillis())).getJSONArray("eventos");
+        }
         SharedPreferences p = ctx.getSharedPreferences("eventos", Context.MODE_PRIVATE);
         Set<String> vistos = new HashSet<>(p.getStringSet("vistos", new HashSet<>()));
         boolean iniciado = p.getBoolean("iniciado", false);

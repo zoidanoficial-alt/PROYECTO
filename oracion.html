@@ -111,6 +111,9 @@ textarea.control { min-height: 150px; resize: vertical; }
 .tel .cc { display: inline-flex; align-items: center; gap: 8px; padding-inline: 16px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tel .control { border: 0; background: transparent; min-height: 50px; padding-inline-start: 4px; outline: none; font-variant-numeric: tabular-nums; }
 .hint { font-size: 14px; color: var(--muted); }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.form .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; color: var(--muted); cursor: pointer; }
+.form .consent input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--magenta); }
 .form .actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; cursor: pointer; }
 .btn:hover { filter: brightness(1.08); }
@@ -209,12 +212,14 @@ textarea.control { min-height: 150px; resize: vertical; }
           <label for="mensaje">Tu mensaje <b>*</b></label>
           <textarea class="control" id="mensaje" name="mensaje" placeholder="Escribe aquí tu petición de oración o tu agradecimiento." required></textarea>
         </div>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="consent field full" id="consent-row" hidden><input type="checkbox" id="consent" name="consent"> <span>Acepto que Tiempo de Gracia guarde estos datos solo para contactarme y dar seguimiento a mi solicitud.</span></label>
         <div class="actions">
           <button class="btn" type="submit">Continuar</button>
         </div>
         <div class="result" id="result" hidden>
-          <h3>Tu mensaje está listo</h3>
-          <p>Revísalo y envíalo a la iglesia. Aquí no se guarda nada.</p>
+          <h3 id="res-title">Tu mensaje está listo</h3>
+          <p id="res-text">Revísalo y envíalo a la iglesia. Aquí no se guarda nada.</p>
           <p id="ig-hint" hidden>Copia el mensaje y pégalo en un mensaje directo a nuestro Instagram.</p>
           <pre id="msg"></pre>
           <div class="row">
@@ -237,6 +242,7 @@ textarea.control { min-height: 150px; resize: vertical; }
     <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
   </footer>
 </div>
+<script src="api.js"></script>
 <script>
 (function () {
   // Menú en celular
@@ -286,11 +292,14 @@ textarea.control { min-height: 150px; resize: vertical; }
     if (val("celular")) lines.push("Celular: +52 " + celDigits());
     var text = lines.join("\n\n");
     msg.textContent = text;
-    var digits = WHATSAPP.replace(/\D/g, "");
-    if (digits) { wa.href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(text); wa.hidden = false; }
-    else { ig.hidden = false; igHint.hidden = false; } // sin número de WhatsApp todavía: enviar por Instagram
-    result.hidden = false;
-    result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    var mostrar = function () {
+      var digits = WHATSAPP.replace(/\D/g, "");
+      if (digits) { wa.href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(text); wa.hidden = false; }
+      else { ig.hidden = false; igHint.hidden = false; } // sin número de WhatsApp todavía: enviar por Instagram
+      result.hidden = false;
+      result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    };
+    TDG.submit(form, "oracion", mostrar, { titulo: "¡Gracias! Recibimos tu mensaje", texto: "Nuestro equipo de intercesión estará orando contigo." });
   });
   copyBtn.addEventListener("click", function () {
     function done() { copyBtn.textContent = "Copiado"; setTimeout(function () { copyBtn.textContent = "Copiar mensaje"; }, 1600); }

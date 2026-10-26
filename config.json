@@ -1,0 +1,4 @@
+{
+  "_instrucciones": "Pega en api la dirección de la aplicación web de Google Apps Script (termina en /exec). Si está vacío, el sitio usa eventos.json y los formularios se mandan por Instagram o WhatsApp.",
+  "api": ""
+}

@@ -115,6 +115,9 @@ textarea.control { min-height: 150px; resize: vertical; }
 .tel .cc { display: inline-flex; align-items: center; gap: 8px; padding-inline: 16px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tel .control { border: 0; background: transparent; min-height: 50px; padding-inline-start: 4px; outline: none; font-variant-numeric: tabular-nums; }
 .hint { font-size: 14px; color: var(--muted); }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.form .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; color: var(--muted); cursor: pointer; }
+.form .consent input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--magenta); }
 .form .actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; cursor: pointer; }
 .btn:hover { filter: brightness(1.08); }
@@ -234,12 +237,14 @@ textarea.control { min-height: 150px; resize: vertical; }
           <label for="mensaje">Cuéntanos un poco de ti</label>
           <textarea class="control" id="mensaje" name="mensaje" placeholder="Por ejemplo, si tocas algún instrumento, tu experiencia o tus horarios."></textarea>
         </div>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="consent field full" id="consent-row" hidden><input type="checkbox" id="consent" name="consent"> <span>Acepto que Tiempo de Gracia guarde estos datos solo para contactarme y dar seguimiento a mi solicitud.</span></label>
         <div class="actions">
           <button class="btn" type="submit">Continuar</button>
         </div>
         <div class="result" id="result" hidden>
-          <h3>Tu mensaje está listo</h3>
-          <p>Revísalo y envíalo. Aquí no se guarda nada.</p>
+          <h3 id="res-title">Tu mensaje está listo</h3>
+          <p id="res-text">Revísalo y envíalo. Aquí no se guarda nada.</p>
           <p id="ig-hint" hidden>Copia el mensaje y pégalo en un mensaje directo a nuestro Instagram.</p>
           <pre id="msg"></pre>
           <div class="row">
@@ -256,6 +261,8 @@ textarea.control { min-height: 150px; resize: vertical; }
     <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
   </footer>
 </div>
+<script src="api.js"></script>
+<script src="api.js"></script>
 <script>
 (function () {
   // Menú en celular
@@ -295,13 +302,33 @@ textarea.control { min-height: 150px; resize: vertical; }
   function celDigits() { return val("celular").replace(/\D/g, ""); }
   cel.addEventListener("input", function () { cel.setCustomValidity(""); });
   // "Quiero servir aquí" elige el ministerio y baja al formulario
-  document.querySelectorAll("[data-min]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      sel.value = b.getAttribute("data-min");
-      document.getElementById("servir").scrollIntoView({ behavior: "smooth" });
-      setTimeout(function () { document.getElementById("nombre").focus({ preventScroll: true }); }, 400);
-    });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-min]");
+    if (!b) return;
+    sel.value = b.getAttribute("data-min");
+    document.getElementById("servir").scrollIntoView({ behavior: "smooth" });
+    setTimeout(function () { document.getElementById("nombre").focus({ preventScroll: true }); }, 400);
   });
+
+  // Con el panel activo, la lista viene de la hoja «Ministerios» del Google Sheet
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  TDG.get("ministerios").then(function (d) {
+    var lista = d.ministerios || [];
+    if (!lista.length) return;
+    var ul = document.querySelector(".mins"), otro = sel.querySelector("option:last-child");
+    ul.textContent = "";
+    Array.prototype.slice.call(sel.options, 1, -1).forEach(function (o) { o.remove(); });
+    lista.forEach(function (m) {
+      var nombre = String(m.nombre), li = el("li", "min"), h = el("h2", null, nombre), acts = el("div", "acts");
+      h.append(el("small", null, String(m.subtitulo || "")));
+      if (m.enlace) { var a = el("a", "link", "Ver más"); a.href = String(m.enlace); acts.append(a); }
+      var b = el("button", "link serve", "Quiero servir aquí"); b.type = "button"; b.setAttribute("data-min", nombre); acts.append(b);
+      li.append(h, el("p", null, String(m.descripcion || "")), acts);
+      ul.append(li);
+      sel.insertBefore(new Option(nombre, nombre), otro);
+    });
+    var beta = document.querySelector(".beta"); if (beta) beta.hidden = true;
+  }).catch(function () {});
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     cel.setCustomValidity(celDigits() && celDigits().length !== 10 ? "Escribe tu número a 10 dígitos." : "");
@@ -311,11 +338,14 @@ textarea.control { min-height: 150px; resize: vertical; }
     if (val("mensaje")) lines.push(val("mensaje"));
     var text = lines.join("\n");
     msg.textContent = text;
-    var digits = WHATSAPP.replace(/\D/g, "");
-    if (digits) { wa.href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(text); wa.hidden = false; }
-    else { ig.hidden = false; igHint.hidden = false; } // sin número de WhatsApp todavía: enviar por Instagram
-    result.hidden = false;
-    result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    var mostrar = function () {
+      var digits = WHATSAPP.replace(/\D/g, "");
+      if (digits) { wa.href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(text); wa.hidden = false; }
+      else { ig.hidden = false; igHint.hidden = false; } // sin número de WhatsApp todavía: enviar por Instagram
+      result.hidden = false;
+      result.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    };
+    TDG.submit(form, "servir", mostrar, { titulo: "¡Gracias por querer servir!", texto: "El líder del ministerio te contactará pronto." });
   });
   copyBtn.addEventListener("click", function () {
     function done() { copyBtn.textContent = "Copiado"; setTimeout(function () { copyBtn.textContent = "Copiar mensaje"; }, 1600); }
