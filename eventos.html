@@ -111,6 +111,12 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
 .watch { display: inline-flex; align-items: center; gap: 8px; font: 600 16px var(--font-body); color: var(--fg); text-decoration: none; border-bottom: 1.5px solid var(--fg); width: fit-content; padding-bottom: 3px; }
 .watch:hover { color: var(--blue); border-color: var(--blue); }
 .hint { font-size: 14px; color: var(--muted); }
+.state { padding-block: 36px; border-top: 1px solid var(--line); color: var(--muted); font-size: 19px; max-width: 40em; }
+.past { margin-top: 56px; }
+.past-title { margin: 0 0 4px; font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 3vw, 34px); letter-spacing: -0.02em; color: var(--muted); }
+.past .event { opacity: 0.72; }
+.past .date b { font-size: clamp(48px, 6vw, 72px); }
+.event { scroll-margin-top: 16px; }
 .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; }
 .btn:hover { filter: brightness(1.08); }
 .btns { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -146,30 +152,12 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
     <h1 class="big">Eventos</h1>
     <p class="lead">Momentos para reunirnos, convivir y crecer juntos. Todos son bienvenidos: trae a tu familia y a tus amigos.</p>
 
-    <article class="event" id="the-chosen">
-      <p class="date"><span class="dow">Domingo</span><b>11</b><span>octubre</span></p>
-      <div class="ev-body">
-        <p class="eyebrow">Noche de película · The Chosen</p>
-        <h2>Comparte con nosotros el primer capítulo de la sexta temporada de The Chosen</h2>
-        <p class="desc">Ven a ver con nosotros el estreno de The Chosen, la serie sobre la vida de Jesús y sus discípulos. Una tarde para disfrutar en comunidad. ¡Invita a quien quieras!</p>
-        <dl class="ev-meta">
-          <div><dt>Fecha</dt><dd>Domingo 11 de octubre</dd></div>
-          <div><dt>Lugar</dt><dd>Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo</dd></div>
-        </dl>
-        <div class="video" id="video" data-id="u433XFiq3mE">
-          <a class="poster" href="https://www.youtube.com/watch?v=u433XFiq3mE" target="_blank" rel="noopener" aria-label="Ver el video de The Chosen, temporada 6">
-            <span class="play" aria-hidden="true"></span>
-            <small>Temporada 6 · Capítulo 1</small>
-            <b>The Chosen</b>
-            <i id="poster-hint">Toca para verlo en YouTube</i>
-          </a>
-        </div>
-        <div class="btns">
-          <a class="watch" href="https://www.youtube.com/watch?v=u433XFiq3mE" target="_blank" rel="noopener">Ver en YouTube <span aria-hidden="true">&#8599;</span></a>
-        </div>
-        <p class="hint" id="hint" hidden>Al pasar el mouse el video empieza sin sonido; actívalo con el botón de volumen del reproductor.</p>
-      </div>
-    </article>
+    <div id="proximos" aria-live="polite"><p class="state">Cargando eventos…</p></div>
+
+    <section class="past" id="pasados" hidden>
+      <h2 class="past-title">Eventos pasados</h2>
+      <div id="pasados-lista"></div>
+    </section>
   </main>
 
   <footer class="foot">
@@ -206,37 +194,116 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
   });
   sync();
 
-  // Video: en el sitio publicado se reproduce dentro de la página al pasar el mouse (sin sonido, porque
-  // los navegadores bloquean el sonido automático) y con sonido al tocarlo. La vista previa de claude.ai
-  // no permite videos incrustados, así que ahí el recuadro solo abre el video en YouTube.
-  var video = document.getElementById("video");
+  // Eventos: se dibujan desde eventos.json (la app Android revisa ese mismo archivo para avisar de eventos nuevos).
+  var DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+  var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
   var embeddable = /^https?:$/.test(location.protocol) && !/claude/.test(location.hostname);
-  if (embeddable) {
-    var frame = null;
-    var cmd = function (func) { if (frame) frame.contentWindow.postMessage(JSON.stringify({ event: "command", func: func, args: [] }), "*"); };
-    var start = function (muted) {
-      if (!frame) {
-        frame = document.createElement("iframe");
-        frame.src = "https://www.youtube-nocookie.com/embed/" + video.dataset.id + "?autoplay=1&playsinline=1&rel=0&enablejsapi=1" + (muted ? "&mute=1" : "");
-        frame.title = "The Chosen, temporada 6";
-        frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
-        frame.allowFullscreen = true;
-        video.appendChild(frame);
-        video.classList.add("playing");
-      } else {
-        cmd("playVideo");
-        if (!muted) cmd("unMute");
-      }
-    };
-    var canHover = window.matchMedia && window.matchMedia("(hover: hover)").matches;
-    document.getElementById("poster-hint").textContent = canHover ? "Pasa el mouse para ver el video" : "Toca para ver el video";
-    if (canHover) {
-      document.getElementById("hint").hidden = false;
-      video.addEventListener("mouseenter", function () { start(true); });
-      video.addEventListener("mouseleave", function () { cmd("pauseVideo"); });
-    }
-    video.querySelector(".poster").addEventListener("click", function (e) { e.preventDefault(); start(false); });
+  var canHover = !!(window.matchMedia && window.matchMedia("(hover: hover)").matches);
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
   }
+  function hoyMX() {
+    var p = {};
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Mexico_City", year: "numeric", month: "2-digit", day: "2-digit" })
+      .formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+    return p.year + "-" + p.month + "-" + p.day;
+  }
+  function partes(fecha) {
+    var f = fecha.split("-").map(Number), d = new Date(Date.UTC(f[0], f[1] - 1, f[2]));
+    return { dia: DIAS[d.getUTCDay()], num: f[2], mes: MESES[f[1] - 1] };
+  }
+
+  function videoBox(ev) {
+    var box = el("div", "video"), url = "https://www.youtube.com/watch?v=" + ev.video;
+    var a = el("a", "poster"); a.href = url; a.target = "_blank"; a.rel = "noopener";
+    a.setAttribute("aria-label", "Ver el video de " + (ev.video_titulo || ev.titulo));
+    var play = el("span", "play"); play.setAttribute("aria-hidden", "true");
+    var hint = el("i", null, embeddable ? (canHover ? "Pasa el mouse para ver el video" : "Toca para ver el video") : "Toca para verlo en YouTube");
+    a.append(play);
+    if (ev.video_subtitulo) a.append(el("small", null, ev.video_subtitulo));
+    a.append(el("b", null, ev.video_titulo || "Ver video"), hint);
+    box.append(a);
+    // En el sitio publicado se reproduce dentro de la página: sin sonido al pasar el mouse (los navegadores
+    // bloquean el sonido automático) y con sonido al tocarlo. La vista previa de claude.ai no permite
+    // videos incrustados, así que ahí solo abre YouTube.
+    if (embeddable) {
+      var frame = null;
+      var cmd = function (func) { if (frame) frame.contentWindow.postMessage(JSON.stringify({ event: "command", func: func, args: [] }), "*"); };
+      var start = function (muted) {
+        if (!frame) {
+          frame = document.createElement("iframe");
+          frame.src = "https://www.youtube-nocookie.com/embed/" + ev.video + "?autoplay=1&playsinline=1&rel=0&enablejsapi=1" + (muted ? "&mute=1" : "");
+          frame.title = ev.video_titulo || ev.titulo;
+          frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+          frame.allowFullscreen = true;
+          box.appendChild(frame);
+          box.classList.add("playing");
+        } else {
+          cmd("playVideo");
+          if (!muted) cmd("unMute");
+        }
+      };
+      if (canHover) {
+        box.addEventListener("mouseenter", function () { start(true); });
+        box.addEventListener("mouseleave", function () { cmd("pauseVideo"); });
+      }
+      a.addEventListener("click", function (e) { e.preventDefault(); start(false); });
+    }
+    var wrap = document.createDocumentFragment();
+    wrap.append(box);
+    var btns = el("div", "btns"), watch = el("a", "watch", "Ver en YouTube ");
+    watch.href = url; watch.target = "_blank"; watch.rel = "noopener";
+    var arrow = el("span", null, "\u2197"); arrow.setAttribute("aria-hidden", "true"); watch.append(arrow);
+    btns.append(watch); wrap.append(btns);
+    if (embeddable && canHover) wrap.append(el("p", "hint", "Al pasar el mouse el video empieza sin sonido; actívalo con el botón de volumen del reproductor."));
+    return wrap;
+  }
+
+  function card(ev) {
+    var p = partes(ev.fecha), art = el("article", "event");
+    art.id = ev.id;
+    var date = el("p", "date");
+    date.append(el("span", "dow", p.dia), el("b", null, String(p.num)), el("span", null, p.mes));
+    var body = el("div", "ev-body");
+    if (ev.etiqueta) body.append(el("p", "eyebrow", ev.etiqueta));
+    body.append(el("h2", null, ev.titulo));
+    if (ev.descripcion) body.append(el("p", "desc", ev.descripcion));
+    var meta = el("dl", "ev-meta"), f = el("div");
+    f.append(el("dt", null, "Fecha"), el("dd", null, p.dia + " " + p.num + " de " + p.mes + (ev.hora ? ", " + ev.hora + " hrs" : "")));
+    meta.append(f);
+    if (ev.lugar) { var l = el("div"); l.append(el("dt", null, "Lugar"), el("dd", null, ev.lugar)); meta.append(l); }
+    body.append(meta);
+    if (ev.video) body.append(videoBox(ev));
+    art.append(date, body);
+    return art;
+  }
+
+  var proximos = document.getElementById("proximos");
+  fetch("eventos.json", { cache: "no-cache" })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (data) {
+      var hoy = hoyMX(), list = (data.eventos || []).slice().sort(function (a, b) { return a.fecha < b.fecha ? -1 : 1; });
+      var next = list.filter(function (e) { return e.fecha >= hoy; });
+      var past = list.filter(function (e) { return e.fecha < hoy; }).reverse();
+      proximos.textContent = "";
+      if (next.length) next.forEach(function (e) { proximos.append(card(e)); });
+      else proximos.append(el("p", "state", "Por ahora no hay eventos próximos. Activa las notificaciones de la app para enterarte cuando publiquemos uno nuevo."));
+      if (past.length) {
+        var pl = document.getElementById("pasados-lista");
+        past.forEach(function (e) { pl.append(card(e)); });
+        document.getElementById("pasados").hidden = false;
+      }
+      // Abrir directo en el evento del aviso (eventos.html#id)
+      if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+    })
+    .catch(function () {
+      proximos.textContent = "";
+      proximos.append(el("p", "state", "No pudimos cargar los eventos. Revisa tu conexión e inténtalo de nuevo, o síguenos en Instagram para enterarte de todo."));
+    });
 })();
 </script>
 </body>

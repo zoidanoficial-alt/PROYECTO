@@ -1,0 +1,17 @@
+{
+  "_instrucciones": "Para agregar un evento copia uno de la lista, cambia sus datos y ponle un id nuevo (sin espacios ni acentos). fecha: AAAA-MM-DD. hora: HH:MM en formato de 24 horas o vacío. video: el código de YouTube (lo que va después de v=) o vacío. La app avisa a todos cuando aparece un id nuevo con fecha de hoy en adelante.",
+  "eventos": [
+    {
+      "id": "the-chosen-t6",
+      "fecha": "2026-10-11",
+      "hora": "",
+      "etiqueta": "Noche de película · The Chosen",
+      "titulo": "Comparte con nosotros el primer capítulo de la sexta temporada de The Chosen",
+      "descripcion": "Ven a ver con nosotros el estreno de The Chosen, la serie sobre la vida de Jesús y sus discípulos. Una tarde para disfrutar en comunidad. ¡Invita a quien quieras!",
+      "lugar": "Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo",
+      "video": "u433XFiq3mE",
+      "video_titulo": "The Chosen",
+      "video_subtitulo": "Temporada 6 · Capítulo 1"
+    }
+  ]
+}
