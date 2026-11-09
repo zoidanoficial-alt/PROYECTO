@@ -117,6 +117,8 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
 .past .event { opacity: 0.72; }
 .past .date b { font-size: clamp(48px, 6vw, 72px); }
 .event { scroll-margin-top: 16px; }
+.ev-link { color: inherit; text-decoration: none; }
+.ev-link:hover { color: var(--blue); }
 .btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; }
 .btn:hover { filter: brightness(1.08); }
 .btns { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -141,6 +143,7 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
       <a class="back" href="oracion.html">¿Necesitas oración?</a>
       <a class="back" href="transforma.html">Transforma</a>
       <a class="back" href="capsulas.html">Cápsulas</a>
+      <a class="back" href="galeria.html">Galería</a>
       <a class="back" href="ministerios.html">Ministerios</a>
       <a class="back" href="series.html">Series</a>
       <a class="back" href="donativos.html">Donativos</a>
@@ -271,14 +274,16 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
     date.append(el("span", "dow", p.dia), el("b", null, String(p.num)), el("span", null, p.mes));
     var body = el("div", "ev-body");
     if (ev.etiqueta) body.append(el("p", "eyebrow", ev.etiqueta));
-    body.append(el("h2", null, ev.titulo));
+    var h2 = el("h2"), tl = el("a", "ev-link", ev.titulo); tl.href = "evento.html#" + ev.id; h2.append(tl); body.append(h2);
     if (ev.descripcion) body.append(el("p", "desc", ev.descripcion));
     var meta = el("dl", "ev-meta"), f = el("div");
     f.append(el("dt", null, "Fecha"), el("dd", null, p.dia + " " + p.num + " de " + p.mes + (ev.hora ? ", " + ev.hora + " hrs" : "")));
     meta.append(f);
     if (ev.lugar) { var l = el("div"); l.append(el("dt", null, "Lugar"), el("dd", null, ev.lugar)); meta.append(l); }
     body.append(meta);
-    if (ev.video) body.append(videoBox(ev));
+    var more = el("a", "watch", "Ver detalles, video y compartir "); more.href = "evento.html#" + ev.id;
+    var arr = el("span", null, "\u2192"); arr.setAttribute("aria-hidden", "true"); more.append(arr);
+    body.append(more);
     art.append(date, body);
     return art;
   }

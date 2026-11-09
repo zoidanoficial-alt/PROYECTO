@@ -21,8 +21,12 @@ var HOJAS = {
   capsulas: { nombre: "Cápsulas", publica: true, columnas: [
     ["seccion", "Sección (TG o Transforma)"], ["url", "Enlace del Short o Reel"], ["titulo", "Título"], ["publicado", "¿Publicado?"]] },
   ministerios: { nombre: "Ministerios", publica: true, columnas: [
-    ["nombre", "Ministerio"], ["subtitulo", "Subtítulo"], ["descripcion", "Descripción"],
-    ["enlace", "Página (opcional)"], ["publicado", "¿Publicado?"]] },
+    ["nombre", "Ministerio"], ["subtitulo", "Subtítulo"], ["descripcion", "Descripción corta"],
+    ["enlace", "Página (opcional)"], ["publicado", "¿Publicado?"],
+    ["reunion", "Cuándo se reúne"], ["lider", "Líder"], ["foto", "Foto (enlace, opcional)"], ["detalle", "Texto largo (opcional)"]] },
+  series: { nombre: "Series", publica: true, columnas: [
+    ["serie", "Serie"], ["descripcion_serie", "Descripción de la serie (solo en la primera fila)"],
+    ["mensaje", "Título del mensaje"], ["video", "Video de YouTube (enlace)"], ["publicado", "¿Publicado?"]] },
   oracion: { nombre: "Oración", columnas: [
     ["recibido", "Recibido"], ["tipo", "Tipo"], ["nombre", "Nombre"], ["apellidos", "Apellidos"],
     ["celular", "Celular"], ["mensaje", "Mensaje"], ["estado", "Estado"], ["notas", "Notas del equipo"]] },
@@ -95,7 +99,14 @@ function sembrar(ss) {
      ["Intercesión", "Oración", "Un equipo que ora por las peticiones de la iglesia y de quienes nos escriben.", "oracion.html"],
      ["Bienvenida", "Recibir a los que llegan", "Saludar, orientar y acompañar a quienes nos visitan por primera vez.", "primer-paso.html"],
      ["Medios", "Redes y transmisión", "Fotos, video, redes sociales y transmisiones para llevar el mensaje más lejos.", "capsulas.html"]
-    ].forEach(function (r) { mi.appendRow(r.concat(["Sí"])); });
+    ].forEach(function (r) { mi.appendRow(r.concat(["Sí", "", "", "", ""])); });
+  }
+  var se = ss.getSheetByName(HOJAS.series.nombre);
+  if (se.getLastRow() < 2) {
+    [["Dominio propio", "", "Dominio propio", "https://www.youtube.com/watch?v=3pP-Zk0qHEM"],
+     ["Gozo", "", "Gozo", "https://www.youtube.com/watch?v=WpZSmpWRo4M"],
+     ["Bondad", "", "Bondad", "https://www.youtube.com/watch?v=cdiuFBDNMB0"]
+    ].forEach(function (r) { se.appendRow(r.concat(["Sí"])); });
   }
   var cf = ss.getSheetByName(HOJAS.config.nombre);
   if (cf.getLastRow() < 2) {
@@ -126,7 +137,10 @@ function doGet(e) {
   filas.forEach(function (r) { delete r.publicado; });
   if (tipo === "eventos") filas = filas.filter(function (r) { return r.id && r.fecha && r.titulo; }).map(limpiarEvento);
   if (tipo === "capsulas") filas = filas.filter(function (r) { return r.url; });
-  if (tipo === "ministerios") filas = filas.filter(function (r) { return r.nombre; });
+  if (tipo === "ministerios") filas = filas.filter(function (r) { return r.nombre; }).map(function (r) {
+    r.id = slug(r.nombre); return r;
+  });
+  if (tipo === "series") filas = agruparSeries(filas);
   var salida = {}; salida.ok = true; salida[tipo] = filas;
   var texto = JSON.stringify(salida);
   cache.put(tipo, texto, 60); // un minuto, para no gastar la cuota de Google
@@ -145,16 +159,39 @@ function leer(tipo) {
     });
 }
 
+function slug(t) {
+  return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function codigoYoutube(v) {
+  v = String(v || "").trim();
+  var m = v.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/);
+  return m ? m[1] : v;
+}
+
+/** Cada fila es un mensaje; las filas con el mismo nombre de serie forman una serie. */
+function agruparSeries(filas) {
+  var orden = [], por = {};
+  filas.forEach(function (r) {
+    var nombre = String(r.serie || "").trim();
+    if (!nombre) return;
+    if (!por[nombre]) { por[nombre] = { id: slug(nombre), titulo: nombre, descripcion: "", mensajes: [] }; orden.push(nombre); }
+    if (r.descripcion_serie && !por[nombre].descripcion) por[nombre].descripcion = String(r.descripcion_serie);
+    if (r.video || r.mensaje) por[nombre].mensajes.push({ titulo: String(r.mensaje || nombre), video: codigoYoutube(r.video) });
+  });
+  return orden.map(function (n) { return por[n]; });
+}
+
 function esFecha(v) { return Object.prototype.toString.call(v) === "[object Date]"; }
 
 function limpiarEvento(r) {
   var fecha = esFecha(r.fecha) ? Utilities.formatDate(r.fecha, ZONA, "yyyy-MM-dd") : String(r.fecha).trim();
   var hora = esFecha(r.hora) ? Utilities.formatDate(r.hora, ZONA, "HH:mm") : String(r.hora || "").trim();
-  var v = String(r.video || "").trim(), m = v.match(/(?:v=|youtu\.be\/|shorts\/)([\w-]{6,})/);
   return {
     id: String(r.id).trim(), fecha: fecha, hora: hora,
     etiqueta: String(r.etiqueta || ""), titulo: String(r.titulo), descripcion: String(r.descripcion || ""),
-    lugar: String(r.lugar || ""), video: m ? m[1] : v,
+    lugar: String(r.lugar || ""), video: codigoYoutube(r.video),
     video_titulo: String(r.video_titulo || ""), video_subtitulo: String(r.video_subtitulo || "")
   };
 }

@@ -148,6 +148,9 @@ section { padding-block: 56px; border-top: 1px solid var(--line); scroll-margin-
 .ph { position: relative; margin: 0; height: clamp(260px, 38vw, 400px); border-radius: 10px; overflow: hidden; min-width: 0; background: var(--screen); }
 .ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .ph figcaption { position: absolute; inset: auto 0 0 0; padding: 36px 16px 14px; font: 600 14px var(--font-body); letter-spacing: 0.04em; color: #fff; background: linear-gradient(to top, rgba(8,11,28,0.78), transparent); }
+.ph-link { display: block; color: inherit; text-decoration: none; border-radius: 10px; }
+.ph-link figcaption span { margin-inline-start: 6px; }
+@media (prefers-reduced-motion: no-preference) { .ph img { transition: transform .35s; } .ph-link:hover .ph img { transform: scale(1.03); } }
 .ph.alabanza img { object-position: 50% 24%; }
 .ph.comunidad img { object-position: 50% 24%; }
 
@@ -235,6 +238,7 @@ footer { border-top: 1px solid var(--line); padding-top: 28px; display: flex; fl
         </li>
         <li><a class="navlink" href="transforma.html">Transforma</a></li>
         <li><a class="navlink" href="capsulas.html">Cápsulas</a></li>
+        <li><a class="navlink" href="galeria.html">Galería</a></li>
         <li><a class="navlink" href="series.html">Series</a></li>
         <li><a class="navlink" href="eventos.html">Eventos</a></li>
         <li><a class="navlink" href="donativos.html">Donativos</a></li>
@@ -296,14 +300,18 @@ footer { border-top: 1px solid var(--line); padding-top: 28px; display: flex; fl
         <p>Nos reunimos para adorar a Dios, aprender de su Palabra y crecer juntos como familia. Si es la primera vez que visitas una iglesia, eres bienvenido tal como eres.</p>
       </div>
       <div class="gallery">
+        <a class="ph-link" href="ministerio.html#alabanza" aria-label="Alabanza: ver más">
         <figure class="ph alabanza">
           <img src="img/alabanza.jpg" width="1200" height="1800" loading="lazy" alt="Un papá con su hijo en brazos levanta la mano durante la alabanza">
-          <figcaption>Alabanza</figcaption>
+          <figcaption>Alabanza<span aria-hidden="true">&rarr;</span></figcaption>
         </figure>
+        </a>
+        <a class="ph-link" href="galeria.html" aria-label="Comunidad: ver más">
         <figure class="ph comunidad">
           <img src="img/comunidad.jpg" width="1200" height="1800" loading="lazy" alt="Dos jóvenes de la iglesia frente al cartel «Descubre tu llamado, haz una diferencia»">
-          <figcaption>Comunidad</figcaption>
+          <figcaption>Comunidad<span aria-hidden="true">&rarr;</span></figcaption>
         </figure>
+        </a>
       </div>
     </section>
 

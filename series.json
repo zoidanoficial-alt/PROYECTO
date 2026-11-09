@@ -1,0 +1,8 @@
+{
+  "_instrucciones": "Series de mensajes (se usa si el panel de Google Sheets no está activo). video: el código de YouTube (lo que va después de v=).",
+  "series": [
+    { "id": "dominio-propio", "titulo": "Dominio propio", "descripcion": "", "mensajes": [ { "titulo": "Dominio propio", "video": "3pP-Zk0qHEM" } ] },
+    { "id": "gozo", "titulo": "Gozo", "descripcion": "", "mensajes": [ { "titulo": "Gozo", "video": "WpZSmpWRo4M" } ] },
+    { "id": "bondad", "titulo": "Bondad", "descripcion": "", "mensajes": [ { "titulo": "Bondad", "video": "cdiuFBDNMB0" } ] }
+  ]
+}

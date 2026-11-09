@@ -1,0 +1,11 @@
+{
+  "_instrucciones": "Lista de ministerios (se usa si el panel de Google Sheets no está activo). id: sin espacios ni acentos. foto: ruta de una imagen (opcional). reunion y lider: déjalos vacíos si no se conocen.",
+  "ministerios": [
+    { "id": "transforma", "nombre": "Transforma", "subtitulo": "Jóvenes", "descripcion": "El grupo de jóvenes: amistad, Palabra y alabanza para vivir la fe en esta etapa.", "detalle": "", "reunion": "", "lider": "", "foto": "img/comunidad.jpg", "enlace": "transforma.html" },
+    { "id": "alabanza", "nombre": "Alabanza", "subtitulo": "Música y adoración", "descripcion": "Músicos y voces que guían a la iglesia en la adoración cada domingo.", "detalle": "", "reunion": "", "lider": "", "foto": "img/alabanza.jpg", "enlace": "" },
+    { "id": "ninos", "nombre": "Niños", "subtitulo": "Escuela dominical", "descripcion": "Enseñanza bíblica para los más pequeños mientras sus papás están en el culto.", "detalle": "", "reunion": "", "lider": "", "foto": "", "enlace": "" },
+    { "id": "intercesion", "nombre": "Intercesión", "subtitulo": "Oración", "descripcion": "Un equipo que ora por las peticiones de la iglesia y de quienes nos escriben.", "detalle": "", "reunion": "", "lider": "", "foto": "", "enlace": "oracion.html" },
+    { "id": "bienvenida", "nombre": "Bienvenida", "subtitulo": "Recibir a los que llegan", "descripcion": "Saludar, orientar y acompañar a quienes nos visitan por primera vez.", "detalle": "", "reunion": "", "lider": "", "foto": "", "enlace": "primer-paso.html" },
+    { "id": "medios", "nombre": "Medios", "subtitulo": "Redes y transmisión", "descripcion": "Fotos, video, redes sociales y transmisiones para llevar el mensaje más lejos.", "detalle": "", "reunion": "", "lider": "", "foto": "", "enlace": "capsulas.html" }
+  ]
+}

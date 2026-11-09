@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Evento · Tiempo de Gracia</title>
+<meta name="description" content="Detalles del evento de la Iglesia Cristiana Tiempo de Gracia en Naucalpan: fecha, lugar y cómo llegar.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Evento · Tiempo de Gracia">
+<meta property="og:description" content="Detalles del evento de la Iglesia Cristiana Tiempo de Gracia en Naucalpan: fecha, lugar y cómo llegar.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: migas para volver, fecha gigante a la izquierda y el detalle a la derecha con acciones (calendario, compartir, cómo llegar) y el video. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #e89a2b;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --focus: #b9690f;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 4px 2px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 8px 9px; border-radius: 8px; white-space: nowrap; }
+.menu-btn { display: none; margin-inline-start: auto; font: 600 15px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 9px 18px; cursor: pointer; }
+@media (max-width: 760px) {
+  header.top { column-gap: 10px; }
+  .brand { font-size: 20px; }
+  .menu-btn { display: inline-flex; padding: 8px 14px; }
+  .top-links { display: none; flex-direction: column; align-items: stretch; padding: 8px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+  .top-links.open { display: flex; }
+  .top-links .back { padding: 12px; font-size: 18px; }
+  .top-links .pill { text-align: center; margin-top: 6px; }
+}
+.back[aria-current="page"] { color: var(--magenta); }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+.crumb { display: inline-flex; gap: 6px; margin-top: 24px; color: var(--muted); text-decoration: none; font-weight: 500; }
+.crumb:hover { color: var(--fg); }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--blue); }
+.btn:hover { filter: brightness(1.08); }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; }
+.state { padding-block: 36px; color: var(--muted); font-size: 19px; max-width: 40em; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--magenta); margin: 0; }
+.meta { display: flex; flex-wrap: wrap; gap: 12px 36px; margin: 0; }
+.meta dt { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); }
+.meta dd { margin: 4px 0 0; font-size: 18px; }
+.meta dd.tbd { color: var(--muted); font-style: italic; }
+.more { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--line); }
+.more h2 { margin: 0 0 14px; font-family: var(--font-display); font-weight: 700; font-size: 24px; letter-spacing: -0.01em; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.chips a { display: inline-block; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); text-decoration: none; font-weight: 500; }
+.chips a:hover { border-color: var(--magenta); color: var(--magenta); }
+
+.ev { display: grid; grid-template-columns: 200px 1fr; gap: 24px 48px; padding-block: 32px 8px; }
+.date { font-family: var(--font-display); line-height: 1; margin: 0; }
+.date .dow { display: block; font: 600 12px var(--font-body); letter-spacing: 0.14em; text-transform: uppercase; color: var(--wood); margin-bottom: 8px; }
+.date b { display: block; font-weight: 800; font-size: clamp(80px, 11vw, 132px); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.date span { display: block; font-weight: 700; font-size: 28px; margin-top: 4px; }
+.ev-body { min-width: 0; display: grid; gap: 20px; align-content: start; }
+.ev-body h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; letter-spacing: -0.025em; text-wrap: balance; }
+.ev-body .desc { color: var(--muted); font-size: 20px; max-width: 40em; }
+.past-note { display: inline-block; padding: 6px 12px; border-radius: 999px; background: color-mix(in srgb, var(--fg) 8%, var(--bg)); color: var(--muted); font-size: 14px; width: fit-content; }
+@media (max-width: 760px) { .ev { grid-template-columns: 1fr; gap: 12px; } .date b { font-size: 88px; } }
+/* Video: portada tipográfica que se cambia por el reproductor al pasar el mouse */
+.video { position: relative; aspect-ratio: 16 / 9; border-radius: 24px; overflow: hidden; background: var(--screen); cursor: pointer; isolation: isolate; max-width: 760px; }
+.video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.poster { position: absolute; inset: 0; display: grid; align-content: end; gap: 6px; padding: 24px; color: #fff; text-decoration: none; }
+.poster:hover .play { transform: scale(1.06); }
+.poster::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(60% 70% at 15% 0%, color-mix(in srgb, var(--amber) 70%, #000), transparent 70%), radial-gradient(55% 60% at 95% 100%, color-mix(in srgb, var(--blue) 65%, #000), transparent 70%); }
+.poster small { font: 600 12px var(--font-body); letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.85); }
+.poster b { font-family: var(--font-display); font-weight: 800; font-size: clamp(34px, 5.4vw, 60px); line-height: 0.98; letter-spacing: -0.03em; text-transform: uppercase; }
+.poster i { font-style: normal; font-size: 15px; color: rgba(255,255,255,0.8); }
+.poster .play { position: absolute; top: 50%; left: 50%; width: 72px; height: 72px; margin: -36px 0 0 -36px; border-radius: 50%; background: rgba(255,255,255,0.92); display: grid; place-content: center; }
+.poster .play::before { content: ""; margin-left: 5px; border: 12px solid transparent; border-left: 20px solid #111; border-right: 0; }
+.video.playing .poster { display: none; }
+.watch { display: inline-flex; align-items: center; gap: 8px; font: 600 16px var(--font-body); color: var(--fg); text-decoration: none; border-bottom: 1.5px solid var(--fg); width: fit-content; padding-bottom: 3px; }
+.watch:hover { color: var(--blue); border-color: var(--blue); }
+.hint { font-size: 14px; color: var(--muted); }
+
+@media (max-width: 560px) { .poster .play { top: 16px; right: 16px; left: auto; margin: 0; width: 52px; height: 52px; } .poster .play::before { border-width: 9px; border-left-width: 15px; } }
+
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+
+@media (max-width: 760px) { .top-links { margin-inline-start: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="top-links">Menú</button>
+    <div class="top-links" id="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="primer-paso.html">Tu primer paso</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="transforma.html">Transforma</a>
+      <a class="back" href="capsulas.html">Cápsulas</a>
+      <a class="back" href="galeria.html">Galería</a>
+      <a class="back" href="ministerios.html">Ministerios</a>
+      <a class="back" href="series.html">Series</a>
+      <a class="back" href="eventos.html" aria-current="page">Eventos</a>
+      <a class="back" href="donativos.html">Donativos</a>
+      <a class="pill" href="index.html#ubicacion">Cómo llegar</a>
+    </div>
+  </header>
+
+  <main>
+    <a class="crumb" href="eventos.html">&larr; Todos los eventos</a>
+    <div id="detalle" aria-live="polite"><p class="state">Cargando evento…</p></div>
+    <section class="more" id="otros" hidden>
+      <h2>Otros eventos</h2>
+      <ul class="chips" id="otros-lista"></ul>
+    </section>
+  </main>
+
+
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script src="api.js"></script>
+<script>
+(function () {
+  // Menú en celular
+  var menuBtn = document.getElementById("menu-btn"), links = document.getElementById("top-links");
+  menuBtn.addEventListener("click", function () {
+    var open = !links.classList.contains("open");
+    links.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    menuBtn.textContent = open ? "Cerrar" : "Menú";
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && links.classList.contains("open")) { menuBtn.click(); menuBtn.focus(); }
+  });
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+
+  var CAN_HOVER = !!(window.matchMedia && window.matchMedia("(hover: hover)").matches);
+  function videoBox(ev) {
+    var box = TDG.el("div", "video"), url = "https://www.youtube.com/watch?v=" + ev.video;
+    var a = TDG.el("a", "poster"); a.href = url; a.target = "_blank"; a.rel = "noopener";
+    a.setAttribute("aria-label", "Ver el video de " + (ev.video_titulo || ev.titulo));
+    var play = TDG.el("span", "play"); play.setAttribute("aria-hidden", "true");
+    var hint = TDG.el("i", null, TDG.embeddable ? (CAN_HOVER ? "Pasa el mouse para ver el video" : "Toca para ver el video") : "Toca para verlo en YouTube");
+    a.append(play);
+    if (ev.video_subtitulo) a.append(TDG.el("small", null, ev.video_subtitulo));
+    a.append(TDG.el("b", null, ev.video_titulo || "Ver video"), hint);
+    box.append(a);
+    // En el sitio publicado se reproduce dentro de la página: sin sonido al pasar el mouse (los navegadores
+    // bloquean el sonido automático) y con sonido al tocarlo. La vista previa de claude.ai no permite
+    // videos incrustados, así que ahí solo abre YouTube.
+    if (TDG.embeddable) {
+      var frame = null;
+      var cmd = function (func) { if (frame) frame.contentWindow.postMessage(JSON.stringify({ event: "command", func: func, args: [] }), "*"); };
+      var start = function (muted) {
+        if (!frame) {
+          frame = document.createElement("iframe");
+          frame.src = "https://www.youtube-nocookie.com/embed/" + ev.video + "?autoplay=1&playsinline=1&rel=0&enablejsapi=1" + (muted ? "&mute=1" : "");
+          frame.title = ev.video_titulo || ev.titulo;
+          frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+          frame.allowFullscreen = true;
+          box.appendChild(frame);
+          box.classList.add("playing");
+        } else {
+          cmd("playVideo");
+          if (!muted) cmd("unMute");
+        }
+      };
+      if (CAN_HOVER) {
+        box.addEventListener("mouseenter", function () { start(true); });
+        box.addEventListener("mouseleave", function () { cmd("pauseVideo"); });
+      }
+      a.addEventListener("click", function (e) { e.preventDefault(); start(false); });
+    }
+    var wrap = document.createDocumentFragment();
+    wrap.append(box);
+    var btns = TDG.el("div", "btns"), watch = TDG.el("a", "watch", "Ver en YouTube ");
+    watch.href = url; watch.target = "_blank"; watch.rel = "noopener";
+    var arrow = TDG.el("span", null, "\u2197"); arrow.setAttribute("aria-hidden", "true"); watch.append(arrow);
+    btns.append(watch); wrap.append(btns);
+    if (TDG.embeddable && CAN_HOVER) wrap.append(TDG.el("p", "hint", "Al pasar el mouse el video empieza sin sonido; actívalo con el botón de volumen del reproductor."));
+    return wrap;
+  }
+
+
+  // Página de un evento: evento.html#id (los datos vienen del panel o de eventos.json)
+  var box = document.getElementById("detalle"), el = TDG.el;
+  function dosDigitos(n) { return (n < 10 ? "0" : "") + n; }
+  function calendario(ev) {
+    var f = ev.fecha.replace(/-/g, ""), h = (ev.hora || "").replace(":", "");
+    var dates;
+    if (h) {
+      var hh = parseInt(h.slice(0, 2), 10), fin = dosDigitos(Math.min(hh + 2, 23)) + h.slice(2);
+      dates = f + "T" + h + "00/" + f + "T" + fin + "00";
+    } else {
+      var d = new Date(Date.UTC(+f.slice(0, 4), +f.slice(4, 6) - 1, +f.slice(6, 8) + 1));
+      dates = f + "/" + d.getUTCFullYear() + dosDigitos(d.getUTCMonth() + 1) + dosDigitos(d.getUTCDate());
+    }
+    return "https://calendar.google.com/calendar/render?action=TEMPLATE&ctz=America/Mexico_City" +
+      "&text=" + encodeURIComponent(ev.titulo) + "&dates=" + dates +
+      "&details=" + encodeURIComponent((ev.descripcion || "") + "\n\n" + location.href) +
+      "&location=" + encodeURIComponent(ev.lugar || "Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo, Naucalpan");
+  }
+  function boton(texto, href, ghost) {
+    var a = el("a", "btn" + (ghost ? " ghost" : ""), texto); a.href = href;
+    if (/^https?:/.test(href)) { a.target = "_blank"; a.rel = "noopener"; }
+    return a;
+  }
+  function mostrar(ev, todos) {
+    var p = TDG.fecha(ev.fecha), pasado = ev.fecha < TDG.hoyMX();
+    document.title = ev.titulo + " · Tiempo de Gracia";
+    var wrap = el("article", "ev"), date = el("p", "date"), body = el("div", "ev-body");
+    date.append(el("span", "dow", p.dia), el("b", null, String(p.num)), el("span", null, p.mes));
+    if (ev.etiqueta) body.append(el("p", "eyebrow", ev.etiqueta));
+    body.append(el("h1", null, ev.titulo));
+    if (pasado) body.append(el("p", "past-note", "Este evento ya pasó"));
+    if (ev.descripcion) body.append(el("p", "desc", ev.descripcion));
+    var meta = el("dl", "meta");
+    [["Fecha", p.dia + " " + p.num + " de " + p.mes + " de " + p.anio], ["Hora", ev.hora ? ev.hora + " hrs" : ""], ["Lugar", ev.lugar]].forEach(function (m) {
+      if (!m[1]) return;
+      var g = el("div"); g.append(el("dt", null, m[0]), el("dd", null, m[1])); meta.append(g);
+    });
+    body.append(meta);
+    var acts = el("div", "btns");
+    if (!pasado) acts.append(boton("Agregar a mi calendario", calendario(ev)));
+    acts.append(boton("Compartir por WhatsApp", "https://wa.me/?text=" + encodeURIComponent(ev.titulo + " · Tiempo de Gracia\n" + location.href), true));
+    acts.append(boton("Cómo llegar", "index.html#ubicacion", true));
+    body.append(acts);
+    if (ev.video) body.append(videoBox(ev));
+    wrap.append(date, body);
+    box.textContent = ""; box.append(wrap);
+    var otros = todos.filter(function (e) { return e.id !== ev.id && e.fecha >= TDG.hoyMX(); });
+    if (otros.length) {
+      var ul = document.getElementById("otros-lista");
+      otros.forEach(function (e) { var li = el("li"), a = el("a", null, e.titulo); a.href = "evento.html#" + e.id; li.append(a); ul.append(li); });
+      document.getElementById("otros").hidden = false;
+    }
+  }
+  function cargar() {
+    var id = TDG.hashId();
+    TDG.data("eventos", "eventos.json").then(function (d) {
+      var todos = (d.eventos || []).slice().sort(function (a, b) { return a.fecha < b.fecha ? -1 : 1; });
+      var ev = todos.filter(function (e) { return e.id === id; })[0];
+      if (ev) return mostrar(ev, todos);
+      box.textContent = "";
+      box.append(el("p", "state", "No encontramos este evento. Puede que se haya cambiado o quitado."));
+      var a = boton("Ver todos los eventos", "eventos.html"); box.append(a);
+    }).catch(function () {
+      box.textContent = ""; box.append(el("p", "state", "No pudimos cargar el evento. Revisa tu conexión e inténtalo de nuevo."));
+    });
+  }
+  window.addEventListener("hashchange", function () { document.getElementById("otros-lista").textContent = ""; cargar(); scrollTo(0, 0); });
+  cargar();
+})();
+</script>
+</body>
+</html>

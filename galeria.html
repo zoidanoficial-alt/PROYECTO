@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Galería · Tiempo de Gracia</title>
+<meta name="description" content="Fotos de los cultos, eventos y la comunidad de la Iglesia Cristiana Tiempo de Gracia en Naucalpan, desde nuestro Instagram.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Galería · Tiempo de Gracia">
+<meta property="og:description" content="Fotos de los cultos, eventos y la comunidad de la Iglesia Cristiana Tiempo de Gracia en Naucalpan, desde nuestro Instagram.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: titular grande, cuadrícula de fotos cuadradas tipo Instagram y un visor para ampliarlas. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #e89a2b;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --focus: #b9690f;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 4px 2px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 8px 9px; border-radius: 8px; white-space: nowrap; }
+.menu-btn { display: none; margin-inline-start: auto; font: 600 15px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 9px 18px; cursor: pointer; }
+@media (max-width: 760px) {
+  header.top { column-gap: 10px; }
+  .brand { font-size: 20px; }
+  .menu-btn { display: inline-flex; padding: 8px 14px; }
+  .top-links { display: none; flex-direction: column; align-items: stretch; padding: 8px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+  .top-links.open { display: flex; }
+  .top-links .back { padding: 12px; font-size: 18px; }
+  .top-links .pill { text-align: center; margin-top: 6px; }
+}
+.back[aria-current="page"] { color: var(--magenta); }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+h1.big { margin: 0; padding-block: 36px 16px; font-family: var(--font-display); font-weight: 500; text-transform: uppercase; font-size: clamp(54px, 13vw, 180px); line-height: 0.98; letter-spacing: -0.04em; }
+.lead { color: var(--muted); font-size: 20px; max-width: 34em; }
+.top-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding-bottom: 28px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--blue); }
+.btn:hover { filter: brightness(1.08); }
+.grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 44vw), 1fr)); gap: 8px; }
+.grid li { min-width: 0; }
+.tile { position: relative; display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: color-mix(in srgb, var(--fg) 8%, var(--bg)); cursor: pointer; }
+.tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.tile .kind { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 999px; background: rgba(0,0,0,0.6); color: #fff; font: 600 11px var(--font-body); letter-spacing: 0.06em; }
+.tile:focus-visible { outline-offset: 2px; }
+.note { color: var(--muted); font-size: 15px; margin-top: 18px; max-width: 46em; }
+.state { padding-block: 24px; color: var(--muted); font-size: 18px; }
+dialog.lb { width: min(920px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 0; border-radius: 18px; background: var(--surface); color: var(--fg); overflow: auto; }
+dialog.lb::backdrop { background: rgba(5,7,18,0.82); }
+.lb-img { display: block; width: 100%; max-height: 70vh; object-fit: contain; background: #000; }
+.lb-body { display: grid; gap: 14px; padding: 18px 20px 20px; }
+.lb-cap { white-space: pre-line; color: var(--muted); max-height: 9em; overflow: auto; }
+.lb-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.lb-nav { display: flex; gap: 8px; }
+.lb-nav button, .lb-close { font: 600 15px var(--font-body); border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+.lb-close { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; border: 0; }
+@media (prefers-reduced-motion: no-preference) { .tile img { transition: transform .3s; } .tile:hover img { transform: scale(1.04); } }
+
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+
+@media (max-width: 760px) { .top-links { margin-inline-start: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="top-links">Menú</button>
+    <div class="top-links" id="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="primer-paso.html">Tu primer paso</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="transforma.html">Transforma</a>
+      <a class="back" href="capsulas.html">Cápsulas</a>
+      <a class="back" href="ministerios.html">Ministerios</a>
+      <a class="back" href="series.html">Series</a>
+      <a class="back" href="eventos.html">Eventos</a>
+      <a class="back" href="donativos.html">Donativos</a>
+      <a class="pill" href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram <span aria-hidden="true">&#8599;</span></a>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="big">Galería</h1>
+    <div class="top-row">
+      <p class="lead">Momentos de nuestros cultos, eventos y comunidad, directo de nuestro Instagram.</p>
+      <a class="btn" href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Síguenos en Instagram <span aria-hidden="true">&#8599;</span></a>
+    </div>
+    <ul class="grid" id="grid" aria-live="polite"></ul>
+    <p class="note" id="note" hidden></p>
+  </main>
+
+  <dialog class="lb" id="lb" aria-label="Foto ampliada">
+    <button class="lb-close" id="lb-close" type="button" aria-label="Cerrar">&times;</button>
+    <img class="lb-img" id="lb-img" alt="">
+    <div class="lb-body">
+      <p class="lb-cap" id="lb-cap"></p>
+      <div class="lb-row">
+        <div class="lb-nav"><button type="button" id="lb-prev">&larr; Anterior</button><button type="button" id="lb-next">Siguiente &rarr;</button></div>
+        <a class="btn" id="lb-ig" href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Ver en Instagram <span aria-hidden="true">&#8599;</span></a>
+      </div>
+    </div>
+  </dialog>
+
+
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script src="api.js"></script>
+<script>
+(function () {
+  // Menú en celular
+  var menuBtn = document.getElementById("menu-btn"), links = document.getElementById("top-links");
+  menuBtn.addEventListener("click", function () {
+    var open = !links.classList.contains("open");
+    links.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    menuBtn.textContent = open ? "Cerrar" : "Menú";
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && links.classList.contains("open")) { menuBtn.click(); menuBtn.focus(); }
+  });
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+
+  // Galería: las fotos vienen del feed JSON de Instagram (Behold.so u otro servicio) configurado en
+  // config.json → instagram_feed. Sin feed, se muestran las fotos del sitio.
+  var IG = "https://www.instagram.com/tiempodegraciamexico/";
+  var grid = document.getElementById("grid"), note = document.getElementById("note"), el = TDG.el, fotos = [], actual = 0;
+  var LOCALES = [
+    { img: "img/alabanza.jpg", full: "img/alabanza.jpg", caption: "Alabanza", link: IG },
+    { img: "img/comunidad.jpg", full: "img/comunidad.jpg", caption: "Comunidad", link: IG },
+    { img: "img/pastores.jpg", full: "img/pastores.jpg", caption: "Nuestros pastores", link: IG }
+  ];
+  // Acepta los formatos comunes: {posts:[...]}, [...] o {data:[...]} (API de Instagram), con nombres en camelCase o snake_case
+  function normalizar(json) {
+    var lista = Array.isArray(json) ? json : (json.posts || json.data || json.items || []);
+    return lista.map(function (p) {
+      var tipo = String(p.mediaType || p.media_type || "IMAGE").toUpperCase();
+      var sz = p.sizes || {};
+      var pick = function (k) { return sz[k] && (sz[k].mediaUrl || sz[k].media_url || sz[k].url); };
+      var esVideo = tipo === "VIDEO";
+      var base = esVideo ? (p.thumbnailUrl || p.thumbnail_url) : (p.mediaUrl || p.media_url);
+      return {
+        img: pick("medium") || pick("small") || base || p.thumbnailUrl || p.thumbnail_url,
+        full: pick("large") || pick("full") || base || pick("medium"),
+        caption: p.prunedCaption || p.caption || "",
+        link: p.permalink || IG,
+        kind: esVideo ? (p.isReel ? "Reel" : "Video") : (tipo === "CAROUSEL_ALBUM" ? "Álbum" : "")
+      };
+    }).filter(function (f) { return f.img; });
+  }
+  function pintar(lista) {
+    fotos = lista; grid.textContent = "";
+    lista.forEach(function (f, i) {
+      var li = el("li"), b = el("button", "tile"), img = el("img");
+      b.type = "button";
+      b.setAttribute("aria-label", "Ver foto" + (f.caption ? ": " + f.caption.slice(0, 80) : ""));
+      img.src = f.img; img.alt = f.caption ? f.caption.slice(0, 120) : "Foto de Tiempo de Gracia"; img.loading = "lazy";
+      b.append(img);
+      if (f.kind) b.append(el("span", "kind", f.kind));
+      b.addEventListener("click", function () { abrir(i); });
+      li.append(b); grid.append(li);
+    });
+  }
+  var lb = document.getElementById("lb");
+  function abrir(i) {
+    actual = (i + fotos.length) % fotos.length;
+    var f = fotos[actual];
+    document.getElementById("lb-img").src = f.full || f.img;
+    document.getElementById("lb-img").alt = f.caption ? f.caption.slice(0, 120) : "Foto de Tiempo de Gracia";
+    document.getElementById("lb-cap").textContent = f.caption || "";
+    document.getElementById("lb-ig").href = f.link || IG;
+    document.querySelector(".lb-nav").hidden = fotos.length < 2;
+    if (!lb.open) { if (lb.showModal) lb.showModal(); else window.open(f.link || IG, "_blank"); }
+  }
+  document.getElementById("lb-close").addEventListener("click", function () { lb.close(); });
+  document.getElementById("lb-prev").addEventListener("click", function () { abrir(actual - 1); });
+  document.getElementById("lb-next").addEventListener("click", function () { abrir(actual + 1); });
+  lb.addEventListener("click", function (e) { if (e.target === lb) lb.close(); });
+  document.addEventListener("keydown", function (e) {
+    if (!lb.open) return;
+    if (e.key === "ArrowLeft") abrir(actual - 1);
+    if (e.key === "ArrowRight") abrir(actual + 1);
+  });
+  function locales(texto) {
+    pintar(LOCALES);
+    note.textContent = texto; note.hidden = false;
+  }
+  grid.append(el("li", "state", "Cargando fotos…"));
+  TDG.config().then(function (c) {
+    var feed = c && c.instagram_feed;
+    if (!feed) return locales("Pronto verás aquí las fotos más recientes de nuestro Instagram.");
+    return fetch(feed).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
+      var lista = normalizar(j);
+      if (!lista.length) throw new Error("vacío");
+      pintar(lista);
+    });
+  }).catch(function () { locales("No pudimos cargar las fotos de Instagram en este momento. Mientras, aquí tienes algunas del sitio."); });
+})();
+</script>
+</body>
+</html>

@@ -125,6 +125,7 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
       <a class="back" href="oracion.html">¿Necesitas oración?</a>
       <a class="back" href="transforma.html">Transforma</a>
       <a class="back" href="capsulas.html">Cápsulas</a>
+      <a class="back" href="galeria.html">Galería</a>
       <a class="back" href="ministerios.html">Ministerios</a>
       <a class="back" href="eventos.html">Eventos</a>
       <a class="back" href="donativos.html">Donativos</a>
@@ -134,32 +135,32 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
 
   <main>
     <h1 class="big">Series</h1>
-    <p class="lead">Mira los mensajes de nuestras series. Cada uno se abre en nuestro canal de YouTube.</p>
+    <p class="lead">Mira los mensajes de nuestras series. Toca una serie para ver todos sus mensajes.</p>
 
     <ul class="series">
       <li>
-        <a class="cover s1" href="https://www.youtube.com/watch?v=3pP-Zk0qHEM" target="_blank" rel="noopener" aria-label="Ver la serie Dominio Propio en YouTube">
+        <a class="cover s1" href="serie.html#dominio-propio" aria-label="Ver la serie Dominio Propio">
           <span class="play" aria-hidden="true"></span>
           <small>Serie</small>
           <b>Dominio propio</b>
         </a>
-        <a class="watch" href="https://www.youtube.com/watch?v=3pP-Zk0qHEM" target="_blank" rel="noopener">Ver en YouTube <span aria-hidden="true">&#8599;</span></a>
+        <a class="watch" href="serie.html#dominio-propio">Ver la serie <span aria-hidden="true">&rarr;</span></a>
       </li>
       <li>
-        <a class="cover s2" href="https://www.youtube.com/watch?v=WpZSmpWRo4M" target="_blank" rel="noopener" aria-label="Ver la serie Gozo en YouTube">
+        <a class="cover s2" href="serie.html#gozo" aria-label="Ver la serie Gozo">
           <span class="play" aria-hidden="true"></span>
           <small>Serie</small>
           <b>Gozo</b>
         </a>
-        <a class="watch" href="https://www.youtube.com/watch?v=WpZSmpWRo4M" target="_blank" rel="noopener">Ver en YouTube <span aria-hidden="true">&#8599;</span></a>
+        <a class="watch" href="serie.html#gozo">Ver la serie <span aria-hidden="true">&rarr;</span></a>
       </li>
       <li>
-        <a class="cover s3" href="https://www.youtube.com/watch?v=cdiuFBDNMB0" target="_blank" rel="noopener" aria-label="Ver la serie Bondad en YouTube">
+        <a class="cover s3" href="serie.html#bondad" aria-label="Ver la serie Bondad">
           <span class="play" aria-hidden="true"></span>
           <small>Serie</small>
           <b>Bondad</b>
         </a>
-        <a class="watch" href="https://www.youtube.com/watch?v=cdiuFBDNMB0" target="_blank" rel="noopener">Ver en YouTube <span aria-hidden="true">&#8599;</span></a>
+        <a class="watch" href="serie.html#bondad">Ver la serie <span aria-hidden="true">&rarr;</span></a>
       </li>
     </ul>
 
@@ -177,6 +178,7 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
     <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
   </footer>
 </div>
+<script src="api.js"></script>
 <script>
 (function () {
   // Menú en celular
@@ -205,6 +207,21 @@ h1.big { margin: 0; padding-block: 36px 24px; font-family: var(--font-display); 
     sync();
   });
   sync();
+
+  // Con el panel activo, las series vienen de la hoja «Series» del Google Sheet
+  TDG.get("series").then(function (d) {
+    var lista = d.series || [];
+    if (!lista.length) return;
+    var ul = document.querySelector(".series"), el = TDG.el;
+    ul.textContent = "";
+    lista.forEach(function (sr, k) {
+      var id = sr.id || TDG.slug(sr.titulo), li = el("li"), c = el("a", "cover s" + (k % 3 + 1)), play = el("span", "play");
+      c.href = "serie.html#" + id; c.setAttribute("aria-label", "Ver la serie " + sr.titulo); play.setAttribute("aria-hidden", "true");
+      c.append(play, el("small", null, "Serie"), el("b", null, sr.titulo));
+      var w = el("a", "watch", "Ver la serie \u2192"); w.href = "serie.html#" + id;
+      li.append(c, w); ul.append(li);
+    });
+  }).catch(function () {});
 })();
 </script>
 </body>

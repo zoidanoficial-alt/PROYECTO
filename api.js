@@ -83,5 +83,40 @@
     });
   });
 
-  window.TDG = { api: api, get: get, submit: submit, resultado: resultado };
+  // ---- Utilidades compartidas por las páginas de detalle ----
+  var DIAS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+  var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+  // Primero el panel (Google Sheets); si no está o falla, el archivo .json del sitio
+  function data(tipo, archivo) {
+    return get(tipo).catch(function () {
+      return fetch(archivo, { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
+    });
+  }
+  function slug(s) {
+    return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+  function hashId() { try { return decodeURIComponent(location.hash.slice(1)); } catch (e) { return location.hash.slice(1); } }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function fecha(f) {
+    var p = String(f).split("-").map(Number), d = new Date(Date.UTC(p[0], p[1] - 1, p[2]));
+    return { dia: DIAS[d.getUTCDay()], num: p[2], mes: MESES[p[1] - 1], anio: p[0] };
+  }
+  function hoyMX() {
+    var p = {};
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Mexico_City", year: "numeric", month: "2-digit", day: "2-digit" })
+      .formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+    return p.year + "-" + p.month + "-" + p.day;
+  }
+  // La vista previa de claude.ai no permite videos incrustados; el sitio publicado sí
+  var embeddable = /^https?:$/.test(location.protocol) && !/claude/.test(location.hostname);
+
+  window.TDG = { api: api, get: get, submit: submit, resultado: resultado, config: config,
+    data: data, slug: slug, hashId: hashId, el: el, fecha: fecha, hoyMX: hoyMX, embeddable: embeddable };
 })();
