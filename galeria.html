@@ -195,6 +195,13 @@ dialog.lb::backdrop { background: rgba(5,7,18,0.82); }
   var IG = "https://www.instagram.com/tiempodegraciamexico/";
   var grid = document.getElementById("grid"), note = document.getElementById("note"), el = TDG.el, fotos = [], actual = 0;
   var LOCALES = [
+    { img: "img/eventos/transforma-2026-11/t01.jpg", full: "img/eventos/transforma-2026-11/01.jpg", caption: "Salida de Transforma · Jóvenes de Transforma caminando por el bosque", link: "evento.html#salida-transforma-nov-2026" },
+    { img: "img/eventos/transforma-2026-11/t02.jpg", full: "img/eventos/transforma-2026-11/02.jpg", caption: "Salida de Transforma · Jóvenes de Transforma en un mirador de madera entre los pinos", link: "evento.html#salida-transforma-nov-2026" },
+    { img: "img/eventos/transforma-2026-11/t03.jpg", full: "img/eventos/transforma-2026-11/03.jpg", caption: "Salida de Transforma · Foto grupal de Transforma junto al lago", link: "evento.html#salida-transforma-nov-2026" },
+    { img: "img/eventos/transforma-2026-11/t04.jpg", full: "img/eventos/transforma-2026-11/04.jpg", caption: "Salida de Transforma · Foto grupal de Transforma saludando junto al lago", link: "evento.html#salida-transforma-nov-2026" },
+    { img: "img/eventos/transforma-2026-11/t05.jpg", full: "img/eventos/transforma-2026-11/05.jpg", caption: "Salida de Transforma · Dos jóvenes de Transforma frente al lago", link: "evento.html#salida-transforma-nov-2026" },
+    { img: "img/eventos/transforma-2026-11/t06.jpg", full: "img/eventos/transforma-2026-11/06.jpg", caption: "Salida de Transforma · Joven de Transforma junto al lago", link: "evento.html#salida-transforma-nov-2026" },
+    { img: "img/eventos/transforma-2026-11/t07.jpg", full: "img/eventos/transforma-2026-11/07.jpg", caption: "Salida de Transforma · Joven de Transforma en el bosque", link: "evento.html#salida-transforma-nov-2026" },
     { img: "img/alabanza.jpg", full: "img/alabanza.jpg", caption: "Alabanza", link: IG },
     { img: "img/comunidad.jpg", full: "img/comunidad.jpg", caption: "Comunidad", link: IG },
     { img: "img/pastores.jpg", full: "img/pastores.jpg", caption: "Nuestros pastores", link: IG }
@@ -237,7 +244,10 @@ dialog.lb::backdrop { background: rgba(5,7,18,0.82); }
     document.getElementById("lb-img").src = f.full || f.img;
     document.getElementById("lb-img").alt = f.caption ? f.caption.slice(0, 120) : "Foto de Tiempo de Gracia";
     document.getElementById("lb-cap").textContent = f.caption || "";
-    document.getElementById("lb-ig").href = f.link || IG;
+    var ig = document.getElementById("lb-ig"), externo = /^https?:/.test(f.link || IG);
+    ig.href = f.link || IG;
+    ig.firstChild.nodeValue = /instagram\.com/.test(f.link || IG) ? "Ver en Instagram " : "Ver el evento ";
+    if (externo) { ig.target = "_blank"; ig.rel = "noopener"; } else { ig.removeAttribute("target"); }
     document.querySelector(".lb-nav").hidden = fotos.length < 2;
     if (!lb.open) { if (lb.showModal) lb.showModal(); else window.open(f.link || IG, "_blank"); }
   }
@@ -257,7 +267,7 @@ dialog.lb::backdrop { background: rgba(5,7,18,0.82); }
   grid.append(el("li", "state", "Cargando fotos…"));
   TDG.config().then(function (c) {
     var feed = c && c.instagram_feed;
-    if (!feed) return locales("Pronto verás aquí las fotos más recientes de nuestro Instagram.");
+    if (!feed) return locales("Pronto verás aquí también las fotos más recientes de nuestro Instagram.");
     return fetch(feed).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
       var lista = normalizar(j);
       if (!lista.length) throw new Error("vacío");

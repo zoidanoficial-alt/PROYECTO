@@ -106,6 +106,21 @@ header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 
 .ev-body { min-width: 0; display: grid; gap: 20px; align-content: start; }
 .ev-body h1 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; letter-spacing: -0.025em; text-wrap: balance; }
 .ev-body .desc { color: var(--muted); font-size: 20px; max-width: 40em; }
+.album { display: grid; gap: 16px; margin-top: 8px; }
+.album h2 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: -0.01em; }
+.fotos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(180px, 42vw), 1fr)); gap: 8px; }
+.foto { display: block; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 12px; overflow: hidden; background: var(--screen); cursor: zoom-in; }
+.foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@media (prefers-reduced-motion: no-preference) { .foto img { transition: transform .3s; } .foto:hover img { transform: scale(1.04); } }
+.album-more { margin: 0; }
+dialog.lb { width: min(1000px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 0; border-radius: 18px; background: var(--surface); color: var(--fg); overflow: auto; }
+dialog.lb::backdrop { background: rgba(5,7,18,0.85); }
+.lb-img { display: block; width: 100%; max-height: 78vh; object-fit: contain; background: #000; }
+.lb-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; padding: 12px 16px; }
+.lb-cap { color: var(--muted); font-variant-numeric: tabular-nums; }
+.lb-nav { display: flex; gap: 8px; }
+.lb-nav button { font: 600 15px var(--font-body); border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+.lb-close { position: absolute; top: 10px; right: 10px; z-index: 1; width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(0,0,0,0.6); color: #fff; font-size: 24px; line-height: 1; cursor: pointer; }
 .past-note { display: inline-block; padding: 6px 12px; border-radius: 999px; background: color-mix(in srgb, var(--fg) 8%, var(--bg)); color: var(--muted); font-size: 14px; width: fit-content; }
 @media (max-width: 760px) { .ev { grid-template-columns: 1fr; gap: 12px; } .date b { font-size: 88px; } }
 /* Video: portada tipográfica que se cambia por el reproductor al pasar el mouse */
@@ -162,6 +177,15 @@ header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 
       <ul class="chips" id="otros-lista"></ul>
     </section>
   </main>
+
+  <dialog class="lb" id="lb" aria-label="Foto ampliada">
+    <button class="lb-close" id="lb-close" type="button" aria-label="Cerrar">&times;</button>
+    <img class="lb-img" id="lb-img" alt="">
+    <div class="lb-row">
+      <span class="lb-cap" id="lb-cap"></span>
+      <span class="lb-nav"><button type="button" id="lb-prev">&larr; Anterior</button><button type="button" id="lb-next">Siguiente &rarr;</button></span>
+    </div>
+  </dialog>
 
 
   <footer class="foot">
@@ -291,6 +315,8 @@ header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 
     acts.append(boton("Cómo llegar", "index.html#ubicacion", true));
     body.append(acts);
     if (ev.video) body.append(videoBox(ev));
+    if (ev.fotos && ev.fotos.length) body.append(album(ev));
+    else if (ev.album) acts.append(boton("Ver fotos y videos", ev.album, true));
     wrap.append(date, body);
     box.textContent = ""; box.append(wrap);
     var otros = todos.filter(function (e) { return e.id !== ev.id && e.fecha >= TDG.hoyMX(); });
@@ -300,6 +326,43 @@ header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 
       document.getElementById("otros").hidden = false;
     }
   }
+  // Álbum: fotos del evento (de eventos.json o del panel) con visor para ampliarlas
+  var lb = document.getElementById("lb"), lbFotos = [], lbI = 0;
+  function verFoto(i) {
+    lbI = (i + lbFotos.length) % lbFotos.length;
+    var f = lbFotos[lbI], img = document.getElementById("lb-img");
+    img.src = f.src; img.alt = f.alt || "";
+    document.getElementById("lb-cap").textContent = (lbI + 1) + " de " + lbFotos.length;
+    if (!lb.open && lb.showModal) lb.showModal();
+  }
+  function album(ev) {
+    var sec = el("section", "album"), h = el("h2", null, "Fotos del evento"), ul = el("ul", "fotos");
+    lbFotos = ev.fotos.map(function (f) { return typeof f === "string" ? { src: f, mini: f, alt: "Foto de " + ev.titulo } : f; });
+    lbFotos.forEach(function (f, i) {
+      var li = el("li"), b = el("button", "foto"), img = el("img");
+      b.type = "button"; b.setAttribute("aria-label", "Ampliar foto " + (i + 1) + (f.alt ? ": " + f.alt : ""));
+      img.src = f.mini || f.src; img.alt = f.alt || ""; img.loading = "lazy";
+      b.append(img); b.addEventListener("click", function () { verFoto(i); });
+      li.append(b); ul.append(li);
+    });
+    sec.append(h, ul);
+    if (ev.album) {
+      var a = el("a", "btn ghost", "Ver todas las fotos y videos "); a.href = ev.album; a.target = "_blank"; a.rel = "noopener";
+      var ar = el("span", null, "\u2197"); ar.setAttribute("aria-hidden", "true"); a.append(ar);
+      var p = el("p", "album-more"); p.append(a); sec.append(p);
+    }
+    return sec;
+  }
+  document.getElementById("lb-close").addEventListener("click", function () { lb.close(); });
+  document.getElementById("lb-prev").addEventListener("click", function () { verFoto(lbI - 1); });
+  document.getElementById("lb-next").addEventListener("click", function () { verFoto(lbI + 1); });
+  lb.addEventListener("click", function (e) { if (e.target === lb) lb.close(); });
+  document.addEventListener("keydown", function (e) {
+    if (!lb.open) return;
+    if (e.key === "ArrowLeft") verFoto(lbI - 1);
+    if (e.key === "ArrowRight") verFoto(lbI + 1);
+  });
+
   function cargar() {
     var id = TDG.hashId();
     TDG.data("eventos", "eventos.json").then(function (d) {

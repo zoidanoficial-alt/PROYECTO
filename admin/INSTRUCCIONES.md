@@ -58,6 +58,8 @@ Instalarlo toma unos 10 minutos y se hace **una sola vez**.
 - **¿Publicado?** = Sí. El **ID se llena solo** al escribir el título.
 - Para ocultar un evento sin borrarlo: **¿Publicado?** = No.
 - El sitio se actualiza en un minuto; la app avisa del evento nuevo en las siguientes horas.
+- **Fotos** opcional: enlaces de las fotos separados por coma; aparecen como álbum en la página del evento.
+- **Álbum completo** opcional: enlace a la carpeta de Google Drive con todas las fotos y videos (compártela como "Cualquier persona con el enlace").
 
 **Ministerios:** cada fila es un ministerio y tiene su propia página (ministerio.html#nombre).
 Llena **Cuándo se reúne**, **Líder**, **Foto** (enlace a una imagen) y **Texto largo** para que su página se vea completa.

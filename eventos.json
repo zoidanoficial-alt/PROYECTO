@@ -1,5 +1,5 @@
 {
-  "_instrucciones": "Para agregar un evento copia uno de la lista, cambia sus datos y ponle un id nuevo (sin espacios ni acentos). fecha: AAAA-MM-DD. hora: HH:MM en formato de 24 horas o vacío. video: el código de YouTube (lo que va después de v=) o vacío. La app avisa a todos cuando aparece un id nuevo con fecha de hoy en adelante.",
+  "_instrucciones": "Para agregar un evento copia uno de la lista, cambia sus datos y ponle un id nuevo (sin espacios ni acentos). fecha: AAAA-MM-DD. hora: HH:MM en formato de 24 horas o vacío. video: el código de YouTube (lo que va después de v=) o vacío. La app avisa a todos cuando aparece un id nuevo con fecha de hoy en adelante. fotos: lista de fotos del evento (opcional). album: enlace a la carpeta con todas las fotos y videos (opcional).",
   "eventos": [
     {
       "id": "the-chosen-t6",
@@ -12,6 +12,56 @@
       "video": "u433XFiq3mE",
       "video_titulo": "The Chosen",
       "video_subtitulo": "Temporada 6 · Capítulo 1"
+    },
+    {
+      "id": "salida-transforma-nov-2026",
+      "fecha": "2026-11-07",
+      "hora": "",
+      "etiqueta": "Transforma · Jóvenes",
+      "titulo": "Salida de Transforma al bosque",
+      "descripcion": "Un día al aire libre con los jóvenes de Transforma: caminata entre los pinos, convivencia junto al lago y muchos recuerdos juntos.",
+      "lugar": "",
+      "video": "",
+      "video_titulo": "",
+      "video_subtitulo": "",
+      "fotos": [
+        {
+          "src": "img/eventos/transforma-2026-11/01.jpg",
+          "mini": "img/eventos/transforma-2026-11/t01.jpg",
+          "alt": "Jóvenes de Transforma caminando por el bosque"
+        },
+        {
+          "src": "img/eventos/transforma-2026-11/02.jpg",
+          "mini": "img/eventos/transforma-2026-11/t02.jpg",
+          "alt": "Jóvenes de Transforma en un mirador de madera entre los pinos"
+        },
+        {
+          "src": "img/eventos/transforma-2026-11/03.jpg",
+          "mini": "img/eventos/transforma-2026-11/t03.jpg",
+          "alt": "Foto grupal de Transforma junto al lago"
+        },
+        {
+          "src": "img/eventos/transforma-2026-11/04.jpg",
+          "mini": "img/eventos/transforma-2026-11/t04.jpg",
+          "alt": "Foto grupal de Transforma saludando junto al lago"
+        },
+        {
+          "src": "img/eventos/transforma-2026-11/05.jpg",
+          "mini": "img/eventos/transforma-2026-11/t05.jpg",
+          "alt": "Dos jóvenes de Transforma frente al lago"
+        },
+        {
+          "src": "img/eventos/transforma-2026-11/06.jpg",
+          "mini": "img/eventos/transforma-2026-11/t06.jpg",
+          "alt": "Joven de Transforma junto al lago"
+        },
+        {
+          "src": "img/eventos/transforma-2026-11/07.jpg",
+          "mini": "img/eventos/transforma-2026-11/t07.jpg",
+          "alt": "Joven de Transforma en el bosque"
+        }
+      ],
+      "album": "https://drive.google.com/drive/folders/1cP_Qo_KlOqbzA8zwrO0vnU3dTBlofaie"
     }
   ]
 }

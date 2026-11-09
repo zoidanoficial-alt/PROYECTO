@@ -17,7 +17,8 @@ var HOJAS = {
     ["id", "ID (se llena solo)"], ["fecha", "Fecha"], ["hora", "Hora (opcional)"], ["etiqueta", "Etiqueta"],
     ["titulo", "Título"], ["descripcion", "Descripción"], ["lugar", "Lugar"],
     ["video", "Video de YouTube (enlace, opcional)"], ["video_titulo", "Título del video"],
-    ["video_subtitulo", "Subtítulo del video"], ["publicado", "¿Publicado?"]] },
+    ["video_subtitulo", "Subtítulo del video"], ["publicado", "¿Publicado?"],
+    ["fotos", "Fotos (enlaces separados por coma, opcional)"], ["album", "Álbum completo (enlace, opcional)"]] },
   capsulas: { nombre: "Cápsulas", publica: true, columnas: [
     ["seccion", "Sección (TG o Transforma)"], ["url", "Enlace del Short o Reel"], ["titulo", "Título"], ["publicado", "¿Publicado?"]] },
   ministerios: { nombre: "Ministerios", publica: true, columnas: [
@@ -89,7 +90,12 @@ function sembrar(ss) {
       "Comparte con nosotros el primer capítulo de la sexta temporada de The Chosen",
       "Ven a ver con nosotros el estreno de The Chosen, la serie sobre la vida de Jesús y sus discípulos. Una tarde para disfrutar en comunidad. ¡Invita a quien quieras!",
       "Priv. de los Cipreses 2, 1.º piso, Jardines de San Mateo", "https://www.youtube.com/watch?v=u433XFiq3mE",
-      "The Chosen", "Temporada 6 · Capítulo 1", "Sí"]);
+      "The Chosen", "Temporada 6 · Capítulo 1", "Sí", "", ""]);
+    var base = "img/eventos/transforma-2026-11/";
+    ev.appendRow(["salida-transforma-nov-2026", "2026-11-07", "", "Transforma · Jóvenes", "Salida de Transforma al bosque",
+      "Un día al aire libre con los jóvenes de Transforma: caminata entre los pinos, convivencia junto al lago y muchos recuerdos juntos.",
+      "", "", "", "", "Sí", [1, 2, 3, 4, 5, 6, 7].map(function (i) { return base + (i < 10 ? "0" : "") + i + ".jpg"; }).join(", "),
+      "https://drive.google.com/drive/folders/1cP_Qo_KlOqbzA8zwrO0vnU3dTBlofaie"]);
   }
   var mi = ss.getSheetByName(HOJAS.ministerios.nombre);
   if (mi.getLastRow() < 2) {
@@ -192,7 +198,9 @@ function limpiarEvento(r) {
     id: String(r.id).trim(), fecha: fecha, hora: hora,
     etiqueta: String(r.etiqueta || ""), titulo: String(r.titulo), descripcion: String(r.descripcion || ""),
     lugar: String(r.lugar || ""), video: codigoYoutube(r.video),
-    video_titulo: String(r.video_titulo || ""), video_subtitulo: String(r.video_subtitulo || "")
+    video_titulo: String(r.video_titulo || ""), video_subtitulo: String(r.video_subtitulo || ""),
+    fotos: String(r.fotos || "").split(/[\s,]+/).filter(function (u) { return /^https?:|^img\//.test(u); }),
+    album: String(r.album || "").trim()
   };
 }
 
