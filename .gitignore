@@ -18,3 +18,7 @@ run_cassandra*.sh
 *.local.ps1
 *.local.sh
 .env
+
+# Realce IA: modelos descargados
+realce/com.realce.panel/engine/models/*.pb
+realce/com.realce.panel/engine/models/*.part
