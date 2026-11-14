@@ -7,6 +7,11 @@
    "desc": "Color cinematográfico, contraste, luz y atmósferas"
   },
   {
+   "id": "cine",
+   "name": "Cine",
+   "desc": "Looks inspirados en grandes directores de fotografía"
+  },
+  {
    "id": "plata",
    "name": "Plata",
    "desc": "Blanco y negro de estética química tradicional"
@@ -109,7 +114,8 @@
    "name": "Contraste tonal",
    "modules": [
     "chroma",
-    "plata"
+    "plata",
+    "cine"
    ],
    "desc": "Contraste local en medios tonos: da volumen sin quemar luces ni sombras.",
    "resizes": false,
@@ -161,7 +167,8 @@
    "name": "Brillo / Calidez",
    "modules": [
     "chroma",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Ajustes básicos de luz y color, con intensidad que protege los tonos ya saturados.",
    "resizes": false,
@@ -264,7 +271,8 @@
    "name": "Sombras / Luces",
    "modules": [
     "chroma",
-    "plata"
+    "plata",
+    "cine"
    ],
    "desc": "Aclara sombras y recupera luces usando el entorno de cada píxel (sin halos duros).",
    "resizes": false,
@@ -318,7 +326,8 @@
     "chroma",
     "plata",
     "analog",
-    "clean"
+    "clean",
+    "cine"
    ],
    "desc": "Niveles clásicos: puntos negro/blanco, gamma, curva en S y negros mate.",
    "resizes": false,
@@ -465,7 +474,8 @@
    "name": "Resplandor",
    "modules": [
     "chroma",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Brillo difuso alrededor de las luces: sueño, bloom de cine o halación roja de película.",
    "resizes": false,
@@ -537,7 +547,8 @@
    "name": "Haz de luz",
    "modules": [
     "chroma",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Añade una fuente de luz: sol cálido, foco de estudio o rayos que atraviesan la escena.",
    "resizes": false,
@@ -618,7 +629,8 @@
    "id": "sunlight",
    "name": "Luz cálida dorada",
    "modules": [
-    "chroma"
+    "chroma",
+    "cine"
    ],
    "desc": "Simula la luz de la hora dorada: luces cálidas, sombras ligeramente frías.",
    "resizes": false,
@@ -660,7 +672,8 @@
    "name": "Filtro fotográfico",
    "modules": [
     "chroma",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Filtros de color de objetivo: cálidos, fríos y de efecto.",
    "resizes": false,
@@ -867,7 +880,8 @@
    "id": "cinematic",
    "name": "Cine (sombras / luces)",
    "modules": [
-    "chroma"
+    "chroma",
+    "cine"
    ],
    "desc": "Gradación de color de película: el clásico verde azulado y naranja o cualquier pareja de tonos.",
    "resizes": false,
@@ -934,7 +948,8 @@
    "modules": [
     "chroma",
     "plata",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Tiñe sombras y luces con colores distintos conservando la luminosidad.",
    "resizes": false,
@@ -994,7 +1009,8 @@
    "name": "Blanqueo parcial (bleach bypass)",
    "modules": [
     "chroma",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Plata retenida en el revelado: alto contraste, colores apagados y aspecto metálico.",
    "resizes": false,
@@ -1078,7 +1094,8 @@
    "name": "Tonos específicos (HSL)",
    "modules": [
     "chroma",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Modifica un solo color: cielos más azules, verdes más naturales, piel más uniforme...",
    "resizes": false,
@@ -1140,7 +1157,8 @@
    "modules": [
     "chroma",
     "analog",
-    "clean"
+    "clean",
+    "cine"
    ],
    "desc": "Corrige o exagera la temperatura de color.",
    "resizes": false,
@@ -1213,7 +1231,8 @@
    "name": "Atmósfera / niebla",
    "modules": [
     "chroma",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Bruma, niebla o aire denso que crea profundidad y ambientes cálidos, fríos o dramáticos.",
    "resizes": false,
@@ -1339,7 +1358,8 @@
    "modules": [
     "chroma",
     "plata",
-    "analog"
+    "analog",
+    "cine"
    ],
    "desc": "Oscurece (o aclara) los bordes para llevar la mirada al centro.",
    "resizes": false,
@@ -1442,7 +1462,8 @@
    "id": "bw_convert",
    "name": "Conversión a blanco y negro",
    "modules": [
-    "plata"
+    "plata",
+    "cine"
    ],
    "desc": "Convierte con la respuesta espectral de una película y un filtro de color delante del objetivo.",
    "resizes": false,
@@ -1638,7 +1659,8 @@
    "modules": [
     "plata",
     "analog",
-    "chroma"
+    "chroma",
+    "cine"
    ],
    "desc": "Grano fotográfico orgánico que depende de la luminosidad, no ruido digital uniforme.",
    "resizes": false,
@@ -1802,7 +1824,8 @@
    "modules": [
     "plata",
     "analog",
-    "chroma"
+    "chroma",
+    "cine"
    ],
    "desc": "Da más exposición a los bordes de la copia, como hace un positivador en la ampliadora.",
    "resizes": false,
@@ -1874,7 +1897,8 @@
    "name": "Aclarar centro (tapado)",
    "modules": [
     "plata",
-    "chroma"
+    "chroma",
+    "cine"
    ],
    "desc": "Retiene luz sobre el motivo principal para aclararlo sutilmente.",
    "resizes": false,
@@ -2256,7 +2280,8 @@
    "name": "Desenfoque óptico",
    "modules": [
     "analog",
-    "chroma"
+    "chroma",
+    "cine"
    ],
    "desc": "Desenfoques de lentes antiguas, efecto miniatura, zoom o movimiento.",
    "resizes": false,
@@ -2824,6 +2849,267 @@
      "unit": ""
     }
    ]
+  },
+  {
+   "id": "print_film",
+   "name": "Copia de cine (film-out)",
+   "modules": [
+    "cine",
+    "chroma"
+   ],
+   "desc": "Pasa la imagen por un negativo y una copia de proyección: luces que ruedan suave, negros densos y colores con cuerpo.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 80,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "contrast",
+     "label": "Contraste de copia",
+     "type": "range",
+     "min": -50,
+     "max": 100,
+     "default": 35,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "toe",
+     "label": "Densidad de negros (pie)",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "shoulder",
+     "label": "Suavidad de luces (hombro)",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "density",
+     "label": "Densidad de color",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "tint",
+     "label": "Laboratorio",
+     "type": "select",
+     "options": [
+      [
+       "neutral",
+       "Neutra"
+      ],
+      [
+       "warm",
+       "Copia cálida"
+      ],
+      [
+       "teal",
+       "Sombras verde azulado"
+      ],
+      [
+       "cold",
+       "Copia fría"
+      ],
+      [
+       "filmout",
+       "Ida y vuelta a película (film-out)"
+      ]
+     ],
+     "default": "neutral"
+    }
+   ]
+  },
+  {
+   "id": "limited_palette",
+   "name": "Paleta limitada",
+   "modules": [
+    "cine",
+    "chroma"
+   ],
+   "desc": "Lleva todos los colores hacia un tono dominante: desiertos, ciudades de noche, mundos de un solo color.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "target",
+     "label": "Tono dominante",
+     "type": "hue",
+     "min": 0,
+     "max": 360,
+     "default": 35,
+     "step": 1
+    },
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "desaturate",
+     "label": "Apagar otros colores",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "skin",
+     "label": "Proteger piel",
+     "type": "check",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "anamorphic_flare",
+   "name": "Destello anamórfico",
+   "modules": [
+    "cine",
+    "chroma",
+    "analog"
+   ],
+   "desc": "Rayas horizontales que salen de las luces intensas, como con objetivos anamórficos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "threshold",
+     "label": "Umbral de luces",
+     "type": "range",
+     "min": 40,
+     "max": 98,
+     "default": 80,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "length",
+     "label": "Longitud",
+     "type": "range",
+     "min": 5,
+     "max": 100,
+     "default": 35,
+     "step": 1,
+     "unit": "%"
+    },
+    {
+     "id": "color",
+     "label": "Color",
+     "type": "select",
+     "options": [
+      [
+       "blue",
+       "Azul"
+      ],
+      [
+       "amber",
+       "Ámbar"
+      ],
+      [
+       "neutral",
+       "Neutro"
+      ],
+      [
+       "red",
+       "Rojo"
+      ]
+     ],
+     "default": "blue"
+    }
+   ]
+  },
+  {
+   "id": "letterbox",
+   "name": "Formato de pantalla",
+   "modules": [
+    "cine"
+   ],
+   "desc": "Añade bandas negras para ver la foto en una proporción de cine (no cambia el tamaño del documento).",
+   "resizes": false,
+   "params": [
+    {
+     "id": "ratio",
+     "label": "Proporción",
+     "type": "select",
+     "options": [
+      [
+       "2.76",
+       "2.76:1 (Ultra Panavision 70)"
+      ],
+      [
+       "2.39",
+       "2.39:1 (anamórfico)"
+      ],
+      [
+       "2.00",
+       "2.00:1"
+      ],
+      [
+       "1.90",
+       "1.90:1 (IMAX digital)"
+      ],
+      [
+       "1.85",
+       "1.85:1"
+      ],
+      [
+       "1.66",
+       "1.66:1 (VistaVision europeo)"
+      ],
+      [
+       "1.43",
+       "1.43:1 (IMAX 70 mm)"
+      ]
+     ],
+     "default": "2.39"
+    },
+    {
+     "id": "opacity",
+     "label": "Opacidad de las bandas",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 100,
+     "step": 1,
+     "unit": ""
+    }
+   ]
   }
  ],
  "presets": [
@@ -3325,6 +3611,1281 @@
      }
     }
    ]
+  },
+  {
+   "module": "cine",
+   "name": "Arkapaw · Juke joint (luz práctica cálida)",
+   "stack": [
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": 22,
+      "tint": 4
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 85,
+      "contrast": 40,
+      "toe": 65,
+      "shoulder": 65,
+      "density": 45,
+      "tint": "warm"
+     }
+    },
+    {
+     "id": "selective_hsl",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 25,
+      "range": 35,
+      "hue_shift": 0,
+      "saturation": 12,
+      "lightness": 6
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "radius": 14,
+      "threshold": 72,
+      "warmth": 0,
+      "style": "halation"
+     }
+    },
+    {
+     "id": "vignette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": -30,
+      "size": 50,
+      "roundness": 60,
+      "softness": 70,
+      "x": 50,
+      "y": 50
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 14,
+      "size": 1.0,
+      "roughness": 30,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "2.76"
+     }
+    }
+   ],
+   "desc": "Inspirada en Autumn Durald Arkapaw («Sinners», 2025): negativo de 65 mm de alta sensibilidad, luz práctica cálida de tungsteno, pieles ricas y luminosas, negros profundos y halación suave. Formato de referencia 2.76:1 / 1.43:1."
+  },
+  {
+   "module": "cine",
+   "name": "Arkapaw · Ámbar retrofuturista",
+   "stack": [
+    {
+     "id": "limited_palette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 32,
+      "strength": 45,
+      "desaturate": 30,
+      "skin": true
+     }
+    },
+    {
+     "id": "cinematic",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadow_hue": 185,
+      "highlight_hue": 35,
+      "strength": 45,
+      "balance": 0,
+      "skin": true,
+      "contrast": 25
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 75,
+      "contrast": 30,
+      "toe": 45,
+      "shoulder": 60,
+      "density": 35,
+      "tint": "warm"
+     }
+    },
+    {
+     "id": "anamorphic_flare",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "intensity": 40,
+      "threshold": 78,
+      "length": 35,
+      "color": "amber"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 18,
+      "size": 1.2,
+      "roughness": 40,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "2.39"
+     }
+    }
+   ],
+   "desc": "Inspirada en el trabajo de Arkapaw en «Loki» (temporada 1): interiores ámbar y anaranjados de aire retro, acentos verde azulado en sombras, destellos anamórficos."
+  },
+  {
+   "module": "cine",
+   "name": "Arkapaw · Azul abisal",
+   "stack": [
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": -45,
+      "tint": -8
+     }
+    },
+    {
+     "id": "selective_hsl",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 200,
+      "range": 60,
+      "hue_shift": 0,
+      "saturation": 40,
+      "lightness": -10
+     }
+    },
+    {
+     "id": "atmosphere",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "mood": "cold",
+      "direction": "depth"
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "radius": 30,
+      "threshold": 55,
+      "warmth": -30,
+      "style": "soft"
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 70,
+      "contrast": 30,
+      "toe": 55,
+      "shoulder": 60,
+      "density": 35,
+      "tint": "teal"
+     }
+    }
+   ],
+   "desc": "Inspirada en las secuencias submarinas de «Black Panther: Wakanda Forever» (Arkapaw): azules y cianes profundos y saturados, luz difusa que se pierde en la distancia."
+  },
+  {
+   "module": "cine",
+   "name": "Crawley · Hormigón monumental",
+   "stack": [
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 20,
+      "saturation": -35,
+      "vibrance": 0,
+      "warmth": 0
+     }
+    },
+    {
+     "id": "split_tone",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadow_hue": 210,
+      "shadow_sat": 20,
+      "highlight_hue": 40,
+      "highlight_sat": 15,
+      "balance": 0
+     }
+    },
+    {
+     "id": "tonal_contrast",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 45,
+      "radius": 60,
+      "fine": 25,
+      "saturation": 0
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 85,
+      "contrast": 45,
+      "toe": 55,
+      "shoulder": 50,
+      "density": 30,
+      "tint": "neutral"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 28,
+      "size": 1.3,
+      "roughness": 55,
+      "response": "film",
+      "color": false
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "1.66"
+     }
+    }
+   ],
+   "desc": "Inspirada en Lol Crawley («The Brutalist», 2024, rodada principalmente en VistaVision): tonos apagados, contraste marcado, piedra y hormigón fríos, bolsas de luz cálida y textura de película forzada en revelado."
+  },
+  {
+   "module": "cine",
+   "name": "Crawley · Delta naturalista",
+   "stack": [
+    {
+     "id": "curves",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "black": 0,
+      "white": 100,
+      "gamma": 5,
+      "contrast": -10,
+      "fade": 20
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": -25,
+      "vibrance": 0,
+      "warmth": 6
+     }
+    },
+    {
+     "id": "selective_hsl",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 100,
+      "range": 50,
+      "hue_shift": -10,
+      "saturation": -30,
+      "lightness": 0
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "size": 1.5,
+      "roughness": 55,
+      "response": "film",
+      "color": true
+     }
+    }
+   ],
+   "desc": "Inspirada en «Ballast» (Crawley, 2008): luz natural de cielo cubierto, verdes y marrones apagados, contraste suave y grano de 35 mm."
+  },
+  {
+   "module": "cine",
+   "name": "Hoytema · Gran formato cálido",
+   "stack": [
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": 15,
+      "tint": 0
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 90,
+      "contrast": 50,
+      "toe": 55,
+      "shoulder": 70,
+      "density": 45,
+      "tint": "warm"
+     }
+    },
+    {
+     "id": "tonal_contrast",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 25,
+      "radius": 50,
+      "fine": 15,
+      "saturation": 0
+     }
+    },
+    {
+     "id": "vignette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": -25,
+      "size": 55,
+      "roundness": 60,
+      "softness": 75,
+      "x": 50,
+      "y": 50
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 12,
+      "size": 0.9,
+      "roughness": 25,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "1.43"
+     }
+    }
+   ],
+   "desc": "Inspirada en Hoyte van Hoytema («Oppenheimer», partes en color, IMAX 65 mm): color cálido y denso, pieles saturadas, luces que ruedan suavemente y grano muy fino de gran formato."
+  },
+  {
+   "module": "cine",
+   "name": "Hoytema · Plata IMAX",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "document",
+      "filter": "none",
+      "brightness": 0,
+      "contrast": 35,
+      "structure": 25,
+      "whites": 20,
+      "blacks": 45
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 60,
+      "contrast": 20,
+      "toe": 60,
+      "shoulder": 70,
+      "density": 0,
+      "tint": "neutral"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "size": 1.1,
+      "roughness": 35,
+      "response": "film",
+      "color": false
+     }
+    },
+    {
+     "id": "burn_edges",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "size": 22,
+      "top": 100,
+      "bottom": 100,
+      "left": 100,
+      "right": 100
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "1.43"
+     }
+    }
+   ],
+   "desc": "Inspirada en las secuencias en blanco y negro de «Oppenheimer», rodadas en una película B/N de 65 mm fabricada para IMAX: alto contraste, negros profundos y una gama de grises amplia."
+  },
+  {
+   "module": "cine",
+   "name": "Hoytema · Mar del Norte",
+   "stack": [
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": -20,
+      "tint": -10
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 10,
+      "saturation": -30,
+      "vibrance": 0,
+      "warmth": 0
+     }
+    },
+    {
+     "id": "split_tone",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadow_hue": 190,
+      "shadow_sat": 25,
+      "highlight_hue": 200,
+      "highlight_sat": 10,
+      "balance": 0
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 75,
+      "contrast": 35,
+      "toe": 50,
+      "shoulder": 65,
+      "density": 30,
+      "tint": "teal"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 15,
+      "size": 1.0,
+      "roughness": 30,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "1.43"
+     }
+    }
+   ],
+   "desc": "Inspirada en «Dunkirk» (van Hoytema): realismo frío, cielos grises, mar verde azulado y colores contenidos, sin aplastar las sombras."
+  },
+  {
+   "module": "cine",
+   "name": "Hoytema · Pastel cálido",
+   "stack": [
+    {
+     "id": "selective_hsl",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 215,
+      "range": 60,
+      "hue_shift": 0,
+      "saturation": -70,
+      "lightness": 12
+     }
+    },
+    {
+     "id": "selective_hsl",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 5,
+      "range": 40,
+      "hue_shift": 0,
+      "saturation": 25,
+      "lightness": 5
+     }
+    },
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": 20,
+      "tint": 10
+     }
+    },
+    {
+     "id": "curves",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "black": 0,
+      "white": 100,
+      "gamma": 8,
+      "contrast": -15,
+      "fade": 15
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "radius": 30,
+      "threshold": 50,
+      "warmth": 20,
+      "style": "soft"
+     }
+    }
+   ],
+   "desc": "Interpretación del color de «Her» (van Hoytema, 2013): rojos, corales y melocotones suaves, azules atenuados, contraste bajo y luz difusa."
+  },
+  {
+   "module": "cine",
+   "name": "Hoytema · Polvo ámbar",
+   "stack": [
+    {
+     "id": "atmosphere",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 40,
+      "mood": "warm",
+      "direction": "uniform"
+     }
+    },
+    {
+     "id": "limited_palette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 38,
+      "strength": 35,
+      "desaturate": 25,
+      "skin": true
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 80,
+      "contrast": 30,
+      "toe": 45,
+      "shoulder": 60,
+      "density": 30,
+      "tint": "warm"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 20,
+      "size": 1.2,
+      "roughness": 40,
+      "response": "film",
+      "color": true
+     }
+    }
+   ],
+   "desc": "Inspirada en las escenas de la Tierra de «Interstellar»: aire cargado de polvo, luz ámbar y contraste bajo."
+  },
+  {
+   "module": "cine",
+   "name": "Fraser · Arena monocroma",
+   "stack": [
+    {
+     "id": "limited_palette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 35,
+      "strength": 65,
+      "desaturate": 45,
+      "skin": false
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 10,
+      "saturation": -20,
+      "vibrance": 0,
+      "warmth": 0
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 90,
+      "contrast": 40,
+      "toe": 60,
+      "shoulder": 60,
+      "density": 35,
+      "tint": "filmout"
+     }
+    },
+    {
+     "id": "atmosphere",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 20,
+      "mood": "warm",
+      "direction": "depth"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 15,
+      "size": 1.2,
+      "roughness": 35,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "2.39"
+     }
+    }
+   ],
+   "desc": "Inspirada en Greig Fraser («Dune»): paleta casi monocroma de arena, sombras profundas y un acabado «ida y vuelta a película» (film-out) que trata el pie y el hombro de la imagen."
+  },
+  {
+   "module": "cine",
+   "name": "Fraser · Ciudad nocturna",
+   "stack": [
+    {
+     "id": "curves",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "black": 6,
+      "white": 100,
+      "gamma": -5,
+      "contrast": 25,
+      "fade": 0
+     }
+    },
+    {
+     "id": "limited_palette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 22,
+      "strength": 45,
+      "desaturate": 40,
+      "skin": true
+     }
+    },
+    {
+     "id": "split_tone",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadow_hue": 0,
+      "shadow_sat": 12,
+      "highlight_hue": 30,
+      "highlight_sat": 35,
+      "balance": -10
+     }
+    },
+    {
+     "id": "vignette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": -60,
+      "size": 35,
+      "roundness": 60,
+      "softness": 70,
+      "x": 50,
+      "y": 50
+     }
+    },
+    {
+     "id": "lens_blur",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "type": "soft_edges",
+      "amount": 25,
+      "focus_x": 50,
+      "focus_y": 50,
+      "focus_size": 45,
+      "angle": 0
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 20,
+      "radius": 12,
+      "threshold": 75,
+      "warmth": 0,
+      "style": "halation"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "size": 1.3,
+      "roughness": 45,
+      "response": "shadows",
+      "color": true
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "2.39"
+     }
+    }
+   ],
+   "desc": "Inspirada en «The Batman» (Fraser): negros muy densos, luces urbanas anaranjadas y rojizas, bordes que se oscurecen y se desenfocan como con ópticas antiguas, y acabado film-out."
+  },
+  {
+   "module": "cine",
+   "name": "Fraser · Infrarrojo solar",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "infrared",
+      "filter": "red",
+      "brightness": 5,
+      "contrast": 30,
+      "structure": 15,
+      "whites": 30,
+      "blacks": 40
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "radius": 25,
+      "threshold": 60,
+      "warmth": 0,
+      "style": "soft"
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 50,
+      "contrast": 20,
+      "toe": 55,
+      "shoulder": 60,
+      "density": 0,
+      "tint": "neutral"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 10,
+      "size": 1.0,
+      "roughness": 30,
+      "response": "film",
+      "color": false
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "1.43"
+     }
+    }
+   ],
+   "desc": "Inspirada en las escenas de Giedi Prime de «Dune: Parte dos»: blanco y negro infrarrojo con pieles lechosas, cielos negros y luz solar que brilla."
+  },
+  {
+   "module": "cine",
+   "name": "Lubezki · Luz natural fría",
+   "stack": [
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": -30,
+      "tint": -5
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 5,
+      "saturation": -25,
+      "vibrance": 0,
+      "warmth": 0
+     }
+    },
+    {
+     "id": "shadows_highlights",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadows": 30,
+      "highlights": 40,
+      "radius": 30,
+      "color": 0
+     }
+    },
+    {
+     "id": "selective_hsl",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 25,
+      "range": 30,
+      "hue_shift": 0,
+      "saturation": 15,
+      "lightness": 0
+     }
+    },
+    {
+     "id": "print_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 60,
+      "contrast": 25,
+      "toe": 40,
+      "shoulder": 75,
+      "density": 20,
+      "tint": "cold"
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "2.39"
+     }
+    }
+   ],
+   "desc": "Inspirada en Emmanuel Lubezki («The Revenant», rodada sin luz eléctrica): luz de día fría y desaturada, mucho rango dinámico y piel que conserva algo de calidez."
+  },
+  {
+   "module": "cine",
+   "name": "Lubezki · Contraluz dorado",
+   "stack": [
+    {
+     "id": "light_beam",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "x": 80,
+      "y": 15,
+      "size": 70,
+      "intensity": 55,
+      "warmth": 70,
+      "type": "sun"
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "radius": 35,
+      "threshold": 50,
+      "warmth": 30,
+      "style": "soft"
+     }
+    },
+    {
+     "id": "sunlight",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 50,
+      "temperature": 60,
+      "lift": 10
+     }
+    },
+    {
+     "id": "curves",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "black": 0,
+      "white": 100,
+      "gamma": 10,
+      "contrast": 0,
+      "fade": 10
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 0,
+      "saturation": 0,
+      "vibrance": 15,
+      "warmth": 0
+     }
+    }
+   ],
+   "desc": "Inspirada en «The Tree of Life» (Lubezki): sol directo usado como contraluz, aire luminoso, sombras abiertas y calidez de hora dorada."
+  },
+  {
+   "module": "cine",
+   "name": "Lubezki · Distopía gris",
+   "stack": [
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 10,
+      "saturation": -55,
+      "vibrance": 0,
+      "warmth": 0
+     }
+    },
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": -10,
+      "tint": -15
+     }
+    },
+    {
+     "id": "bleach_bypass",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 35,
+      "contrast": 40,
+      "saturation": 40
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "size": 1.4,
+      "roughness": 55,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "1.85"
+     }
+    }
+   ],
+   "desc": "Inspirada en «Children of Men» (Lubezki): mundo gris verdoso casi sin color, contraste áspero y grano."
+  },
+  {
+   "module": "cine",
+   "name": "Lubezki · Fuego y nieve",
+   "stack": [
+    {
+     "id": "cinematic",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadow_hue": 215,
+      "highlight_hue": 28,
+      "strength": 70,
+      "balance": 20,
+      "skin": true,
+      "contrast": 30
+     }
+    },
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": -15,
+      "tint": 0
+     }
+    },
+    {
+     "id": "vignette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": -35,
+      "size": 45,
+      "roundness": 60,
+      "softness": 70,
+      "x": 50,
+      "y": 50
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 15,
+      "size": 1.0,
+      "roughness": 30,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "letterbox",
+     "enabled": false,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "ratio": "2.39"
+     }
+    }
+   ],
+   "desc": "Inspirada en las noches de «The Revenant»: sombras azules del entorno nevado contra el calor de una hoguera."
   },
   {
    "module": "plata",

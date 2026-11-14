@@ -68,10 +68,11 @@
   var state = loadState();
   var uidSeq = 1;
   var openCards = {};
-  var running = null;
+  var running = null;          // proceso de "Aplicar" (se puede cancelar)
   var previewTimer = null;
-  var previewSrc = null;
   var lastDoc = null;
+  var LAYER_PREVIEW = { fit: 1400, crop: 1024 };   // tamaño de exportación ligera desde Photoshop
+  var pv = { inflight: false, pending: null, src: null, beforeSrc: null, shown: false };
 
   function loadState() {
     var s = {};
@@ -153,6 +154,12 @@
     }
   }
 
+  function renderPresetDesc() {
+    var d = (state.presetDesc || {})[state.module] || '';
+    $('presetDesc').textContent = d;
+    $('presetDesc').classList.toggle('hidden', !d);
+  }
+
   function renderAddFilter() {
     var sel = $('addFilter');
     sel.innerHTML = '';
@@ -176,7 +183,7 @@
     var out = el('output', { text: fmt(p, value) });
     var input = el('input', { type: 'range', min: p.min, max: p.max, step: p.step || 1, value: value });
     if (p.type === 'hue') input.className = 'hue';
-    input.addEventListener('input', function () { out.textContent = fmt(p, Number(input.value)); onChange(Number(input.value), false); });
+    input.addEventListener('input', function () { out.textContent = fmt(p, Number(input.value)); onChange(Number(input.value), false); livePreview(); });
     input.addEventListener('change', function () { onChange(Number(input.value), true); });
     input.addEventListener('dblclick', function () { input.value = p.default; out.textContent = fmt(p, p.default); onChange(p.default, true); });
     return el('div', { cls: 'param' }, [el('span', { cls: 'lbl', text: p.label, title: p.label + ' (doble clic: restablecer)' }), input, out]);
@@ -279,6 +286,7 @@
   function renderAll() {
     renderTabs();
     renderPresets();
+    renderPresetDesc();
     renderAddFilter();
     renderStack();
     $('previewMode').value = state.previewMode;
@@ -327,7 +335,7 @@
 
   function refreshDocInfo() {
     return jsx('eg_docInfo').then(function (p) {
-      lastDoc = { name: p[0], w: +p[1], h: +p[2], bits: +p[3], sel: p[4] === '1' };
+      lastDoc = { name: p[0], w: +p[1], h: +p[2], bits: +p[3], sel: p[4] === '1', hist: p[5] || '' };
       $('docInfo').textContent = p[0] + ' · ' + p[1] + '×' + p[2] + ' · ' + p[3] + ' bits' + (lastDoc.sel ? ' · selección' : '');
       return lastDoc;
     }, function () { lastDoc = null; $('docInfo').textContent = 'Sin documento'; return null; });
@@ -385,6 +393,56 @@
     });
   }
 
+  // ------------------------------------------------------------------ motor persistente
+  // Python (NumPy + OpenCV) se arranca una sola vez y se queda esperando peticiones:
+  // cada vista previa cuesta decenas de milisegundos en lugar de más de un segundo.
+  var srv = { proc: null, buf: '', seq: 0, wait: {}, err: '' };
+  function serverStop() {
+    if (srv.proc) { try { srv.proc.stdin.end(); srv.proc.kill(); } catch (e) { /* ya cerrado */ } }
+    srv.proc = null;
+  }
+  function serverFail(msg) {
+    Object.keys(srv.wait).forEach(function (id) { srv.wait[id].reject(new Error(msg)); });
+    srv.wait = {};
+    srv.proc = null;
+  }
+  function serverStart() {
+    var cmd = splitCommand(state.python);
+    if (!cmd.length) throw new Error('Configura el comando de Python en Ajustes.');
+    var proc = cp.spawn(cmd[0], cmd.slice(1).concat([ENGINE, '--serve', '--profiles-dir', PROFILES_DIR]),
+      { env: childEnv(), windowsHide: true });
+    srv = { proc: proc, buf: '', seq: srv.seq, wait: {}, err: '' };
+    proc.stdout.on('data', function (d) {
+      srv.buf += d.toString('utf8');
+      var lines = srv.buf.split('\n');
+      srv.buf = lines.pop();
+      lines.forEach(function (line) {
+        var msg;
+        try { msg = JSON.parse(line); } catch (e) { return; }
+        if (msg.id === undefined || msg.id === null || !srv.wait[msg.id]) return;
+        var w = srv.wait[msg.id];
+        delete srv.wait[msg.id];
+        if (msg.ok) w.resolve(msg); else w.reject(new Error(msg.error || 'Error del motor'));
+      });
+    });
+    proc.stderr.on('data', function (d) { srv.err = (srv.err + d.toString('utf8')).slice(-2000); });
+    proc.on('error', function (e) {
+      serverFail('No se pudo ejecutar Python («' + state.python + '»): ' + e.message + '. Revisa Ajustes.');
+    });
+    proc.on('close', function (code) {
+      if (srv.proc === proc) serverFail('El motor se cerró (código ' + code + '). ' + srv.err.trim().split('\n').slice(-2).join(' '));
+    });
+  }
+  function serverCall(req) {
+    return new Promise(function (resolve, reject) {
+      try { if (!srv.proc) serverStart(); } catch (e) { return reject(e); }
+      req.id = ++srv.seq;
+      srv.wait[req.id] = { resolve: resolve, reject: reject };
+      srv.proc.stdin.write(JSON.stringify(req) + '\n');
+    });
+  }
+  window.addEventListener('beforeunload', serverStop);
+
   function recipeFile() {
     mkdirp(TMP_DIR);
     var file = path.join(TMP_DIR, 'recipe.json');
@@ -396,42 +454,88 @@
     var file = path.join(TMP_DIR, name);
     return jsx('eg_export', [file.replace(/\\/g, '/'), state.source]).then(function () { return file; });
   }
-  function dataUri(file) { return 'data:image/png;base64,' + fs.readFileSync(file).toString('base64'); }
+  function dataUri(file, type) { return 'data:image/' + (type || 'png') + ';base64,' + fs.readFileSync(file).toString('base64'); }
 
   // ------------------------------------------------------------------ vista previa
-  function doPreview(forceExport) {
-    if (running) return;
-    var compare = $('compare');
-    setBusy(true, 'preview');
-    compare.classList.add('loading');
-    setStatus('Generando vista previa…');
-    refreshDocInfo().then(function (info) {
+  // La fuente de la vista previa se exporta reducida (o recortada) y se reutiliza
+  // mientras el documento no cambie (se detecta con el historial de Photoshop).
+  function previewSource(force) {
+    if (!force && pv.src && Date.now() - (pv.checked || 0) < 2000) return Promise.resolve(pv.src);
+    return refreshDocInfo().then(function (info) {
+      pv.checked = Date.now();
       if (!info) throw new Error('Abre una imagen en Photoshop.');
-      var key = [info.name, info.w, info.h, state.source].join('|');
-      if (!forceExport && previewSrc && previewSrc.key === key && fs.existsSync(previewSrc.file)) return previewSrc.file;
-      return exportInput('preview_src.png').then(function (f) { previewSrc = { key: key, file: f }; return f; });
-    }).then(function (src) {
       var fc = String(state.focus).split(',');
-      var size = state.previewMode === 'crop' ? 480 : Math.max(480, Math.min(900, Math.round($('compare').clientWidth * 2)));
-      return runEngine(['-i', src, '--recipe', recipeFile(), '--preview', path.join(TMP_DIR, 'preview'),
-        '--preview-mode', state.previewMode, '--preview-size', String(size), '--cx', fc[0], '--cy', fc[1]]);
+      var key = [info.name, info.w, info.h, info.hist, state.source, state.previewMode,
+        state.previewMode === 'crop' ? state.focus : ''].join('|');
+      if (!force && pv.src && pv.src.key === key && fs.existsSync(pv.src.file)) return pv.src;
+      mkdirp(TMP_DIR);
+      var file = path.join(TMP_DIR, 'preview_src_' + state.previewMode + '.png');
+      return jsx('eg_exportPreview', [file.replace(/\\/g, '/'), state.source, state.previewMode,
+        LAYER_PREVIEW.fit, fc[0], fc[1], LAYER_PREVIEW.crop]).then(function (r) {
+        pv.src = { key: key, file: file, full: [+r[1], +r[2]], rect: [+r[3], +r[4], +r[5], +r[6]] };
+        return pv.src;
+      });
+    });
+  }
+
+  // Pide una vista previa. Si ya hay una en curso, sólo se guarda la última petición:
+  // al mover un deslizador deprisa no se acumulan cálculos atrasados.
+  function requestPreview(opts) {
+    opts = opts || {};
+    var prev = pv.pending;
+    pv.pending = { draft: !!opts.draft && !(prev && !prev.draft), force: !!opts.force || !!(prev && prev.force) };
+    pump();
+  }
+  function pump() {
+    if (pv.inflight || !pv.pending) return;
+    var o = pv.pending;
+    pv.pending = null;
+    pv.inflight = true;
+    var compare = $('compare');
+    compare.classList.add('loading');
+    if (!pv.shown) setStatus('Generando vista previa…');
+    previewSource(o.force).then(function (src) {
+      var fc = String(state.focus).split(',');
+      var full = state.previewMode === 'crop' ? 480 : Math.max(480, Math.min(900, Math.round(compare.clientWidth * 2)));
+      return serverCall({
+        cmd: 'preview', input: src.file, recipe: { module: state.module, stack: stack() },
+        mode: state.previewMode, size: o.draft ? Math.round(full * 0.5) : full,
+        cx: Number(fc[0]), cy: Number(fc[1]), rect: src.rect, full: src.full,
+        out: path.join(TMP_DIR, 'preview'), profiles_dir: PROFILES_DIR
+      });
     }).then(function (res) {
-      $('imgBefore').src = dataUri(res.preview.before);
-      $('imgAfter').src = dataUri(res.preview.after);
+      if (res.preview.before_changed || pv.beforeSrc !== res.preview.before) {
+        $('imgBefore').src = dataUri(res.preview.before, 'jpeg');
+        pv.beforeSrc = res.preview.before;
+      }
+      $('imgAfter').src = dataUri(res.preview.after, 'jpeg');
       compare.classList.remove('empty');
+      pv.shown = true;
       sizeBefore();
-      setStatus('Vista previa (' + res.seconds + ' s).');
+      setStatus((o.draft ? 'Vista rápida' : 'Vista previa') + ' · ' + res.ms + ' ms');
     }).catch(function (e) {
       setStatus(e.message, 'error');
     }).then(function () {
-      compare.classList.remove('loading');
-      setBusy(false);
+      pv.inflight = false;
+      if (!pv.pending) compare.classList.remove('loading');
+      pump();
     });
   }
+  function doPreview(force) { requestPreview({ force: force }); }
+  // Cambios "terminados" (soltar un deslizador, elegir una opción): calidad completa.
   function schedulePreview() {
-    if ($('compare').classList.contains('empty')) return;
+    if (!pv.shown) return;
     clearTimeout(previewTimer);
-    previewTimer = setTimeout(function () { if (!running) doPreview(false); else schedulePreview(); }, 450);
+    previewTimer = setTimeout(function () { requestPreview({ draft: false }); }, 120);
+  }
+  // Mientras se arrastra: vista rápida a media resolución, como mucho ~16 por segundo.
+  var lastLive = 0;
+  function livePreview() {
+    if (!pv.shown) return;
+    var now = Date.now();
+    clearTimeout(previewTimer);
+    if (now - lastLive > 60) { lastLive = now; requestPreview({ draft: true }); }
+    previewTimer = setTimeout(function () { requestPreview({ draft: true }); }, 70);
   }
   function sizeBefore() {
     var inner = $('compare').querySelector('.compare-inner');
@@ -468,6 +572,7 @@
       return jsx('eg_import', [res.output.replace(/\\/g, '/'), asDoc, docName + '_' + modName, layerName, state.useMask ? '1' : '0'])
         .then(function (r) {
           try { fs.unlinkSync(res.output); } catch (e) { /* temporal */ }
+          pv.src = null;
           var secs = ((Date.now() - started) / 1000).toFixed(1);
           var msg = r[0] === 'doc' ? 'Abierto como documento nuevo' : ('Capa «' + layerName + '» añadida' + (r[1] === '1' ? ' con máscara de la selección' : ''));
           setStatus(msg + ' (' + res.width + '×' + res.height + ', ' + secs + ' s).', 'ok');
@@ -487,6 +592,9 @@
       st = r.stack;
     }
     state.stacks[state.module] = st.slice(0, SCHEMA.max_stack);
+    state.presetDesc = state.presetDesc || {};
+    state.presetDesc[state.module] = value.indexOf('b:') === 0 ? (SCHEMA.presets[Number(value.slice(2))].desc || '') : '';
+    renderPresetDesc();
     openCards = {};
     saveState(); renderStack(); schedulePreview();
   }
@@ -557,7 +665,7 @@
 
   // ------------------------------------------------------------------ eventos
   function bind() {
-    $('btnPreview').addEventListener('click', function () { doPreview(true); });
+    $('btnPreview').addEventListener('click', function () { pv.shown = true; doPreview(true); });
     $('btnApply').addEventListener('click', doApply);
     $('btnCheck').addEventListener('click', doCheck);
     $('btnMeasure').addEventListener('click', measureProfile);
@@ -582,10 +690,10 @@
       saveState(); schedulePreview();
     });
     $('focus').addEventListener('change', function (e) { state.focus = e.target.value; saveState(); schedulePreview(); });
-    $('source').addEventListener('change', function (e) { state.source = e.target.value; previewSrc = null; saveState(); schedulePreview(); });
+    $('source').addEventListener('change', function (e) { state.source = e.target.value; pv.src = null; saveState(); schedulePreview(); });
     $('target').addEventListener('change', function (e) { state.target = e.target.value; saveState(); });
     $('useMask').addEventListener('change', function (e) { state.useMask = e.target.checked; saveState(); });
-    $('python').addEventListener('change', function (e) { state.python = e.target.value.trim(); saveState(); });
+    $('python').addEventListener('change', function (e) { state.python = e.target.value.trim(); saveState(); serverStop(); });
     $('btnReset').addEventListener('click', function () {
       var py = state.python;
       try { localStorage.removeItem(STORE_KEY); } catch (e) { /* nada */ }

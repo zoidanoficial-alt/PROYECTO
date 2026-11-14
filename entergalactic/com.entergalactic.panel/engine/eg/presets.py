@@ -1,15 +1,18 @@
 """Recetas predefinidas de cada módulo. Cada una es una pila de filtros."""
 
 
-def f(fid, opacity=100, blend="normal", mask=None, **params):
-    item = {"id": fid, "enabled": True, "opacity": opacity, "blend": blend, "params": params}
+def f(fid, opacity=100, blend="normal", mask=None, enabled=True, **params):
+    item = {"id": fid, "enabled": enabled, "opacity": opacity, "blend": blend, "params": params}
     if mask:
         item["mask"] = mask
     return item
 
 
-def preset(module, name, *stack):
-    return {"module": module, "name": name, "stack": list(stack)}
+def preset(module, name, *stack, desc=""):
+    p = {"module": module, "name": name, "stack": list(stack)}
+    if desc:
+        p["desc"] = desc
+    return p
 
 
 PRESETS = [
@@ -163,3 +166,10 @@ PRESETS = [
            f("sharpen", amount=45, radius=1.0, threshold=20),
            f("detail_extractor", amount=25, size=4, protect=70)),
 ]
+
+
+from .presets_cine import CINE_PRESETS  # noqa: E402
+
+# Las recetas de Cine van justo después de las de Chroma.
+_i = max(i for i, p in enumerate(PRESETS) if p["module"] == "chroma") + 1
+PRESETS[_i:_i] = CINE_PRESETS

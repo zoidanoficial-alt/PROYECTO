@@ -15,6 +15,7 @@ MAX_STACK = 15
 
 MODULES = [
     ("chroma", "Chroma", "Color cinematográfico, contraste, luz y atmósferas"),
+    ("cine", "Cine", "Looks inspirados en grandes directores de fotografía"),
     ("plata", "Plata", "Blanco y negro de estética química tradicional"),
     ("analog", "Analógico", "Cámaras antiguas, fugas de luz, polvo y película vintage"),
     ("clean", "Clean", "Reducción de ruido de luminancia y color"),

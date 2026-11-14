@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ENTERGALACTIC: panel CEP 8 para Photoshop CC 2018 (19.x) y posteriores. -->
-<ExtensionManifest Version="7.0" ExtensionBundleId="com.entergalactic.panel" ExtensionBundleVersion="1.0.0"
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.entergalactic.panel" ExtensionBundleVersion="1.1.0"
                    ExtensionBundleName="ENTERGALACTIC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ExtensionList>
-    <Extension Id="com.entergalactic.panel.main" Version="1.0.0"/>
+    <Extension Id="com.entergalactic.panel.main" Version="1.1.0"/>
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>

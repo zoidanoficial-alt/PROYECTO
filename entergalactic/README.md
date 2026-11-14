@@ -1,6 +1,6 @@
 # ENTERGALACTIC — suite de efectos fotográficos para Photoshop CC 2018
 
-Un único panel con cinco módulos. En cada módulo puedes **combinar hasta 15 filtros** en una misma edición.
+Un único panel con seis módulos. En cada módulo puedes **combinar hasta 15 filtros** en una misma edición.
 Cada filtro tiene su opacidad, su modo de fusión y su máscara: sombras, luces, un rango de color, el centro o los bordes…
 
 | Módulo | Para qué sirve |
@@ -8,10 +8,11 @@ Cada filtro tiene su opacidad, su modo de fusión y su máscara: sombras, luces,
 | **Chroma** | Color cinematográfico, contraste tonal, saturación, efectos de luz (resplandor, haz de luz, hora dorada), recuperar sombras y luces, filtros fotográficos (cálidos, fríos, polarizador, degradados), tonos específicos (HSL), atmósferas cálidas, frías o dramáticas. |
 | **Plata** | Blanco y negro con aspecto de película química: 8 películas (pancromática, clásica 400, 3200, ortocromática, infrarroja…), filtros de color, contraste, estructura (texturas), negros profundos, zonas de luces y sombras, grano orgánico. Técnicas de cuarto oscuro: virados, grado de papel, quemado de bordes, tapado, copia lith y solarización. |
 | **Analógico** | Cámaras antiguas (juguete, cajón años 50, placa húmeda, telemétrica años 70, desechable años 90, estenopeica), fugas de luz, polvo, rayones y pelos, películas vintage, desenfoques ópticos (miniatura, bordes blandos, zoom, movimiento), aberración cromática, texturas, viñetas e instantáneas con marco. |
+| **Cine** | Looks inspirados en Autumn Durald Arkapaw, Lol Crawley, Hoyte van Hoytema, Greig Fraser y Emmanuel Lubezki (18 recetas, ver [ESTILOS.md](ESTILOS.md)). Incluye copia de cine (film-out), paleta limitada, destello anamórfico y formatos de pantalla. |
 | **Clean** | Reducción de ruido de luminancia y de color por separado, **perfiles de ruido por cámara e ISO**, reducción localizada (con la selección de Photoshop o por zonas y colores), conservación de detalle y contraste, píxeles calientes y artefactos JPEG. |
 | **Realce IA** | Ampliación 2×, 3× o 4× con redes neuronales, más enfoque de salida. |
 
-Incluye **41 recetas** listas para usar, y puedes guardar las tuyas.
+Incluye **58 recetas** listas para usar, y puedes guardar las tuyas.
 
 ## Instalación
 
@@ -60,7 +61,16 @@ Medido en una foto de 24 megapíxeles (6000×4000), incluyendo leer y guardar:
 | Medio ISO 1600-3200 (Clean) | ~10 s | 2,5 GB |
 | Cine verde azulado y naranja (Chroma) | ~13 s | 3,5 GB |
 
-Las vistas previas tardan menos de un segundo.
+### Vista previa en vivo
+
+El panel está pensado para responder al instante:
+
+- **Motor persistente.** Python, NumPy y OpenCV arrancan una sola vez. Antes, cada vista previa volvía a arrancarlos (más de 1 s).
+- **Exportación ligera.** Para la vista previa, Photoshop exporta la imagen reducida a 1400 px y en 8 bits, o un recorte de 1024 px al 100 %. Esa exportación se reutiliza mientras no edites el documento.
+- **Vista en vivo al arrastrar.** Mientras mueves un deslizador se calculan vistas rápidas a media resolución (unos 45 ms, hasta ~16 por segundo). Al soltar llega la vista de calidad completa (unos 230 ms).
+- **Sin colas atrasadas.** Si mueves deprisa, solo se calcula el último ajuste.
+
+Medido con la foto de 24 MP reducida a 1400 px: unos 45 ms en vista rápida y unos 230 ms en calidad completa. En la prueba del panel, arrastrar un deslizador durante 1,5 s produjo 24 actualizaciones.
 
 ## Estructura
 
