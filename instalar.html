@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Instala la app · Tiempo de Gracia</title>
+<meta name="description" content="Instala la app de la Iglesia Cristiana Tiempo de Gracia en tu iPhone o Android, gratis y en un minuto.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<meta property="og:site_name" content="Tiempo de Gracia">
+<meta property="og:title" content="Instala la app · Tiempo de Gracia">
+<meta property="og:description" content="Instala la app de la Iglesia Cristiana Tiempo de Gracia en tu iPhone o Android, gratis y en un minuto.">
+<meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="img/app/favicon-32.png" sizes="32x32">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tiempo de Gracia">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* Layout: titular grande, pestañas iPhone / Android y pasos numerados con capturas tipográficas de cada botón. */
+:root {
+  --bg: #fbf6ea;
+  --surface: #fffdf7;
+  --fg: #1f2030;
+  --muted: #5a5a63;
+  --line: #e6dec9;
+  --wood: #a8683a;
+  --blue: #2457e6;
+  --magenta: #d6246e;
+  --amber: #e89a2b;
+  --screen: #0e1430;
+  --on-accent: #ffffff;
+  --focus: #b9690f;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+    --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+    --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1020; --surface: #161a30; --fg: #edeff7; --muted: #a3a9c2; --line: #2a3050;
+  --wood: #d9965f; --blue: #7a9cff; --magenta: #ff5c9e; --amber: #f2b35a;
+  --screen: #080b1c; --on-accent: #0d1020; --focus: #f2b35a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.6; padding-inline: 20px; padding-block: 0 56px; overflow-x: hidden; }
+p { margin: 0; }
+a { color: var(--blue); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+
+header.top { display: flex; align-items: center; gap: 14px 18px; padding-block: 18px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; text-decoration: none; color: var(--fg); }
+.brand span { color: var(--magenta); }
+.theme { width: 52px; height: 28px; border-radius: 999px; border: 2px solid var(--fg); background: transparent; padding: 0; position: relative; cursor: pointer; flex: none; }
+.theme::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--fg); }
+.theme[aria-pressed="true"]::after { transform: translateX(24px); }
+.top-links { margin-inline-start: auto; display: flex; align-items: center; gap: 4px 2px; flex-wrap: wrap; }
+.back { color: var(--fg); text-decoration: none; font-weight: 500; padding: 8px 9px; border-radius: 8px; white-space: nowrap; }
+.menu-btn { display: none; margin-inline-start: auto; font: 600 15px var(--font-body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 9px 18px; cursor: pointer; }
+@media (max-width: 760px) {
+  header.top { column-gap: 10px; }
+  .brand { font-size: 20px; }
+  .menu-btn { display: inline-flex; padding: 8px 14px; }
+  .top-links { display: none; flex-direction: column; align-items: stretch; padding: 8px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+  .top-links.open { display: flex; }
+  .top-links .back { padding: 12px; font-size: 18px; }
+  .top-links .pill { text-align: center; margin-top: 6px; }
+}
+.back[aria-current="page"] { color: var(--magenta); }
+.back:hover { background: color-mix(in srgb, var(--fg) 8%, transparent); }
+.pill { display: inline-block; background: var(--wood); color: var(--on-accent); font: 600 16px var(--font-body); padding: 12px 24px; border-radius: 999px; text-decoration: none; }
+.pill:hover { filter: brightness(1.08); }
+
+h1.big { margin: 0; padding-block: 36px 16px; font-family: var(--font-display); font-weight: 500; text-transform: uppercase; font-size: clamp(46px, 11vw, 150px); line-height: 0.98; letter-spacing: -0.04em; }
+.lead { color: var(--muted); font-size: 20px; max-width: 34em; }
+.app-id { display: flex; align-items: center; gap: 16px; margin-top: 28px; }
+.app-id img { width: 72px; height: 72px; border-radius: 18px; box-shadow: 0 8px 24px -10px rgba(0,0,0,0.5); }
+.app-id b { font-family: var(--font-display); font-size: 22px; display: block; }
+.app-id span { color: var(--muted); font-size: 15px; }
+.done { margin-top: 24px; padding: 14px 16px; border-radius: 12px; background: color-mix(in srgb, var(--blue) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--blue) 35%, transparent); }
+.tabs { display: inline-flex; gap: 4px; padding: 4px; margin-top: 36px; border-radius: 999px; background: color-mix(in srgb, var(--fg) 8%, var(--bg)); }
+.tab { font: 700 17px var(--font-display); color: var(--muted); background: none; border: 0; border-radius: 999px; padding: 10px 22px; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--fg); color: var(--bg); }
+.pasos { list-style: none; margin: 28px 0 0; padding: 0; display: grid; gap: 0; counter-reset: paso; max-width: 760px; }
+.pasos li { counter-increment: paso; display: grid; grid-template-columns: 56px 1fr; gap: 4px 16px; padding-block: 20px; border-top: 1px solid var(--line); }
+.pasos li::before { content: counter(paso); grid-row: 1 / 3; font: 800 40px/1 var(--font-display); color: var(--magenta); font-variant-numeric: tabular-nums; }
+.pasos b { font-family: var(--font-display); font-size: 21px; }
+.pasos p { color: var(--muted); }
+.key { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); font-weight: 600; white-space: nowrap; }
+.key svg { width: 16px; height: 16px; }
+.nota { margin-top: 20px; color: var(--muted); font-size: 15px; max-width: 46em; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 16px/1 var(--font-body); padding: 14px 22px; border-radius: 10px; border: 2px solid var(--blue); background: var(--blue); color: var(--on-accent); text-decoration: none; margin-top: 8px; width: fit-content; }
+.btn:hover { filter: brightness(1.08); }
+
+.foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; color: var(--muted); font-size: 15px; }
+.foot .soc { display: flex; gap: 18px; flex-wrap: wrap; }
+.foot a { color: var(--fg); }
+
+@media (max-width: 760px) { .top-links { margin-inline-start: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html">Tiempo de <span>Gracia</span></a>
+    <button class="theme" id="theme" type="button" aria-label="Cambiar entre tema claro y oscuro" aria-pressed="false"></button>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="top-links">Menú</button>
+    <div class="top-links" id="top-links">
+      <a class="back" href="index.html">&larr; Inicio</a>
+      <a class="back" href="primer-paso.html">Tu primer paso</a>
+      <a class="back" href="oracion.html">¿Necesitas oración?</a>
+      <a class="back" href="transforma.html">Transforma</a>
+      <a class="back" href="capsulas.html">Cápsulas</a>
+      <a class="back" href="galeria.html">Galería</a>
+      <a class="back" href="ministerios.html">Ministerios</a>
+      <a class="back" href="eventos.html">Eventos</a>
+      <a class="back" href="donativos.html">Donativos</a>
+      <a class="pill" href="index.html">Ir al inicio</a>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="big">Instala la app</h1>
+    <p class="lead">Ten a Tiempo de Gracia en tu celular: horarios, eventos, Transforma, oración y más, con un toque. Es gratis y se actualiza sola.</p>
+    <div class="app-id"><img src="img/app/apple-touch-icon.png" alt="" width="72" height="72"><div><b>Tiempo de Gracia</b><span>Iglesia Cristiana · Naucalpan</span></div></div>
+    <p class="done" id="done" hidden>¡Ya tienes la app instalada! Estás viéndola ahora mismo.</p>
+
+    <div class="tabs" role="tablist" aria-label="Tipo de celular">
+      <button class="tab" role="tab" id="t-ios" aria-controls="p-ios" aria-selected="true" type="button">iPhone</button>
+      <button class="tab" role="tab" id="t-and" aria-controls="p-and" aria-selected="false" tabindex="-1" type="button">Android</button>
+    </div>
+
+    <section id="p-ios" role="tabpanel" aria-labelledby="t-ios">
+      <ol class="pasos">
+        <li><b>Abre esta página en Safari</b><p>Tiene que ser Safari, el navegador del iPhone (la brújula azul). Desde Chrome u otras apps no aparece la opción.</p></li>
+        <li><b>Toca Compartir <span class="key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg> Compartir</span></b><p>Está abajo en el centro de la pantalla (en iPad, arriba a la derecha).</p></li>
+        <li><b>Elige <span class="key">Agregar a inicio</span></b><p>Desliza la lista hacia abajo hasta encontrarla. Si no aparece, toca "Editar acciones" y agrégala.</p></li>
+        <li><b>Toca <span class="key">Agregar</span></b><p>Listo: el logo de Tiempo de Gracia queda en tu pantalla de inicio y se abre como una app, a pantalla completa.</p></li>
+      </ol>
+      <p class="nota">En iPhone, los recordatorios del culto y los avisos de eventos nuevos todavía no están disponibles. Mientras, síguenos en Instagram para enterarte de todo.</p>
+    </section>
+
+    <section id="p-and" role="tabpanel" aria-labelledby="t-and" hidden>
+      <ol class="pasos">
+        <li><b>Descarga la app</b><p>Incluye recordatorios del culto y avisos de eventos nuevos.</p><a class="btn" href="https://github.com/zoidanoficial-alt/PROYECTO/releases/download/app-android/TiempoDeGracia.apk">Descargar para Android</a></li>
+        <li><b>Abre el archivo descargado</b><p>Si Android pregunta, permite "instalar apps de esta fuente". Es normal porque la app no viene de Play Store.</p></li>
+        <li><b>Toca <span class="key">Instalar</span> y acepta las notificaciones</b><p>Así te avisamos antes del culto y cuando haya un evento nuevo.</p></li>
+      </ol>
+      <p class="nota">¿Prefieres no instalar nada? En Chrome toca el menú ⋮ y luego <span class="key">Agregar a la pantalla principal</span>.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
+    <span class="soc"><a href="instalar.html">Instala la app</a><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+  </footer>
+</div>
+<script>
+(function () {
+  // Menú en celular
+  var menuBtn = document.getElementById("menu-btn"), links = document.getElementById("top-links");
+  menuBtn.addEventListener("click", function () {
+    var open = !links.classList.contains("open");
+    links.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    menuBtn.textContent = open ? "Cerrar" : "Menú";
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && links.classList.contains("open")) { menuBtn.click(); menuBtn.focus(); }
+  });
+  var root = document.documentElement, btn = document.getElementById("theme");
+  try { var saved = localStorage.getItem("tdg-theme"); if (saved === "dark" || saved === "light") root.setAttribute("data-theme", saved); } catch (e) {}
+  function isDark() {
+    var t = root.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  }
+  function sync() { btn.setAttribute("aria-pressed", isDark() ? "true" : "false"); }
+  btn.addEventListener("click", function () {
+    var next = isDark() ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("tdg-theme", next); } catch (e) {}
+    sync();
+  });
+  sync();
+
+  // Pestañas iPhone / Android; se abre la del celular que usa la persona
+  var tabs = [document.getElementById("t-ios"), document.getElementById("t-and")];
+  var panels = [document.getElementById("p-ios"), document.getElementById("p-and")];
+  function elegir(i, foco) {
+    tabs.forEach(function (t, j) { t.setAttribute("aria-selected", j === i ? "true" : "false"); t.tabIndex = j === i ? 0 : -1; panels[j].hidden = j !== i; });
+    if (foco) tabs[i].focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { elegir(i); });
+    t.addEventListener("keydown", function (e) { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); elegir(i ? 0 : 1, true); } });
+  });
+  if (/android/i.test(navigator.userAgent)) elegir(1);
+  var instalada = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+  if (instalada) document.getElementById("done").hidden = false;
+
+})();
+</script>
+</body>
+</html>

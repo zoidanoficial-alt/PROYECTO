@@ -12,7 +12,13 @@
 <meta property="og:description" content="Culto todos los domingos de 11:00 a 14:00 hrs en Jardines de San Mateo, Naucalpan. Ven como estás.">
 <meta name="theme-color" content="#fbf6ea" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0d1020" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e1430'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23d6246e'/%3E%3C/svg%3E">
+<link rel="icon" href="img/app/favicon-32.png" sizes="32x32">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="img/app/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tiempo de Gracia">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>try { var t = localStorage.getItem("tdg-theme"); if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); } catch (e) {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,6 +154,12 @@ section { padding-block: 56px; border-top: 1px solid var(--line); scroll-margin-
 .ph { position: relative; margin: 0; height: clamp(260px, 38vw, 400px); border-radius: 10px; overflow: hidden; min-width: 0; background: var(--screen); }
 .ph img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .ph figcaption { position: absolute; inset: auto 0 0 0; padding: 36px 16px 14px; font: 600 14px var(--font-body); letter-spacing: 0.04em; color: #fff; background: linear-gradient(to top, rgba(8,11,28,0.78), transparent); }
+.ios-banner { display: flex; align-items: center; gap: 12px; margin-inline: -20px; padding: 10px 16px 10px 20px; background: var(--screen); color: #f1f3fb; }
+.ios-banner img { border-radius: 10px; flex: none; }
+.ios-banner a { color: inherit; text-decoration: none; display: grid; flex: 1; min-width: 0; }
+.ios-banner b { font-size: 15px; }
+.ios-banner span { font-size: 13px; opacity: 0.8; }
+.ios-banner button { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.12); color: #fff; font-size: 22px; line-height: 1; cursor: pointer; }
 .ph-link { display: block; color: inherit; text-decoration: none; border-radius: 10px; }
 .ph-link figcaption span { margin-inline-start: 6px; }
 @media (prefers-reduced-motion: no-preference) { .ph img { transition: transform .35s; } .ph-link:hover .ph img { transform: scale(1.03); } }
@@ -204,6 +216,12 @@ footer { border-top: 1px solid var(--line); padding-top: 28px; display: flex; fl
 </head>
 <body>
 
+
+<div class="ios-banner" id="ios-banner" hidden>
+  <img src="img/app/apple-touch-icon.png" alt="" width="40" height="40">
+  <a href="instalar.html"><b>Instala la app en tu iPhone</b><span>Toca aquí y te decimos cómo, toma un minuto</span></a>
+  <button type="button" id="ios-banner-x" aria-label="Cerrar aviso">&times;</button>
+</div>
 
 <div class="wrap">
   <header class="top">
@@ -352,7 +370,7 @@ footer { border-top: 1px solid var(--line); padding-top: 28px; display: flex; fl
 
   <footer>
     <span>© 2026 Iglesia Cristiana Tiempo de Gracia</span>
-    <span class="soc"><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
+    <span class="soc"><a href="instalar.html">Instala la app</a><a href="https://www.instagram.com/tiempodegraciamexico/" target="_blank" rel="noopener">Instagram</a><a href="https://www.youtube.com/@tiempodegraciamexico2082" target="_blank" rel="noopener">YouTube</a></span>
   </footer>
 </div>
 
@@ -402,6 +420,23 @@ footer { border-top: 1px solid var(--line); padding-top: 28px; display: flex; fl
     syncTheme();
   });
   syncTheme();
+
+  // Aviso para instalar la app: solo en iPhone/iPad con Safari, si aún no está instalada y no lo cerraron
+  try {
+    var ua = navigator.userAgent, ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    var safari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA|Instagram|FBAN|FBAV/.test(ua);
+    var instalada = window.navigator.standalone || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+    var cerrado = false;
+    try { cerrado = localStorage.getItem("tdg-ios-banner") === "no"; } catch (e) {}
+    if (ios && safari && !instalada && !cerrado) {
+      var banner = document.getElementById("ios-banner");
+      banner.hidden = false;
+      document.getElementById("ios-banner-x").addEventListener("click", function () {
+        banner.hidden = true;
+        try { localStorage.setItem("tdg-ios-banner", "no"); } catch (e) {}
+      });
+    }
+  } catch (e) {}
 
   // Próximo culto según la hora de la Ciudad de México: domingos de 11:00 a 14:00
   try {
