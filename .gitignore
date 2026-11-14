@@ -24,3 +24,9 @@ realce/com.realce.panel/engine/models/*.pb
 realce/com.realce.panel/engine/models/*.part
 entergalactic/com.entergalactic.panel/engine/models/*.pb
 entergalactic/com.entergalactic.panel/engine/models/*.part
+
+# Android (ENTERGALACTIC móvil)
+entergalactic-android/android/.gradle/
+entergalactic-android/android/build/
+entergalactic-android/android/app/build/
+entergalactic-android/android/local.properties

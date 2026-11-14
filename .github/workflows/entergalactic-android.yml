@@ -1,0 +1,60 @@
+name: ENTERGALACTIC Android
+
+on:
+  push:
+    branches: [claude/hopeful-hawking-hwp68i]
+    paths:
+      - "entergalactic-android/**"
+      - "entergalactic/com.entergalactic.panel/engine/**"
+      - ".github/workflows/entergalactic-android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Motor JavaScript igual al de Python
+        run: |
+          pip install numpy opencv-python-headless
+          python entergalactic-android/tools/build_web.py
+          git diff --exit-code entergalactic-android/web/schema.json || (echo "schema.json desactualizado: ejecuta tools/build_web.py" && exit 1)
+          python entergalactic-android/tools/make_fixtures.py entergalactic-android/tests/fixture.jpg /tmp/fx
+          node entergalactic-android/tests/compare.js /tmp/fx
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.10.2"
+      - name: Compilar APK
+        run: gradle -p entergalactic-android/android assembleRelease --no-daemon
+      - name: Preparar APK
+        run: cp entergalactic-android/android/app/build/outputs/apk/release/app-release.apk ENTERGALACTIC.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ENTERGALACTIC-apk
+          path: ENTERGALACTIC.apk
+
+      - name: Publicar descarga
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete entergalactic-android --yes --cleanup-tag || true
+          gh release create entergalactic-android ENTERGALACTIC.apk \
+            --target "${{ github.sha }}" --prerelease \
+            --title "ENTERGALACTIC para Android" \
+            --notes "APK de ENTERGALACTIC (Cine, Chroma, Plata y Analógico). Compilada automáticamente desde ${{ github.sha }}. Descárgala desde el móvil, ábrela y permite «Instalar apps desconocidas» si Android lo pide."
