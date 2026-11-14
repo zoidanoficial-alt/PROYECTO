@@ -22,3 +22,5 @@ run_cassandra*.sh
 # Realce IA: modelos descargados
 realce/com.realce.panel/engine/models/*.pb
 realce/com.realce.panel/engine/models/*.part
+entergalactic/com.entergalactic.panel/engine/models/*.pb
+entergalactic/com.entergalactic.panel/engine/models/*.part

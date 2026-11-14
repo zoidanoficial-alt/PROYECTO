@@ -1,0 +1,4312 @@
+{
+ "max_stack": 15,
+ "modules": [
+  {
+   "id": "chroma",
+   "name": "Chroma",
+   "desc": "Color cinematográfico, contraste, luz y atmósferas"
+  },
+  {
+   "id": "plata",
+   "name": "Plata",
+   "desc": "Blanco y negro de estética química tradicional"
+  },
+  {
+   "id": "analog",
+   "name": "Analógico",
+   "desc": "Cámaras antiguas, fugas de luz, polvo y película vintage"
+  },
+  {
+   "id": "clean",
+   "name": "Clean",
+   "desc": "Reducción de ruido de luminancia y color"
+  },
+  {
+   "id": "realce",
+   "name": "Realce IA",
+   "desc": "Ampliación con IA, nitidez y limpieza"
+  }
+ ],
+ "blend_modes": [
+  {
+   "id": "normal",
+   "name": "Normal"
+  },
+  {
+   "id": "multiply",
+   "name": "Multiplicar"
+  },
+  {
+   "id": "screen",
+   "name": "Trama"
+  },
+  {
+   "id": "overlay",
+   "name": "Superponer"
+  },
+  {
+   "id": "soft_light",
+   "name": "Luz suave"
+  },
+  {
+   "id": "luminosity",
+   "name": "Luminosidad"
+  },
+  {
+   "id": "color",
+   "name": "Color"
+  },
+  {
+   "id": "lighten",
+   "name": "Aclarar"
+  },
+  {
+   "id": "darken",
+   "name": "Oscurecer"
+  }
+ ],
+ "mask_types": [
+  {
+   "id": "all",
+   "name": "Toda la imagen"
+  },
+  {
+   "id": "shadows",
+   "name": "Sombras"
+  },
+  {
+   "id": "midtones",
+   "name": "Medios tonos"
+  },
+  {
+   "id": "highlights",
+   "name": "Luces"
+  },
+  {
+   "id": "color",
+   "name": "Rango de color"
+  },
+  {
+   "id": "center",
+   "name": "Centro"
+  },
+  {
+   "id": "edges",
+   "name": "Bordes"
+  },
+  {
+   "id": "top",
+   "name": "Parte superior"
+  },
+  {
+   "id": "bottom",
+   "name": "Parte inferior"
+  }
+ ],
+ "filters": [
+  {
+   "id": "tonal_contrast",
+   "name": "Contraste tonal",
+   "modules": [
+    "chroma",
+    "plata"
+   ],
+   "desc": "Contraste local en medios tonos: da volumen sin quemar luces ni sombras.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "radius",
+     "label": "Radio",
+     "type": "range",
+     "min": 5,
+     "max": 200,
+     "default": 40,
+     "step": 1,
+     "unit": "px"
+    },
+    {
+     "id": "fine",
+     "label": "Detalle fino",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "saturation",
+     "label": "Saturación",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "brilliance",
+   "name": "Brillo / Calidez",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Ajustes básicos de luz y color, con intensidad que protege los tonos ya saturados.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "brightness",
+     "label": "Brillo",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "contrast",
+     "label": "Contraste",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "saturation",
+     "label": "Saturación",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 15,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "vibrance",
+     "label": "Intensidad de color",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "warmth",
+     "label": "Calidez",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "pro_contrast",
+   "name": "Contraste profesional",
+   "modules": [
+    "chroma"
+   ],
+   "desc": "Neutraliza dominantes de color y ajusta el contraste automáticamente.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "cast",
+     "label": "Corregir dominante",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "contrast",
+     "label": "Contraste",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "dynamic",
+     "label": "Contraste dinámico",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "shadows_highlights",
+   "name": "Sombras / Luces",
+   "modules": [
+    "chroma",
+    "plata"
+   ],
+   "desc": "Aclara sombras y recupera luces usando el entorno de cada píxel (sin halos duros).",
+   "resizes": false,
+   "params": [
+    {
+     "id": "shadows",
+     "label": "Recuperar sombras",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "highlights",
+     "label": "Recuperar luces",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "radius",
+     "label": "Radio",
+     "type": "range",
+     "min": 5,
+     "max": 150,
+     "default": 30,
+     "step": 1,
+     "unit": "px"
+    },
+    {
+     "id": "color",
+     "label": "Corrección de color",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "curves",
+   "name": "Niveles y curva",
+   "modules": [
+    "chroma",
+    "plata",
+    "analog",
+    "clean"
+   ],
+   "desc": "Niveles clásicos: puntos negro/blanco, gamma, curva en S y negros mate.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "black",
+     "label": "Punto negro",
+     "type": "range",
+     "min": 0,
+     "max": 50,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "white",
+     "label": "Punto blanco",
+     "type": "range",
+     "min": 50,
+     "max": 100,
+     "default": 100,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "gamma",
+     "label": "Medios tonos",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "contrast",
+     "label": "Curva en S",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "fade",
+     "label": "Negros desvaídos",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "dramatic",
+   "name": "Dramático",
+   "modules": [
+    "chroma",
+    "plata"
+   ],
+   "desc": "Contraste local muy marcado, color contenido y bordes oscuros.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "saturation",
+     "label": "Saturación",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": -30,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "darken",
+     "label": "Oscurecer bordes",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "detail_extractor",
+   "name": "Extractor de detalle",
+   "modules": [
+    "chroma",
+    "plata",
+    "realce"
+   ],
+   "desc": "Resalta texturas en varias escalas (piedra, madera, piel curtida).",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Cantidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "size",
+     "label": "Tamaño del detalle",
+     "type": "range",
+     "min": 1,
+     "max": 30,
+     "default": 6,
+     "step": 1,
+     "unit": "px"
+    },
+    {
+     "id": "protect",
+     "label": "Proteger cielos lisos",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "glow",
+   "name": "Resplandor",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Brillo difuso alrededor de las luces: sueño, bloom de cine o halación roja de película.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "radius",
+     "label": "Difusión",
+     "type": "range",
+     "min": 2,
+     "max": 200,
+     "default": 30,
+     "step": 1,
+     "unit": "px"
+    },
+    {
+     "id": "threshold",
+     "label": "Umbral de luces",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 55,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "warmth",
+     "label": "Calidez",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 10,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "style",
+     "label": "Estilo",
+     "type": "select",
+     "options": [
+      [
+       "soft",
+       "Suave (Orton)"
+      ],
+      [
+       "bloom",
+       "Bloom cinematográfico"
+      ],
+      [
+       "halation",
+       "Halación (película)"
+      ]
+     ],
+     "default": "soft"
+    }
+   ]
+  },
+  {
+   "id": "light_beam",
+   "name": "Haz de luz",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Añade una fuente de luz: sol cálido, foco de estudio o rayos que atraviesan la escena.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "x",
+     "label": "Posición horizontal",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 75,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "y",
+     "label": "Posición vertical",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 20,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "size",
+     "label": "Tamaño",
+     "type": "range",
+     "min": 5,
+     "max": 150,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "intensity",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "warmth",
+     "label": "Calidez",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "type",
+     "label": "Tipo",
+     "type": "select",
+     "options": [
+      [
+       "sun",
+       "Sol"
+      ],
+      [
+       "spot",
+       "Foco"
+      ],
+      [
+       "rays",
+       "Rayos"
+      ]
+     ],
+     "default": "sun"
+    }
+   ]
+  },
+  {
+   "id": "sunlight",
+   "name": "Luz cálida dorada",
+   "modules": [
+    "chroma"
+   ],
+   "desc": "Simula la luz de la hora dorada: luces cálidas, sombras ligeramente frías.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "temperature",
+     "label": "Temperatura",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "lift",
+     "label": "Luminosidad",
+     "type": "range",
+     "min": -50,
+     "max": 50,
+     "default": 10,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "photo_filter",
+   "name": "Filtro fotográfico",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Filtros de color de objetivo: cálidos, fríos y de efecto.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "type",
+     "label": "Filtro",
+     "type": "select",
+     "options": [
+      [
+       "warm_81a",
+       "Cálido 81A"
+      ],
+      [
+       "warm_85",
+       "Cálido 85 (ámbar)"
+      ],
+      [
+       "cool_80a",
+       "Frío 80A (azul)"
+      ],
+      [
+       "cool_82",
+       "Frío 82 (azul suave)"
+      ],
+      [
+       "sepia",
+       "Sepia"
+      ],
+      [
+       "green",
+       "Verde"
+      ],
+      [
+       "red",
+       "Rojo"
+      ],
+      [
+       "magenta",
+       "Magenta"
+      ],
+      [
+       "underwater",
+       "Subacuático"
+      ]
+     ],
+     "default": "warm_81a"
+    },
+    {
+     "id": "density",
+     "label": "Densidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 35,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "preserve",
+     "label": "Conservar luminosidad",
+     "type": "check",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "polarizer",
+   "name": "Polarizador",
+   "modules": [
+    "chroma"
+   ],
+   "desc": "Cielos azules profundos, nubes que destacan y menos reflejos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "rotation",
+     "label": "Rotación (tono del cielo)",
+     "type": "range",
+     "min": -30,
+     "max": 30,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "reflections",
+     "label": "Reducir reflejos",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "graduated",
+   "name": "Filtro degradado",
+   "modules": [
+    "chroma",
+    "plata",
+    "analog"
+   ],
+   "desc": "Oscurece o tiñe el cielo como un filtro degradado de cristal.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "color",
+     "label": "Color",
+     "type": "select",
+     "options": [
+      [
+       "nd",
+       "Neutro (ND)"
+      ],
+      [
+       "blue",
+       "Azul"
+      ],
+      [
+       "orange",
+       "Naranja"
+      ],
+      [
+       "tobacco",
+       "Tabaco"
+      ],
+      [
+       "magenta",
+       "Magenta"
+      ],
+      [
+       "sunset",
+       "Atardecer"
+      ],
+      [
+       "teal",
+       "Verde azulado"
+      ]
+     ],
+     "default": "nd"
+    },
+    {
+     "id": "density",
+     "label": "Densidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "position",
+     "label": "Posición",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 45,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "softness",
+     "label": "Suavidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "angle",
+     "label": "Ángulo",
+     "type": "range",
+     "min": -90,
+     "max": 90,
+     "default": 0,
+     "step": 1,
+     "unit": "°"
+    },
+    {
+     "id": "invert",
+     "label": "Desde abajo",
+     "type": "check",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "cinematic",
+   "name": "Cine (sombras / luces)",
+   "modules": [
+    "chroma"
+   ],
+   "desc": "Gradación de color de película: el clásico verde azulado y naranja o cualquier pareja de tonos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "shadow_hue",
+     "label": "Tono de sombras",
+     "type": "hue",
+     "min": 0,
+     "max": 360,
+     "default": 190,
+     "step": 1
+    },
+    {
+     "id": "highlight_hue",
+     "label": "Tono de luces",
+     "type": "hue",
+     "min": 0,
+     "max": 360,
+     "default": 32,
+     "step": 1
+    },
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "balance",
+     "label": "Equilibrio",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "skin",
+     "label": "Proteger piel",
+     "type": "check",
+     "default": true
+    },
+    {
+     "id": "contrast",
+     "label": "Contraste de cine",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 25,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "split_tone",
+   "name": "Virado partido",
+   "modules": [
+    "chroma",
+    "plata",
+    "analog"
+   ],
+   "desc": "Tiñe sombras y luces con colores distintos conservando la luminosidad.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "shadow_hue",
+     "label": "Tono de sombras",
+     "type": "hue",
+     "min": 0,
+     "max": 360,
+     "default": 220,
+     "step": 1
+    },
+    {
+     "id": "shadow_sat",
+     "label": "Saturación sombras",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "highlight_hue",
+     "label": "Tono de luces",
+     "type": "hue",
+     "min": 0,
+     "max": 360,
+     "default": 45,
+     "step": 1
+    },
+    {
+     "id": "highlight_sat",
+     "label": "Saturación luces",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 25,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "balance",
+     "label": "Equilibrio",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "bleach_bypass",
+   "name": "Blanqueo parcial (bleach bypass)",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Plata retenida en el revelado: alto contraste, colores apagados y aspecto metálico.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "contrast",
+     "label": "Contraste",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "saturation",
+     "label": "Color restante",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "cross_process",
+   "name": "Proceso cruzado",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Revelar película con el químico equivocado: colores inesperados y contraste alto.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "type",
+     "label": "Tipo",
+     "type": "select",
+     "options": [
+      [
+       "yg",
+       "Diapositiva en C-41 (amarillo/verde)"
+      ],
+      [
+       "bm",
+       "Negativo en E-6 (azul/magenta)"
+      ],
+      [
+       "cyan",
+       "Cian lavado"
+      ]
+     ],
+     "default": "yg"
+    },
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "selective_hsl",
+   "name": "Tonos específicos (HSL)",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Modifica un solo color: cielos más azules, verdes más naturales, piel más uniforme...",
+   "resizes": false,
+   "params": [
+    {
+     "id": "target",
+     "label": "Color a modificar",
+     "type": "hue",
+     "min": 0,
+     "max": 360,
+     "default": 30,
+     "step": 1
+    },
+    {
+     "id": "range",
+     "label": "Amplitud",
+     "type": "range",
+     "min": 10,
+     "max": 120,
+     "default": 35,
+     "step": 1,
+     "unit": "°"
+    },
+    {
+     "id": "hue_shift",
+     "label": "Cambiar tono",
+     "type": "range",
+     "min": -90,
+     "max": 90,
+     "default": 0,
+     "step": 1,
+     "unit": "°"
+    },
+    {
+     "id": "saturation",
+     "label": "Saturación",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "lightness",
+     "label": "Luminosidad",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "white_balance",
+   "name": "Balance de blancos",
+   "modules": [
+    "chroma",
+    "analog",
+    "clean"
+   ],
+   "desc": "Corrige o exagera la temperatura de color.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "temperature",
+     "label": "Temperatura",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "tint",
+     "label": "Matiz (verde/magenta)",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "foliage",
+   "name": "Follaje / Otoño",
+   "modules": [
+    "chroma"
+   ],
+   "desc": "Vegetación más viva o convertida en tonos otoñales.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "mode",
+     "label": "Modo",
+     "type": "select",
+     "options": [
+      [
+       "enhance",
+       "Realzar verdes"
+      ],
+      [
+       "autumn",
+       "Otoño dorado"
+      ],
+      [
+       "indian",
+       "Verano tardío (rojizo)"
+      ]
+     ],
+     "default": "enhance"
+    },
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "atmosphere",
+   "name": "Atmósfera / niebla",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Bruma, niebla o aire denso que crea profundidad y ambientes cálidos, fríos o dramáticos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Cantidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "mood",
+     "label": "Ambiente",
+     "type": "select",
+     "options": [
+      [
+       "neutral",
+       "Neutro"
+      ],
+      [
+       "warm",
+       "Cálido"
+      ],
+      [
+       "cold",
+       "Frío"
+      ],
+      [
+       "mystic",
+       "Místico"
+      ],
+      [
+       "dramatic",
+       "Tormenta"
+      ]
+     ],
+     "default": "neutral"
+    },
+    {
+     "id": "direction",
+     "label": "Dirección",
+     "type": "select",
+     "options": [
+      [
+       "uniform",
+       "Uniforme"
+      ],
+      [
+       "bottom",
+       "Desde abajo (bruma)"
+      ],
+      [
+       "top",
+       "Desde arriba"
+      ],
+      [
+       "depth",
+       "Profundidad (zonas lisas)"
+      ]
+     ],
+     "default": "uniform"
+    }
+   ]
+  },
+  {
+   "id": "pastel",
+   "name": "Pastel / película suave",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Colores suaves, negros levantados y un tinte delicado.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "lift",
+     "label": "Levantar negros",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "tint",
+     "label": "Tinte",
+     "type": "hue",
+     "min": 0,
+     "max": 360,
+     "default": 330,
+     "step": 1
+    },
+    {
+     "id": "tint_amount",
+     "label": "Cantidad de tinte",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 20,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "vignette",
+   "name": "Viñeta",
+   "modules": [
+    "chroma",
+    "plata",
+    "analog"
+   ],
+   "desc": "Oscurece (o aclara) los bordes para llevar la mirada al centro.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Cantidad",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": -40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "size",
+     "label": "Tamaño",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "roundness",
+     "label": "Redondez",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "softness",
+     "label": "Suavidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "x",
+     "label": "Centro horizontal",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "y",
+     "label": "Centro vertical",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "infrared_color",
+   "name": "Infrarrojo color",
+   "modules": [
+    "chroma",
+    "analog"
+   ],
+   "desc": "Falso color infrarrojo: vegetación clara y cielos invertidos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 70,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "foliage",
+     "label": "Brillo del follaje",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "bw_convert",
+   "name": "Conversión a blanco y negro",
+   "modules": [
+    "plata"
+   ],
+   "desc": "Convierte con la respuesta espectral de una película y un filtro de color delante del objetivo.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "film",
+     "label": "Película",
+     "type": "select",
+     "options": [
+      [
+       "neutral",
+       "Neutra (digital)"
+      ],
+      [
+       "pan100",
+       "Pancromática 100 (fina)"
+      ],
+      [
+       "classic400",
+       "Clásica 400 (granulada)"
+      ],
+      [
+       "high3200",
+       "Alta sensibilidad 3200"
+      ],
+      [
+       "ortho",
+       "Ortocromática (antigua)"
+      ],
+      [
+       "infrared",
+       "Infrarroja B/N"
+      ],
+      [
+       "portrait",
+       "Retrato suave"
+      ],
+      [
+       "document",
+       "Documental de alto contraste"
+      ]
+     ],
+     "default": "classic400"
+    },
+    {
+     "id": "filter",
+     "label": "Filtro de color",
+     "type": "select",
+     "options": [
+      [
+       "none",
+       "Sin filtro"
+      ],
+      [
+       "red",
+       "Rojo (cielos dramáticos)"
+      ],
+      [
+       "orange",
+       "Naranja"
+      ],
+      [
+       "yellow",
+       "Amarillo (clásico paisaje)"
+      ],
+      [
+       "green",
+       "Verde (follaje y piel)"
+      ],
+      [
+       "blue",
+       "Azul (niebla, atmósfera)"
+      ]
+     ],
+     "default": "none"
+    },
+    {
+     "id": "brightness",
+     "label": "Luminosidad",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "contrast",
+     "label": "Contraste",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "structure",
+     "label": "Estructura (textura)",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 20,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "whites",
+     "label": "Amplificar blancos",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "blacks",
+     "label": "Negros profundos",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 15,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "bw_zones",
+   "name": "Zonas: luces, medios, sombras",
+   "modules": [
+    "plata"
+   ],
+   "desc": "Control independiente de cada zona tonal, como en el sistema de zonas.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "highlights",
+     "label": "Luces",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "midtones",
+     "label": "Medios tonos",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "shadows",
+     "label": "Sombras",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "hl_structure",
+     "label": "Estructura en luces",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "sh_structure",
+     "label": "Estructura en sombras",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "grain",
+   "name": "Grano de película",
+   "modules": [
+    "plata",
+    "analog",
+    "chroma"
+   ],
+   "desc": "Grano fotográfico orgánico que depende de la luminosidad, no ruido digital uniforme.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Cantidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 35,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "size",
+     "label": "Tamaño",
+     "type": "range",
+     "min": 0.5,
+     "max": 6,
+     "default": 1.4,
+     "step": 0.1,
+     "unit": "px"
+    },
+    {
+     "id": "roughness",
+     "label": "Rugosidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "response",
+     "label": "Respuesta",
+     "type": "select",
+     "options": [
+      [
+       "film",
+       "Película (más en medios tonos)"
+      ],
+      [
+       "uniform",
+       "Uniforme"
+      ],
+      [
+       "shadows",
+       "Más en sombras (forzado)"
+      ]
+     ],
+     "default": "film"
+    },
+    {
+     "id": "color",
+     "label": "Grano de color",
+     "type": "check",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "toning",
+   "name": "Virado",
+   "modules": [
+    "plata",
+    "analog"
+   ],
+   "desc": "Virados químicos clásicos: selenio, sepia, cianotipia, oro, platino...",
+   "resizes": false,
+   "params": [
+    {
+     "id": "type",
+     "label": "Virado",
+     "type": "select",
+     "options": [
+      [
+       "selenium",
+       "Selenio"
+      ],
+      [
+       "sepia",
+       "Sepia"
+      ],
+      [
+       "cyanotype",
+       "Cianotipia"
+      ],
+      [
+       "gold",
+       "Oro (azul frío)"
+      ],
+      [
+       "platinum",
+       "Platino / paladio"
+      ],
+      [
+       "copper",
+       "Cobre"
+      ],
+      [
+       "split",
+       "Partido: selenio y sepia"
+      ]
+     ],
+     "default": "selenium"
+    },
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "paper_white",
+     "label": "Conservar blanco del papel",
+     "type": "check",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "paper_grade",
+   "name": "Grado de papel",
+   "modules": [
+    "plata"
+   ],
+   "desc": "Contraste del papel de copia: grados suaves para mucho detalle, duros para gráficos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "grade",
+     "label": "Grado (0 suave – 5 duro)",
+     "type": "range",
+     "min": 0,
+     "max": 5,
+     "default": 2,
+     "step": 0.5,
+     "unit": ""
+    },
+    {
+     "id": "exposure",
+     "label": "Exposición de ampliadora",
+     "type": "range",
+     "min": -100,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "burn_edges",
+   "name": "Quemar bordes (cuarto oscuro)",
+   "modules": [
+    "plata",
+    "analog",
+    "chroma"
+   ],
+   "desc": "Da más exposición a los bordes de la copia, como hace un positivador en la ampliadora.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "size",
+     "label": "Anchura",
+     "type": "range",
+     "min": 5,
+     "max": 60,
+     "default": 25,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "top",
+     "label": "Arriba",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 100,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "bottom",
+     "label": "Abajo",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 100,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "left",
+     "label": "Izquierda",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 100,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "right",
+     "label": "Derecha",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 100,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "dodge_center",
+   "name": "Aclarar centro (tapado)",
+   "modules": [
+    "plata",
+    "chroma"
+   ],
+   "desc": "Retiene luz sobre el motivo principal para aclararlo sutilmente.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "x",
+     "label": "Centro horizontal",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "y",
+     "label": "Centro vertical",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 45,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "size",
+     "label": "Tamaño",
+     "type": "range",
+     "min": 5,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "lith_print",
+   "name": "Copia lith",
+   "modules": [
+    "plata"
+   ],
+   "desc": "Revelado lith: luces suaves y cálidas, sombras duras y granuladas.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 70,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "hardness",
+     "label": "Dureza de sombras",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "warmth",
+     "label": "Calidez de luces",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "grain",
+     "label": "Grano en sombras",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "sabattier",
+   "name": "Solarización (Sabattier)",
+   "modules": [
+    "plata",
+    "analog"
+   ],
+   "desc": "Exposición a la luz durante el revelado: tonos parcialmente invertidos y bordes luminosos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "threshold",
+     "label": "Umbral",
+     "type": "range",
+     "min": 30,
+     "max": 95,
+     "default": 65,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "lines",
+     "label": "Líneas de Mackie",
+     "type": "check",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "vintage_film",
+   "name": "Película vintage",
+   "modules": [
+    "analog",
+    "chroma"
+   ],
+   "desc": "Respuesta de color de películas de época: dominantes, curvas y negros lavados.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "look",
+     "label": "Película",
+     "type": "select",
+     "options": [
+      [
+       "slide60",
+       "Diapositiva años 60"
+      ],
+      [
+       "neg70",
+       "Negativo cálido años 70"
+      ],
+      [
+       "neg80",
+       "Negativo años 80"
+      ],
+      [
+       "expired",
+       "Película caducada"
+      ],
+      [
+       "cine35",
+       "Cine 35 mm"
+      ],
+      [
+       "faded_print",
+       "Copia descolorida"
+      ],
+      [
+       "chrome_cool",
+       "Diapositiva fría"
+      ]
+     ],
+     "default": "neg70"
+    },
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 80,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "fade",
+     "label": "Desvaído extra",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "light_leak",
+   "name": "Fuga de luz",
+   "modules": [
+    "analog"
+   ],
+   "desc": "Luz que entra por la tapa o el chasis de la cámara y vela la película.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "style",
+     "label": "Estilo",
+     "type": "select",
+     "options": [
+      [
+       "red",
+       "Rojo intenso"
+      ],
+      [
+       "amber",
+       "Ámbar"
+      ],
+      [
+       "rainbow",
+       "Arcoíris"
+      ],
+      [
+       "magenta",
+       "Magenta"
+      ],
+      [
+       "burn",
+       "Quemado de bobina"
+      ]
+     ],
+     "default": "amber"
+    },
+    {
+     "id": "position",
+     "label": "Posición",
+     "type": "select",
+     "options": [
+      [
+       "left",
+       "Izquierda"
+      ],
+      [
+       "right",
+       "Derecha"
+      ],
+      [
+       "top",
+       "Arriba"
+      ],
+      [
+       "bottom",
+       "Abajo"
+      ],
+      [
+       "corner",
+       "Esquina"
+      ],
+      [
+       "random",
+       "Aleatoria"
+      ]
+     ],
+     "default": "right"
+    },
+    {
+     "id": "intensity",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 60,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "size",
+     "label": "Tamaño",
+     "type": "range",
+     "min": 5,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "seed",
+     "label": "Variación",
+     "type": "range",
+     "min": 1,
+     "max": 99,
+     "default": 7,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "dust_scratches",
+   "name": "Polvo y rayones",
+   "modules": [
+    "analog",
+    "plata"
+   ],
+   "desc": "Partículas, rayones verticales y fibras como en una película manoseada.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "dust",
+     "label": "Polvo",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "scratches",
+     "label": "Rayones",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 30,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "hairs",
+     "label": "Pelos y fibras",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 15,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "tone",
+     "label": "Tipo",
+     "type": "select",
+     "options": [
+      [
+       "print",
+       "Copia (manchas oscuras)"
+      ],
+      [
+       "negative",
+       "Negativo escaneado (manchas claras)"
+      ],
+      [
+       "mixed",
+       "Mixto"
+      ]
+     ],
+     "default": "negative"
+    },
+    {
+     "id": "seed",
+     "label": "Variación",
+     "type": "range",
+     "min": 1,
+     "max": 99,
+     "default": 3,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "lens_blur",
+   "name": "Desenfoque óptico",
+   "modules": [
+    "analog",
+    "chroma"
+   ],
+   "desc": "Desenfoques de lentes antiguas, efecto miniatura, zoom o movimiento.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "type",
+     "label": "Tipo",
+     "type": "select",
+     "options": [
+      [
+       "tilt",
+       "Basculante (miniatura)"
+      ],
+      [
+       "soft_edges",
+       "Bordes blandos (lente antigua)"
+      ],
+      [
+       "zoom",
+       "Zoom"
+      ],
+      [
+       "motion",
+       "Movimiento"
+      ],
+      [
+       "dream",
+       "Lente de ensueño"
+      ]
+     ],
+     "default": "soft_edges"
+    },
+    {
+     "id": "amount",
+     "label": "Cantidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "focus_x",
+     "label": "Foco horizontal",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "focus_y",
+     "label": "Foco vertical",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "focus_size",
+     "label": "Zona nítida",
+     "type": "range",
+     "min": 5,
+     "max": 100,
+     "default": 35,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "angle",
+     "label": "Ángulo (movimiento)",
+     "type": "range",
+     "min": -90,
+     "max": 90,
+     "default": 0,
+     "step": 1,
+     "unit": "°"
+    }
+   ]
+  },
+  {
+   "id": "chromatic_aberration",
+   "name": "Aberración cromática",
+   "modules": [
+    "analog"
+   ],
+   "desc": "Bordes de color rojo/cian típicos de objetivos sencillos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Cantidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 35,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "type",
+     "label": "Tipo",
+     "type": "select",
+     "options": [
+      [
+       "radial",
+       "Radial (lente)"
+      ],
+      [
+       "shift",
+       "Desplazamiento (registro)"
+      ]
+     ],
+     "default": "radial"
+    }
+   ]
+  },
+  {
+   "id": "texture",
+   "name": "Textura",
+   "modules": [
+    "analog",
+    "plata"
+   ],
+   "desc": "Superficies físicas: papel, lienzo, emulsión agrietada o manchas químicas.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "type",
+     "label": "Textura",
+     "type": "select",
+     "options": [
+      [
+       "paper",
+       "Papel fotográfico"
+      ],
+      [
+       "canvas",
+       "Lienzo"
+      ],
+      [
+       "emulsion",
+       "Emulsión craquelada"
+      ],
+      [
+       "stains",
+       "Manchas de revelado"
+      ]
+     ],
+     "default": "paper"
+    },
+    {
+     "id": "amount",
+     "label": "Cantidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 35,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "scale",
+     "label": "Escala",
+     "type": "range",
+     "min": 10,
+     "max": 300,
+     "default": 100,
+     "step": 1,
+     "unit": "%"
+    },
+    {
+     "id": "seed",
+     "label": "Variación",
+     "type": "range",
+     "min": 1,
+     "max": 99,
+     "default": 11,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "old_camera",
+   "name": "Cámara antigua",
+   "modules": [
+    "analog"
+   ],
+   "desc": "Combina óptica, película y defectos de una cámara de época en un solo paso.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "camera",
+     "label": "Cámara",
+     "type": "select",
+     "options": [
+      [
+       "toy",
+       "Cámara de juguete (plástico)"
+      ],
+      [
+       "box50",
+       "Cámara de cajón años 50"
+      ],
+      [
+       "wetplate",
+       "Placa húmeda (colodión)"
+      ],
+      [
+       "rangefinder70",
+       "Telemétrica años 70"
+      ],
+      [
+       "disposable90",
+       "Desechable años 90"
+      ],
+      [
+       "pinhole",
+       "Estenopeica"
+      ]
+     ],
+     "default": "toy"
+    },
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 80,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "seed",
+     "label": "Variación",
+     "type": "range",
+     "min": 1,
+     "max": 99,
+     "default": 5,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "instant",
+   "name": "Fotografía instantánea",
+   "modules": [
+    "analog"
+   ],
+   "desc": "Color de película instantánea y, opcionalmente, su marco característico (cambia el tamaño).",
+   "resizes": true,
+   "params": [
+    {
+     "id": "look",
+     "label": "Química",
+     "type": "select",
+     "options": [
+      [
+       "classic",
+       "Clásica (cian en sombras, luces cálidas)"
+      ],
+      [
+       "sx",
+       "Integral años 70 (verdosa)"
+      ],
+      [
+       "faded",
+       "Desvaída por el sol"
+      ],
+      [
+       "bw",
+       "Blanco y negro instantánea"
+      ]
+     ],
+     "default": "classic"
+    },
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 80,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "frame",
+     "label": "Marco",
+     "type": "select",
+     "options": [
+      [
+       "none",
+       "Sin marco"
+      ],
+      [
+       "square",
+       "Cuadrada clásica (marco blanco)"
+      ],
+      [
+       "wide",
+       "Formato ancho"
+      ],
+      [
+       "mini",
+       "Mini (vertical)"
+      ],
+      [
+       "black",
+       "Marco negro"
+      ],
+      [
+       "film_border",
+       "Bordes de negativo"
+      ]
+     ],
+     "default": "square"
+    },
+    {
+     "id": "crop",
+     "label": "Recortar al formato del marco",
+     "type": "check",
+     "default": true
+    }
+   ]
+  },
+  {
+   "id": "denoise",
+   "name": "Reducción de ruido",
+   "modules": [
+    "clean",
+    "realce"
+   ],
+   "desc": "Limpia el grano digital por separado en luminancia y en color, adaptado al ruido medido.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "profile",
+     "label": "Perfil de ruido",
+     "type": "profile",
+     "default": "auto",
+     "options": [
+      [
+       "auto",
+       "Automático (medir en esta foto)"
+      ],
+      [
+       "manual",
+       "Manual (sin perfil)"
+      ]
+     ]
+    },
+    {
+     "id": "luma",
+     "label": "Ruido de luminancia",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "chroma",
+     "label": "Ruido de color",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 70,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "detail",
+     "label": "Conservar detalle",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "contrast",
+     "label": "Conservar contraste",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "shadows",
+     "label": "Extra en sombras",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 0,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "jpeg",
+     "label": "Reducir artefactos JPEG",
+     "type": "check",
+     "default": false
+    }
+   ]
+  },
+  {
+   "id": "color_noise_only",
+   "name": "Sólo ruido de color",
+   "modules": [
+    "clean"
+   ],
+   "desc": "Elimina manchas de color sin tocar la nitidez (ideal para fotos de ISO medio).",
+   "resizes": false,
+   "params": [
+    {
+     "id": "strength",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 80,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "radius",
+     "label": "Radio",
+     "type": "range",
+     "min": 1,
+     "max": 20,
+     "default": 5,
+     "step": 1,
+     "unit": "px"
+    }
+   ]
+  },
+  {
+   "id": "hot_pixels",
+   "name": "Píxeles calientes",
+   "modules": [
+    "clean"
+   ],
+   "desc": "Elimina puntos aislados muy brillantes (exposiciones largas, sensores calientes).",
+   "resizes": false,
+   "params": [
+    {
+     "id": "threshold",
+     "label": "Sensibilidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "upscale",
+   "name": "Ampliar con IA",
+   "modules": [
+    "realce"
+   ],
+   "desc": "Multiplica la resolución reconstruyendo detalle con redes neuronales (cambia el tamaño).",
+   "resizes": true,
+   "params": [
+    {
+     "id": "scale",
+     "label": "Escala",
+     "type": "select",
+     "options": [
+      [
+       "2",
+       "2×"
+      ],
+      [
+       "3",
+       "3×"
+      ],
+      [
+       "4",
+       "4×"
+      ]
+     ],
+     "default": "2"
+    },
+    {
+     "id": "model",
+     "label": "Modelo",
+     "type": "select",
+     "options": [
+      [
+       "fast",
+       "IA rápida (FSRCNN)"
+      ],
+      [
+       "balance",
+       "IA equilibrada (ESPCN)"
+      ],
+      [
+       "quality",
+       "IA calidad (EDSR, lento)"
+      ],
+      [
+       "classic",
+       "Clásico (Lanczos)"
+      ]
+     ],
+     "default": "fast"
+    }
+   ]
+  },
+  {
+   "id": "sharpen",
+   "name": "Enfoque de salida",
+   "modules": [
+    "realce",
+    "clean",
+    "chroma",
+    "plata"
+   ],
+   "desc": "Máscara de enfoque sobre la luminancia con control de halos.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "amount",
+     "label": "Cantidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "radius",
+     "label": "Radio",
+     "type": "range",
+     "min": 0.3,
+     "max": 5,
+     "default": 1.0,
+     "step": 0.1,
+     "unit": "px"
+    },
+    {
+     "id": "threshold",
+     "label": "Umbral (proteger ruido)",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 20,
+     "step": 1,
+     "unit": ""
+    }
+   ]
+  }
+ ],
+ "presets": [
+  {
+   "module": "chroma",
+   "name": "Cine verde azulado y naranja",
+   "stack": [
+    {
+     "id": "tonal_contrast",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 30,
+      "radius": 40,
+      "fine": 20,
+      "saturation": 0
+     }
+    },
+    {
+     "id": "cinematic",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadow_hue": 190,
+      "highlight_hue": 32,
+      "strength": 60,
+      "balance": 0,
+      "skin": true,
+      "contrast": 30
+     }
+    },
+    {
+     "id": "vignette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": -30,
+      "size": 55,
+      "roundness": 60,
+      "softness": 70,
+      "x": 50,
+      "y": 50
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Hora dorada",
+   "stack": [
+    {
+     "id": "sunlight",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 70,
+      "temperature": 70,
+      "lift": 10
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "radius": 40,
+      "threshold": 60,
+      "warmth": 40,
+      "style": "bloom"
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 5,
+      "contrast": 10,
+      "saturation": 15,
+      "vibrance": 10,
+      "warmth": 20
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Nórdico frío",
+   "stack": [
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": -35,
+      "tint": -5
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 5,
+      "contrast": -10,
+      "saturation": -25,
+      "vibrance": 0,
+      "warmth": 0
+     }
+    },
+    {
+     "id": "curves",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "black": 0,
+      "white": 100,
+      "gamma": 10,
+      "contrast": 10,
+      "fade": 25
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Dramático",
+   "stack": [
+    {
+     "id": "dramatic",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 70,
+      "saturation": -35,
+      "darken": 40
+     }
+    },
+    {
+     "id": "shadows_highlights",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadows": 30,
+      "highlights": 40,
+      "radius": 30,
+      "color": 0
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Paisaje polarizado",
+   "stack": [
+    {
+     "id": "polarizer",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 70,
+      "rotation": 0,
+      "reflections": 40
+     }
+    },
+    {
+     "id": "graduated",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "color": "nd",
+      "density": 45,
+      "position": 40,
+      "softness": 50,
+      "angle": 0,
+      "invert": false
+     }
+    },
+    {
+     "id": "foliage",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "mode": "enhance",
+      "strength": 50
+     }
+    },
+    {
+     "id": "detail_extractor",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 35,
+      "size": 6,
+      "protect": 60
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Atardecer intenso",
+   "stack": [
+    {
+     "id": "graduated",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "color": "sunset",
+      "density": 60,
+      "position": 50,
+      "softness": 60,
+      "angle": 0,
+      "invert": false
+     }
+    },
+    {
+     "id": "light_beam",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "x": 70,
+      "y": 35,
+      "size": 60,
+      "intensity": 45,
+      "warmth": 80,
+      "type": "sun"
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 15,
+      "saturation": 20,
+      "vibrance": 20,
+      "warmth": 25
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Blanqueo de cine",
+   "stack": [
+    {
+     "id": "bleach_bypass",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 70,
+      "contrast": 50,
+      "saturation": 35
+     }
+    },
+    {
+     "id": "cinematic",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadow_hue": 200,
+      "highlight_hue": 40,
+      "strength": 25,
+      "balance": 0,
+      "skin": true,
+      "contrast": 10
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Pastel soñador",
+   "stack": [
+    {
+     "id": "pastel",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 70,
+      "lift": 45,
+      "tint": 330,
+      "tint_amount": 25
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 35,
+      "radius": 30,
+      "threshold": 50,
+      "warmth": 0,
+      "style": "soft"
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Noche neón",
+   "stack": [
+    {
+     "id": "cinematic",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "shadow_hue": 240,
+      "highlight_hue": 320,
+      "strength": 70,
+      "balance": -20,
+      "skin": false,
+      "contrast": 35
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 45,
+      "radius": 25,
+      "threshold": 70,
+      "warmth": -40,
+      "style": "bloom"
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 0,
+      "contrast": 15,
+      "saturation": 25,
+      "vibrance": 15,
+      "warmth": -10
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Bosque de otoño",
+   "stack": [
+    {
+     "id": "foliage",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "mode": "autumn",
+      "strength": 75
+     }
+    },
+    {
+     "id": "atmosphere",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "mood": "warm",
+      "direction": "depth"
+     }
+    },
+    {
+     "id": "tonal_contrast",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 35,
+      "radius": 40,
+      "fine": 25,
+      "saturation": 10
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Retrato limpio",
+   "stack": [
+    {
+     "id": "pro_contrast",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "cast": 50,
+      "contrast": 25,
+      "dynamic": 15
+     }
+    },
+    {
+     "id": "selective_hsl",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "target": 25,
+      "range": 30,
+      "hue_shift": 0,
+      "saturation": -10,
+      "lightness": 10
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 20,
+      "radius": 30,
+      "threshold": 55,
+      "warmth": 10,
+      "style": "soft"
+     }
+    },
+    {
+     "id": "dodge_center",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 20,
+      "x": 50,
+      "y": 40,
+      "size": 45
+     }
+    }
+   ]
+  },
+  {
+   "module": "chroma",
+   "name": "Tormenta",
+   "stack": [
+    {
+     "id": "atmosphere",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 35,
+      "mood": "dramatic",
+      "direction": "top"
+     }
+    },
+    {
+     "id": "dramatic",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 60,
+      "saturation": -50,
+      "darken": 50
+     }
+    },
+    {
+     "id": "white_balance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "temperature": -20,
+      "tint": 0
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Clásico 400",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "classic400",
+      "filter": "yellow",
+      "brightness": 0,
+      "contrast": 10,
+      "structure": 20,
+      "whites": 0,
+      "blacks": 20
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 35,
+      "size": 1.4,
+      "roughness": 50,
+      "response": "film",
+      "color": false
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Alto contraste",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "document",
+      "filter": "red",
+      "brightness": 0,
+      "contrast": 40,
+      "structure": 40,
+      "whites": 30,
+      "blacks": 50
+     }
+    },
+    {
+     "id": "burn_edges",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 40,
+      "size": 20,
+      "top": 100,
+      "bottom": 100,
+      "left": 100,
+      "right": 100
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "size": 1.2,
+      "roughness": 40,
+      "response": "film",
+      "color": false
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Bellas artes suave",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "pan100",
+      "filter": "none",
+      "brightness": 10,
+      "contrast": -15,
+      "structure": -10,
+      "whites": 10,
+      "blacks": 5
+     }
+    },
+    {
+     "id": "toning",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "type": "platinum",
+      "strength": 35,
+      "paper_white": true
+     }
+    },
+    {
+     "id": "dodge_center",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 20,
+      "x": 50,
+      "y": 45,
+      "size": 45
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Selenio profundo",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "classic400",
+      "filter": "orange",
+      "brightness": 0,
+      "contrast": 20,
+      "structure": 25,
+      "whites": 10,
+      "blacks": 40
+     }
+    },
+    {
+     "id": "toning",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "type": "selenium",
+      "strength": 60,
+      "paper_white": true
+     }
+    },
+    {
+     "id": "paper_grade",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "grade": 3,
+      "exposure": 0
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Lith cálido",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "pan100",
+      "filter": "none",
+      "brightness": 5,
+      "contrast": 0,
+      "structure": 10,
+      "whites": 0,
+      "blacks": 10
+     }
+    },
+    {
+     "id": "lith_print",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 80,
+      "hardness": 65,
+      "warmth": 70,
+      "grain": 45
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Infrarrojo blanco y negro",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "infrared",
+      "filter": "red",
+      "brightness": 5,
+      "contrast": 25,
+      "structure": 10,
+      "whites": 20,
+      "blacks": 30
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "radius": 25,
+      "threshold": 60,
+      "warmth": 0,
+      "style": "soft"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "size": 1.6,
+      "roughness": 60,
+      "response": "film",
+      "color": false
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Ortocromático antiguo",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "ortho",
+      "filter": "none",
+      "brightness": 0,
+      "contrast": 20,
+      "structure": 30,
+      "whites": 10,
+      "blacks": 25
+     }
+    },
+    {
+     "id": "toning",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "type": "sepia",
+      "strength": 30,
+      "paper_white": true
+     }
+    },
+    {
+     "id": "burn_edges",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 50,
+      "size": 22,
+      "top": 100,
+      "bottom": 100,
+      "left": 100,
+      "right": 100
+     }
+    },
+    {
+     "id": "dust_scratches",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "dust": 20,
+      "scratches": 10,
+      "hairs": 5,
+      "tone": "print",
+      "seed": 4
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Grano forzado 3200",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "high3200",
+      "filter": "none",
+      "brightness": 0,
+      "contrast": 30,
+      "structure": 30,
+      "whites": 10,
+      "blacks": 35
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 70,
+      "size": 2.2,
+      "roughness": 80,
+      "response": "shadows",
+      "color": false
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Cianotipia",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "pan100",
+      "filter": "blue",
+      "brightness": 5,
+      "contrast": 10,
+      "structure": 10,
+      "whites": 0,
+      "blacks": 10
+     }
+    },
+    {
+     "id": "toning",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "type": "cyanotype",
+      "strength": 85,
+      "paper_white": false
+     }
+    },
+    {
+     "id": "texture",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "type": "paper",
+      "amount": 40,
+      "scale": 100,
+      "seed": 11
+     }
+    }
+   ]
+  },
+  {
+   "module": "plata",
+   "name": "Solarizado",
+   "stack": [
+    {
+     "id": "bw_convert",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "film": "classic400",
+      "filter": "none",
+      "brightness": 0,
+      "contrast": 20,
+      "structure": 20,
+      "whites": 0,
+      "blacks": 20
+     }
+    },
+    {
+     "id": "sabattier",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 60,
+      "threshold": 65,
+      "lines": true
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Cámara de juguete",
+   "stack": [
+    {
+     "id": "old_camera",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "camera": "toy",
+      "strength": 85,
+      "seed": 5
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Instantánea clásica",
+   "stack": [
+    {
+     "id": "instant",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "look": "classic",
+      "strength": 85,
+      "frame": "square",
+      "crop": true
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Película caducada",
+   "stack": [
+    {
+     "id": "vintage_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "look": "expired",
+      "strength": 90,
+      "fade": 10
+     }
+    },
+    {
+     "id": "light_leak",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "style": "amber",
+      "position": "random",
+      "intensity": 45,
+      "size": 45,
+      "seed": 12
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 35,
+      "size": 1.6,
+      "roughness": 60,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "dust_scratches",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "dust": 30,
+      "scratches": 15,
+      "hairs": 10,
+      "tone": "negative",
+      "seed": 8
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Verano de los 70",
+   "stack": [
+    {
+     "id": "old_camera",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "camera": "rangefinder70",
+      "strength": 90,
+      "seed": 3
+     }
+    },
+    {
+     "id": "light_leak",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "style": "red",
+      "position": "left",
+      "intensity": 30,
+      "size": 35,
+      "seed": 21
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Desechable de los 90",
+   "stack": [
+    {
+     "id": "old_camera",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "camera": "disposable90",
+      "strength": 90,
+      "seed": 9
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Placa húmeda",
+   "stack": [
+    {
+     "id": "old_camera",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "camera": "wetplate",
+      "strength": 95,
+      "seed": 2
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Cine 35 mm",
+   "stack": [
+    {
+     "id": "vintage_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "look": "cine35",
+      "strength": 85,
+      "fade": 0
+     }
+    },
+    {
+     "id": "glow",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "radius": 15,
+      "threshold": 70,
+      "warmth": 0,
+      "style": "halation"
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "size": 1.3,
+      "roughness": 40,
+      "response": "film",
+      "color": true
+     }
+    },
+    {
+     "id": "vignette",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": -25,
+      "size": 55,
+      "roundness": 40,
+      "softness": 70,
+      "x": 50,
+      "y": 50
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Miniatura",
+   "stack": [
+    {
+     "id": "lens_blur",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "type": "tilt",
+      "amount": 60,
+      "focus_x": 50,
+      "focus_y": 55,
+      "focus_size": 25,
+      "angle": 0
+     }
+    },
+    {
+     "id": "brilliance",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "brightness": 5,
+      "contrast": 20,
+      "saturation": 40,
+      "vibrance": 10,
+      "warmth": 0
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Estenopeica",
+   "stack": [
+    {
+     "id": "old_camera",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "camera": "pinhole",
+      "strength": 90,
+      "seed": 1
+     }
+    },
+    {
+     "id": "grain",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "size": 1.5,
+      "roughness": 50,
+      "response": "film",
+      "color": false
+     }
+    }
+   ]
+  },
+  {
+   "module": "analog",
+   "name": "Negativo escaneado",
+   "stack": [
+    {
+     "id": "vintage_film",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "look": "neg80",
+      "strength": 70,
+      "fade": 0
+     }
+    },
+    {
+     "id": "instant",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "look": "classic",
+      "strength": 0,
+      "frame": "film_border",
+      "crop": false
+     }
+    },
+    {
+     "id": "dust_scratches",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "dust": 35,
+      "scratches": 10,
+      "hairs": 10,
+      "tone": "negative",
+      "seed": 14
+     }
+    }
+   ]
+  },
+  {
+   "module": "clean",
+   "name": "Suave (ISO bajo)",
+   "stack": [
+    {
+     "id": "denoise",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "profile": "auto",
+      "luma": 30,
+      "chroma": 60,
+      "detail": 70,
+      "contrast": 40,
+      "shadows": 0,
+      "jpeg": false
+     }
+    }
+   ]
+  },
+  {
+   "module": "clean",
+   "name": "Medio (ISO 1600-3200)",
+   "stack": [
+    {
+     "id": "denoise",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "profile": "auto",
+      "luma": 55,
+      "chroma": 80,
+      "detail": 50,
+      "contrast": 40,
+      "shadows": 20,
+      "jpeg": false
+     }
+    }
+   ]
+  },
+  {
+   "module": "clean",
+   "name": "Fuerte (ISO alto / nocturna)",
+   "stack": [
+    {
+     "id": "denoise",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "profile": "auto",
+      "luma": 80,
+      "chroma": 95,
+      "detail": 35,
+      "contrast": 50,
+      "shadows": 50,
+      "jpeg": false
+     }
+    },
+    {
+     "id": "sharpen",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "radius": 1.0,
+      "threshold": 40
+     }
+    }
+   ]
+  },
+  {
+   "module": "clean",
+   "name": "Sólo color",
+   "stack": [
+    {
+     "id": "color_noise_only",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "strength": 85,
+      "radius": 5
+     }
+    }
+   ]
+  },
+  {
+   "module": "clean",
+   "name": "Sombras ruidosas",
+   "stack": [
+    {
+     "id": "denoise",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "profile": "auto",
+      "luma": 75,
+      "chroma": 90,
+      "detail": 40,
+      "contrast": 40,
+      "shadows": 60,
+      "jpeg": false
+     },
+     "mask": {
+      "type": "shadows",
+      "softness": 60
+     }
+    }
+   ]
+  },
+  {
+   "module": "clean",
+   "name": "JPEG comprimido",
+   "stack": [
+    {
+     "id": "denoise",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "profile": "auto",
+      "luma": 25,
+      "chroma": 60,
+      "detail": 60,
+      "contrast": 30,
+      "shadows": 0,
+      "jpeg": true
+     }
+    }
+   ]
+  },
+  {
+   "module": "realce",
+   "name": "Ampliar 2× rápido",
+   "stack": [
+    {
+     "id": "denoise",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "profile": "auto",
+      "luma": 25,
+      "chroma": 60,
+      "detail": 60,
+      "contrast": 30,
+      "shadows": 0,
+      "jpeg": false
+     }
+    },
+    {
+     "id": "upscale",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "scale": "2",
+      "model": "fast"
+     }
+    },
+    {
+     "id": "sharpen",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "radius": 1.4,
+      "threshold": 20
+     }
+    }
+   ]
+  },
+  {
+   "module": "realce",
+   "name": "Ampliar 4× calidad",
+   "stack": [
+    {
+     "id": "denoise",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "profile": "auto",
+      "luma": 30,
+      "chroma": 70,
+      "detail": 60,
+      "contrast": 30,
+      "shadows": 0,
+      "jpeg": false
+     }
+    },
+    {
+     "id": "upscale",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "scale": "4",
+      "model": "quality"
+     }
+    },
+    {
+     "id": "sharpen",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 30,
+      "radius": 2.0,
+      "threshold": 25
+     }
+    }
+   ]
+  },
+  {
+   "module": "realce",
+   "name": "Nitidez de salida",
+   "stack": [
+    {
+     "id": "sharpen",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 45,
+      "radius": 1.0,
+      "threshold": 20
+     }
+    },
+    {
+     "id": "detail_extractor",
+     "enabled": true,
+     "opacity": 100,
+     "blend": "normal",
+     "params": {
+      "amount": 25,
+      "size": 4,
+      "protect": 70
+     }
+    }
+   ]
+  }
+ ]
+}
