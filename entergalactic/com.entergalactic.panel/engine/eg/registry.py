@@ -17,6 +17,8 @@ MODULES = [
     ("chroma", "Chroma", "Color cinematográfico, contraste, luz y atmósferas"),
     ("cine", "Cine", "Looks inspirados en grandes directores de fotografía"),
     ("pop", "Pop", "Serigrafía pop inspirada en Andy Warhol, repeticiones y tramas"),
+    ("film", "Película", "Más de 60 perfiles de película, grano, halación, bloom, daños y respuesta tonal"),
+    ("optics", "Óptica y luz", "Destellos, rayos de luz, partículas, filtros ópticos, objetivos y corrección de color"),
     ("plata", "Plata", "Blanco y negro de estética química tradicional"),
     ("analog", "Analógico", "Cámaras antiguas, fugas de luz, polvo y película vintage"),
     ("clean", "Clean", "Reducción de ruido de luminancia y color"),

@@ -1,19 +1,21 @@
 # ENTERGALACTIC — suite de efectos fotográficos para Photoshop CC 2018
 
-Un único panel con siete módulos. En cada módulo puedes **combinar hasta 15 filtros** en una misma edición.
+Un único panel con nueve módulos. En cada módulo puedes **combinar hasta 15 filtros** en una misma edición.
 Cada filtro tiene su opacidad, su modo de fusión y su máscara: sombras, luces, un rango de color, el centro o los bordes…
 
 | Módulo | Para qué sirve |
 |---|---|
 | **Chroma** | Color cinematográfico, contraste tonal, saturación, efectos de luz (resplandor, haz de luz, hora dorada), recuperar sombras y luces, filtros fotográficos (cálidos, fríos, polarizador, degradados), tonos específicos (HSL), atmósferas cálidas, frías o dramáticas. |
 | **Pop** | Serigrafía pop inspirada en Andy Warhol (zonas planas de color + tinta negra desplazada), repetición en cuadrícula con paletas distintas y díptico color/B-N, y trama de puntos. 9 recetas. |
+| **Película** | **69 perfiles de película** (ver [PERFILES.md](PERFILES.md)): negativo de cine, cine sin capa antihalo, retrato, consumo, diapositiva, instantánea, copias de proyección, procesos de laboratorio, color histórico (tricromía, bicromía, autocromo), 16 blancos y negros y procesos antiguos (daguerrotipo, ambrotipo, albúmina, cianotipo, calotipo, platino). Además: grano cinematográfico de tres capas según formato e ISO, halación, bloom, daños de película, respiración (variaciones sutiles de exposición y color) y compresión tonal. 13 recetas. |
+| **Óptica y luz** | Destellos de lente (estrella de diafragma, reflejos, raya anamórfica, anillo), rayos de luz volumétricos, partículas (polvo, bokeh, nieve, lluvia, chispas, luciérnagas, estrellas, confeti), filtros ópticos (estrellas, niebla negra o blanca, fog, glimmer, centro nítido), carácter de objetivo (distorsión, remolino tipo Petzval, bordes blandos, caída de luz, franjas de color) y corrección de color (automática, lift/gamma/gain). 11 recetas. |
 | **Plata** | Blanco y negro con aspecto de película química: 8 películas (pancromática, clásica 400, 3200, ortocromática, infrarroja…), filtros de color, contraste, estructura (texturas), negros profundos, zonas de luces y sombras, grano orgánico. Técnicas de cuarto oscuro: virados, grado de papel, quemado de bordes, tapado, copia lith y solarización. |
 | **Analógico** | Cámaras antiguas (juguete, cajón años 50, placa húmeda, telemétrica años 70, desechable años 90, estenopeica), fugas de luz, polvo, rayones y pelos, películas vintage, desenfoques ópticos (miniatura, bordes blandos, zoom, movimiento), aberración cromática, texturas, viñetas e instantáneas con marco. |
 | **Cine** | Looks inspirados en 14 directores de fotografía: Arkapaw, Crawley, van Hoytema, Fraser, Lubezki, Deakins, Doyle, Storaro, Willis, Kamiński, Khondji, Bradford Young, Gabriel Figueroa y Sandgren (33 recetas, ver [ESTILOS.md](ESTILOS.md)). Incluye copia de cine (film-out), paleta limitada, destello anamórfico y formatos de pantalla. |
 | **Clean** | Reducción de ruido de luminancia y de color por separado, **perfiles de ruido por cámara e ISO**, reducción localizada (con la selección de Photoshop o por zonas y colores), conservación de detalle y contraste, píxeles calientes y artefactos JPEG. |
 | **Realce IA** | Ampliación 2×, 3× o 4× con redes neuronales, más enfoque de salida. |
 
-Incluye **79 recetas** listas para usar, y puedes guardar las tuyas.
+Incluye **103 recetas** listas para usar, y puedes guardar las tuyas.
 
 ## Instalación
 
@@ -35,6 +37,7 @@ Para el modelo de ampliación de máxima calidad (unos 115 MB), ejecuta el insta
    - **Duplicar** con ⧉ y **quitar** con ✕.
    - **Opacidad** y **Fusión**: normal, multiplicar, trama, superponer, luz suave, luminosidad, color…
    - **Aplicar a**: toda la imagen, sombras, medios tonos, luces, un rango de color, el centro, los bordes, arriba o abajo. Puedes ajustar la suavidad e invertir.
+   - **Máscaras automáticas:** cielo, piel, vegetación, sujeto principal, zonas nítidas y brillos especulares. Se calculan por color, posición, textura y contraste, no con IA. Funcionan bien en fotos típicas, pero pueden confundirse; por ejemplo, la máscara de piel también marca una naranja. Para afinar, combínalas con una selección de Photoshop.
    - Doble clic en un deslizador lo devuelve a su valor por defecto.
 3. Pulsa **Vista previa**. Puedes ver la *imagen completa* o el *detalle al 100 %*, útil para el ruido y el grano. Arrastra el comparador para ver antes y después. Mientras haya vista previa, cada cambio la actualiza.
 4. Pulsa **Aplicar**:

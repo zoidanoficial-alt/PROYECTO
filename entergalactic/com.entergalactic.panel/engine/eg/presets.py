@@ -179,3 +179,9 @@ from .presets_pop import POP_PRESETS  # noqa: E402
 # Las recetas Pop van después de las de Cine.
 _j = max(i for i, p in enumerate(PRESETS) if p["module"] == "cine") + 1
 PRESETS[_j:_j] = POP_PRESETS
+
+from .presets_film import FILM_PRESETS  # noqa: E402
+
+# Película y Óptica van después de las recetas Pop.
+_k = max(i for i, p in enumerate(PRESETS) if p["module"] == "pop") + 1
+PRESETS[_k:_k] = FILM_PRESETS

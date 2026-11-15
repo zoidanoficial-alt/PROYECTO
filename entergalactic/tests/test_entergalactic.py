@@ -265,3 +265,62 @@ def test_new_cinematographers_present():
     for dp in ("Deakins", "Doyle", "Storaro", "Willis", "Kamiński", "Khondji", "Young", "Figueroa", "Sandgren"):
         assert any(n.startswith(dp) for n in names), dp
     assert len([p for p in eg.schema()["presets"] if p["module"] == "pop"]) >= 8
+
+
+# ---------------------------------------------------------------------- Película, Óptica y máscaras inteligentes
+def test_more_than_60_film_profiles_all_valid():
+    from eg.film_profiles import PROFILES
+    assert len(PROFILES) > 60
+    img = photo()
+    for pr in PROFILES:
+        out, _ = eg.run_stack(img, {"stack": [{"id": "film_profile", "params": {"profile": pr["id"], "grain": 0, "halation": 0}}]},
+                              ctx_for(img))
+        assert np.isfinite(out).all() and out.min() >= 0 and out.max() <= 1, pr["id"]
+
+
+def test_neutral_film_curve_is_identity_and_white_stays_white():
+    from eg import filters_film as FF
+    x = np.linspace(0, 1, 21).astype(np.float32)
+    lin = FF.srgb_to_lin(x)
+    assert np.abs(FF._char_curve(lin, FF._K_LO, FF._K_HI, 0, 1) - x).max() < 1e-3
+    soft_shoulder = FF._char_curve(lin, FF._K_LO, FF._K_HI * 0.7, 0, 1)
+    assert soft_shoulder[-1] > 0.99 and abs(soft_shoulder[10] - 0.5) < 0.02
+
+
+def test_bw_profiles_are_gray_and_tone_profiles_are_tinted():
+    img = photo()
+    bw, _ = eg.run_stack(img, {"stack": [{"id": "film_profile", "params": {"profile": "bw_hp5", "grain": 0}}]}, ctx_for(img))
+    assert np.abs(bw[..., 0] - bw[..., 2]).max() < 1e-4
+    cy, _ = eg.run_stack(img, {"stack": [{"id": "film_profile", "params": {"profile": "cyanotype_p", "grain": 0}}]}, ctx_for(img))
+    assert cy[..., 2].mean() > cy[..., 0].mean() + 0.05
+
+
+def test_halation_is_red_around_highlights():
+    img = np.full((80, 80, 3), 0.1, np.float32)
+    img[30:50, 30:50] = 1.0
+    out, _ = eg.run_stack(img, {"stack": [{"id": "halation", "params": {"amount": 80}}]}, ctx_for(img))
+    ring = out[25:29, 35:45]
+    assert ring[..., 0].mean() > ring[..., 2].mean() + 0.05
+
+
+def test_sky_mask_finds_top_blue_region():
+    img = photo(120, 160)
+    m = C.build_mask(img, {"type": "sky", "softness": 0}, ctx_for(img))
+    assert m[:40].mean() > 0.5 and m[80:].mean() < 0.1
+
+
+def test_skin_and_subject_masks_find_the_face_disc():
+    img = photo(120, 160)
+    skin = C.build_mask(img, {"type": "skin", "softness": 0}, ctx_for(img))
+    assert skin[55:65, 75:85].mean() > 0.5 and skin[5:15, 5:15].mean() < 0.1
+    subj = C.build_mask(img, {"type": "subject", "softness": 0}, ctx_for(img))
+    assert subj[55:65, 75:85].mean() > subj[5:15, 5:15].mean()
+
+
+def test_optics_tools_brighten_where_expected():
+    img = np.full((90, 120, 3), 0.15, np.float32)
+    img[20:26, 90:96] = 1.0
+    out, _ = eg.run_stack(img, {"stack": [{"id": "lens_flare", "params": {"auto": True}}]}, ctx_for(img))
+    assert out[23, 93].mean() >= 0.99 and out.mean() > img.mean() + 0.005
+    out2, _ = eg.run_stack(img, {"stack": [{"id": "particles", "params": {"type": "snow", "amount": 80}}]}, ctx_for(img))
+    assert (out2.max(axis=2) > 0.5).sum() > 40

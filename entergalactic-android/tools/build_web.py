@@ -45,7 +45,10 @@ def build():
     order = {m: i for i, m in enumerate(MOBILE_MODULES)}
     modules = sorted([m for m in s["modules"] if m["id"] in MOBILE_MODULES], key=lambda m: order[m["id"]])
     presets.sort(key=lambda p: order[p["module"]])
-    return dict(s, modules=modules, filters=filters, presets=presets)
+    # Las máscaras inteligentes (cielo, piel, sujeto…) sólo existen en el motor de escritorio.
+    from eg import core as _core
+    masks = [m for m in s["mask_types"] if m["id"] in _core.BASIC_MASK_TYPES]
+    return dict(s, modules=modules, filters=filters, presets=presets, mask_types=masks)
 
 
 if __name__ == "__main__":

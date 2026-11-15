@@ -320,6 +320,10 @@ def build_mask(img, spec, ctx):
         m = 1.0 - smoothstep(0.3 - 0.3 * soft, 0.5 + 0.3 * soft, v)
         if t == "bottom":
             m = 1.0 - m
+    elif t in SMART_MASKS:
+        m = SMART_MASKS[t](img, ctx)
+        if soft:
+            m = blur(m, ctx.px(2 + 30 * soft) if hasattr(ctx, "px") else 2)
     else:
         raise ValueError("Máscara desconocida: %s" % t)
     if spec.get("invert"):
@@ -327,8 +331,95 @@ def build_mask(img, spec, ctx):
     return m.astype(np.float32)
 
 
+# ------------------------------------------------------------------ máscaras inteligentes
+# Segmentación heurística (color, posición, textura, contraste): sin modelos de IA.
+def _small(img, ctx, side=320):
+    h, w = img.shape[:2]
+    f = min(1.0, side / float(max(h, w)))
+    return cv2.resize(img, (max(1, int(w * f)), max(1, int(h * f))), interpolation=cv2.INTER_AREA) if f < 1 else img
+
+
+def _up(m, img):
+    h, w = img.shape[:2]
+    return cv2.resize(m.astype(np.float32), (w, h), interpolation=cv2.INTER_LINEAR) if m.shape != (h, w) else m
+
+
+def mask_skin(img, ctx):
+    hsv = to_hsv(img)
+    h, s, v = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    m = hue_weight(h, 18.0, 28.0) * smoothstep(0.12, 0.22, s) * (1 - smoothstep(0.65, 0.85, s)) * smoothstep(0.18, 0.35, v)
+    return np.clip(m * 1.6, 0, 1).astype(np.float32)
+
+
+def mask_foliage(img, ctx):
+    hsv = to_hsv(img)
+    m = hue_weight(hsv[..., 0], 95.0, 55.0) * smoothstep(0.12, 0.3, hsv[..., 1]) * smoothstep(0.06, 0.15, hsv[..., 2])
+    return np.clip(m * 1.4, 0, 1).astype(np.float32)
+
+
+def mask_sky(img, ctx):
+    sm = _small(img, ctx)
+    hsv = to_hsv(sm)
+    hh, ss, vv = hsv[..., 0], hsv[..., 1], hsv[..., 2]
+    l = luminance(sm)
+    tex = blur(np.abs(l - blur(l, 1.5)), 3.0)
+    blue = hue_weight(hh, 210.0, 45.0) * smoothstep(0.08, 0.25, ss) * smoothstep(0.25, 0.45, vv)
+    bright = smoothstep(0.65, 0.85, vv) * (1 - smoothstep(0.15, 0.35, ss))          # cielo cubierto / nubes
+    sunset = hue_weight(hh, 25.0, 30.0) * smoothstep(0.55, 0.75, vv) * smoothstep(0.2, 0.4, ss)
+    cand = np.clip(np.maximum(np.maximum(blue, bright * 0.9), sunset * 0.7), 0, 1) * (1 - smoothstep(0.015, 0.05, tex))
+    # El cielo está conectado con el borde superior: una fila es cielo si lo parece
+    # y el cielo de la fila de encima (o de sus vecinas) llega hasta ella.
+    conn = np.zeros_like(cand)
+    conn[0] = cand[0]
+    for y in range(1, cand.shape[0]):
+        up = conn[y - 1]
+        prev = np.maximum(up, np.maximum(np.roll(up, 1), np.roll(up, -1)) * 0.98)
+        conn[y] = cand[y] * smoothstep(0.15, 0.4, prev)
+    m = blur(conn, 1.5)
+    return _up(m, img)
+
+
+def mask_subject(img, ctx):
+    """Sujeto probable: contraste de color con el entorno + sesgo al centro + piel + nitidez."""
+    sm = _small(img, ctx, 256)
+    lab = to_lab(sm)
+    mean = lab.reshape(-1, 3).mean(axis=0)
+    d = np.sqrt(((blur(lab, 2.0) - mean) ** 2).sum(axis=2))
+    d = d / (np.percentile(d, 98) + 1e-6)
+    l = luminance(sm)
+    sharp = blur(np.abs(l - blur(l, 1.2)), 4.0)
+    sharp = sharp / (np.percentile(sharp, 98) + 1e-6)
+    h, w = sm.shape[:2]
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    center = np.exp(-(((xx / w - 0.5) / 0.32) ** 2 + ((yy / h - 0.52) / 0.36) ** 2))
+    m = (0.45 * np.clip(d, 0, 1) + 0.35 * np.clip(sharp, 0, 1) + 0.5 * mask_skin(sm, ctx)) * (0.35 + 0.65 * center)
+    m = blur(m, 4.0)
+    m = smoothstep(np.percentile(m, 55), np.percentile(m, 92), m)
+    return _up(m.astype(np.float32), img)
+
+
+def mask_focus(img, ctx):
+    sm = _small(img, ctx, 320)
+    l = luminance(sm)
+    lap = np.abs(cv2.Laplacian(l, cv2.CV_32F, ksize=3))
+    e = blur(lap, 5.0)
+    e = e / (np.percentile(e, 97) + 1e-6)
+    return _up(np.clip(smoothstep(0.15, 0.6, e), 0, 1).astype(np.float32), img)
+
+
+def mask_specular(img, ctx):
+    return smoothstep(0.88, 0.97, luminance(img)).astype(np.float32)
+
+
+SMART_MASKS = {"sky": mask_sky, "skin": mask_skin, "foliage": mask_foliage, "subject": mask_subject,
+               "focus": mask_focus, "specular": mask_specular}
+
 MASK_TYPES = [
     ("all", "Toda la imagen"), ("shadows", "Sombras"), ("midtones", "Medios tonos"),
     ("highlights", "Luces"), ("color", "Rango de color"), ("center", "Centro"),
     ("edges", "Bordes"), ("top", "Parte superior"), ("bottom", "Parte inferior"),
+    ("sky", "Cielo (automático)"), ("skin", "Piel (automático)"), ("foliage", "Vegetación (automático)"),
+    ("subject", "Sujeto principal (automático)"), ("focus", "Zonas nítidas (automático)"),
+    ("specular", "Brillos especulares"),
 ]
+BASIC_MASK_TYPES = ["all", "shadows", "midtones", "highlights", "color", "center", "edges", "top", "bottom"]
