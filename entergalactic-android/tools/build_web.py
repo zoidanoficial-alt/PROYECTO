@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Genera web/schema.json para la app Android a partir del catálogo del motor de Photoshop.
 
-La app móvil lleva sólo lo necesario: módulos Cine, Chroma, Plata y Analógico
+La app móvil lleva sólo lo necesario: módulos Cine, Pop, Chroma, Plata y Analógico
 (sin Clean ni Realce IA, que necesitan OpenCV/modelos de IA). Así hay un único
 catálogo de filtros y recetas para las dos plataformas.
 """
@@ -14,7 +14,7 @@ ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 ENGINE = os.path.join(ROOT, "entergalactic", "com.entergalactic.panel", "engine")
 OUT = os.path.join(HERE, "..", "web", "schema.json")
 
-MOBILE_MODULES = ["cine", "chroma", "plata", "analog"]
+MOBILE_MODULES = ["cine", "pop", "chroma", "plata", "analog"]
 # Filtros que dependen de OpenCV/IA y no se incluyen en el móvil.
 EXCLUDED = {"denoise", "color_noise_only", "hot_pixels", "upscale"}
 

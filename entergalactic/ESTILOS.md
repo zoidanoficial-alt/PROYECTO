@@ -1,6 +1,6 @@
-# Estudio de estilos: módulo «Cine» de ENTERGALACTIC
+# Estudio de estilos: módulos «Cine» y «Pop» de ENTERGALACTIC
 
-Las recetas del módulo **Cine** interpretan en fotografía fija rasgos visuales documentados del trabajo de cinco directores de fotografía. Son **inspiraciones**: no reproducen ningún fotograma, no son LUT oficiales y no están afiliadas ni respaldadas por estas personas.
+Las recetas del módulo **Cine** (14 directores de fotografía, 33 recetas) y del módulo **Pop** (inspirado en Andy Warhol) interpretan en fotografía fija rasgos visuales documentados del trabajo de cinco directores de fotografía. Son **inspiraciones**: no reproducen ningún fotograma, no son LUT oficiales y no están afiliadas ni respaldadas por estas personas.
 
 Un look de cine nace del rodaje: la luz, el formato, la película, la óptica, el revelado. El etalonaje solo lo completa. Por eso estas recetas funcionan mejor cuando tu foto ya comparte algo con la referencia: luz práctica cálida para «Juke joint», cielo cubierto para «Delta naturalista», sol a contraluz para «Contraluz dorado»…
 
@@ -99,6 +99,141 @@ Todas terminan con **«Formato de pantalla»** desactivado. Actívalo para ver l
 
 ---
 
+## Roger Deakins
+
+**Trabajos clave:** *Blade Runner 2049*, *Sicario*, *Prisoners*, *No Country for Old Men*, *1917*.
+
+**Rasgos documentados:**
+- En *Blade Runner 2049* separa planos con **siluetas y bruma muy densa** dentro de una imagen casi monocroma naranja.
+- Prefiere la luz práctica y natural. Con Denis Villeneuve (*Prisoners*, *Sicario*, *Blade Runner 2049*) cultivó un estilo nocturno sobrio.
+
+| Receta | Qué hace |
+|---|---|
+| Deakins · Niebla naranja | Atmósfera cálida densa, paleta limitada a 28°, luces sin detalle, siluetas |
+| Deakins · Frontera nocturna | Fuente única fría, negros profundos, poco color |
+
+## Christopher Doyle
+
+**Trabajos clave:** *Chungking Express*, *In the Mood for Love* (con Mark Lee Ping-bin), *Fallen Angels*.
+
+**Rasgos documentados:**
+- En *Chungking Express* usó **step-printing** (rodar a pocas imágenes por segundo y repetir fotogramas), con un efecto entrecortado y onírico.
+- *In the Mood for Love* tiene encuadres más formales y una textura «sensual», casi pictórica.
+
+| Receta | Qué hace |
+|---|---|
+| Doyle · Neón de Hong Kong | Verdes y rojos de neón, color saturado, desenfoque de movimiento, bloom y grano |
+| Doyle · Pasillo de amor | Rojos y ámbar densos, viñeta, textura de película |
+
+## Vittorio Storaro
+
+**Trabajos clave:** *Apocalypse Now*, *Last Tango in Paris*, *1900*, *The Last Emperor*.
+
+**Rasgos documentados:**
+- Escribió *Writing with Light* sobre el **significado de los colores**.
+- El naranja es la pasión en *Last Tango in Paris*, y una luz naranja intensa recrea un atardecer en *1900*.
+- Matiz importante: según las fuentes, *Apocalypse Now* es anterior a su teoría del color y está más centrada en la luz.
+
+| Receta | Qué hace |
+|---|---|
+| Storaro · Naranja de pasión | Luz naranja de atardecer, paleta cálida, copia densa |
+
+## Gordon Willis
+
+**Trabajos clave:** *The Godfather* I y II, *Annie Hall*, *Manhattan*, *All the President's Men*.
+
+**Rasgos documentados:**
+- **Luz cenital** que hunde los ojos de Vito Corleone en sombra.
+- **Subexposición deliberada.** Conrad Hall lo apodó «el Príncipe de las Tinieblas».
+- Una pátina **ámbar** en las escenas del joven Vito (*Parte II*).
+
+| Receta | Qué hace |
+|---|---|
+| Willis · Luz cenital | Degradado oscuro desde abajo, aclarado superior, filtro ámbar, viñeta, subexposición |
+
+## Janusz Kamiński
+
+**Trabajos clave:** *Saving Private Ryan*, *Schindler's List*, *Minority Report*.
+
+**Rasgos documentados:**
+- Para *Saving Private Ryan* buscó con Spielberg un aspecto **muy desaturado y de alto contraste**.
+- Lo logró con el proceso **ENR de Technicolor** (retención de plata) en uno de los niveles más altos usados hasta entonces.
+
+| Receta | Qué hace |
+|---|---|
+| Kamiński · Desembarco | Saturación −60, blanqueo parcial fuerte, grano |
+
+## Darius Khondji
+
+**Trabajos clave:** *Se7en*, *Delicatessen*, *Uncut Gems*, *Okja*.
+
+**Rasgos documentados:**
+- En *Se7en* usó el proceso **CCE de Deluxe** (retención de plata, «más radical que cualquier bleach bypass que hubiera usado»), en copias para estreno.
+- También forzó el revelado para dar aspereza.
+
+| Receta | Qué hace |
+|---|---|
+| Khondji · Ciudad en lluvia | Blanqueo parcial, verdes enfermizos, negros densos, grano en sombras |
+
+## Bradford Young
+
+**Trabajos clave:** *Arrival*, *Selma*, *A Most Violent Year*.
+
+**Rasgos documentados:**
+- *Arrival* tiene **tonos apagados y contraste suave** sobre una cámara ya subexpuesta.
+- Young buscaba algo «oscuro de un modo que incomode». El naranja de los trajes es el único color que destaca.
+
+| Receta | Qué hace |
+|---|---|
+| Young · Penumbra suave | Luces bajas, contraste blando, negros mate, pieles cálidas protegidas |
+
+## Gabriel Figueroa
+
+**Trabajos clave:** *María Candelaria*, *Enamorada*, *Río Escondido*, *Los olvidados*, *La perla*.
+
+**Rasgos documentados:**
+- Los **«cielos de Figueroa»**: cúmulos con volumen sobre cielos oscuros, logrados con **filtros infrarrojos** y combinaciones de filtros.
+- **Claroscuro intenso** en la Época de Oro del cine mexicano.
+- *María Candelaria* ganó premios a la mejor fotografía en Cannes, Venecia y Madrid.
+
+| Receta | Qué hace |
+|---|---|
+| Figueroa · Cielo mexicano | B/N infrarrojo con filtro rojo, cielo oscurecido, nubes con contraste tonal |
+| Figueroa · Claroscuro | B/N con rostro aclarado y bordes quemados |
+
+## Linus Sandgren
+
+**Trabajos clave:** *La La Land*, *Babylon*, *No Time to Die*.
+
+**Rasgos documentados:**
+- *La La Land* se rodó en película con la idea de hacerla «como en los años 50», capturando todo en cámara sin pantalla azul.
+- Vestuario de **colores primarios** y fondos de fantasía.
+
+| Receta | Qué hace |
+|---|---|
+| Sandgren · Hora mágica musical | Cielos violeta, colores primarios, resplandor suave |
+
+---
+
+## Pop: inspiración en Andy Warhol
+
+**Técnica documentada:**
+- Warhol **pintaba primero el lienzo** con zonas de color plano.
+- Después **serigrafiaba la foto encima en tinta negra**.
+- El pequeño **desajuste entre la pintura y la impresión** creaba una superficie viva.
+- En el *Marilyn Diptych* (1962) **repite la imagen en cuadrícula**: una mitad en color intenso y la otra en blanco y negro.
+
+| Herramienta | Qué hace |
+|---|---|
+| **Serigrafía pop** | Divide la foto en zonas planas: luces, tonos cálidos o piel, tonos fríos o fondo, rojos intensos. Pinta cada zona con un color de la paleta e imprime encima la tinta negra desplazada. Los umbrales se adaptan a cada foto: «tinta» es el % de la imagen impreso en negro. |
+| **Repetición pop** | Cuadrícula 1×2, 2×2, 3×3, 2×3 o 4×4 con otra paleta en cada copia. Opción de díptico color + B/N. |
+| **Trama de puntos** | Puntos de imprenta: tinta sobre color, cuatricromía o puntos negros. |
+
+Hay 9 recetas Pop: Rosa y turquesa, Amarillo eléctrico, Violeta y naranja, Rojo y plata, Serie 2×2, Serie 3×3, Díptico color y B/N, Trama de cómic y Cuatricromía.
+
+Son interpretaciones de una técnica. No reproducen obras concretas ni están afiliadas a la Fundación Andy Warhol.
+
+---
 ## Herramientas nuevas creadas para este estudio
 
 - **Copia de cine (film-out):** curva de negativo y copia con *pie* (densidad de negros) y *hombro* (luces que ruedan sin quemarse). Incluye densidad sustractiva de color y dominantes de laboratorio. Es la base de casi todas las recetas.
@@ -107,6 +242,27 @@ Todas terminan con **«Formato de pantalla»** desactivado. Actívalo para ver l
 - **Formato de pantalla:** bandas 2.76, 2.39, 2.00, 1.90, 1.85, 1.66 o 1.43 sin cambiar el tamaño del documento.
 
 ## Fuentes consultadas
+
+**Pop y nuevos directores de fotografía**
+- Phaidon / Artspace — [How Andy Warhol got famous with soup and a starlet](https://www.phaidon.com/en-ca/blogs/artspace/how-andy-warhol-got-famous-with-soup-a-starlet)
+- Public Delivery — [Andy Warhol's Marilyn Monroe](https://publicdelivery.org/andy-warhol-marilyn-monroe/)
+- Krannert Art Museum — [Marilyn, 1971](https://kam.illinois.edu/collection-highlight/marilyn)
+- Filmmaker Magazine — [The Color of the Future: Roger Deakins on Blade Runner 2049](https://filmmakermagazine.com/?p=103272)
+- American Cinematographer — [Blade Runner 2049 (PDF)](https://cdn.theasc.com/AC1217-Blade-Runner-2047.pdf)
+- Criterion — [In the Mood for Love](https://www.criterion.com/current/posts/197-in-the-mood-for-love)
+- BFI — [How Wong Kar Wai depicts emotion](https://www.bfi.org.uk/features/mood-love-wong-kar-wai-emotion)
+- In Depth Cine — [Chungking Express](https://indepthcine.com/videos/chungking-express)
+- Cinephilia & Beyond — [Vittorio Storaro](https://cinephiliabeyond.org/vittorio-storaro-tragedy-modern-technology-effect-cinematography/)
+- No Film School — [How Gordon Willis used darkness in The Godfather](https://nofilmschool.com/2016/11/gordon-willis-the-godfather)
+- Wikipedia — [Gordon Willis](https://www.wikiwand.com/en/articles/Gordon_Willis)
+- American Cinematographer — [The 1990s (ENR en Saving Private Ryan)](https://theasc.com/article/the-end-of-the-century-as-we-knew-it-the-1990s/)
+- American Cinematographer — [Darius Khondji: Cinematic Rhythms](https://theasc.com/article/darius-khondji-asc-afc-cinematic-rhythms/)
+- American Cinematographer — [Arrival: Bradford Young](https://theasc.com/article/arrival-cinematography-bradford-young/)
+- American Cinematographer — [Gabriel Figueroa, Mexico's master cinematographer](https://theasc.com/article/gabriel-figueroa-mexicos-master-cinematographer/)
+- Wikipedia — [Gabriel Figueroa](https://en.wikipedia.org/wiki/Gabriel_Figueroa)
+- Quartz — [Sights and sounds of the 2017 Oscar films (La La Land)](https://qz.com/917662/the-curious-delightful-sights-and-sounds-that-heightened-this-years-oscar-movies)
+
+**Primera tanda**
 
 - ASC — [«Sinners: Big, Bold Blues and Blood»](https://theasc.com/article/sinners-cinematography-durald-arkapaw/)
 - Panavision — [Autumn Durald Arkapaw on filming Sinners in Ultra Panavision 70 and IMAX](https://www.panavision.com/highlights/highlights-detail/autumn-durald-arkapaw-asc-on-filming-sinners-in-ultra-panavision-70-and-imax)

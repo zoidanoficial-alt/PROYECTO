@@ -1,12 +1,13 @@
 # ENTERGALACTIC para Android
 
 Versión móvil de ENTERGALACTIC con las herramientas esenciales:
-- **Cine:** 18 looks inspirados en Arkapaw, Crawley, van Hoytema, Fraser y Lubezki.
+- **Cine:** 33 looks inspirados en 14 directores de fotografía.
+- **Pop:** serigrafía, repeticiones y tramas inspiradas en Andy Warhol.
 - **Chroma:** color, luz, contraste y atmósferas.
 - **Plata:** blanco y negro químico.
 - **Analógico:** cámaras antiguas, fugas de luz, película vintage e instantáneas.
 
-En total, 46 filtros y 49 recetas.
+En total, 49 filtros y 70 recetas.
 
 Funciona **sin conexión** y procesa las fotos en el propio móvil. No envía nada a internet.
 
@@ -24,7 +25,7 @@ Requiere Android 8.0 o posterior.
 ## Uso
 
 1. **Abrir foto:** elige una imagen de la galería.
-2. Elige una pestaña (**Cine, Chroma, Plata, Analógico**) y toca una receta. Las miniaturas se generan con tu foto.
+2. Elige una pestaña (**Cine, Pop, Chroma, Plata, Analógico**) y toca una receta. Las miniaturas se generan con tu foto.
 3. Ajusta la **Intensidad** del look. **Mantén pulsada la foto** para ver el original.
 4. En **Ajustar filtros**:
    - Activa o desactiva filtros, reordénalos (▲▼) o quítalos (✕).
@@ -51,7 +52,7 @@ entergalactic-android/
 
 **Un solo catálogo.** Las recetas y los parámetros se generan desde el mismo motor que usa el plugin de Photoshop. Una receta nueva en el escritorio llega al móvil con `python tools/build_web.py`.
 
-**Verificado contra Python.** `tests/compare.js` aplica cada filtro, cada receta y cada tipo de máscara en JavaScript y en Python sobre la misma foto (103 casos):
+**Verificado contra Python.** `tests/compare.js` aplica cada filtro, cada receta y cada tipo de máscara en JavaScript y en Python sobre la misma foto (134 casos):
 - **Filtros deterministas:** diferencia media inferior a 0,004.
 - **Filtros aleatorios** (grano, polvo, fugas de luz): se comparan por media y contraste.
 

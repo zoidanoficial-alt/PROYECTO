@@ -13,6 +13,122 @@ def lb(ratio):
 
 
 CINE_PRESETS = [
+    # ------------------------------------------------------------------ Roger Deakins
+    preset("cine", "Deakins · Niebla naranja",
+           f("atmosphere", amount=55, mood="warm", direction="depth"),
+           f("limited_palette", target=28, strength=70, desaturate=50, skin=False),
+           f("curves", black=4, white=92, gamma=0, contrast=15, fade=0),
+           f("print_film", strength=70, contrast=25, toe=60, shoulder=80, density=30, tint="warm"),
+           lb("2.39"),
+           desc="Inspirada en Roger Deakins («Blade Runner 2049»): bruma naranja muy densa, siluetas y luces sin "
+                "detalle que separan los planos por la atmósfera."),
+    preset("cine", "Deakins · Frontera nocturna",
+           f("white_balance", temperature=-30, tint=-5),
+           f("curves", black=8, white=100, gamma=-15, contrast=30, fade=0),
+           f("brilliance", brightness=0, contrast=0, saturation=-35, vibrance=0, warmth=0),
+           f("vignette", amount=-35, size=50, roundness=60, softness=70, x=50, y=50),
+           lb("2.39"),
+           desc="Inspirada en el naturalismo nocturno de Deakins con Denis Villeneuve («Sicario», «Prisoners»): "
+                "fuentes únicas, negros profundos, siluetas frías y poco color."),
+
+    # ------------------------------------------------------------------ Christopher Doyle
+    preset("cine", "Doyle · Neón de Hong Kong",
+           f("cinematic", shadow_hue=150, highlight_hue=15, strength=65, balance=-10, skin=True, contrast=30),
+           f("brilliance", brightness=5, contrast=15, saturation=40, vibrance=20, warmth=0),
+           f("lens_blur", type="motion", amount=25, focus_x=50, focus_y=50, focus_size=35, angle=0),
+           f("glow", amount=35, radius=20, threshold=65, warmth=0, style="bloom"),
+           f("grain", amount=35, size=1.6, roughness=60, response="film", color=True),
+           desc="Inspirada en Christopher Doyle («Chungking Express»): neones verdes y rojos, color saturado, luces que "
+                "estallan y movimiento borroso que evoca el «step-printing»."),
+    preset("cine", "Doyle · Pasillo de amor",
+           f("limited_palette", target=8, strength=40, desaturate=20, skin=True),
+           f("white_balance", temperature=25, tint=8),
+           f("print_film", strength=85, contrast=40, toe=60, shoulder=60, density=55, tint="warm"),
+           f("vignette", amount=-40, size=45, roundness=60, softness=75, x=50, y=50),
+           f("grain", amount=18, size=1.2, roughness=40, response="film", color=True),
+           desc="Inspirada en «In the Mood for Love» (Doyle y Mark Lee Ping-bin): rojos y ámbar densos, encuadres "
+                "pictóricos, pasillos en penumbra y textura de película."),
+
+    # ------------------------------------------------------------------ Vittorio Storaro
+    preset("cine", "Storaro · Naranja de pasión",
+           f("white_balance", temperature=45, tint=5),
+           f("limited_palette", target=25, strength=50, desaturate=25, skin=True),
+           f("light_beam", x=85, y=35, size=80, intensity=45, warmth=90, type="sun"),
+           f("print_film", strength=80, contrast=40, toe=55, shoulder=65, density=50, tint="warm"),
+           lb("2.39"),
+           desc="Inspirada en Vittorio Storaro, para quien cada color tiene un significado: la luz naranja de la "
+                "pasión y el atardecer de «Last Tango in Paris» y «1900»."),
+
+    # ------------------------------------------------------------------ Gordon Willis
+    preset("cine", "Willis · Luz cenital",
+           f("curves", black=6, white=100, gamma=-25, contrast=20, fade=0),
+           f("graduated", color="nd", density=55, position=55, softness=60, angle=0, invert=True),
+           f("dodge_center", amount=25, x=50, y=30, size=35),
+           f("photo_filter", type="warm_85", density=40, preserve=True),
+           f("vignette", amount=-50, size=40, roundness=60, softness=70, x=50, y=40),
+           f("grain", amount=15, size=1.1, roughness=30, response="film", color=True),
+           lb("1.85"),
+           desc="Inspirada en Gordon Willis («The Godfather»): luz cenital que hunde los ojos en sombra, "
+                "subexposición deliberada y pátina ámbar. Lo apodaron «el Príncipe de las Tinieblas»."),
+
+    # ------------------------------------------------------------------ Janusz Kamiński
+    preset("cine", "Kamiński · Desembarco",
+           f("brilliance", brightness=0, contrast=25, saturation=-60, vibrance=0, warmth=0),
+           f("bleach_bypass", strength=60, contrast=60, saturation=40),
+           f("white_balance", temperature=-10, tint=-5),
+           f("grain", amount=30, size=1.3, roughness=50, response="film", color=False),
+           lb("1.85"),
+           desc="Inspirada en «Saving Private Ryan» (Kamiński): color muy desaturado y alto contraste, logrados en "
+                "laboratorio con un proceso de retención de plata (ENR) en niveles muy altos."),
+
+    # ------------------------------------------------------------------ Darius Khondji
+    preset("cine", "Khondji · Ciudad en lluvia",
+           f("bleach_bypass", strength=70, contrast=55, saturation=35),
+           f("white_balance", temperature=-5, tint=-20),
+           f("curves", black=5, white=100, gamma=-15, contrast=25, fade=0),
+           f("vignette", amount=-40, size=45, roundness=60, softness=70, x=50, y=50),
+           f("grain", amount=35, size=1.4, roughness=60, response="shadows", color=True),
+           lb("2.39"),
+           desc="Inspirada en «Se7en» (Khondji): retención de plata (proceso CCE), negros densos, verdes enfermizos "
+                "y una textura áspera de película forzada."),
+
+    # ------------------------------------------------------------------ Bradford Young
+    preset("cine", "Young · Penumbra suave",
+           f("curves", black=0, white=88, gamma=-20, contrast=-20, fade=12),
+           f("brilliance", brightness=0, contrast=0, saturation=-30, vibrance=0, warmth=-5),
+           f("shadows_highlights", shadows=20, highlights=50, radius=40, color=0),
+           f("selective_hsl", target=25, range=35, hue_shift=0, saturation=10, lightness=5),
+           lb("2.39"),
+           desc="Inspirada en Bradford Young («Arrival»): exposición baja y suave, contraste blando, colores apagados "
+                "y pieles cálidas que no se pierden en la penumbra."),
+
+    # ------------------------------------------------------------------ Gabriel Figueroa
+    preset("cine", "Figueroa · Cielo mexicano",
+           f("bw_convert", film="infrared", filter="red", brightness=0, contrast=30, structure=25, whites=20, blacks=40),
+           f("graduated", color="nd", density=40, position=40, softness=55, angle=0, invert=False),
+           f("tonal_contrast", strength=50, radius=60, fine=30, saturation=0),
+           f("grain", amount=15, size=1.1, roughness=30, response="film", color=False),
+           lb("1.85"),
+           desc="Inspirada en Gabriel Figueroa («María Candelaria», «Enamorada»): los «cielos de Figueroa», nubes con "
+                "volumen sobre cielos oscuros logrados con filtros infrarrojos, y un claroscuro intenso."),
+    preset("cine", "Figueroa · Claroscuro",
+           f("bw_convert", film="pan100", filter="orange", brightness=0, contrast=35, structure=25, whites=15, blacks=50),
+           f("dodge_center", amount=30, x=50, y=40, size=40),
+           f("burn_edges", amount=55, size=25, top=100, bottom=100, left=100, right=100),
+           desc="Inspirada en el claroscuro de Figueroa en el cine de la Época de Oro mexicana: rostros iluminados "
+                "contra fondos densos y turbulentos."),
+
+    # ------------------------------------------------------------------ Linus Sandgren
+    preset("cine", "Sandgren · Hora mágica musical",
+           f("split_tone", shadow_hue=250, shadow_sat=45, highlight_hue=20, highlight_sat=35, balance=0),
+           f("selective_hsl", target=230, range=45, hue_shift=25, saturation=10, lightness=-5),
+           f("brilliance", brightness=5, contrast=10, saturation=15, vibrance=20, warmth=0),
+           f("glow", amount=30, radius=30, threshold=60, warmth=20, style="soft"),
+           f("grain", amount=15, size=1.2, roughness=30, response="film", color=True),
+           lb("2.39"),
+           desc="Inspirada en Linus Sandgren («La La Land», rodada en película al estilo del Hollywood de los 50): "
+                "cielos violeta de hora mágica, colores primarios saturados y un resplandor romántico."),
+
     # ------------------------------------------------------------------ Autumn Durald Arkapaw
     preset("cine", "Arkapaw · Juke joint (luz práctica cálida)",
            f("white_balance", temperature=22, tint=4),

@@ -173,3 +173,9 @@ from .presets_cine import CINE_PRESETS  # noqa: E402
 # Las recetas de Cine van justo después de las de Chroma.
 _i = max(i for i, p in enumerate(PRESETS) if p["module"] == "chroma") + 1
 PRESETS[_i:_i] = CINE_PRESETS
+
+from .presets_pop import POP_PRESETS  # noqa: E402
+
+# Las recetas Pop van después de las de Cine.
+_j = max(i for i, p in enumerate(PRESETS) if p["module"] == "cine") + 1
+PRESETS[_j:_j] = POP_PRESETS

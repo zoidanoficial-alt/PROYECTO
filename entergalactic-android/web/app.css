@@ -38,8 +38,9 @@ main { padding: 0 16px; }
 @keyframes scan { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
 .hold-hint { text-align: center; font-size: 12px; margin: 6px 0 10px; }
 
-.tabs { display: flex; gap: 4px; background: var(--bg2); padding: 4px; border-radius: 12px; }
-.tabs button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 9px 4px; border-radius: 9px; font: inherit; font-weight: 700; font-size: 14px; }
+.tabs { display: flex; gap: 4px; background: var(--bg2); padding: 4px; border-radius: 12px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: 1 0 auto; border: 0; background: transparent; color: var(--muted); padding: 9px 10px; border-radius: 9px; font: inherit; font-weight: 700; font-size: 13.5px; }
 .tabs button.on { background: var(--accent); color: #fff; box-shadow: 0 0 12px rgba(139, 92, 246, .45); }
 
 .presets { margin-top: 12px; }

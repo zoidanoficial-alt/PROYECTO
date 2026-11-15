@@ -1,18 +1,19 @@
 # ENTERGALACTIC — suite de efectos fotográficos para Photoshop CC 2018
 
-Un único panel con seis módulos. En cada módulo puedes **combinar hasta 15 filtros** en una misma edición.
+Un único panel con siete módulos. En cada módulo puedes **combinar hasta 15 filtros** en una misma edición.
 Cada filtro tiene su opacidad, su modo de fusión y su máscara: sombras, luces, un rango de color, el centro o los bordes…
 
 | Módulo | Para qué sirve |
 |---|---|
 | **Chroma** | Color cinematográfico, contraste tonal, saturación, efectos de luz (resplandor, haz de luz, hora dorada), recuperar sombras y luces, filtros fotográficos (cálidos, fríos, polarizador, degradados), tonos específicos (HSL), atmósferas cálidas, frías o dramáticas. |
+| **Pop** | Serigrafía pop inspirada en Andy Warhol (zonas planas de color + tinta negra desplazada), repetición en cuadrícula con paletas distintas y díptico color/B-N, y trama de puntos. 9 recetas. |
 | **Plata** | Blanco y negro con aspecto de película química: 8 películas (pancromática, clásica 400, 3200, ortocromática, infrarroja…), filtros de color, contraste, estructura (texturas), negros profundos, zonas de luces y sombras, grano orgánico. Técnicas de cuarto oscuro: virados, grado de papel, quemado de bordes, tapado, copia lith y solarización. |
 | **Analógico** | Cámaras antiguas (juguete, cajón años 50, placa húmeda, telemétrica años 70, desechable años 90, estenopeica), fugas de luz, polvo, rayones y pelos, películas vintage, desenfoques ópticos (miniatura, bordes blandos, zoom, movimiento), aberración cromática, texturas, viñetas e instantáneas con marco. |
-| **Cine** | Looks inspirados en Autumn Durald Arkapaw, Lol Crawley, Hoyte van Hoytema, Greig Fraser y Emmanuel Lubezki (18 recetas, ver [ESTILOS.md](ESTILOS.md)). Incluye copia de cine (film-out), paleta limitada, destello anamórfico y formatos de pantalla. |
+| **Cine** | Looks inspirados en 14 directores de fotografía: Arkapaw, Crawley, van Hoytema, Fraser, Lubezki, Deakins, Doyle, Storaro, Willis, Kamiński, Khondji, Bradford Young, Gabriel Figueroa y Sandgren (33 recetas, ver [ESTILOS.md](ESTILOS.md)). Incluye copia de cine (film-out), paleta limitada, destello anamórfico y formatos de pantalla. |
 | **Clean** | Reducción de ruido de luminancia y de color por separado, **perfiles de ruido por cámara e ISO**, reducción localizada (con la selección de Photoshop o por zonas y colores), conservación de detalle y contraste, píxeles calientes y artefactos JPEG. |
 | **Realce IA** | Ampliación 2×, 3× o 4× con redes neuronales, más enfoque de salida. |
 
-Incluye **58 recetas** listas para usar, y puedes guardar las tuyas.
+Incluye **79 recetas** listas para usar, y puedes guardar las tuyas.
 
 ## Instalación
 

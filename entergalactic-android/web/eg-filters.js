@@ -923,6 +923,127 @@
     return out;
   };
 
+  // =================================================================== POP (serigrafía inspirada en Warhol)
+  var PALETTES = {
+    pink_turq: ['#ffe25a', '#f6a3c4', '#29c3c0', '#e5283c', '#141414'],
+    yellow: ['#fff3a0', '#ffd21f', '#ff4f9a', '#1fa3ff', '#1a1a1a'],
+    violet_orange: ['#ffb347', '#ff7a2f', '#7b3fd1', '#ffe14d', '#161018'],
+    lime: ['#f2ff8a', '#b6f03c', '#2f6bff', '#ff3d7f', '#121a12'],
+    blue_peach: ['#ffe7c2', '#ffb08a', '#1f4fd6', '#ff2f6d', '#10131c'],
+    red_silver: ['#eeeef2', '#c9c9d1', '#9a9aa6', '#d7192a', '#121212'],
+    bw: ['#f2f2f2', '#bdbdbd', '#8a8a8a', '#5e5e5e', '#111111']
+  };
+  var COLOR_PALETTES = ['pink_turq', 'yellow', 'violet_orange', 'lime', 'blue_peach', 'red_silver'];
+  function percentile(arr, q) {   // como np.percentile (interpolación lineal)
+    var s = Float32Array.from(arr).sort(), pos = q / 100 * (s.length - 1), lo = Math.floor(pos), f = pos - lo;
+    return lo + 1 < s.length ? s[lo] + (s[lo + 1] - s[lo]) * f : s[lo];
+  }
+  function popClasses(a, p, ctx) {
+    var sm = p.simplify > 0 ? C.blur(a, ctx.px(p.simplify)) : a, n = a.w * a.h, hsv = [0, 0, 0], d = sm.d;
+    var L = C.luminance(sm).d, cls = new Int32Array(n), ink = new Float32Array(n);
+    var hiT = percentile(L, p.highlights), t = percentile(L, p.ink);
+    for (var i = 0; i < n; i++) {
+      C.rgb2hsv(d[3 * i], d[3 * i + 1], d[3 * i + 2], hsv, 0);
+      var c = 2;
+      if (C.hueWeight(hsv[0], 25, 40) > 0.35 && hsv[1] > 0.12) c = 1;
+      if (L[i] > hiT) c = 0;
+      if (hsv[1] > 0.45 && C.hueWeight(hsv[0], 355, 22) > 0.5) c = 3;
+      cls[i] = c;
+      ink[i] = L[i] < t ? 1 : 0;   // la plancha imprime tinta o no la imprime
+    }
+    return { cls: cls, ink: ink, l: L, w: a.w, h: a.h };
+  }
+  function popRender(m, palette, p, ctx) {
+    var pal = PALETTES[palette].map(C.hexColor), w = m.w, h = m.h, n = w * h, dd = p.detail / 100;
+    var off = p.offset / 1000 * Math.max(ctx.full_w, ctx.full_h) * ctx.k;
+    var dx = Math.round(off), dy = Math.round(off * 0.6), inkS = new Float32Array(n), x, y, i;
+    // Python round() redondea medios al par: se replica para que el desplazamiento coincida.
+    var pyRound = function (v) { var r = Math.round(v); return (Math.abs(v % 1) === 0.5 && r % 2 !== 0) ? r - 1 : r; };
+    dx = pyRound(off); dy = pyRound(off * 0.6);
+    for (y = 0; y < h; y++) {
+      var sy = Math.min(h - 1, Math.max(0, y - dy));
+      for (x = 0; x < w; x++) inkS[y * w + x] = m.ink[sy * w + Math.min(w - 1, Math.max(0, x - dx))];
+    }
+    if (p.texture) {
+      var rg = ctx.rng(31), N = img(w, h, 1);
+      for (i = 0; i < n; i++) N.d[i] = rg.normal();
+      N = C.blur(N, ctx.px(1.2));
+      var sd = C.std(N.d) + 1e-6, kt = p.texture / 100 * 0.25;
+      for (i = 0; i < n; i++) inkS[i] = clip01(inkS[i] * (1 - kt * Math.min(3, Math.max(0, N.d[i] / sd))));
+    }
+    var out = img(w, h, 3), ic = pal[4];
+    for (i = 0; i < n; i++) {
+      var col = pal[m.cls[i]], f = dd ? 1 - dd + dd * Math.min(1.5, Math.max(0, 0.5 + m.l[i])) : 1, k = inkS[i];
+      for (var c = 0; c < 3; c++) out.d[3 * i + c] = clip01(col[c] * f * (1 - k) + ic[c] * k);
+    }
+    return out;
+  }
+  F.pop_silkscreen = function (a, p, ctx) { return popRender(popClasses(a, p, ctx), p.palette, p, ctx); };
+
+  F.pop_grid = function (a, p, ctx) {
+    var w = a.w, h = a.h, r = ctx.rect;
+    if (r[0] !== 0 || r[1] !== 0 || r[2] !== 1 || r[3] !== 1) return F.pop_silkscreen(a, p, ctx);
+    var g = { '1x2': [1, 2], '2x2': [2, 2], '3x3': [3, 3], '2x3': [2, 3], '4x4': [4, 4] }[p.grid], rows = g[0], cols = g[1];
+    var pyRound = function (v) { var rr = Math.round(v); return (Math.abs(v % 1) === 0.5 && rr % 2 !== 0) ? rr - 1 : rr; };
+    var gap = pyRound(p.gap / 1000 * Math.max(w, h));
+    var tw = Math.max(4, Math.floor((w - gap * (cols + 1)) / cols)), th = Math.max(4, Math.floor((h - gap * (rows + 1)) / rows));
+    var ta = tw / th, cw, ch;
+    if (w / h > ta) { cw = pyRound(h * ta); ch = h; } else { cw = w; ch = pyRound(w / ta); }
+    var x0 = Math.floor((w - cw) / 2), y0 = Math.floor((h - ch) / 2), src = img(cw, ch, 3), y, x, c;
+    for (y = 0; y < ch; y++) src.d.set(a.d.subarray(((y + y0) * w + x0) * 3, ((y + y0) * w + x0 + cw) * 3), y * cw * 3);
+    var tile = (tw !== cw || th !== ch) ? C.resize(src, tw, th, 'area') : src;
+    var tk = ctx.k * tw / cw, tctx = new C.Context(th, tw, tk, [0, 0, 1, 1], ctx.seed, [tw, th]);
+    var m = popClasses(tile, p, tctx), out = img(w, h, 3);
+    for (var i = 0; i < w * h; i++) { out.d[3 * i] = 0.97; out.d[3 * i + 1] = 0.96; out.d[3 * i + 2] = 0.93; }
+    var start = COLOR_PALETTES.indexOf(p.palette); if (start < 0) start = 0;
+    var idx = 0;
+    for (var rr = 0; rr < rows; rr++) for (var cc = 0; cc < cols; cc++) {
+      var pal;
+      if (p.diptych_bw && cc === cols - 1) pal = 'bw';
+      else if (p.palette === 'bw' && !p.rotate) pal = 'bw';
+      else pal = COLOR_PALETTES[(start + (p.rotate ? idx : 0)) % COLOR_PALETTES.length];
+      var t2 = new C.Context(th, tw, tk, [0, 0, 1, 1], ctx.seed + idx, [tw, th]);
+      var rd = popRender(m, pal, p, t2), ox = gap + cc * (tw + gap), oy = gap + rr * (th + gap);
+      for (y = 0; y < th; y++) out.d.set(rd.d.subarray(y * tw * 3, (y + 1) * tw * 3), ((oy + y) * w + ox) * 3);
+      idx++;
+    }
+    return out;
+  };
+
+  F.halftone = function (a, p, ctx) {
+    var w = a.w, h = a.h, g = ctx.grid(), r = ctx.rect, cell = Math.max(2, p.size * ctx.k), k = 1 + p.contrast / 100 * 1.5;
+    var sm = C.blur(a, cell * 0.5), out = img(w, h, 3), i, x, y;
+    function dot(dark, ang, fx, fy) {
+      var an = ang * Math.PI / 180, ca = Math.cos(an), sa = Math.sin(an);
+      var rx = fx * ca + fy * sa, ry = -fx * sa + fy * ca;
+      var cx = (Math.floor(rx / cell) + 0.5) * cell - rx, cy = (Math.floor(ry / cell) + 0.5) * cell - ry;
+      var dist = Math.sqrt(cx * cx + cy * cy) / cell, rad = Math.sqrt(clip01(dark)) * 0.72;
+      var t = clip01((dist - (rad - 0.04)) / 0.08);
+      return 1 - t * t * (3 - 2 * t);
+    }
+    var inv = function (v) { return 0.5 + (0.5 - v) * k; };
+    var base = p.mode === 'ink' ? C.saturate(C.map3(sm, function (R, G, B, ii, o, j) { o[j] = clip01(R * 1.1); o[j + 1] = clip01(G * 1.1); o[j + 2] = clip01(B * 1.1); }), 1.3) : null;
+    for (y = 0; y < h; y++) {
+      var fy = (g.v[y] - r[1]) / (r[3] - r[1]) * h;
+      for (x = 0; x < w; x++) {
+        var fx = (g.u[x] - r[0]) / (r[2] - r[0]) * w, j = (y * w + x) * 3, d = sm.d;
+        if (p.mode === 'cmy') {
+          out.d[j] = clip01(1 - dot(inv(d[j]), p.angle + 15, fx, fy));
+          out.d[j + 1] = clip01(1 - dot(inv(d[j + 1]), p.angle + 75, fx, fy));
+          out.d[j + 2] = clip01(1 - dot(inv(d[j + 2]), p.angle, fx, fy));
+        } else {
+          var l = d[j] * LR + d[j + 1] * LG + d[j + 2] * LB;
+          if (p.mode === 'mono') { var v = 1 - dot(inv(l), p.angle, fx, fy); out.d[j] = out.d[j + 1] = out.d[j + 2] = v; }
+          else {
+            var dd = dot((0.7 - l) * k, p.angle, fx, fy);
+            for (var c = 0; c < 3; c++) out.d[j + c] = base.d[j + c] * (1 - dd * 0.85);
+          }
+        }
+      }
+    }
+    return out;
+  };
+
   // =================================================================== nitidez (de Realce)
   F.sharpen = function (a, p, ctx) {
     var L = C.luminance(a), l = L.d, r = ctx.px(p.radius), b = C.blur(L, r).d, thr = p.threshold / 100 * 0.02, amt = p.amount / 100 * 2.5;

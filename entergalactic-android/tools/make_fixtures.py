@@ -21,6 +21,14 @@ def main(photo, out_dir):
                "mask": {"type": m, "softness": 40}, "opacity": 70, "blend": b}]}}
               for m, b in [("shadows", "normal"), ("highlights", "multiply"), ("midtones", "screen"), ("color", "overlay"),
                            ("center", "soft_light"), ("edges", "luminosity"), ("top", "color"), ("bottom", "darken")]]
+    # Pop sin textura de tinta (aleatoria) para comparar píxel a píxel.
+    for st in ({"id": "pop_silkscreen", "params": {"texture": 0}},
+               {"id": "pop_silkscreen", "params": {"texture": 0, "palette": "lime", "simplify": 0, "offset": 20}},
+               {"id": "pop_grid", "params": {"texture": 0}},
+               {"id": "pop_grid", "params": {"texture": 0, "grid": "1x2", "diptych_bw": True}},
+               {"id": "pop_grid", "params": {"texture": 0, "grid": "3x3", "palette": "bw", "rotate": False}},
+               {"id": "halftone", "params": {"mode": "cmy"}}, {"id": "halftone", "params": {"mode": "mono"}}):
+        cases.append({"name": "pop:" + st["id"] + json.dumps(st["params"], sort_keys=True), "recipe": {"stack": [st]}})
     index = []
     for i, c in enumerate(cases):
         ctx = C.Context(120, 160, 1.0, (0, 0, 1, 1), 1, (160, 120))

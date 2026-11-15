@@ -230,3 +230,38 @@ def test_serve_mode_answers_requests(tmp_path):
     finally:
         proc.stdin.close()
         proc.wait(timeout=10)
+
+
+# ---------------------------------------------------------------------- Pop y nuevos directores de fotografía
+def test_pop_silkscreen_uses_flat_palette_colors():
+    from eg import filters_pop as FP
+    img = photo()
+    out, _ = eg.run_stack(img, {"stack": [{"id": "pop_silkscreen", "params": {"texture": 0, "detail": 0, "offset": 0}}]},
+                          ctx_for(img))
+    pal = np.array([C.hex_color(c) for c in FP.PALETTES["pink_turq"][1:]], np.float32)
+    flat = out.reshape(-1, 3)
+    d = np.min(np.abs(flat[:, None, :] - pal[None, :, :]).sum(axis=2), axis=1)
+    # Casi todos los píxeles son uno de los 5 colores de la paleta (salvo el borde suavizado de la tinta).
+    assert (d < 0.02).mean() > 0.9
+
+
+def test_pop_grid_keeps_size_and_tiles_differ():
+    img = photo(120, 160)
+    out, _ = eg.run_stack(img, {"stack": [{"id": "pop_grid", "params": {"grid": "2x2", "texture": 0}}]}, ctx_for(img))
+    assert out.shape == img.shape
+    assert np.abs(out[10:50, 10:70].mean(axis=(0, 1)) - out[70:110, 90:150].mean(axis=(0, 1))).sum() > 0.05
+
+
+def test_diptych_last_column_is_gray():
+    img = photo(120, 160)
+    out, _ = eg.run_stack(img, {"stack": [{"id": "pop_grid", "params": {"grid": "1x2", "diptych_bw": True,
+                                                                         "texture": 0, "detail": 0}}]}, ctx_for(img))
+    right = out[20:100, 100:150]
+    assert np.abs(right[..., 0] - right[..., 1]).max() < 0.01
+
+
+def test_new_cinematographers_present():
+    names = [p["name"] for p in eg.schema()["presets"] if p["module"] == "cine"]
+    for dp in ("Deakins", "Doyle", "Storaro", "Willis", "Kamiński", "Khondji", "Young", "Figueroa", "Sandgren"):
+        assert any(n.startswith(dp) for n in names), dp
+    assert len([p for p in eg.schema()["presets"] if p["module"] == "pop"]) >= 8
