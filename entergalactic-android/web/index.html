@@ -29,17 +29,19 @@
 
     <nav id="tabs" class="tabs"></nav>
 
-    <section class="presets">
+    <section id="develop" class="develop hidden"></section>
+
+    <section class="presets looks-only">
       <div id="presetStrip" class="strip"></div>
       <p id="presetDesc" class="desc hidden"></p>
     </section>
 
-    <section class="intensity">
+    <section class="intensity looks-only">
       <label>Intensidad <output id="intOut">100</output></label>
       <input type="range" id="intensity" min="0" max="100" value="100">
     </section>
 
-    <details id="adjust" class="adjust">
+    <details id="adjust" class="adjust looks-only">
       <summary>Ajustar filtros <span id="stackCount" class="muted"></span></summary>
       <div id="stack" class="stack"></div>
       <div class="add-row">
@@ -68,6 +70,9 @@
     <button id="btnSave" class="btn primary" disabled>Guardar en galería</button>
   </footer>
 
+  <script src="eg-core.js"></script>
+  <script src="eg-filters.js"></script>
+  <script src="eg-develop.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

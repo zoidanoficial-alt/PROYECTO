@@ -31,6 +31,7 @@ jobs:
           git diff --exit-code entergalactic-android/web/schema.json || (echo "schema.json desactualizado: ejecuta tools/build_web.py" && exit 1)
           python entergalactic-android/tools/make_fixtures.py entergalactic-android/tests/fixture.jpg /tmp/fx
           node entergalactic-android/tests/compare.js /tmp/fx
+          node entergalactic-android/tests/develop.test.js
 
       - uses: actions/setup-java@v4
         with:
@@ -57,4 +58,4 @@ jobs:
           gh release create entergalactic-android ENTERGALACTIC.apk \
             --target "${{ github.sha }}" --prerelease \
             --title "ENTERGALACTIC para Android" \
-            --notes "APK de ENTERGALACTIC (Cine, Chroma, Plata y Analógico). Compilada automáticamente desde ${{ github.sha }}. Descárgala desde el móvil, ábrela y permite «Instalar apps desconocidas» si Android lo pide."
+            --notes "APK de ENTERGALACTIC: Revelado, Cine, Pop, Chroma, Plata y Analógico. Compilada automáticamente desde ${{ github.sha }}. Descárgala desde el móvil, ábrela y permite «Instalar apps desconocidas» si Android lo pide."

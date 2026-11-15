@@ -4,7 +4,9 @@
   var $ = function (id) { return document.getElementById(id); };
   var STORE = 'eg-mobile-v1';
   var SCHEMA, FILTERS = {}, worker, file = null, loaded = false;
-  var state = { module: 'cine', stacks: {}, chosen: {}, intensity: 100, exportSize: 4096 };
+  var D = window.EGDevelop;
+  var state = { module: 'develop', stacks: {}, chosen: {}, intensity: 100, exportSize: 4096, dev: null, devOpen: { basic: true } };
+  var devUI = { channel: 'rgb', hslColor: 'orange' };
   var pv = { inflight: false, pending: null, seq: 0 };
   var thumbs = {}, openCards = {}, saving = false;
 
@@ -25,7 +27,13 @@
     try { var s = JSON.parse(localStorage.getItem(STORE) || 'null'); if (s) Object.keys(s).forEach(function (k) { state[k] = s[k]; }); } catch (e) { /* nada */ }
   }
   function status(msg, err) { $('status').textContent = msg || ''; $('status').className = 'status' + (err ? ' error' : ''); }
-  function stack() { return state.stacks[state.module]; }
+  function stack() { return state.stacks[state.module] || []; }
+  // El look activo es el del último módulo de looks visitado (el revelado va siempre antes).
+  function lookStack() {
+    var m = state.module === 'develop' ? state.lastLook : state.module;
+    if (!m || state.lookOff) return [];
+    return state.stacks[m] || [];
+  }
   function presetsOf(mod) { return SCHEMA.presets.filter(function (p) { return p.module === mod; }); }
 
   // ------------------------------------------------------------------ arranque
@@ -33,6 +41,8 @@
     SCHEMA = s;
     s.filters.forEach(function (f) { FILTERS[f.id] = f; });
     load();
+    var dd = D.defaults();
+    state.dev = state.dev ? Object.assign(dd, state.dev) : dd;
     s.modules.forEach(function (m) {
       if (!state.stacks[m.id]) {
         var first = presetsOf(m.id)[0];
@@ -40,7 +50,7 @@
         state.chosen[m.id] = first ? first.name : '';
       }
     });
-    if (!s.modules.some(function (m) { return m.id === state.module; })) state.module = s.modules[0].id;
+    if (state.module !== 'develop' && !s.modules.some(function (m) { return m.id === state.module; })) state.module = 'develop';
     worker = new Worker('worker.js');
     worker.onmessage = onWorker;
     worker.postMessage({ type: 'init', schema: s });
@@ -67,6 +77,7 @@
       paint($('orig'), m);
     } else if (m.type === 'preview') {
       paint($('canvas'), m);
+      if (m.hist) drawHisto(m.hist);
       pv.inflight = false;
       $('busy').classList.toggle('hidden', !pv.pending);
       if (!saving) status((m.draft ? 'Vista rápida' : 'Vista previa') + ' · ' + m.ms + ' ms');
@@ -77,6 +88,10 @@
       thumbs[m.key] = c.toDataURL('image/jpeg', 0.8);
       var chip = document.querySelector('.chip[data-key="' + CSS.escape(m.key) + '"] .th');
       if (chip) chip.style.backgroundImage = 'url(' + thumbs[m.key] + ')';
+    } else if (m.type === 'auto') {
+      ['exposure', 'contrast', 'highlights', 'shadows', 'whites', 'blacks', 'vibrance'].forEach(function (k) { state.dev[k] = m.settings[k]; });
+      renderDevelop(); devCommit();
+      status('Ajuste automático aplicado');
     } else if (m.type === 'progress') {
       status('Guardando… ' + Math.round(m.f * 100) + '% · ' + m.label);
     } else if (m.type === 'exported') {
@@ -108,7 +123,7 @@
     $('busy').classList.remove('hidden');
     var size = previewSize();
     worker.postMessage({ type: 'preview', id: ++pv.seq, draft: o.draft, size: o.draft ? Math.round(size * 0.45) : size,
-      recipe: { stack: stack() }, intensity: state.intensity });
+      recipe: { stack: lookStack() }, intensity: state.intensity, dev: state.dev });
   }
   var liveTimer = null, lastLive = 0;
   function live() {
@@ -123,7 +138,7 @@
     if (!loaded) return;
     var items = presetsOf(state.module).filter(function (p) { return !thumbs[p.name]; })
       .map(function (p) { return { key: p.name, recipe: { stack: p.stack } }; });
-    if (items.length) worker.postMessage({ type: 'thumbs', items: items });
+    if (items.length) worker.postMessage({ type: 'thumbs', items: items, dev: state.dev });
   }
 
   // ------------------------------------------------------------------ abrir y guardar
@@ -150,7 +165,7 @@
     saving = true;
     $('btnSave').disabled = true;
     status('Guardando…');
-    worker.postMessage({ type: 'export', recipe: { stack: stack() }, intensity: state.intensity, quality: 0.95 });
+    worker.postMessage({ type: 'export', recipe: { stack: lookStack() }, intensity: state.intensity, dev: state.dev, quality: 0.95 });
   }
   function deliver(blob, w, h) {
     var name = 'ENTERGALACTIC_' + new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14) + '.jpg';
@@ -185,9 +200,14 @@
   function renderTabs() {
     var t = $('tabs');
     t.innerHTML = '';
+    var devBtn = el('button', { cls: state.module === 'develop' ? 'on' : '', onclick: function () {
+      state.module = 'develop'; save(); renderAll();
+    } }, ['Revelado']);
+    if (!D.isNeutral(state.dev)) devBtn.appendChild(el('span', { cls: 'live', title: 'Revelado activo' }));
+    t.appendChild(devBtn);
     SCHEMA.modules.forEach(function (m) {
       t.appendChild(el('button', { cls: m.id === state.module ? 'on' : '', text: m.name, onclick: function () {
-        state.module = m.id; save(); renderAll(); requestPreview(false); requestThumbs();
+        state.module = m.id; state.lastLook = m.id; state.lookOff = false; save(); renderAll(); requestPreview(false); requestThumbs();
       } }));
     });
   }
@@ -296,9 +316,197 @@
       .forEach(function (f) { sel.appendChild(el('option', { value: f.id, text: f.name })); });
   }
   function renderAll() {
-    renderTabs(); renderPresets(); renderStack();
+    var isDev = state.module === 'develop';
+    Array.prototype.forEach.call(document.querySelectorAll('.looks-only'), function (e) { e.classList.toggle('hidden', isDev); });
+    $('develop').classList.toggle('hidden', !isDev);
+    renderTabs();
+    if (isDev) renderDevelop(); else { renderPresets(); renderStack(); }
     $('intensity').value = state.intensity; $('intOut').textContent = state.intensity;
     $('exportSize').value = String(state.exportSize);
+  }
+
+  // ------------------------------------------------------------------ Revelado
+  function fmtDev(p, v) {
+    if (p.unit === 'EV') return (v > 0 ? '+' : '') + Number(v).toFixed(2);
+    if (p.track === 'hue') return Math.round(v) + '°';
+    if (p.step && p.step < 1) return (v > 0 && p.min < 0 ? '+' : '') + Number(v).toFixed(1) + (p.unit || '');
+    return (v > 0 && p.min < 0 ? '+' : '') + Math.round(v) + (p.unit === '%' ? '%' : '');
+  }
+  function devSlider(p, get, set) {
+    var v = get(), out = el('b', { text: fmtDev(p, v), cls: v !== p.def ? 'changed' : '' });
+    var inp = el('input', { type: 'range', min: p.min, max: p.max, step: p.step || 1, value: v });
+    if (p.track) inp.className = p.track;
+    var upd = function (x) { set(x); out.textContent = fmtDev(p, x); out.className = x !== p.def ? 'changed' : ''; };
+    inp.addEventListener('input', function () { upd(+inp.value); live(); });
+    inp.addEventListener('change', devCommit);
+    // doble toque: valor por defecto
+    inp.addEventListener('dblclick', function () { inp.value = p.def; upd(p.def); devCommit(); });
+    return el('div', { cls: 'dslider' }, [el('div', { cls: 'lbl' }, [el('span', { text: p.label }), out]), inp]);
+  }
+  function devCommit() {
+    thumbs = {};
+    save(); renderTabs(); commit();
+  }
+  function resetSection(sec) {
+    var d = D.defaults();
+    if (sec.custom === 'curve') state.dev.curve = d.curve;
+    else if (sec.custom === 'hsl') state.dev.hsl = d.hsl;
+    else sec.params.forEach(function (p) { state.dev[p.id] = d[p.id]; });
+    renderDevelop(); devCommit();
+  }
+  function renderDevelop() {
+    var box = $('develop');
+    box.innerHTML = '';
+    var hc = el('canvas', { id: 'histo' });
+    box.appendChild(el('div', { cls: 'histo' }, [hc, el('span', { cls: 'info', id: 'histoInfo', text: '' })]));
+    box.appendChild(el('div', { cls: 'dev-bar' }, [
+      el('button', { cls: 'btn ghost', text: '✦ Auto', onclick: function () { if (loaded) worker.postMessage({ type: 'auto' }); } }),
+      el('button', { cls: 'btn', text: 'Restablecer todo', onclick: function () { state.dev = D.defaults(); renderDevelop(); devCommit(); } })]));
+    D.SECTIONS.forEach(function (sec) {
+      var det = el('details', { cls: 'dsec' });
+      if (state.devOpen[sec.id]) det.open = true;
+      det.addEventListener('toggle', function () { state.devOpen[sec.id] = det.open; save(); if (det.open && sec.custom === 'curve') drawCurve(); });
+      var reset = el('span', { cls: 'reset', text: 'Restablecer' });
+      reset.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); resetSection(sec); });
+      det.appendChild(el('summary', {}, [el('span', { text: sec.name }), reset]));
+      if (sec.custom === 'curve') det.appendChild(curveEditor());
+      else if (sec.custom === 'hsl') det.appendChild(hslEditor());
+      else sec.params.forEach(function (p) {
+        if (p.type === 'select') {
+          var sel = el('select');
+          p.options.forEach(function (o) { sel.appendChild(el('option', { value: o[0], text: o[1] })); });
+          sel.value = state.dev[p.id];
+          sel.addEventListener('change', function () { state.dev[p.id] = sel.value; devCommit(); });
+          det.appendChild(el('div', { cls: 'param' }, [el('div', { cls: 'lbl' }, [el('span', { text: p.label })]), sel]));
+        } else det.appendChild(devSlider(p, function () { return state.dev[p.id]; }, function (x) { state.dev[p.id] = x; }));
+      });
+      box.appendChild(det);
+    });
+    var lk = lookStack().filter(function (it) { return it.enabled !== false; });
+    if (lk.length) {
+      var mod = SCHEMA.modules.filter(function (m) { return m.id === state.lastLook; })[0];
+      var nm = state.chosen[state.lastLook] || (lk.length + ' filtros');
+      box.insertBefore(el('div', { cls: 'desc' }, ['Look aplicado encima: ' + (mod ? mod.name : '') + ' · ' + nm + '  ',
+        el('button', { cls: 'link', text: 'Quitar', onclick: function () { state.lookOff = true; save(); renderDevelop(); commit(); } })]), box.children[2]);
+    }
+    box.appendChild(el('p', { cls: 'dev-note', text: 'El revelado se aplica antes del look que elijas en Cine, Pop, Chroma, Plata o Analógico. Admite JPEG, PNG y HEIC; los archivos RAW (DNG) todavía no se pueden abrir.' }));
+    if (lastHist) drawHisto(lastHist);
+    setTimeout(drawCurve, 0);
+  }
+  var lastHist = null;
+  function drawHisto(h) {
+    lastHist = h;
+    var c = $('histo');
+    if (!c) return;
+    var dpr = window.devicePixelRatio || 1, W = c.clientWidth * dpr, H = c.clientHeight * dpr;
+    if (!W) return;
+    c.width = W; c.height = H;
+    var g = c.getContext('2d'), mx = 1;
+    ['r', 'g', 'b'].forEach(function (k) { h[k].forEach(function (v, i) { if (i > 0 && i < 63 && v > mx) mx = v; }); });
+    g.globalCompositeOperation = 'lighter';
+    [['r', 'rgba(255,70,70,.75)'], ['g', 'rgba(70,255,110,.75)'], ['b', 'rgba(80,140,255,.75)']].forEach(function (cv) {
+      g.fillStyle = cv[1]; g.beginPath(); g.moveTo(0, H);
+      h[cv[0]].forEach(function (v, i) { g.lineTo(i / 63 * W, H - Math.min(1, v / mx) * H * 0.95); });
+      g.lineTo(W, H); g.closePath(); g.fill();
+    });
+    var lo = h.r[0] + h.g[0] + h.b[0], hi = h.r[63] + h.g[63] + h.b[63], tot = h.r.reduce(function (a, b) { return a + b; }, 0) * 3;
+    var info = $('histoInfo');
+    if (info) info.textContent = (hi / tot > 0.01 ? '⚠ luces quemadas  ' : '') + (lo / tot > 0.02 ? '⚠ sombras empastadas' : '');
+  }
+
+  // Curva de tonos: tocar para añadir un punto, arrastrar para moverlo, sacarlo del recuadro para quitarlo.
+  var curveCanvas = null, dragPt = -1;
+  function curvePts() { return state.dev.curve[devUI.channel]; }
+  function curveEditor() {
+    var wrap = el('div', { cls: 'curve-wrap' });
+    var chips = el('div', { cls: 'chips' });
+    [['rgb', 'RGB'], ['r', 'Rojo'], ['g', 'Verde'], ['b', 'Azul']].forEach(function (c) {
+      chips.appendChild(el('button', { cls: devUI.channel === c[0] ? 'on' : '', text: c[1], onclick: function () { devUI.channel = c[0]; renderDevelop(); } }));
+    });
+    curveCanvas = el('canvas');
+    var pos = function (e) {
+      var r = curveCanvas.getBoundingClientRect();
+      return [(e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height];
+    };
+    curveCanvas.addEventListener('pointerdown', function (e) {
+      var p = pos(e), pts = curvePts(), best = -1, bd = 0.06;
+      pts.forEach(function (q, i) { var d = Math.hypot(q[0] - p[0], q[1] - p[1]); if (d < bd) { bd = d; best = i; } });
+      if (best < 0) {
+        var lut = D.curveLUT(pts), y = lut ? lut[Math.round(Math.min(1, Math.max(0, p[0])) * 1024)] : p[0];
+        pts.push([Math.min(0.99, Math.max(0.01, p[0])), y]);
+        pts.sort(function (a, b) { return a[0] - b[0]; });
+        best = pts.findIndex(function (q) { return q[1] === y; });
+      }
+      dragPt = best;
+      curveCanvas.setPointerCapture(e.pointerId);
+      e.preventDefault(); drawCurve(); live();
+    });
+    curveCanvas.addEventListener('pointermove', function (e) {
+      if (dragPt < 0) return;
+      var p = pos(e), pts = curvePts(), last = pts.length - 1, q = pts[dragPt];
+      if (dragPt === 0) q[0] = 0; else if (dragPt === last) q[0] = 1;
+      else q[0] = Math.min(pts[dragPt + 1][0] - 0.01, Math.max(pts[dragPt - 1][0] + 0.01, p[0]));
+      q[1] = Math.min(1, Math.max(0, p[1]));
+      q.out = dragPt > 0 && dragPt < last && (p[1] < -0.08 || p[1] > 1.08);
+      drawCurve(); live();
+    });
+    var end = function () {
+      if (dragPt < 0) return;
+      var pts = curvePts();
+      if (pts[dragPt] && pts[dragPt].out) pts.splice(dragPt, 1);
+      pts.forEach(function (q) { delete q.out; });
+      dragPt = -1; drawCurve(); devCommit();
+    };
+    curveCanvas.addEventListener('pointerup', end);
+    curveCanvas.addEventListener('pointercancel', end);
+    wrap.appendChild(chips); wrap.appendChild(curveCanvas);
+    wrap.appendChild(el('p', { cls: 'dev-note', text: 'Toca la curva para añadir un punto, arrástralo para moverlo y sácalo del recuadro para quitarlo.' }));
+    return wrap;
+  }
+  function drawCurve() {
+    var c = curveCanvas;
+    if (!c || !c.isConnected) return;
+    var dpr = window.devicePixelRatio || 1, W = c.clientWidth * dpr;
+    if (!W) return;
+    c.width = W; c.height = W;
+    var g = c.getContext('2d'), col = { rgb: '#ffffff', r: '#ff5a5a', g: '#4ade80', b: '#5a9bff' }[devUI.channel];
+    g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = dpr;
+    for (var i = 1; i < 4; i++) { g.beginPath(); g.moveTo(i * W / 4, 0); g.lineTo(i * W / 4, W); g.moveTo(0, i * W / 4); g.lineTo(W, i * W / 4); g.stroke(); }
+    if (lastHist) {
+      var hh = lastHist.r.map(function (v, k) { return v + lastHist.g[k] + lastHist.b[k]; }), mx = Math.max.apply(null, hh.slice(1, 63)) || 1;
+      g.fillStyle = 'rgba(139,92,246,.18)'; g.beginPath(); g.moveTo(0, W);
+      hh.forEach(function (v, k) { g.lineTo(k / 63 * W, W - Math.min(1, v / mx) * W * 0.6); });
+      g.lineTo(W, W); g.fill();
+    }
+    g.strokeStyle = 'rgba(255,255,255,.2)'; g.beginPath(); g.moveTo(0, W); g.lineTo(W, 0); g.stroke();
+    var pts = curvePts(), lut = D.curveLUT(pts.filter(function (q) { return !q.out; }));
+    g.strokeStyle = col; g.lineWidth = 2.5 * dpr; g.beginPath();
+    for (var x = 0; x <= 256; x++) { var y = lut ? lut[x * 4] : x / 256; if (x === 0) g.moveTo(0, W - y * W); else g.lineTo(x / 256 * W, W - y * W); }
+    g.stroke();
+    pts.forEach(function (q, k) {
+      g.fillStyle = q.out ? '#ff6b81' : (k === dragPt ? col : '#13121a'); g.strokeStyle = col; g.lineWidth = 2 * dpr;
+      g.beginPath(); g.arc(q[0] * W, W - q[1] * W, 7 * dpr, 0, Math.PI * 2); g.fill(); g.stroke();
+    });
+  }
+
+  function hslEditor() {
+    var wrap = el('div');
+    var chips = el('div', { cls: 'chips' });
+    var hex = { red: '#ff3b3b', orange: '#ff8c1a', yellow: '#ffd21a', green: '#3ccf4e', aqua: '#26d6d0', blue: '#2f6bff', purple: '#8b4dff', magenta: '#e83fc8' };
+    D.HSL_COLORS.forEach(function (c) {
+      var b = el('button', { cls: 'dot' + (devUI.hslColor === c[0] ? ' on' : ''), title: c[1], onclick: function () { devUI.hslColor = c[0]; renderDevelop(); } });
+      b.style.background = hex[c[0]];
+      chips.appendChild(b);
+    });
+    wrap.appendChild(chips);
+    var name = D.HSL_COLORS.filter(function (c) { return c[0] === devUI.hslColor; })[0][1];
+    wrap.appendChild(el('p', { cls: 'dev-note', text: 'Color: ' + name }));
+    var v = state.dev.hsl[devUI.hslColor];
+    [['h', 'Tono'], ['s', 'Saturación'], ['l', 'Luminancia']].forEach(function (k) {
+      wrap.appendChild(devSlider({ id: k[0], label: k[1], min: -100, max: 100, def: 0, step: 1 },
+        function () { return v[k[0]]; }, function (x) { v[k[0]] = x; }));
+    });
+    return wrap;
   }
 
   function bind() {

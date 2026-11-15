@@ -1,8 +1,8 @@
 /* ENTERGALACTIC móvil — hilo de procesado (Web Worker).
  * Todo el cálculo ocurre aquí para que la interfaz no se trabe.
  */
-importScripts('eg-core.js', 'eg-filters.js');
-var C = self.EGCore, E = self.EGFilters;
+importScripts('eg-core.js', 'eg-filters.js', 'eg-develop.js');
+var C = self.EGCore, E = self.EGFilters, D = self.EGDevelop;
 var byId = {}, src = null, cache = {};   // src: {w, h, rgba: Uint8ClampedArray}
 
 function toFloat(rgba, w, h) {
@@ -28,11 +28,21 @@ function working(maxSide) {
   cache[key] = { img: a, k: w / src.w };
   return cache[key];
 }
-function process(work, recipe, intensity, progress) {
-  var ctx = new C.Context(work.img.h, work.img.w, work.k, [0, 0, 1, 1], 1, [src.w, src.h]);
-  var res = E.runStack(C.clone(work.img), recipe, ctx, byId, progress).img;
+// Revelado (si hay ajustes) y después la pila de looks; la intensidad mezcla el look con la foto revelada.
+function process(work, recipe, intensity, progress, dev) {
+  var base = work.img, k = work.k;
+  if (dev && !D.isNeutral(dev)) {
+    if (progress) progress(0, 'Revelado');
+    var dctx = new C.Context(base.h, base.w, k, [0, 0, 1, 1], 1, [src.w, src.h]);
+    base = D.develop(base, dev, dctx);
+  }
+  var full = [Math.round(base.w / k), Math.round(base.h / k)];
+  var ctx = new C.Context(base.h, base.w, k, [0, 0, 1, 1], 1, full);
+  var stack = (recipe && recipe.stack) || [];
+  if (!stack.some(function (it) { return it.enabled !== false; })) return base;
+  var res = E.runStack(C.clone(base), recipe, ctx, byId, progress).img;
   var t = intensity / 100;
-  if (t < 0.999 && res.w === work.img.w && res.h === work.img.h) res = C.mix(work.img, res, t);
+  if (t < 0.999 && res.w === base.w && res.h === base.h) res = C.mix(base, res, t);
   return res;
 }
 
@@ -51,9 +61,9 @@ self.onmessage = function (ev) {
       self.postMessage({ type: 'loaded', w: src.w, h: src.h });
     } else if (m.type === 'preview') {
       if (!src) return;
-      var t0 = Date.now(), work = working(m.size), out = process(work, m.recipe, m.intensity);
-      var px = toRGBA(out);
-      self.postMessage({ type: 'preview', id: m.id, draft: !!m.draft, w: out.w, h: out.h, rgba: px, ms: Date.now() - t0 }, [px.buffer]);
+      var t0 = Date.now(), work = working(m.size), out = process(work, m.recipe, m.intensity, null, m.dev);
+      var px = toRGBA(out), hist = m.draft ? null : D.histogram(out);
+      self.postMessage({ type: 'preview', id: m.id, draft: !!m.draft, w: out.w, h: out.h, rgba: px, hist: hist, ms: Date.now() - t0 }, [px.buffer]);
     } else if (m.type === 'original') {
       var wo = working(m.size), po = toRGBA(wo.img);
       self.postMessage({ type: 'original', w: wo.img.w, h: wo.img.h, rgba: po }, [po.buffer]);
@@ -61,16 +71,19 @@ self.onmessage = function (ev) {
       if (!src) return;
       var base = working(160);
       m.items.forEach(function (it) {
-        var o = process(base, it.recipe, 100), p2 = toRGBA(o);
+        var o = process(base, it.recipe, 100, null, m.dev), p2 = toRGBA(o);
         self.postMessage({ type: 'thumb', key: it.key, w: o.w, h: o.h, rgba: p2 }, [p2.buffer]);
       });
+    } else if (m.type === 'auto') {
+      if (!src) return;
+      self.postMessage({ type: 'auto', settings: D.auto(working(640).img) });
     } else if (m.type === 'export') {
       if (!src) return;
       var full = cache.full || toFloat(src.rgba, src.w, src.h);
       cache = {};   // libera memoria antes del procesado grande
       var res = process({ img: full, k: 1 }, m.recipe, m.intensity, function (f, label) {
         self.postMessage({ type: 'progress', f: f, label: label });
-      });
+      }, m.dev);
       var oc = new OffscreenCanvas(res.w, res.h);
       oc.getContext('2d').putImageData(new ImageData(toRGBA(res), res.w, res.h), 0, 0);
       res = null; full = null;
