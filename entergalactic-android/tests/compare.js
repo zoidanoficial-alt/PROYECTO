@@ -1,7 +1,9 @@
 // Compara el motor JavaScript con el motor Python (casos de tools/make_fixtures.py).
 const fs = require('fs'), path = require('path');
 const C = require('../web/eg-core.js'), E = require('../web/eg-filters.js');
+require('../web/eg-filters2.js');
 const schema = require('../web/schema.json');
+E.setData(schema);
 const byId = {}; schema.filters.forEach(f => byId[f.id] = f);
 const dir = process.argv[2];
 const idx = JSON.parse(fs.readFileSync(path.join(dir, 'index.json'), 'utf8'));
@@ -9,7 +11,7 @@ const read = f => new Float32Array(fs.readFileSync(path.join(dir, f)).buffer.sli
 const input = read('input.bin');
 // Filtros con componentes aleatorios: el generador de Python (NumPy) no se puede replicar,
 // así que se comparan por estadística (media y contraste), no píxel a píxel.
-const RANDOM = /filtro:pop_silkscreen|filtro:pop_grid|receta:Pop · (?!Trama|Cuatri)|Deakins · Frontera|Doyle|Willis|Kamiński|Khondji|Figueroa|Sandgren|grain|dust|light_leak|texture|old_camera|lith_print|instant|Película caducada|Cámara de juguete|Verano|Desechable|Placa|Estenopeica|Negativo escaneado|Clásico 400|Alto contraste|Infrarrojo|Ortocromático|Grano|Cianotipia|Lith|Cine 35|Arkapaw · Juke|Ámbar retro|Crawley|Hoytema · Gran|Plata IMAX|Mar del Norte|Polvo|Fraser|Distopía|Fuego/;
+const RANDOM = /filtro:film_profile|filtro:cine_grain|filtro:film_breath|filtro:film_damage|filtro:particles|filtro:paper_sim|receta:(Noche de cine|Luz de día|Neones|Boda|Verano dorado|Diapositiva vívida|Cromo de revista|Reportaje B|B\/N brit|Proyección|Daguerrotipo|Autocromo|Instantánea de los 70|Rayos entre|Bokeh|Nieve|Brasas)|filtro:pop_silkscreen|filtro:pop_grid|receta:Pop · (?!Trama|Cuatri)|Deakins · Frontera|Doyle|Willis|Kamiński|Khondji|Figueroa|Sandgren|grain|dust|light_leak|texture|old_camera|lith_print|instant|Película caducada|Cámara de juguete|Verano|Desechable|Placa|Estenopeica|Negativo escaneado|Clásico 400|Alto contraste|Infrarrojo|Ortocromático|Grano|Cianotipia|Lith|Cine 35|Arkapaw · Juke|Ámbar retro|Crawley|Hoytema · Gran|Plata IMAX|Mar del Norte|Polvo|Fraser|Distopía|Fuego/;
 let fails = 0, rows = [];
 for (const c of idx) {
   const ref = read(c.file);

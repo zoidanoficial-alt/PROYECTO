@@ -1,15 +1,37 @@
-/* ENTERGALACTIC móvil — interfaz. El procesado ocurre en worker.js. */
+/* CINELAB — laboratorio de dirección de fotografía (Android).
+ *
+ * Proyecto no destructivo:  { dev: revelado base, layers: [capas], look, intensity }
+ *   dev     → motor de Color (eg-develop.js): balance, tono, curvas, HSL, ruedas de color…
+ *   layers  → pila de capas (filtros de Film, Optics, Mono, Color) con opacidad, fusión y máscara
+ * El procesado ocurre en worker.js; la foto original nunca se modifica.
+ */
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var STORE = 'eg-mobile-v1';
+  var D = window.EGDevelop, STORE = 'cinelab-v1';
   var SCHEMA, FILTERS = {}, worker, file = null, loaded = false;
-  var D = window.EGDevelop;
-  var state = { module: 'develop', stacks: {}, chosen: {}, intensity: 100, exportSize: 4096, dev: null, devOpen: { basic: true } };
-  var devUI = { channel: 'rgb', hslColor: 'orange' };
-  var pv = { inflight: false, pending: null, seq: 0 };
-  var thumbs = {}, openCards = {}, saving = false;
+  var LABS = [
+    { id: 'film', name: 'Film', ico: '🎞', modules: ['film', 'cine', 'analog'], extra: [],
+      desc: 'Perfiles de película, looks de cine, grano, halación, daños y cámaras antiguas.' },
+    { id: 'color', name: 'Color', ico: '◑', modules: ['chroma', 'pop'], extra: ['color_correction'], dev: true,
+      desc: 'Ruedas de color, HSL, curvas RGB, balance de blancos, split toning, contraste y saturación.' },
+    { id: 'optics', name: 'Optics', ico: '✦', modules: ['optics'],
+      extra: ['glow', 'light_leak', 'chromatic_aberration', 'anamorphic_flare', 'light_beam', 'lens_blur', 'vignette'],
+      desc: 'Destellos, fugas de luz, glow, rayos, aberración cromática, difusión y efectos de cristal.' },
+    { id: 'retouch', name: 'Retouch', ico: '✎', soon: 'Fase 2', modules: [],
+      desc: 'Llegará en la fase 2: eliminación de imperfecciones con un toque, dodge & burn con pincel, selección de personas y de piel con IA (MediaPipe, sin conexión), corrección de piel, borrado de objetos y ajustes selectivos con pincel.' },
+    { id: 'mono', name: 'Mono', ico: '◐', modules: ['plata'], extra: ['vignette'],
+      desc: 'Blanco y negro analógico: películas, filtros de color, contraste tonal, grano, texturas, negros profundos y papel fotográfico.' },
+    { id: 'ai', name: 'AI', ico: '✺', soon: 'Fase 3', modules: [],
+      desc: 'Llegará en la fase 3: reducción de ruido, superresolución, recuperación de detalle, desenfoque de fondo, restauración y segmentación inteligente.' }
+  ];
+  var GROUP_NAMES = { film: 'Perfiles y efectos de película', cine: 'Looks cinematográficos (directores de fotografía)',
+    analog: 'Analógico y cámaras antiguas', chroma: 'Color', pop: 'Arte pop', optics: 'Óptica y luz', plata: 'Blanco y negro' };
+  var state = { mode: 'director', lab: 'film', exportSize: 4096, devOpen: { basic: true }, sel: null, project: null, recipes: [] };
+  var hist = [], future = [], lastSnap = null, pv = { inflight: false, pending: null, seq: 0 }, thumbs = {}, lastHist = null;
+  var devUI = { channel: 'rgb', hsl: 'orange' };
 
+  // ------------------------------------------------------------------ utilidades
   function el(tag, attrs, kids) {
     var e = document.createElement(tag);
     Object.keys(attrs || {}).forEach(function (k) {
@@ -22,94 +44,109 @@
     return e;
   }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
-  function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* sin almacenamiento */ } }
+  function lab() { return LABS.filter(function (l) { return l.id === state.lab; })[0] || LABS[0]; }
+  function status(m, err) { $('status').textContent = m || ''; $('status').className = 'status' + (err ? ' error' : ''); }
+  function newProject() { return { dev: D.defaults(), layers: [], look: null, intensity: 100 }; }
+  function save() {
+    try {
+      localStorage.setItem(STORE, JSON.stringify({ mode: state.mode, lab: state.lab, exportSize: state.exportSize,
+        devOpen: state.devOpen, project: state.project, recipes: state.recipes }));
+    } catch (e) { /* sin almacenamiento */ }
+  }
   function load() {
-    try { var s = JSON.parse(localStorage.getItem(STORE) || 'null'); if (s) Object.keys(s).forEach(function (k) { state[k] = s[k]; }); } catch (e) { /* nada */ }
+    try {
+      var s = JSON.parse(localStorage.getItem(STORE) || 'null');
+      if (s) Object.keys(s).forEach(function (k) { state[k] = s[k]; });
+    } catch (e) { /* nada */ }
+    if (!state.project) state.project = newProject();
+    state.project.dev = Object.assign(D.defaults(), state.project.dev || {});
+    state.project.layers = (state.project.layers || []).filter(function (l) { return FILTERS[l.id]; });
   }
-  function status(msg, err) { $('status').textContent = msg || ''; $('status').className = 'status' + (err ? ' error' : ''); }
-  function stack() { return state.stacks[state.module] || []; }
-  // El look activo es el del último módulo de looks visitado (el revelado va siempre antes).
-  function lookStack() {
-    var m = state.module === 'develop' ? state.lastLook : state.module;
-    if (!m || state.lookOff) return [];
-    return state.stacks[m] || [];
+  function labTools(l) {
+    return SCHEMA.filters.filter(function (f) {
+      return f.modules.some(function (m) { return l.modules.indexOf(m) >= 0; }) || (l.extra || []).indexOf(f.id) >= 0;
+    });
   }
-  function presetsOf(mod) { return SCHEMA.presets.filter(function (p) { return p.module === mod; }); }
+  function labOfFilter(fid) {
+    var f = FILTERS[fid];
+    for (var i = 0; i < LABS.length; i++) {
+      var l = LABS[i];
+      if ((l.extra || []).indexOf(fid) >= 0 || (f && f.modules.some(function (m) { return l.modules.indexOf(m) >= 0; }))) return l;
+    }
+    return LABS[0];
+  }
+  function newLayer(fid) {
+    var f = FILTERS[fid], params = {};
+    f.params.forEach(function (p) { params[p.id] = p['default']; });
+    return { id: fid, enabled: true, opacity: 100, blend: 'normal', mask: { type: 'all' }, params: params, origin: 'user' };
+  }
+
+  // ------------------------------------------------------------------ historial (deshacer / rehacer)
+  function snapshot() { return JSON.stringify(state.project); }
+  function commit() {
+    var s = snapshot();
+    if (s !== lastSnap) {
+      if (lastSnap !== null) { hist.push(lastSnap); if (hist.length > 60) hist.shift(); future = []; }
+      lastSnap = s;
+    }
+    thumbs = {};
+    save(); updateUndo(); requestPreview(true); requestPreview(false);
+  }
+  function undo() { if (!hist.length) return; future.push(lastSnap); lastSnap = hist.pop(); state.project = JSON.parse(lastSnap); afterHistory(); }
+  function redo() { if (!future.length) return; hist.push(lastSnap); lastSnap = future.pop(); state.project = JSON.parse(lastSnap); afterHistory(); }
+  function afterHistory() { thumbs = {}; state.sel = null; save(); updateUndo(); renderPanel(); requestPreview(false); }
+  function updateUndo() { $('btnUndo').disabled = !hist.length; $('btnRedo').disabled = !future.length; }
 
   // ------------------------------------------------------------------ arranque
   fetch('schema.json').then(function (r) { return r.json(); }).then(function (s) {
     SCHEMA = s;
     s.filters.forEach(function (f) { FILTERS[f.id] = f; });
     load();
-    var dd = D.defaults();
-    state.dev = state.dev ? Object.assign(dd, state.dev) : dd;
-    s.modules.forEach(function (m) {
-      if (!state.stacks[m.id]) {
-        var first = presetsOf(m.id)[0];
-        state.stacks[m.id] = first ? clone(first.stack) : [];
-        state.chosen[m.id] = first ? first.name : '';
-      }
-    });
-    if (state.module !== 'develop' && !s.modules.some(function (m) { return m.id === state.module; })) state.module = 'develop';
+    lastSnap = snapshot();
     worker = new Worker('worker.js');
     worker.onmessage = onWorker;
     worker.postMessage({ type: 'init', schema: s });
-    renderAll();
-    bind();
+    bind(); renderModes(); renderLabs(); renderPanel(); updateUndo();
   }).catch(function (e) { status('No se pudo iniciar: ' + e.message, true); });
 
-  // ------------------------------------------------------------------ mensajes del worker
-  function paint(canvas, m) {
-    canvas.width = m.w; canvas.height = m.h;
-    canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(m.rgba), m.w, m.h), 0, 0);
+  // ------------------------------------------------------------------ worker
+  function paint(c, m) {
+    c.width = m.w; c.height = m.h;
+    c.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(m.rgba), m.w, m.h), 0, 0);
   }
   function onWorker(ev) {
     var m = ev.data;
     if (m.type === 'loaded') {
       loaded = true; thumbs = {};
       $('viewer').classList.remove('empty');
-      $('btnSave').disabled = false;
+      $('btnExport').disabled = false;
+      $('info').textContent = 'ORIGINAL · ' + m.w + ' × ' + m.h;
       worker.postMessage({ type: 'original', size: previewSize() });
-      requestPreview(false);
-      requestThumbs();
-      status(m.w + ' × ' + m.h + ' px');
-    } else if (m.type === 'original') {
-      paint($('orig'), m);
-    } else if (m.type === 'preview') {
+      requestPreview(false); requestThumbs();
+    } else if (m.type === 'original') paint($('orig'), m);
+    else if (m.type === 'preview') {
       paint($('canvas'), m);
-      if (m.hist) drawHisto(m.hist);
+      if (m.hist) { lastHist = m.hist; drawHisto(); }
       pv.inflight = false;
       $('busy').classList.toggle('hidden', !pv.pending);
-      if (!saving) status((m.draft ? 'Vista rápida' : 'Vista previa') + ' · ' + m.ms + ' ms');
+      $('editing').textContent = isEdited() ? 'EDITANDO' : '';
+      status((m.draft ? 'Vista rápida' : 'Vista previa') + ' · ' + m.ms + ' ms');
       pump();
     } else if (m.type === 'thumb') {
-      var c = document.createElement('canvas');
-      paint(c, m);
+      var c = document.createElement('canvas'); paint(c, m);
       thumbs[m.key] = c.toDataURL('image/jpeg', 0.8);
-      var chip = document.querySelector('.chip[data-key="' + CSS.escape(m.key) + '"] .th');
-      if (chip) chip.style.backgroundImage = 'url(' + thumbs[m.key] + ')';
+      var th = document.querySelector('.chip[data-key="' + CSS.escape(m.key) + '"] .th');
+      if (th) th.style.backgroundImage = 'url(' + thumbs[m.key] + ')';
     } else if (m.type === 'auto') {
-      ['exposure', 'contrast', 'highlights', 'shadows', 'whites', 'blacks', 'vibrance'].forEach(function (k) { state.dev[k] = m.settings[k]; });
-      renderDevelop(); devCommit();
-      status('Ajuste automático aplicado');
-    } else if (m.type === 'progress') {
-      status('Guardando… ' + Math.round(m.f * 100) + '% · ' + m.label);
-    } else if (m.type === 'exported') {
-      deliver(m.blob, m.w, m.h);
-    } else if (m.type === 'error') {
-      pv.inflight = false; saving = false;
-      $('busy').classList.add('hidden');
-      $('btnSave').disabled = !loaded;
-      status(m.message, true);
-      pump();
-    }
+      ['exposure', 'contrast', 'highlights', 'shadows', 'whites', 'blacks', 'vibrance'].forEach(function (k) { state.project.dev[k] = m.settings[k]; });
+      renderPanel(); commit(); status('Ajuste inteligente aplicado');
+    } else if (m.type === 'progress') status('Exportando… ' + Math.round(m.f * 100) + '% · ' + m.label);
+    else if (m.type === 'exported') deliver(m.blob, m.w, m.h);
+    else if (m.type === 'error') { pv.inflight = false; status(m.message, true); $('btnExport').disabled = !loaded; pump(); }
   }
-
-  // ------------------------------------------------------------------ vista previa
-  function previewSize() {
-    var w = $('viewer').clientWidth * (window.devicePixelRatio || 1);
-    return Math.max(480, Math.min(900, Math.round(w)));
-  }
+  function isEdited() { return !D.isNeutral(state.project.dev) || state.project.layers.some(function (l) { return l.enabled !== false; }); }
+  function previewSize() { return Math.max(480, Math.min(900, Math.round($('viewer').clientWidth * (window.devicePixelRatio || 1)))); }
+  function recipe() { return { stack: state.project.layers }; }
   function requestPreview(draft) {
     if (!loaded) return;
     var prev = pv.pending;
@@ -118,365 +155,354 @@
   }
   function pump() {
     if (pv.inflight || !pv.pending) return;
-    var o = pv.pending;
-    pv.pending = null; pv.inflight = true;
+    var o = pv.pending; pv.pending = null; pv.inflight = true;
     $('busy').classList.remove('hidden');
     var size = previewSize();
     worker.postMessage({ type: 'preview', id: ++pv.seq, draft: o.draft, size: o.draft ? Math.round(size * 0.45) : size,
-      recipe: { stack: lookStack() }, intensity: state.intensity, dev: state.dev });
+      recipe: recipe(), intensity: state.project.intensity, dev: state.project.dev });
   }
-  var liveTimer = null, lastLive = 0;
+  var liveT = null, lastLive = 0;
   function live() {
-    var now = Date.now();
-    clearTimeout(liveTimer);
+    var now = Date.now(); clearTimeout(liveT);
     if (now - lastLive > 50) { lastLive = now; requestPreview(true); }
-    liveTimer = setTimeout(function () { requestPreview(true); }, 60);
+    liveT = setTimeout(function () { requestPreview(true); }, 60);
   }
-  // Al confirmar un cambio: primero una vista rápida (respuesta inmediata) y después la definitiva.
-  function commit() { clearTimeout(liveTimer); save(); requestPreview(true); requestPreview(false); }
   function requestThumbs() {
-    if (!loaded) return;
-    var items = presetsOf(state.module).filter(function (p) { return !thumbs[p.name]; })
+    if (!loaded || state.mode !== 'director') return;
+    var items = presetsForLab(lab()).filter(function (p) { return !thumbs[p.name]; })
       .map(function (p) { return { key: p.name, recipe: { stack: p.stack } }; });
-    if (items.length) worker.postMessage({ type: 'thumbs', items: items, dev: state.dev });
+    if (items.length) worker.postMessage({ type: 'thumbs', items: items, dev: state.project.dev });
   }
 
-  // ------------------------------------------------------------------ abrir y guardar
+  // ------------------------------------------------------------------ abrir / exportar
   function openFile(f) {
     if (!f) return;
-    file = f;
-    status('Abriendo…');
-    decode(f).then(function (bmp) {
-      worker.postMessage({ type: 'load', bitmap: bmp }, [bmp]);
-    }).catch(function (e) { status('No se pudo abrir la foto: ' + e.message, true); });
-  }
-  function decode(f) {
+    file = f; status('Abriendo…');
     var maxSide = Number(state.exportSize) || 0;
-    return createImageBitmap(f, { imageOrientation: 'from-image' }).catch(function () { return createImageBitmap(f); })
-      .then(function (bmp) {
-        var s = maxSide ? Math.min(1, maxSide / Math.max(bmp.width, bmp.height)) : 1;
-        if (s >= 1) return bmp;
-        return createImageBitmap(bmp, { resizeWidth: Math.round(bmp.width * s), resizeHeight: Math.round(bmp.height * s), resizeQuality: 'high' })
-          .then(function (b2) { bmp.close && bmp.close(); return b2; });
-      });
+    createImageBitmap(f, { imageOrientation: 'from-image' }).catch(function () { return createImageBitmap(f); }).then(function (bmp) {
+      var s = maxSide ? Math.min(1, maxSide / Math.max(bmp.width, bmp.height)) : 1;
+      if (s >= 1) return bmp;
+      return createImageBitmap(bmp, { resizeWidth: Math.round(bmp.width * s), resizeHeight: Math.round(bmp.height * s), resizeQuality: 'high' });
+    }).then(function (bmp) { worker.postMessage({ type: 'load', bitmap: bmp }, [bmp]); })
+      .catch(function (e) { status('No se pudo abrir la foto: ' + e.message, true); });
   }
-  function doSave() {
-    if (!loaded || saving) return;
-    saving = true;
-    $('btnSave').disabled = true;
-    status('Guardando…');
-    worker.postMessage({ type: 'export', recipe: { stack: lookStack() }, intensity: state.intensity, dev: state.dev, quality: 0.95 });
+  function exportSheet() {
+    var sh = $('sheet'); sh.innerHTML = '';
+    var sel = el('select');
+    [['4096', 'Alta (hasta 4096 px)'], ['0', 'Original (más lento)'], ['2048', 'Media (2048 px)']].forEach(function (o) { sel.appendChild(el('option', { value: o[0], text: o[1] })); });
+    sel.value = String(state.exportSize);
+    sel.addEventListener('change', function () { state.exportSize = +sel.value; save(); if (file) openFile(file); });
+    sh.appendChild(el('h3', { text: 'Exportar' }));
+    sh.appendChild(el('div', { cls: 'param' }, [el('div', { cls: 'lbl', text: 'Tamaño' }), sel]));
+    sh.appendChild(el('div', { cls: 'row' }, [
+      el('button', { cls: 'btn', text: 'Cancelar', onclick: function () { sh.classList.add('hidden'); } }),
+      el('button', { cls: 'btn primary', text: 'Guardar en galería', onclick: function () { sh.classList.add('hidden'); doExport(); } })]));
+    sh.appendChild(el('p', { cls: 'note', text: 'Se guarda en Imágenes › CINELAB como JPEG de alta calidad. La foto original no se modifica.' }));
+    sh.classList.remove('hidden');
+  }
+  function doExport() {
+    if (!loaded) return;
+    $('btnExport').disabled = true; status('Exportando…');
+    worker.postMessage({ type: 'export', recipe: recipe(), intensity: state.project.intensity, dev: state.project.dev, quality: 0.95 });
   }
   function deliver(blob, w, h) {
-    var name = 'ENTERGALACTIC_' + new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14) + '.jpg';
-    var done = function (msg, err) { saving = false; $('btnSave').disabled = false; status(msg, err); };
-    if (!window.Android) {   // navegador: descarga normal
-      var a = el('a', { href: URL.createObjectURL(blob), download: name });
-      document.body.appendChild(a); a.click(); a.remove();
+    var name = 'CINELAB_' + new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14) + '.jpg';
+    var done = function (msg, err) { $('btnExport').disabled = false; status(msg, err); };
+    if (!window.Android) {
+      var a = el('a', { href: URL.createObjectURL(blob), download: name }); document.body.appendChild(a); a.click(); a.remove();
       return done('Descargada ' + name + ' (' + w + '×' + h + ')');
     }
-    // Android: se envía en trozos (múltiplos de 3 bytes para que el base64 encaje) al puente nativo.
-    var CH = 3 * 262144, off = 0;
-    var r0 = Android.saveBegin(name);
+    var CH = 3 * 262144, off = 0, r0 = Android.saveBegin(name);
     if (r0 !== 'OK') return done(r0.replace(/^ERR\|/, ''), true);
     (function next() {
       if (off >= blob.size) {
         var r = Android.saveEnd();
-        return r.indexOf('OK') === 0 ? done('Guardada en Galería › ENTERGALACTIC (' + w + '×' + h + ')') : done(r.replace(/^ERR\|/, ''), true);
+        return r.indexOf('OK') === 0 ? done('Guardada en Imágenes › CINELAB (' + w + '×' + h + ')') : done(r.replace(/^ERR\|/, ''), true);
       }
       var fr = new FileReader();
-      fr.onload = function () {
-        Android.saveChunk(String(fr.result).split(',')[1]);
-        off += CH;
-        status('Guardando… ' + Math.min(100, Math.round(off / blob.size * 100)) + '%');
-        setTimeout(next, 0);
-      };
+      fr.onload = function () { Android.saveChunk(String(fr.result).split(',')[1]); off += CH; status('Guardando… ' + Math.min(100, Math.round(off / blob.size * 100)) + '%'); setTimeout(next, 0); };
       fr.onerror = function () { Android.saveAbort(); done('No se pudo leer la imagen', true); };
       fr.readAsDataURL(blob.slice(off, off + CH));
     })();
   }
 
-  // ------------------------------------------------------------------ interfaz
-  function renderTabs() {
-    var t = $('tabs');
-    t.innerHTML = '';
-    var devBtn = el('button', { cls: state.module === 'develop' ? 'on' : '', onclick: function () {
-      state.module = 'develop'; save(); renderAll();
-    } }, ['Revelado']);
-    if (!D.isNeutral(state.dev)) devBtn.appendChild(el('span', { cls: 'live', title: 'Revelado activo' }));
-    t.appendChild(devBtn);
-    SCHEMA.modules.forEach(function (m) {
-      t.appendChild(el('button', { cls: m.id === state.module ? 'on' : '', text: m.name, onclick: function () {
-        state.module = m.id; state.lastLook = m.id; state.lookOff = false; save(); renderAll(); requestPreview(false); requestThumbs();
-      } }));
+  // ------------------------------------------------------------------ modos y laboratorios
+  function renderModes() {
+    Array.prototype.forEach.call(document.querySelectorAll('.modes button'), function (b) { b.classList.toggle('on', b.getAttribute('data-mode') === state.mode); });
+  }
+  function renderLabs() {
+    var nav = $('labs'); nav.innerHTML = '';
+    LABS.forEach(function (l) {
+      nav.appendChild(el('button', { cls: 'lab' + (l.id === state.lab ? ' on' : ''), onclick: function () {
+        state.lab = l.id; state.sel = null; save(); renderLabs(); renderPanel(); requestThumbs();
+      } }, [el('span', { cls: 'ico', text: l.ico }), el('span', { cls: 'nm', text: l.name }), l.soon ? el('span', { cls: 'soon', text: l.soon }) : null]));
     });
   }
-  function renderPresets() {
-    var strip = $('presetStrip');
-    strip.innerHTML = '';
-    presetsOf(state.module).forEach(function (p) {
-      var th = el('span', { cls: 'th' });
-      if (thumbs[p.name]) th.style.backgroundImage = 'url(' + thumbs[p.name] + ')';
-      strip.appendChild(el('button', { cls: 'chip' + (state.chosen[state.module] === p.name ? ' on' : ''), 'data-key': p.name, onclick: function () {
-        state.stacks[state.module] = clone(p.stack);
-        state.chosen[state.module] = p.name;
-        openCards = {};
-        save(); renderPresets(); renderStack(); requestPreview(true); requestPreview(false);
-      } }, [th, el('span', { cls: 'nm', text: p.name })]));
+  function renderPanel() {
+    var p = $('panel'); p.innerHTML = '';
+    var l = lab();
+    if (l.soon) { p.appendChild(el('div', { cls: 'soonbox', text: l.desc })); return; }
+    if (state.mode === 'director') renderDirector(p, l); else renderPro(p, l);
+  }
+
+  // ------------------------------------------------------------------ MODO DIRECTOR
+  function presetsForLab(l) { return SCHEMA.presets.filter(function (pr) { return l.modules.indexOf(pr.module) >= 0; }); }
+  function applyLook(pr) {
+    state.project.layers = state.project.layers.filter(function (x) { return x.origin !== 'look'; })
+      .concat(clone(pr.stack).map(function (it) { it.origin = 'look'; return it; }));
+    state.project.look = pr.name;
+    renderPanel(); commit();
+  }
+  function renderDirector(p, l) {
+    p.appendChild(el('div', { cls: 'row' }, [
+      el('button', { cls: 'btn ghost', text: '✦ Ajuste inteligente', onclick: function () { if (loaded) worker.postMessage({ type: 'auto' }); } }),
+      el('button', { cls: 'btn', text: '♥ Recetas', onclick: recipesSheet })]));
+    l.modules.forEach(function (mid) {
+      var ps = SCHEMA.presets.filter(function (pr) { return pr.module === mid; });
+      if (!ps.length) return;
+      p.appendChild(el('div', { cls: 'group-title', text: GROUP_NAMES[mid] || mid }));
+      var strip = el('div', { cls: 'strip' });
+      ps.forEach(function (pr) {
+        var th = el('span', { cls: 'th' });
+        if (thumbs[pr.name]) th.style.backgroundImage = 'url(' + thumbs[pr.name] + ')';
+        strip.appendChild(el('button', { cls: 'chip' + (state.project.look === pr.name ? ' on' : ''), 'data-key': pr.name, onclick: function () { applyLook(pr); } },
+          [th, el('span', { cls: 'nm', text: pr.name })]));
+      });
+      p.appendChild(strip);
     });
-    var cur = presetsOf(state.module).filter(function (p) { return p.name === state.chosen[state.module]; })[0];
-    $('presetDesc').textContent = cur && cur.desc ? cur.desc : '';
-    $('presetDesc').classList.toggle('hidden', !(cur && cur.desc));
+    var cur = SCHEMA.presets.filter(function (pr) { return pr.name === state.project.look; })[0];
+    if (cur && cur.desc) p.appendChild(el('p', { cls: 'desc', text: cur.desc }));
+    p.appendChild(devSlider({ label: 'Intensidad del look', min: 0, max: 100, def: 100, step: 1 },
+      function () { return state.project.intensity; }, function (v) { state.project.intensity = v; }));
+    if (state.project.look) p.appendChild(el('button', { cls: 'link', text: 'Quitar el look', onclick: function () {
+      state.project.layers = state.project.layers.filter(function (x) { return x.origin !== 'look'; });
+      state.project.look = null; renderPanel(); commit();
+    } }));
+    p.appendChild(el('p', { cls: 'note', text: 'Mantén pulsada la foto (o toca ◐) para comparar antes y después. En Modo Profesional cada capa del look se puede abrir y ajustar.' }));
   }
-  function fmt(p, v) {
-    if (p.type === 'hue') return Math.round(v) + '°';
-    return (p.step && p.step < 1 ? Number(v).toFixed(1) : Math.round(v)) + (p.unit === '%' ? '%' : p.unit === '°' ? '°' : '');
-  }
-  function rangeCtl(p, v, set) {
-    var out = el('span', { text: fmt(p, v) });
-    var inp = el('input', { type: 'range', min: p.min, max: p.max, step: p.step || 1, value: v });
-    if (p.type === 'hue') inp.className = 'hue';
-    inp.addEventListener('input', function () { out.textContent = fmt(p, +inp.value); set(+inp.value); live(); });
-    inp.addEventListener('change', commit);
-    return el('div', { cls: 'param' }, [el('div', { cls: 'lbl' }, [el('span', { text: p.label }), out]), inp]);
-  }
-  function selectCtl(label, opts, v, set) {
-    var s = el('select');
-    opts.forEach(function (o) { s.appendChild(el('option', { value: o[0], text: o[1] })); });
-    s.value = v;
-    s.addEventListener('change', function () { set(s.value); commit(); });
-    return el('div', { cls: 'param' }, [el('div', { cls: 'lbl' }, [el('span', { text: label })]), s]);
-  }
-  function checkCtl(label, v, set) {
-    var c = el('input', { type: 'checkbox' });
-    c.checked = !!v;
-    c.addEventListener('change', function () { set(c.checked); commit(); });
-    return el('label', { cls: 'param chk' }, [c, label]);
-  }
-  function card(item, i, n) {
-    var f = FILTERS[item.id], key = i + ':' + item.id;
-    var cd = el('div', { cls: 'card' + (item.enabled === false ? ' off' : '') + (openCards[key] ? ' open' : '') });
-    var en = el('input', { type: 'checkbox' });
-    en.checked = item.enabled !== false;
-    en.addEventListener('click', function (e) { e.stopPropagation(); });
-    en.addEventListener('change', function () { item.enabled = en.checked; state.chosen[state.module] = ''; renderStack(); commit(); });
-    var act = function (t, fn, dis) {
-      var b = el('button', { text: t });
-      b.disabled = !!dis;
-      b.addEventListener('click', function (e) { e.stopPropagation(); fn(); });
-      return b;
-    };
-    var st = stack();
-    var head = el('div', { cls: 'card-head' }, [en, el('span', { cls: 'name', text: f ? f.name : item.id }),
-      act('▲', function () { var t = st[i]; st[i] = st[i - 1]; st[i - 1] = t; renderStack(); commit(); }, i === 0),
-      act('▼', function () { var t = st[i]; st[i] = st[i + 1]; st[i + 1] = t; renderStack(); commit(); }, i === n - 1),
-      act('✕', function () { st.splice(i, 1); renderStack(); commit(); })]);
-    head.addEventListener('click', function () { openCards[key] = !openCards[key]; cd.classList.toggle('open'); });
-    cd.appendChild(head);
-    if (!f) return cd;
-    var body = el('div', { cls: 'card-body' }, [el('p', { cls: 'muted small', text: f.desc })]);
-    item.params = item.params || {};
-    f.params.forEach(function (p) {
-      var v = item.params[p.id] !== undefined ? item.params[p.id] : p['default'];
-      var set = function (x) { item.params[p.id] = x; state.chosen[state.module] = ''; };
-      if (p.type === 'range' || p.type === 'hue') body.appendChild(rangeCtl(p, v, set));
-      else if (p.type === 'select') body.appendChild(selectCtl(p.label, p.options, v, set));
-      else if (p.type === 'check') body.appendChild(checkCtl(p.label, v, set));
+  function recipesSheet() {
+    var sh = $('sheet'); sh.innerHTML = '';
+    sh.appendChild(el('h3', { text: 'Recetas de color' }));
+    var name = el('input', { type: 'text', placeholder: 'Nombre de la receta', cls: 'txt' });
+    sh.appendChild(name);
+    sh.appendChild(el('div', { cls: 'row' }, [el('button', { cls: 'btn primary', text: 'Guardar la edición actual', onclick: function () {
+      var n = name.value.trim() || ('Receta ' + (state.recipes.length + 1));
+      state.recipes.push({ name: n, project: clone(state.project) }); save(); recipesSheet(); status('Receta «' + n + '» guardada');
+    } })]));
+    if (!state.recipes.length) sh.appendChild(el('p', { cls: 'note', text: 'Aún no tienes recetas. Guarda una edición (revelado y capas) para aplicarla a otras fotos con un toque.' }));
+    state.recipes.forEach(function (r, i) {
+      sh.appendChild(el('div', { cls: 'row' }, [
+        el('button', { cls: 'btn', text: r.name, onclick: function () { state.project = clone(r.project); sh.classList.add('hidden'); renderPanel(); commit(); } }),
+        el('button', { cls: 'btn narrow', text: '✕', onclick: function () { state.recipes.splice(i, 1); save(); recipesSheet(); } })]));
     });
-    body.appendChild(rangeCtl({ label: 'Opacidad', min: 0, max: 100, step: 1, unit: '%' }, item.opacity === undefined ? 100 : item.opacity,
-      function (x) { item.opacity = x; }));
+    sh.appendChild(el('button', { cls: 'btn wide', text: 'Cerrar', onclick: function () { sh.classList.add('hidden'); } }));
+    sh.classList.remove('hidden');
+  }
+
+  // ------------------------------------------------------------------ MODO PROFESIONAL
+  function renderPro(p, l) {
+    if (l.dev) renderColorLab(p);
+    p.appendChild(el('div', { cls: 'ph' }, [el('h2', { text: 'Capas' }), el('span', { cls: 'muted small', text: state.project.layers.length + ' / ' + SCHEMA.max_stack })]));
+    var box = el('div', { cls: 'layers' });
+    box.appendChild(el('div', { cls: 'layer' }, [el('div', { cls: 'lh' }, [el('span', { cls: 'eye', text: '◑' }),
+      el('span', { cls: 'ln', text: 'Revelado base' }), el('span', { cls: 'badge', text: 'Color' }),
+      el('button', { cls: 'x', text: '✎', onclick: function () { state.lab = 'color'; renderLabs(); renderPanel(); } })])]));
+    state.project.layers.forEach(function (it, i) { box.appendChild(layerCard(it, i)); });
+    p.appendChild(box);
+    var sel = el('select');
+    labTools(l).forEach(function (f) { sel.appendChild(el('option', { value: f.id, text: f.name })); });
+    p.appendChild(el('div', { cls: 'row' }, [sel, el('button', { cls: 'btn ghost narrow2', text: '＋ Capa', onclick: function () {
+      if (state.project.layers.length >= SCHEMA.max_stack) return status('Máximo ' + SCHEMA.max_stack + ' capas', true);
+      state.project.layers.push(newLayer(sel.value)); state.sel = state.project.layers.length - 1; renderPanel(); commit();
+    } })]));
+    p.appendChild(el('p', { cls: 'note', text: l.desc + ' Las capas se aplican de arriba abajo sobre el revelado base. Toca una capa para editarla.' }));
+  }
+  function layerCard(it, i) {
+    var f = FILTERS[it.id], L = state.project.layers, open = state.sel === i;
+    var card = el('div', { cls: 'layer' + (open ? ' sel' : '') + (it.enabled === false ? ' off' : '') });
+    var head = el('div', { cls: 'lh' }, [
+      el('button', { cls: 'eye', text: it.enabled === false ? '○' : '●', onclick: function (e) { e.stopPropagation(); it.enabled = it.enabled === false; renderPanel(); commit(); } }),
+      el('span', { cls: 'ln', text: f ? f.name : it.id }), el('span', { cls: 'badge', text: labOfFilter(it.id).name }),
+      el('span', { cls: 'op', text: Math.round(it.opacity === undefined ? 100 : it.opacity) + '%' }),
+      el('button', { cls: 'x', text: '▲', onclick: function (e) { e.stopPropagation(); if (i > 0) { L.splice(i - 1, 0, L.splice(i, 1)[0]); state.sel = i - 1; renderPanel(); commit(); } } }),
+      el('button', { cls: 'x', text: '▼', onclick: function (e) { e.stopPropagation(); if (i < L.length - 1) { L.splice(i + 1, 0, L.splice(i, 1)[0]); state.sel = i + 1; renderPanel(); commit(); } } }),
+      el('button', { cls: 'x', text: '✕', onclick: function (e) { e.stopPropagation(); L.splice(i, 1); state.sel = null; renderPanel(); commit(); } })]);
+    head.addEventListener('click', function () { state.sel = open ? null : i; renderPanel(); });
+    card.appendChild(head);
+    if (!open || !f) return card;
+    var body = el('div', { cls: 'lbody' }, [el('p', { cls: 'note', text: f.desc })]);
+    it.params = it.params || {};
+    f.params.forEach(function (q) { body.appendChild(paramCtl(q, it)); });
+    body.appendChild(devSlider({ label: 'Opacidad', min: 0, max: 100, def: 100, step: 1, unit: '%' }, function () { return it.opacity === undefined ? 100 : it.opacity; }, function (v) { it.opacity = v; }));
     if (!f.resizes) {
-      body.appendChild(selectCtl('Fusión', SCHEMA.blend_modes.map(function (b) { return [b.id, b.name]; }), item.blend || 'normal',
-        function (x) { item.blend = x; }));
-      item.mask = item.mask || { type: 'all' };
-      var mk = item.mask;
-      body.appendChild(selectCtl('Aplicar a', SCHEMA.mask_types.map(function (m) { return [m.id, m.name]; }), mk.type || 'all',
-        function (x) { mk.type = x; setTimeout(renderStack, 0); }));
+      body.appendChild(selectCtl('Modo de fusión', SCHEMA.blend_modes.map(function (b) { return [b.id, b.name]; }), it.blend || 'normal', function (v) { it.blend = v; }));
+      it.mask = it.mask || { type: 'all' };
+      var mk = it.mask;
+      body.appendChild(selectCtl('Máscara (aplicar a)', SCHEMA.mask_types.map(function (m) { return [m.id, m.name]; }), mk.type || 'all', function (v) { mk.type = v; setTimeout(renderPanel, 0); }));
       if (mk.type === 'color') {
-        body.appendChild(rangeCtl({ label: 'Color', type: 'hue', min: 0, max: 360 }, mk.hue === undefined ? 30 : mk.hue, function (x) { mk.hue = x; }));
-        body.appendChild(rangeCtl({ label: 'Amplitud', min: 10, max: 120, step: 1, unit: '°' }, mk.width === undefined ? 40 : mk.width, function (x) { mk.width = x; }));
+        body.appendChild(devSlider({ label: 'Color de la máscara', min: 0, max: 360, def: 30, step: 1, track: 'hue' }, function () { return mk.hue === undefined ? 30 : mk.hue; }, function (v) { mk.hue = v; }));
+        body.appendChild(devSlider({ label: 'Amplitud', min: 10, max: 120, def: 40, step: 1 }, function () { return mk.width === undefined ? 40 : mk.width; }, function (v) { mk.width = v; }));
       }
       if (mk.type && mk.type !== 'all') {
-        body.appendChild(rangeCtl({ label: 'Suavidad', min: 0, max: 100, step: 1 }, mk.softness === undefined ? 50 : mk.softness, function (x) { mk.softness = x; }));
-        body.appendChild(checkCtl('Invertir máscara', mk.invert, function (x) { mk.invert = x; }));
+        body.appendChild(devSlider({ label: 'Suavidad', min: 0, max: 100, def: 50, step: 1 }, function () { return mk.softness === undefined ? 50 : mk.softness; }, function (v) { mk.softness = v; }));
+        body.appendChild(checkCtl('Invertir máscara', mk.invert, function (v) { mk.invert = v; }));
       }
     }
-    cd.appendChild(body);
-    return cd;
+    card.appendChild(body);
+    return card;
   }
-  function renderStack() {
-    var st = stack(), box = $('stack');
-    box.innerHTML = '';
-    st.forEach(function (it, i) { box.appendChild(card(it, i, st.length)); });
-    $('stackCount').textContent = '(' + st.length + '/' + SCHEMA.max_stack + ')';
-    $('btnAdd').disabled = st.length >= SCHEMA.max_stack;
-    var sel = $('addFilter');
-    sel.innerHTML = '';
-    SCHEMA.filters.filter(function (f) { return f.modules.indexOf(state.module) >= 0; })
-      .forEach(function (f) { sel.appendChild(el('option', { value: f.id, text: f.name })); });
-  }
-  function renderAll() {
-    var isDev = state.module === 'develop';
-    Array.prototype.forEach.call(document.querySelectorAll('.looks-only'), function (e) { e.classList.toggle('hidden', isDev); });
-    $('develop').classList.toggle('hidden', !isDev);
-    renderTabs();
-    if (isDev) renderDevelop(); else { renderPresets(); renderStack(); }
-    $('intensity').value = state.intensity; $('intOut').textContent = state.intensity;
-    $('exportSize').value = String(state.exportSize);
+  function paramCtl(q, it) {
+    var get = function () { return it.params[q.id] !== undefined ? it.params[q.id] : q['default']; };
+    var set = function (v) { it.params[q.id] = v; if (it.origin === 'look') it.origin = 'user'; };
+    if (q.type === 'range' || q.type === 'hue') return devSlider({ label: q.label, min: q.min, max: q.max, step: q.step || 1, def: q['default'], unit: q.unit, track: q.type === 'hue' ? 'hue' : null }, get, set);
+    if (q.type === 'select') return selectCtl(q.label, q.options, get(), set);
+    if (q.type === 'check') return checkCtl(q.label, get(), set);
+    return el('span');
   }
 
-  // ------------------------------------------------------------------ Revelado
-  function fmtDev(p, v) {
-    if (p.unit === 'EV') return (v > 0 ? '+' : '') + Number(v).toFixed(2);
-    if (p.track === 'hue') return Math.round(v) + '°';
-    if (p.step && p.step < 1) return (v > 0 && p.min < 0 ? '+' : '') + Number(v).toFixed(1) + (p.unit || '');
-    return (v > 0 && p.min < 0 ? '+' : '') + Math.round(v) + (p.unit === '%' ? '%' : '');
-  }
-  function devSlider(p, get, set) {
-    var v = get(), out = el('b', { text: fmtDev(p, v), cls: v !== p.def ? 'changed' : '' });
-    var inp = el('input', { type: 'range', min: p.min, max: p.max, step: p.step || 1, value: v });
-    if (p.track) inp.className = p.track;
-    var upd = function (x) { set(x); out.textContent = fmtDev(p, x); out.className = x !== p.def ? 'changed' : ''; };
-    inp.addEventListener('input', function () { upd(+inp.value); live(); });
-    inp.addEventListener('change', devCommit);
-    // doble toque: valor por defecto
-    inp.addEventListener('dblclick', function () { inp.value = p.def; upd(p.def); devCommit(); });
-    return el('div', { cls: 'dslider' }, [el('div', { cls: 'lbl' }, [el('span', { text: p.label }), out]), inp]);
-  }
-  function devCommit() {
-    thumbs = {};
-    save(); renderTabs(); commit();
-  }
-  function resetSection(sec) {
-    var d = D.defaults();
-    if (sec.custom === 'curve') state.dev.curve = d.curve;
-    else if (sec.custom === 'hsl') state.dev.hsl = d.hsl;
-    else sec.params.forEach(function (p) { state.dev[p.id] = d[p.id]; });
-    renderDevelop(); devCommit();
-  }
-  function renderDevelop() {
-    var box = $('develop');
-    box.innerHTML = '';
-    var hc = el('canvas', { id: 'histo' });
-    box.appendChild(el('div', { cls: 'histo' }, [hc, el('span', { cls: 'info', id: 'histoInfo', text: '' })]));
-    box.appendChild(el('div', { cls: 'dev-bar' }, [
+  // ------------------------------------------------------------------ COLOR LAB (revelado base)
+  function renderColorLab(p) {
+    p.appendChild(el('div', { cls: 'histo' }, [el('canvas', { id: 'histo' }), el('span', { cls: 'hi', id: 'histoInfo' })]));
+    p.appendChild(el('div', { cls: 'row' }, [
       el('button', { cls: 'btn ghost', text: '✦ Auto', onclick: function () { if (loaded) worker.postMessage({ type: 'auto' }); } }),
-      el('button', { cls: 'btn', text: 'Restablecer todo', onclick: function () { state.dev = D.defaults(); renderDevelop(); devCommit(); } })]));
-    D.SECTIONS.forEach(function (sec) {
-      var det = el('details', { cls: 'dsec' });
-      if (state.devOpen[sec.id]) det.open = true;
-      det.addEventListener('toggle', function () { state.devOpen[sec.id] = det.open; save(); if (det.open && sec.custom === 'curve') drawCurve(); });
-      var reset = el('span', { cls: 'reset', text: 'Restablecer' });
-      reset.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); resetSection(sec); });
-      det.appendChild(el('summary', {}, [el('span', { text: sec.name }), reset]));
-      if (sec.custom === 'curve') det.appendChild(curveEditor());
-      else if (sec.custom === 'hsl') det.appendChild(hslEditor());
-      else sec.params.forEach(function (p) {
-        if (p.type === 'select') {
-          var sel = el('select');
-          p.options.forEach(function (o) { sel.appendChild(el('option', { value: o[0], text: o[1] })); });
-          sel.value = state.dev[p.id];
-          sel.addEventListener('change', function () { state.dev[p.id] = sel.value; devCommit(); });
-          det.appendChild(el('div', { cls: 'param' }, [el('div', { cls: 'lbl' }, [el('span', { text: p.label })]), sel]));
-        } else det.appendChild(devSlider(p, function () { return state.dev[p.id]; }, function (x) { state.dev[p.id] = x; }));
+      el('button', { cls: 'btn', text: 'Restablecer color', onclick: function () { state.project.dev = D.defaults(); renderPanel(); commit(); } })]));
+    var dev = state.project.dev, all = {};
+    D.SECTIONS.forEach(function (s) { (s.params || []).forEach(function (q) { all[q.id] = q; }); });
+    var secs = [
+      { id: 'wb', name: 'Balance de blancos', ids: ['temp', 'tint'] },
+      { id: 'basic', name: 'Contraste, luz y saturación', ids: ['exposure', 'contrast', 'highlights', 'shadows', 'whites', 'blacks', 'texture', 'clarity', 'dehaze', 'vibrance', 'saturation'] },
+      { id: 'wheels', name: 'Ruedas de color', custom: wheelsEditor },
+      { id: 'split', name: 'Split toning', custom: splitEditor },
+      { id: 'curve', name: 'Curvas RGB', custom: curveEditor },
+      { id: 'hsl', name: 'HSL', custom: hslEditor },
+      { id: 'detail', name: 'Detalle y ruido', sec: 'detail' },
+      { id: 'effects', name: 'Viñeta y grano', sec: 'effects' },
+      { id: 'geometry', name: 'Recortar y enderezar', sec: 'geometry' }];
+    secs.forEach(function (s) {
+      var det = el('details', { cls: 'sec' });
+      if (state.devOpen[s.id]) det.open = true;
+      det.addEventListener('toggle', function () { state.devOpen[s.id] = det.open; save(); if (det.open) setTimeout(drawAllCanvases, 0); });
+      det.appendChild(el('summary', {}, [el('span', { text: s.name })]));
+      var ids = s.ids || (s.sec ? D.SECTIONS.filter(function (x) { return x.id === s.sec; })[0].params.map(function (q) { return q.id; }) : null);
+      if (s.custom) det.appendChild(s.custom());
+      else ids.forEach(function (id) {
+        var q = all[id];
+        if (q.type === 'select') det.appendChild(selectCtl(q.label, q.options, dev[id], function (v) { dev[id] = v; }));
+        else det.appendChild(devSlider(q, function () { return dev[id]; }, function (v) { dev[id] = v; }));
       });
-      box.appendChild(det);
+      p.appendChild(det);
     });
-    var lk = lookStack().filter(function (it) { return it.enabled !== false; });
-    if (lk.length) {
-      var mod = SCHEMA.modules.filter(function (m) { return m.id === state.lastLook; })[0];
-      var nm = state.chosen[state.lastLook] || (lk.length + ' filtros');
-      box.insertBefore(el('div', { cls: 'desc' }, ['Look aplicado encima: ' + (mod ? mod.name : '') + ' · ' + nm + '  ',
-        el('button', { cls: 'link', text: 'Quitar', onclick: function () { state.lookOff = true; save(); renderDevelop(); commit(); } })]), box.children[2]);
-    }
-    box.appendChild(el('p', { cls: 'dev-note', text: 'El revelado se aplica antes del look que elijas en Cine, Pop, Chroma, Plata o Analógico. Admite JPEG, PNG y HEIC; los archivos RAW (DNG) todavía no se pueden abrir.' }));
-    if (lastHist) drawHisto(lastHist);
-    setTimeout(drawCurve, 0);
+    setTimeout(function () { drawHisto(); drawAllCanvases(); }, 0);
   }
-  var lastHist = null;
-  function drawHisto(h) {
-    lastHist = h;
-    var c = $('histo');
-    if (!c) return;
-    var dpr = window.devicePixelRatio || 1, W = c.clientWidth * dpr, H = c.clientHeight * dpr;
-    if (!W) return;
-    c.width = W; c.height = H;
-    var g = c.getContext('2d'), mx = 1;
-    ['r', 'g', 'b'].forEach(function (k) { h[k].forEach(function (v, i) { if (i > 0 && i < 63 && v > mx) mx = v; }); });
-    g.globalCompositeOperation = 'lighter';
-    [['r', 'rgba(255,70,70,.75)'], ['g', 'rgba(70,255,110,.75)'], ['b', 'rgba(80,140,255,.75)']].forEach(function (cv) {
-      g.fillStyle = cv[1]; g.beginPath(); g.moveTo(0, H);
-      h[cv[0]].forEach(function (v, i) { g.lineTo(i / 63 * W, H - Math.min(1, v / mx) * H * 0.95); });
-      g.lineTo(W, H); g.closePath(); g.fill();
+  function drawAllCanvases() { drawCurve(); drawWheels(); }
+
+  // ---- ruedas de color: arrastra el punto (tono e intensidad) y ajusta la luminancia debajo
+  var wheelEls = [];
+  function wheelsEditor() {
+    var dev = state.project.dev, wrap = el('div', { cls: 'wheels' });
+    wheelEls = [];
+    [['gs', 'Sombras'], ['gm', 'Medios'], ['gh', 'Luces']].forEach(function (z) {
+      var c = el('canvas'), lum = el('input', { type: 'range', min: -100, max: 100, step: 1, value: dev[z[0] + '_lum'] });
+      lum.addEventListener('input', function () { dev[z[0] + '_lum'] = +lum.value; live(); });
+      lum.addEventListener('change', commit);
+      var drag = false, setFrom = function (e) {
+        var r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 2 - 1, y = (e.clientY - r.top) / r.height * 2 - 1;
+        dev[z[0] + '_hue'] = Math.round((Math.atan2(-y, x) * 180 / Math.PI + 360) % 360);
+        dev[z[0] + '_sat'] = Math.round(Math.min(1, Math.sqrt(x * x + y * y)) * 100);
+        drawWheels(); live();
+      };
+      c.addEventListener('pointerdown', function (e) { drag = true; c.setPointerCapture(e.pointerId); setFrom(e); e.preventDefault(); });
+      c.addEventListener('pointermove', function (e) { if (drag) setFrom(e); });
+      c.addEventListener('pointerup', function () { if (drag) { drag = false; commit(); } });
+      c.addEventListener('dblclick', function () { dev[z[0] + '_sat'] = 0; dev[z[0] + '_lum'] = 0; lum.value = 0; drawWheels(); commit(); });
+      wheelEls.push([c, z[0]]);
+      wrap.appendChild(el('div', { cls: 'wheel' }, [c, el('div', { cls: 'wl', text: z[1] }), lum]));
     });
-    var lo = h.r[0] + h.g[0] + h.b[0], hi = h.r[63] + h.g[63] + h.b[63], tot = h.r.reduce(function (a, b) { return a + b; }, 0) * 3;
-    var info = $('histoInfo');
-    if (info) info.textContent = (hi / tot > 0.01 ? '⚠ luces quemadas  ' : '') + (lo / tot > 0.02 ? '⚠ sombras empastadas' : '');
+    var box = el('div', {}, [wrap]);
+    box.appendChild(devSlider({ label: 'Fusión', min: 0, max: 100, def: 50, step: 1 }, function () { return dev.g_blend; }, function (v) { dev.g_blend = v; }));
+    box.appendChild(devSlider({ label: 'Equilibrio', min: -100, max: 100, def: 0, step: 1 }, function () { return dev.g_balance; }, function (v) { dev.g_balance = v; }));
+    box.appendChild(el('p', { cls: 'note', text: 'Arrastra el punto hacia un color: la distancia al centro es la intensidad. La barra de debajo cambia la luminancia de esa zona. Doble toque: restablecer.' }));
+    return box;
+  }
+  function drawWheels() {
+    var dev = state.project.dev;
+    wheelEls.forEach(function (we) {
+      var c = we[0], z = we[1];
+      if (!c.isConnected) return;
+      var dpr = window.devicePixelRatio || 1, W = c.clientWidth * dpr;
+      if (!W) return;
+      c.width = W; c.height = W;
+      var g = c.getContext('2d'), R = W / 2 - 4 * dpr;
+      for (var a = 0; a < 360; a += 3) {
+        var grad = g.createRadialGradient(W / 2, W / 2, 0, W / 2, W / 2, R);
+        grad.addColorStop(0, '#7f7f7f'); grad.addColorStop(1, 'hsl(' + a + ',90%,55%)');
+        g.fillStyle = grad; g.beginPath(); g.moveTo(W / 2, W / 2);
+        g.arc(W / 2, W / 2, R, -(a + 3.5) * Math.PI / 180, -a * Math.PI / 180); g.closePath(); g.fill();
+      }
+      var hue = dev[z + '_hue'] * Math.PI / 180, rr = dev[z + '_sat'] / 100 * R;
+      g.strokeStyle = '#fff'; g.lineWidth = 2.5 * dpr; g.beginPath();
+      g.arc(W / 2 + Math.cos(hue) * rr, W / 2 - Math.sin(hue) * rr, 7 * dpr, 0, Math.PI * 2); g.stroke();
+    });
+  }
+  function splitEditor() {
+    var dev = state.project.dev, box = el('div');
+    box.appendChild(el('p', { cls: 'note', text: 'Tiñe sombras y luces con colores distintos (son las mismas zonas que las ruedas).' }));
+    [['gs', 'Sombras', 220], ['gh', 'Luces', 45]].forEach(function (z) {
+      box.appendChild(devSlider({ label: z[1] + ' · tono', min: 0, max: 360, def: z[2], step: 1, track: 'hue' }, function () { return dev[z[0] + '_hue']; }, function (v) { dev[z[0] + '_hue'] = v; }));
+      box.appendChild(devSlider({ label: z[1] + ' · saturación', min: 0, max: 100, def: 0, step: 1 }, function () { return dev[z[0] + '_sat']; }, function (v) { dev[z[0] + '_sat'] = v; }));
+    });
+    box.appendChild(devSlider({ label: 'Equilibrio', min: -100, max: 100, def: 0, step: 1 }, function () { return dev.g_balance; }, function (v) { dev.g_balance = v; }));
+    return box;
   }
 
-  // Curva de tonos: tocar para añadir un punto, arrastrar para moverlo, sacarlo del recuadro para quitarlo.
+  // ---- curva de tonos
   var curveCanvas = null, dragPt = -1;
-  function curvePts() { return state.dev.curve[devUI.channel]; }
+  function curvePts() { return state.project.dev.curve[devUI.channel]; }
   function curveEditor() {
-    var wrap = el('div', { cls: 'curve-wrap' });
-    var chips = el('div', { cls: 'chips' });
+    var wrap = el('div', { cls: 'curve' }), chips = el('div', { cls: 'chips' });
     [['rgb', 'RGB'], ['r', 'Rojo'], ['g', 'Verde'], ['b', 'Azul']].forEach(function (c) {
-      chips.appendChild(el('button', { cls: devUI.channel === c[0] ? 'on' : '', text: c[1], onclick: function () { devUI.channel = c[0]; renderDevelop(); } }));
+      chips.appendChild(el('button', { cls: devUI.channel === c[0] ? 'on' : '', text: c[1], onclick: function () { devUI.channel = c[0]; renderPanel(); } }));
     });
     curveCanvas = el('canvas');
-    var pos = function (e) {
-      var r = curveCanvas.getBoundingClientRect();
-      return [(e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height];
-    };
+    var pos = function (e) { var r = curveCanvas.getBoundingClientRect(); return [(e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height]; };
     curveCanvas.addEventListener('pointerdown', function (e) {
-      var p = pos(e), pts = curvePts(), best = -1, bd = 0.06;
-      pts.forEach(function (q, i) { var d = Math.hypot(q[0] - p[0], q[1] - p[1]); if (d < bd) { bd = d; best = i; } });
+      var q = pos(e), pts = curvePts(), best = -1, bd = 0.06;
+      pts.forEach(function (pt, i) { var d = Math.hypot(pt[0] - q[0], pt[1] - q[1]); if (d < bd) { bd = d; best = i; } });
       if (best < 0) {
-        var lut = D.curveLUT(pts), y = lut ? lut[Math.round(Math.min(1, Math.max(0, p[0])) * 1024)] : p[0];
-        pts.push([Math.min(0.99, Math.max(0.01, p[0])), y]);
-        pts.sort(function (a, b) { return a[0] - b[0]; });
-        best = pts.findIndex(function (q) { return q[1] === y; });
+        var lut = D.curveLUT(pts), y = lut ? lut[Math.round(Math.min(1, Math.max(0, q[0])) * 1024)] : q[0], np = [Math.min(0.99, Math.max(0.01, q[0])), y];
+        pts.push(np); pts.sort(function (a, b) { return a[0] - b[0]; }); best = pts.indexOf(np);
       }
-      dragPt = best;
-      curveCanvas.setPointerCapture(e.pointerId);
-      e.preventDefault(); drawCurve(); live();
+      dragPt = best; curveCanvas.setPointerCapture(e.pointerId); e.preventDefault(); drawCurve(); live();
     });
     curveCanvas.addEventListener('pointermove', function (e) {
       if (dragPt < 0) return;
-      var p = pos(e), pts = curvePts(), last = pts.length - 1, q = pts[dragPt];
-      if (dragPt === 0) q[0] = 0; else if (dragPt === last) q[0] = 1;
-      else q[0] = Math.min(pts[dragPt + 1][0] - 0.01, Math.max(pts[dragPt - 1][0] + 0.01, p[0]));
-      q[1] = Math.min(1, Math.max(0, p[1]));
-      q.out = dragPt > 0 && dragPt < last && (p[1] < -0.08 || p[1] > 1.08);
+      var q = pos(e), pts = curvePts(), last = pts.length - 1, pt = pts[dragPt];
+      if (dragPt === 0) pt[0] = 0; else if (dragPt === last) pt[0] = 1;
+      else pt[0] = Math.min(pts[dragPt + 1][0] - 0.01, Math.max(pts[dragPt - 1][0] + 0.01, q[0]));
+      pt[1] = Math.min(1, Math.max(0, q[1])); pt.out = dragPt > 0 && dragPt < last && (q[1] < -0.08 || q[1] > 1.08);
       drawCurve(); live();
     });
     var end = function () {
       if (dragPt < 0) return;
-      var pts = curvePts();
-      if (pts[dragPt] && pts[dragPt].out) pts.splice(dragPt, 1);
-      pts.forEach(function (q) { delete q.out; });
-      dragPt = -1; drawCurve(); devCommit();
+      var pts = curvePts(); if (pts[dragPt] && pts[dragPt].out) pts.splice(dragPt, 1);
+      pts.forEach(function (pt) { delete pt.out; }); dragPt = -1; drawCurve(); commit();
     };
-    curveCanvas.addEventListener('pointerup', end);
-    curveCanvas.addEventListener('pointercancel', end);
+    curveCanvas.addEventListener('pointerup', end); curveCanvas.addEventListener('pointercancel', end);
     wrap.appendChild(chips); wrap.appendChild(curveCanvas);
-    wrap.appendChild(el('p', { cls: 'dev-note', text: 'Toca la curva para añadir un punto, arrástralo para moverlo y sácalo del recuadro para quitarlo.' }));
+    wrap.appendChild(el('p', { cls: 'note', text: 'Toca para añadir un punto, arrástralo para moverlo y sácalo del recuadro para quitarlo.' }));
     return wrap;
   }
   function drawCurve() {
-    var c = curveCanvas;
-    if (!c || !c.isConnected) return;
-    var dpr = window.devicePixelRatio || 1, W = c.clientWidth * dpr;
-    if (!W) return;
+    var c = curveCanvas; if (!c || !c.isConnected) return;
+    var dpr = window.devicePixelRatio || 1, W = c.clientWidth * dpr; if (!W) return;
     c.width = W; c.height = W;
     var g = c.getContext('2d'), col = { rgb: '#ffffff', r: '#ff5a5a', g: '#4ade80', b: '#5a9bff' }[devUI.channel];
     g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = dpr;
     for (var i = 1; i < 4; i++) { g.beginPath(); g.moveTo(i * W / 4, 0); g.lineTo(i * W / 4, W); g.moveTo(0, i * W / 4); g.lineTo(W, i * W / 4); g.stroke(); }
     if (lastHist) {
       var hh = lastHist.r.map(function (v, k) { return v + lastHist.g[k] + lastHist.b[k]; }), mx = Math.max.apply(null, hh.slice(1, 63)) || 1;
-      g.fillStyle = 'rgba(139,92,246,.18)'; g.beginPath(); g.moveTo(0, W);
-      hh.forEach(function (v, k) { g.lineTo(k / 63 * W, W - Math.min(1, v / mx) * W * 0.6); });
-      g.lineTo(W, W); g.fill();
+      g.fillStyle = 'rgba(47,210,197,.15)'; g.beginPath(); g.moveTo(0, W);
+      hh.forEach(function (v, k) { g.lineTo(k / 63 * W, W - Math.min(1, v / mx) * W * 0.6); }); g.lineTo(W, W); g.fill();
     }
     g.strokeStyle = 'rgba(255,255,255,.2)'; g.beginPath(); g.moveTo(0, W); g.lineTo(W, 0); g.stroke();
     var pts = curvePts(), lut = D.curveLUT(pts.filter(function (q) { return !q.out; }));
@@ -484,56 +510,83 @@
     for (var x = 0; x <= 256; x++) { var y = lut ? lut[x * 4] : x / 256; if (x === 0) g.moveTo(0, W - y * W); else g.lineTo(x / 256 * W, W - y * W); }
     g.stroke();
     pts.forEach(function (q, k) {
-      g.fillStyle = q.out ? '#ff6b81' : (k === dragPt ? col : '#13121a'); g.strokeStyle = col; g.lineWidth = 2 * dpr;
+      g.fillStyle = q.out ? '#ff6b81' : (k === dragPt ? col : '#0b0b10'); g.strokeStyle = col; g.lineWidth = 2 * dpr;
       g.beginPath(); g.arc(q[0] * W, W - q[1] * W, 7 * dpr, 0, Math.PI * 2); g.fill(); g.stroke();
     });
   }
-
   function hslEditor() {
-    var wrap = el('div');
-    var chips = el('div', { cls: 'chips' });
+    var wrap = el('div'), chips = el('div', { cls: 'chips' }), dev = state.project.dev;
     var hex = { red: '#ff3b3b', orange: '#ff8c1a', yellow: '#ffd21a', green: '#3ccf4e', aqua: '#26d6d0', blue: '#2f6bff', purple: '#8b4dff', magenta: '#e83fc8' };
     D.HSL_COLORS.forEach(function (c) {
-      var b = el('button', { cls: 'dot' + (devUI.hslColor === c[0] ? ' on' : ''), title: c[1], onclick: function () { devUI.hslColor = c[0]; renderDevelop(); } });
-      b.style.background = hex[c[0]];
-      chips.appendChild(b);
+      var b = el('button', { cls: 'dot' + (devUI.hsl === c[0] ? ' on' : ''), title: c[1], onclick: function () { devUI.hsl = c[0]; renderPanel(); } });
+      b.style.background = hex[c[0]]; chips.appendChild(b);
     });
     wrap.appendChild(chips);
-    var name = D.HSL_COLORS.filter(function (c) { return c[0] === devUI.hslColor; })[0][1];
-    wrap.appendChild(el('p', { cls: 'dev-note', text: 'Color: ' + name }));
-    var v = state.dev.hsl[devUI.hslColor];
+    var v = dev.hsl[devUI.hsl];
+    wrap.appendChild(el('p', { cls: 'note', text: 'Color: ' + D.HSL_COLORS.filter(function (c) { return c[0] === devUI.hsl; })[0][1] }));
     [['h', 'Tono'], ['s', 'Saturación'], ['l', 'Luminancia']].forEach(function (k) {
-      wrap.appendChild(devSlider({ id: k[0], label: k[1], min: -100, max: 100, def: 0, step: 1 },
-        function () { return v[k[0]]; }, function (x) { v[k[0]] = x; }));
+      wrap.appendChild(devSlider({ label: k[1], min: -100, max: 100, def: 0, step: 1 }, function () { return v[k[0]]; }, function (x) { v[k[0]] = x; }));
     });
     return wrap;
   }
+  function drawHisto() {
+    var c = $('histo'); if (!c || !lastHist) return;
+    var dpr = window.devicePixelRatio || 1, W = c.clientWidth * dpr, H = c.clientHeight * dpr; if (!W) return;
+    c.width = W; c.height = H;
+    var g = c.getContext('2d'), h = lastHist, mx = 1;
+    ['r', 'g', 'b'].forEach(function (k) { h[k].forEach(function (v, i) { if (i > 0 && i < 63 && v > mx) mx = v; }); });
+    g.globalCompositeOperation = 'lighter';
+    [['r', 'rgba(255,70,70,.75)'], ['g', 'rgba(70,255,110,.75)'], ['b', 'rgba(80,140,255,.75)']].forEach(function (cv) {
+      g.fillStyle = cv[1]; g.beginPath(); g.moveTo(0, H);
+      h[cv[0]].forEach(function (v, i) { g.lineTo(i / 63 * W, H - Math.min(1, v / mx) * H * 0.95); }); g.lineTo(W, H); g.closePath(); g.fill();
+    });
+    var tot = h.r.reduce(function (a, b) { return a + b; }, 0) * 3, info = $('histoInfo');
+    if (info) info.textContent = ((h.r[63] + h.g[63] + h.b[63]) / tot > 0.01 ? '⚠ luces quemadas  ' : '') + ((h.r[0] + h.g[0] + h.b[0]) / tot > 0.02 ? '⚠ sombras empastadas' : '');
+  }
 
+  // ------------------------------------------------------------------ controles
+  function fmt(p, v) {
+    if (p.unit === 'EV') return (v > 0 ? '+' : '') + Number(v).toFixed(2);
+    if (p.track === 'hue') return Math.round(v) + '°';
+    var s = (p.step && p.step < 1) ? Number(v).toFixed(1) : String(Math.round(v));
+    return (v > 0 && p.min < 0 ? '+' : '') + s + (p.unit === '%' ? '%' : p.unit === '°' ? '°' : '');
+  }
+  function devSlider(p, get, set) {
+    var v = get(), out = el('b', { text: fmt(p, v), cls: v !== p.def ? 'changed' : '' });
+    var inp = el('input', { type: 'range', min: p.min, max: p.max, step: p.step || 1, value: v });
+    if (p.track) inp.className = p.track;
+    var upd = function (x) { set(x); out.textContent = fmt(p, x); out.className = x !== p.def ? 'changed' : ''; };
+    inp.addEventListener('input', function () { upd(+inp.value); live(); });
+    inp.addEventListener('change', commit);
+    inp.addEventListener('dblclick', function () { if (p.def === undefined) return; inp.value = p.def; upd(p.def); commit(); });
+    return el('div', { cls: 'dslider' }, [el('div', { cls: 'lbl' }, [el('span', { text: p.label }), out]), inp]);
+  }
+  function selectCtl(label, opts, v, set) {
+    var s = el('select');
+    opts.forEach(function (o) { s.appendChild(el('option', { value: o[0], text: o[1] })); });
+    s.value = v; s.addEventListener('change', function () { set(s.value); commit(); });
+    return el('div', { cls: 'param' }, [el('div', { cls: 'lbl', text: label }), s]);
+  }
+  function checkCtl(label, v, set) {
+    var c = el('input', { type: 'checkbox' }); c.checked = !!v;
+    c.addEventListener('change', function () { set(c.checked); commit(); });
+    return el('label', { cls: 'chk' }, [c, label]);
+  }
+
+  // ------------------------------------------------------------------ eventos
   function bind() {
     $('file').addEventListener('change', function (e) { openFile(e.target.files[0]); e.target.value = ''; });
     $('file2').addEventListener('change', function (e) { openFile(e.target.files[0]); e.target.value = ''; });
-    $('btnSave').addEventListener('click', doSave);
-    $('intensity').addEventListener('input', function (e) { state.intensity = +e.target.value; $('intOut').textContent = state.intensity; live(); });
-    $('intensity').addEventListener('change', commit);
-    $('exportSize').addEventListener('change', function (e) {
-      state.exportSize = +e.target.value; save();
-      if (file) openFile(file);
+    $('btnUndo').addEventListener('click', undo);
+    $('btnRedo').addEventListener('click', redo);
+    $('btnExport').addEventListener('click', exportSheet);
+    var v = $('viewer'), cmp = $('btnCompare'), locked = false;
+    cmp.addEventListener('click', function () { locked = !locked; cmp.classList.toggle('on', locked); v.classList.toggle('before', locked); });
+    v.addEventListener('pointerdown', function (e) { if (loaded) { v.classList.add('before'); e.preventDefault(); } });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { v.addEventListener(t, function () { if (!locked) v.classList.remove('before'); }); });
+    Array.prototype.forEach.call(document.querySelectorAll('.modes button'), function (b) {
+      b.addEventListener('click', function () { state.mode = b.getAttribute('data-mode'); state.sel = null; save(); renderModes(); renderPanel(); requestThumbs(); });
     });
-    $('btnAdd').addEventListener('click', function () {
-      var f = FILTERS[$('addFilter').value], params = {};
-      f.params.forEach(function (p) { params[p.id] = p['default']; });
-      stack().push({ id: f.id, enabled: true, opacity: 100, blend: 'normal', mask: { type: 'all' }, params: params });
-      openCards[(stack().length - 1) + ':' + f.id] = true;
-      state.chosen[state.module] = '';
-      renderStack(); renderPresets(); commit();
-    });
-    $('btnClear').addEventListener('click', function () { state.stacks[state.module] = []; state.chosen[state.module] = ''; renderStack(); renderPresets(); commit(); });
-    // Mantener pulsado para ver el original
-    var v = $('viewer');
-    var on = function (e) { if (loaded) { v.classList.add('holding'); e.preventDefault(); } };
-    var off = function () { v.classList.remove('holding'); };
-    v.addEventListener('pointerdown', on);
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { v.addEventListener(t, off); });
     window.addEventListener('resize', function () { if (loaded) { worker.postMessage({ type: 'original', size: previewSize() }); requestPreview(false); } });
   }
 })();

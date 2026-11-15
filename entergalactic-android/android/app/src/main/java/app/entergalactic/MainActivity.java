@@ -29,12 +29,12 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 /**
- * ENTERGALACTIC para Android.
+ * CINELAB (ENTERGALACTIC) para Android.
  *
  * La interfaz y el motor de efectos son HTML/JavaScript (carpeta web/ del proyecto) y se sirven
  * sin conexión desde los assets mediante WebViewAssetLoader, en un origen https propio, para que
  * funcionen los Web Workers. La actividad sólo añade lo que el navegador no puede hacer solo:
- * elegir fotos de la galería y guardar el resultado en Imágenes/ENTERGALACTIC.
+ * elegir fotos de la galería y guardar el resultado en Imágenes/CINELAB.
  */
 public class MainActivity extends Activity {
     private static final int PICK_IMAGE = 1;
@@ -124,7 +124,7 @@ public class MainActivity extends Activity {
                     ContentValues v = new ContentValues();
                     v.put(MediaStore.Images.Media.DISPLAY_NAME, name);
                     v.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-                    v.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/ENTERGALACTIC");
+                    v.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/CINELAB");
                     v.put(MediaStore.Images.Media.IS_PENDING, 1);
                     ContentResolver cr = getContentResolver();
                     uri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
@@ -135,8 +135,8 @@ public class MainActivity extends Activity {
                         runOnUiThread(() -> requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQ_STORAGE));
                         return "ERR|Concede el permiso de almacenamiento y vuelve a pulsar «Guardar».";
                     }
-                    File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "ENTERGALACTIC");
-                    if (!dir.exists() && !dir.mkdirs()) return "ERR|No se pudo crear la carpeta Imágenes/ENTERGALACTIC.";
+                    File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "CINELAB");
+                    if (!dir.exists() && !dir.mkdirs()) return "ERR|No se pudo crear la carpeta Imágenes/CINELAB.";
                     legacyFile = new File(dir, name);
                     out = new FileOutputStream(legacyFile);
                 }

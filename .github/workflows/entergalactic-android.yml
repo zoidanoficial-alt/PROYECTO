@@ -43,19 +43,19 @@ jobs:
       - name: Compilar APK
         run: gradle -p entergalactic-android/android assembleRelease --no-daemon
       - name: Preparar APK
-        run: cp entergalactic-android/android/app/build/outputs/apk/release/app-release.apk ENTERGALACTIC.apk
+        run: cp entergalactic-android/android/app/build/outputs/apk/release/app-release.apk CINELAB.apk && cp CINELAB.apk ENTERGALACTIC.apk
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ENTERGALACTIC-apk
-          path: ENTERGALACTIC.apk
+          name: CINELAB-apk
+          path: CINELAB.apk
 
       - name: Publicar descarga
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete entergalactic-android --yes --cleanup-tag || true
-          gh release create entergalactic-android ENTERGALACTIC.apk \
+          gh release create entergalactic-android CINELAB.apk ENTERGALACTIC.apk \
             --target "${{ github.sha }}" --prerelease \
-            --title "ENTERGALACTIC para Android" \
-            --notes "APK de ENTERGALACTIC: Revelado, Cine, Pop, Chroma, Plata y Analógico. Compilada automáticamente desde ${{ github.sha }}. Descárgala desde el móvil, ábrela y permite «Instalar apps desconocidas» si Android lo pide."
+            --title "CINELAB para Android" \
+            --notes "CINELAB, laboratorio de dirección de fotografía (Film, Color, Optics, Mono; Retouch y AI en camino). ENTERGALACTIC.apk es el mismo archivo con el nombre anterior. Compilada automáticamente desde ${{ github.sha }}. Descárgala desde el móvil, ábrela y permite «Instalar apps desconocidas» si Android lo pide."

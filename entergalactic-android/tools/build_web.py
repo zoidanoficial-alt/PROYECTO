@@ -14,7 +14,7 @@ ROOT = os.path.normpath(os.path.join(HERE, "..", ".."))
 ENGINE = os.path.join(ROOT, "entergalactic", "com.entergalactic.panel", "engine")
 OUT = os.path.join(HERE, "..", "web", "schema.json")
 
-MOBILE_MODULES = ["cine", "pop", "chroma", "plata", "analog"]
+MOBILE_MODULES = ["cine", "pop", "film", "chroma", "optics", "plata", "analog"]
 # Filtros que dependen de OpenCV/IA y no se incluyen en el móvil.
 EXCLUDED = {"denoise", "color_noise_only", "hot_pixels", "upscale"}
 
@@ -48,7 +48,8 @@ def build():
     # Las máscaras inteligentes (cielo, piel, sujeto…) sólo existen en el motor de escritorio.
     from eg import core as _core
     masks = [m for m in s["mask_types"] if m["id"] in _core.BASIC_MASK_TYPES]
-    return dict(s, modules=modules, filters=filters, presets=presets, mask_types=masks)
+    from eg.film_profiles import PROFILES
+    return dict(s, modules=modules, filters=filters, presets=presets, mask_types=masks, film_profiles=PROFILES)
 
 
 if __name__ == "__main__":

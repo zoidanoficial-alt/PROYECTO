@@ -29,6 +29,27 @@ def main(photo, out_dir):
                {"id": "pop_grid", "params": {"texture": 0, "grid": "3x3", "palette": "bw", "rotate": False}},
                {"id": "halftone", "params": {"mode": "cmy"}}, {"id": "halftone", "params": {"mode": "mono"}}):
         cases.append({"name": "pop:" + st["id"] + json.dumps(st["params"], sort_keys=True), "recipe": {"stack": [st]}})
+    # Cada perfil de película sin grano (aleatorio) para comparar la emulsión píxel a píxel.
+    from eg.film_profiles import PROFILES
+    for pr in PROFILES:
+        if pr["kind"] == "auto":
+            continue
+        for hal in (0, 100):
+            if hal and not pr["hal"]:
+                continue
+            cases.append({"name": "perfil:%s:hal%d" % (pr["id"], hal), "recipe": {"stack": [{"id": "film_profile", "params": {
+                "profile": pr["id"], "grain": 0, "halation": hal}}]}})
+    for st in ({"id": "film_profile", "params": {"profile": "cine500t", "grain": 0, "exposure": 1.5}},
+               {"id": "film_profile", "params": {"profile": "portrait400", "grain": 0, "print": "print3513"}},
+               {"id": "paper_sim", "params": {"texture": 0, "paper": "fiber_warm"}},
+               {"id": "optical_filter", "params": {"type": "star6", "threshold": 60}},
+               {"id": "optical_filter", "params": {"type": "fog"}},
+               {"id": "lens_character", "params": {"distortion": -60, "swirl": 70}},
+               {"id": "lens_flare", "params": {"auto": False, "x": 30, "y": 20, "style": "rainbow"}},
+               {"id": "glass", "params": {"type": "crystal"}}, {"id": "glass", "params": {"type": "rainbow"}},
+               {"id": "color_correction", "params": {"auto": "white", "lift": 40}},
+               {"id": "color_correction", "params": {"auto": "levels", "gain": 30}}):
+        cases.append({"name": "opt:" + st["id"] + json.dumps(st["params"], sort_keys=True), "recipe": {"stack": [st]}})
     index = []
     for i, c in enumerate(cases):
         ctx = C.Context(120, 160, 1.0, (0, 0, 1, 1), 1, (160, 120))

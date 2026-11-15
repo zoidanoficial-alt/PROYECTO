@@ -3,75 +3,49 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#13121a">
-  <title>ENTERGALACTIC</title>
+  <meta name="theme-color" content="#0b0b10">
+  <title>CINELAB</title>
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
-  <header class="top">
-    <div class="logo"><span class="orb"></span>ENTERGALACTIC</div>
-    <label class="btn open">Abrir foto<input type="file" id="file" accept="image/*" hidden></label>
+  <header class="topbar">
+    <div class="brand"><span class="aperture"></span>CINELAB</div>
+    <div class="tb">
+      <label class="ib" title="Abrir foto">⊕<input type="file" id="file" accept="image/*" hidden></label>
+      <button class="ib" id="btnUndo" title="Deshacer" disabled>↶</button>
+      <button class="ib" id="btnRedo" title="Rehacer" disabled>↷</button>
+      <button class="ib" id="btnCompare" title="Antes / después">◐</button>
+      <button class="ib accent" id="btnExport" title="Exportar" disabled>⤓</button>
+    </div>
   </header>
 
-  <main>
-    <section id="viewer" class="viewer empty">
-      <canvas id="canvas"></canvas>
-      <canvas id="orig" class="orig"></canvas>
-      <div class="hint-empty">
-        <div class="orb big"></div>
-        <p>Abre una foto para empezar</p>
-        <label class="btn primary">Elegir de la galería<input type="file" id="file2" accept="image/*" hidden></label>
-      </div>
-      <span id="holdTag" class="tag">Original</span>
-      <div id="busy" class="busy hidden"></div>
-    </section>
-    <p class="hold-hint muted">Mantén pulsada la foto para ver el original</p>
+  <section id="viewer" class="viewer empty">
+    <canvas id="canvas"></canvas>
+    <canvas id="orig" class="orig"></canvas>
+    <div class="empty-msg">
+      <div class="aperture big"></div>
+      <p>Laboratorio de dirección de fotografía</p>
+      <label class="btn primary">Abrir una foto<input type="file" id="file2" accept="image/*" hidden></label>
+    </div>
+    <span id="tagBefore" class="tag">ANTES</span>
+    <div id="busy" class="busy hidden"></div>
+  </section>
+  <div class="infobar"><span id="info">Sin foto</span><span id="editing" class="editing"></span></div>
 
-    <nav id="tabs" class="tabs"></nav>
+  <div class="modes">
+    <button data-mode="director" class="on">Modo Director</button>
+    <button data-mode="pro">Modo Profesional</button>
+  </div>
 
-    <section id="develop" class="develop hidden"></section>
+  <nav id="labs" class="labs"></nav>
+  <main id="panel" class="panel"></main>
 
-    <section class="presets looks-only">
-      <div id="presetStrip" class="strip"></div>
-      <p id="presetDesc" class="desc hidden"></p>
-    </section>
-
-    <section class="intensity looks-only">
-      <label>Intensidad <output id="intOut">100</output></label>
-      <input type="range" id="intensity" min="0" max="100" value="100">
-    </section>
-
-    <details id="adjust" class="adjust looks-only">
-      <summary>Ajustar filtros <span id="stackCount" class="muted"></span></summary>
-      <div id="stack" class="stack"></div>
-      <div class="add-row">
-        <select id="addFilter"></select>
-        <button id="btnAdd" class="btn ghost">＋ Añadir</button>
-      </div>
-      <button id="btnClear" class="link">Vaciar filtros</button>
-    </details>
-
-    <details class="settings">
-      <summary>Ajustes</summary>
-      <div class="row">
-        <label for="exportSize">Tamaño al guardar</label>
-        <select id="exportSize">
-          <option value="4096">Alta (hasta 4096 px)</option>
-          <option value="0">Original (más lento)</option>
-          <option value="2048">Media (2048 px)</option>
-        </select>
-      </div>
-      <p class="muted small">Las recetas de Cine son interpretaciones inspiradas en trabajos de esos directores de fotografía; no están afiliadas a ellos.</p>
-    </details>
-  </main>
-
-  <footer class="bottom">
-    <span id="status" class="status"></span>
-    <button id="btnSave" class="btn primary" disabled>Guardar en galería</button>
-  </footer>
+  <div id="sheet" class="sheet hidden"></div>
+  <footer class="status"><span id="status"></span></footer>
 
   <script src="eg-core.js"></script>
   <script src="eg-filters.js"></script>
+  <script src="eg-filters2.js"></script>
   <script src="eg-develop.js"></script>
   <script src="app.js"></script>
 </body>

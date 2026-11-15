@@ -76,16 +76,16 @@ def lens_flare(img, p, ctx):
     # reflejos internos sobre la línea fuente → centro → reflejo
     if p["ghosts"]:
         cx, cy = 0.5, 0.5
-        rg = np.random.default_rng(42)
-        for t, size, hue_ in ((-0.35, 0.06, 30), (0.25, 0.035, 200), (0.55, 0.08, 120), (0.85, 0.025, 280),
-                              (1.25, 0.1, 40), (1.6, 0.05, 190), (1.9, 0.14, 300)):
+        for t, size, hue_, gain in ((-0.35, 0.06, 30, 0.9), (0.25, 0.035, 200, 0.7), (0.55, 0.08, 120, 0.85),
+                                    (0.85, 0.025, 280, 0.65), (1.25, 0.1, 40, 0.95), (1.6, 0.05, 190, 0.75),
+                                    (1.9, 0.14, 300, 0.6)):
             # t = 0 en la fuente, 0,5 en el centro óptico, 1 en el punto reflejado
             gx, gy = sx + (cx - sx) * 2 * t, sy + (cy - sy) * 2 * t
             gd = np.sqrt(((u - gx) * a) ** 2 + (v - gy) ** 2)
             ring = 1.0 - C.smoothstep(size * 0.7, size, gd)
             edge = C.smoothstep(size * 0.55, size * 0.95, gd) * (1.0 - C.smoothstep(size * 0.95, size * 1.05, gd))
             gcol = C.hue_color(hue_, 0.55, 1.0) if p["style"] == "rainbow" else col * (0.75 + 0.25 * C.hue_color(hue_, 0.4, 1.0))
-            layer += (ring * 0.22 + edge * 0.3)[..., None] * gcol * rg.uniform(0.6, 1.0) * p["ghosts"] / 100.0
+            layer += (ring * 0.22 + edge * 0.3)[..., None] * gcol * gain * p["ghosts"] / 100.0
     # anillo
     if p["halo"]:
         hr = 0.32
@@ -236,18 +236,26 @@ def optical_filter(img, p, ctx):
     l = C.luminance(img)
     th = p["threshold"] / 100.0
     if t.startswith("star") or t == "glimmer":
-        m = C.smoothstep(th - 0.03, th + 0.05, l)
+        # Rayos por muestreo direccional a resolución reducida (idéntico en el motor móvil).
+        sm = ctx.small(900)
+        lum = cv2.resize(l, (sm.w, sm.h), interpolation=cv2.INTER_AREA) if (sm.w, sm.h) != (l.shape[1], l.shape[0]) else l
+        m = C.smoothstep(th - 0.03, th + 0.05, lum).astype(np.float32)
         n = {"star4": 4, "star6": 6, "star8": 8, "glimmer": 8}[t]
-        length = (0.04 if t != "glimmer" else 0.012) * full * p["size"] / 100.0
+        sfull = max(sm.full_w, sm.full_h) * sm.k
+        R = int(max(2, (0.04 if t != "glimmer" else 0.012) * sfull * p["size"] / 100.0 / 2))
         acc = np.zeros_like(m)
-        L = int(max(5, length)) | 1
         for i in range(n // 2):
-            kern = np.zeros((L, L), np.float32)
-            kern[L // 2, :] = np.exp(-np.abs(np.arange(L) - L // 2) / (L / 6.0))
-            M = cv2.getRotationMatrix2D((L / 2 - 0.5, L / 2 - 0.5), p["angle"] + i * 360.0 / n, 1.0)
-            kern = cv2.warpAffine(kern, M, (L, L))
-            kern /= max(kern.sum(), 1e-6)
-            acc += cv2.filter2D(m, -1, kern) * L * 0.35
+            ang = np.deg2rad(p["angle"] + i * 360.0 / n)
+            dx, dy = np.cos(ang), -np.sin(ang)
+            wsum = 0.0
+            for j in range(-R, R + 1):
+                wj = float(np.exp(-abs(j) / (R / 3.0)))
+                M = np.float32([[1, 0, j * dx], [0, 1, j * dy]])
+                acc += cv2.warpAffine(m, M, (sm.w, sm.h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT) * wj
+                wsum += wj
+        acc = acc / max(wsum, 1e-6) * (2 * R + 1) * 0.35 / (n // 2) * 2
+        if acc.shape != l.shape:
+            acc = cv2.resize(acc, (l.shape[1], l.shape[0]), interpolation=cv2.INTER_LINEAR)
         layer = np.clip(acc, 0, 1)[..., None] * np.clip(img * 0.4 + 0.6, 0, 1)
         return _screen(img, layer * k * 1.4)
     if t in ("black_mist", "white_mist", "fog"):
@@ -360,3 +368,74 @@ def color_correction(img, p, ctx):
     if p["saturation"]:
         out = C.saturate(out, 1.0 + p["saturation"] / 100.0)
     return np.clip(out, 0, 1)
+
+
+# --------------------------------------------------------------------------- efectos de cristal
+GLASS = {"prism": "Prisma (doble imagen irisada)", "rainbow": "Arcoíris refractado", "crystal": "Bola de cristal",
+         "frosted": "Cristal esmerilado (bordes)"}
+
+
+@register("glass", "Efectos de cristal", ["optics"], [
+    sel("type", "Efecto", list(GLASS.items()), "prism"),
+    rng("intensity", "Intensidad", 0, 100, 50),
+    rng("x", "Posición horizontal", 0, 100, 50), rng("y", "Posición vertical", 0, 100, 50),
+    rng("size", "Tamaño", 5, 100, 40),
+    rng("angle", "Ángulo", -90, 90, 25, unit="°"),
+], "Cristales delante del objetivo: prisma con reflejo desplazado e irisado, arcoíris, bola de cristal y vidrio esmerilado.")
+def glass(img, p, ctx):
+    h, w = img.shape[:2]
+    u, v = ctx.grid()
+    x0, y0, x1, y1 = ctx.rect
+    k = p["intensity"] / 100.0
+    a = ctx.aspect
+    t = p["type"]
+    ang = np.deg2rad(p["angle"])
+    if t == "prism":
+        # copia desplazada (reflejo interno del prisma) con color según la posición
+        off = 0.04 + 0.12 * p["size"] / 100.0
+        su = u + np.cos(ang) * off / a
+        sv = v + np.sin(ang) * off
+        mx = ((su - x0) / (x1 - x0) * w - 0.5).astype(np.float32)
+        my = ((sv - y0) / (y1 - y0) * h - 0.5).astype(np.float32)
+        ghost = cv2.remap(img, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+        hue_ = ((u * np.cos(ang) * a + v * np.sin(ang)) * 360.0 * 1.5) % 360.0
+        hsv = np.stack([hue_, np.full_like(hue_, 0.6), np.ones_like(hue_)], -1).astype(np.float32)
+        tint = C.from_hsv(hsv)
+        side = C.smoothstep(p["x"] / 100.0 - 0.3, p["x"] / 100.0 + 0.3, u)[..., None]
+        return 1.0 - (1.0 - img) * (1.0 - np.clip(ghost * tint * 0.6 * k * side, 0, 1))
+    if t == "rainbow":
+        cx, cy = p["x"] / 100.0, p["y"] / 100.0
+        d = (u - cx) * a * np.cos(ang + np.pi / 2) + (v - cy) * np.sin(ang + np.pi / 2)
+        width = 0.03 + 0.15 * p["size"] / 100.0
+        tt = np.clip(d / width * 0.5 + 0.5, 0, 1)
+        band = np.exp(-((d / width) ** 2) * 2.0)
+        hsv = np.stack([(tt * 300.0) % 360.0, np.full_like(tt, 0.85), np.ones_like(tt)], -1).astype(np.float32)
+        layer = C.from_hsv(hsv) * band[..., None] * k * 0.6
+        return 1.0 - (1.0 - img) * (1.0 - np.clip(layer, 0, 1))
+    if t == "crystal":
+        cx, cy = p["x"] / 100.0, p["y"] / 100.0
+        R = 0.08 + 0.4 * p["size"] / 100.0
+        dx, dy = (u - cx) * a, (v - cy)
+        r = np.sqrt(dx * dx + dy * dy)
+        inside = r < R
+        # dentro de la bola la imagen se ve invertida y comprimida (refracción)
+        f = np.where(inside, -(0.25 + 0.6 * (r / R) ** 2) * (0.5 + k), 1.0)
+        su, sv = cx + dx * f / a, cy + dy * f
+        mx = ((su - x0) / (x1 - x0) * w - 0.5).astype(np.float32)
+        my = ((sv - y0) / (y1 - y0) * h - 0.5).astype(np.float32)
+        ball = cv2.remap(img, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+        rim = np.exp(-((r - R) / (R * 0.04 + 1e-4)) ** 2)[..., None] * 0.5
+        edge = (1.0 - C.smoothstep(R * 0.98, R, r))[..., None]
+        out = img * (1 - edge) + ball * edge
+        return np.clip(out + rim * k, 0, 1)
+    # esmerilado: desplazamiento con ruido y difusión, más fuerte hacia los bordes
+    rg = ctx.rng(57)
+    full = max(ctx.full_w, ctx.full_h) * ctx.k
+    nx = C.blur(rg.standard_normal((h, w)).astype(np.float32), max(0.6, 0.002 * full))
+    ny = C.blur(rg.standard_normal((h, w)).astype(np.float32), max(0.6, 0.002 * full))
+    sc = 0.01 * full * k / (nx.std() + 1e-6)
+    xs, ys = np.meshgrid(np.arange(w, dtype=np.float32), np.arange(h, dtype=np.float32))
+    fr = cv2.remap(img, xs + nx * sc, ys + ny * sc, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+    fr = C.blur(fr, 0.004 * full * k)
+    m = C.smoothstep(0.2, 0.2 + 0.6 * p["size"] / 100.0, ctx.radial(p["x"] / 100.0, p["y"] / 100.0, 1.0))[..., None]
+    return img + (fr - img) * m

@@ -1,48 +1,58 @@
-# ENTERGALACTIC para Android
+# CINELAB para Android
 
-Versión móvil de ENTERGALACTIC con las herramientas esenciales:
-- **Revelado:** revelador fotográfico completo, solo en la app:
-  - **Básico:** temperatura, matiz, exposición, contraste, iluminaciones, sombras, blancos, negros, textura, claridad, neblina, intensidad y saturación.
-  - **Curva de tonos** editable con el dedo (RGB y por canal).
-  - **Mezcla de color** por 8 tonos y **gradación de color** (sombras, medios tonos y luces).
-  - **Detalle:** enfoque con máscara y reducción de ruido.
-  - **Efectos:** viñeta y grano.
-  - **Recortar y enderezar.**
-  - **Histograma** en vivo y botón **Auto**.
-- **Cine:** 33 looks inspirados en 14 directores de fotografía.
-- **Pop:** serigrafía, repeticiones y tramas inspiradas en Andy Warhol.
-- **Chroma:** color, luz, contraste y atmósferas.
-- **Plata:** blanco y negro químico.
-- **Analógico:** cámaras antiguas, fugas de luz, película vintage e instantáneas.
+**CINELAB** es un laboratorio de dirección de fotografía en el móvil, no solo un editor. Es la versión Android de ENTERGALACTIC y comparte con el plugin de Photoshop el mismo motor, catálogo de filtros y recetas.
 
-En total, 49 filtros y 70 recetas.
+## La pantalla
+
+- **Barra superior:**
+  - ⊕ abrir
+  - ↶ deshacer
+  - ↷ rehacer
+  - ◐ antes / después
+  - ⤓ exportar
+- **Lienzo** fijo arriba. Mantenlo pulsado para ver el original.
+- **Modo Director** y **Modo Profesional.**
+- **Seis laboratorios:** Film, Color, Optics, Retouch, Mono y AI.
+
+## Laboratorios
+
+| Lab | Qué hace |
+|---|---|
+| **Film 🎞** | 69 perfiles de película (cine, diapositiva, retrato, instantánea, copias de proyección, procesos históricos), looks de 14 directores de fotografía, grano, halación, bloom, daños, respiración y compresión de película, cámaras antiguas |
+| **Color ◑** | Ruedas de color (sombras, medios, luces), HSL, curvas RGB, balance de blancos, split toning, contraste y saturación, detalle, viñeta y grano, recorte; además, filtros de color y arte pop inspirado en Warhol |
+| **Optics ✦** | Destellos de lente, fugas de luz, glow, rayos de luz, aberración cromática, difusión óptica, filtros estrella, partículas y efectos de cristal (prisma, arcoíris, cristal, esmerilado) |
+| **Mono ◐** | Blanco y negro analógico: películas, filtros de color, contraste tonal, grano, texturas, negros profundos, virados y simulación de papel (RC brillante y perla, mate, baritado neutro, cálido y frío) |
+| **Retouch ✎** | *Fase 2:* imperfecciones con un toque, dodge & burn con pincel, selección de personas y piel con IA, piel, borrado de objetos |
+| **AI ✺** | *Fase 3:* reducción de ruido, superresolución, recuperación de detalle, desenfoque de fondo, restauración, segmentación |
+
+## Los dos modos
+
+- **Modo Director:**
+  - Looks cinematográficos y perfiles de película con miniaturas de tu foto.
+  - **Intensidad del look.**
+  - **✦ Ajuste inteligente**: exposición y tono automáticos.
+  - **♥ Recetas**: guarda tu edición completa y aplícala a otras fotos con un toque.
+- **Modo Profesional:**
+  - Revelado base completo (laboratorio Color).
+  - Pila de **capas** independientes, hasta 15. Cada capa se puede:
+    - activar u ocultar, reordenar (▲▼) o quitar (✕)
+    - ajustar en sus parámetros, su **opacidad** y su **modo de fusión**
+    - limitar con una **máscara**: sombras, medios, luces, un color, el centro, los bordes, arriba o abajo; con suavidad e inversión
+
+Todo es **no destructivo**: la foto original nunca se toca. Deshacer y rehacer guardan hasta 60 pasos, y la edición se recuerda al cerrar la app.
 
 Funciona **sin conexión** y procesa las fotos en el propio móvil. No envía nada a internet.
 
-No incluye **Clean** ni **Realce IA**: necesitan OpenCV y modelos de redes neuronales pesados, y las cámaras de los móviles ya reducen el ruido.
-
 ## Descargar e instalar
 
-1. Desde el móvil, con tu sesión de GitHub iniciada, abre la página de la versión **«ENTERGALACTIC para Android»**:
-   `https://github.com/zoidanoficial-alt/PROYECTO/releases/tag/entergalactic-android`
-2. Descarga **ENTERGALACTIC.apk** y ábrela.
-3. Si Android lo pide, permite **«Instalar apps desconocidas»** para el navegador o el gestor de archivos.
+1. Desde el móvil, con tu sesión de GitHub iniciada, abre:
+   `https://github.com/zoidanoficial-alt/PROYECTO/releases/download/entergalactic-android/CINELAB.apk`
+2. Abre el archivo descargado.
+3. Si Android lo pide, permite **«Instalar apps desconocidas»**.
 
-Requiere Android 8.0 o posterior.
+Se instala encima de ENTERGALACTIC, porque es la misma app actualizada. Requiere Android 8.0 o posterior.
 
-## Uso
-
-1. **Abrir foto:** elige una imagen de la galería.
-2. En **Revelado**, ajusta la foto: pulsa **Auto** o mueve los controles. La foto queda fija arriba mientras te desplazas por ellos; doble toque en un control lo devuelve a 0.
-   - Admite JPEG, PNG y HEIC. Los RAW (DNG) aún no se pueden abrir.
-3. Si quieres, elige una pestaña de looks (**Cine, Pop, Chroma, Plata, Analógico**) y toca una receta. Las miniaturas se generan con tu foto.
-4. Ajusta la **Intensidad** del look. **Mantén pulsada la foto** para ver el original.
-5. En **Ajustar filtros**:
-   - Activa o desactiva filtros, reordénalos (▲▼) o quítalos (✕).
-   - Toca un filtro para cambiar sus parámetros, su opacidad, su modo de fusión o a qué zona se aplica (sombras, luces, un color, el centro…).
-   - Añade más, hasta 15.
-6. **Guardar en galería:** la foto se guarda en *Imágenes › ENTERGALACTIC*.
-   - En **Ajustes** eliges el tamaño: hasta 4096 px (por defecto), original o 2048 px.
+Las fotos se guardan en *Imágenes › CINELAB* como JPEG. Al exportar eliges el tamaño: hasta 4096 px, original o 2048 px.
 
 ## Cómo está hecha
 
@@ -51,6 +61,7 @@ entergalactic-android/
 ├── web/                     ← la app (HTML/CSS/JS); funciona también en un navegador
 │   ├── eg-core.js           ← núcleo del motor (port de eg/core.py)
 │   ├── eg-filters.js        ← filtros de looks (port de los filtros Python)
+│   ├── eg-filters2.js       ← película, óptica, cristal y papel (port)
 │   ├── eg-develop.js        ← Revelado (exclusivo de la app)
 │   ├── worker.js            ← procesado en segundo plano (Web Worker)
 │   ├── app.js, index.html, app.css

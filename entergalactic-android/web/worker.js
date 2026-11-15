@@ -1,7 +1,7 @@
-/* ENTERGALACTIC móvil — hilo de procesado (Web Worker).
+/* CINELAB — hilo de procesado (Web Worker).
  * Todo el cálculo ocurre aquí para que la interfaz no se trabe.
  */
-importScripts('eg-core.js', 'eg-filters.js', 'eg-develop.js');
+importScripts('eg-core.js', 'eg-filters.js', 'eg-filters2.js', 'eg-develop.js');
 var C = self.EGCore, E = self.EGFilters, D = self.EGDevelop;
 var byId = {}, src = null, cache = {};   // src: {w, h, rgba: Uint8ClampedArray}
 
@@ -51,6 +51,7 @@ self.onmessage = function (ev) {
   try {
     if (m.type === 'init') {
       m.schema.filters.forEach(function (f) { byId[f.id] = f; });
+      E.setData(m.schema);
       self.postMessage({ type: 'ready' });
     } else if (m.type === 'load') {
       var c = new OffscreenCanvas(m.bitmap.width, m.bitmap.height), g = c.getContext('2d');

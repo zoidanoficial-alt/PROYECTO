@@ -2074,6 +2074,75 @@
    ]
   },
   {
+   "id": "paper_sim",
+   "name": "Papel fotográfico",
+   "modules": [
+    "plata"
+   ],
+   "desc": "Simula la copia sobre papel: blanco del papel, negro máximo (Dmax), grado de contraste y textura de la superficie.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "paper",
+     "label": "Papel",
+     "type": "select",
+     "options": [
+      [
+       "glossy_rc",
+       "Brillante RC (neutro)"
+      ],
+      [
+       "pearl_rc",
+       "Perla RC"
+      ],
+      [
+       "matte",
+       "Mate"
+      ],
+      [
+       "fiber_neutral",
+       "Baritado neutro"
+      ],
+      [
+       "fiber_warm",
+       "Baritado cálido"
+      ],
+      [
+       "fiber_cold",
+       "Baritado frío"
+      ]
+     ],
+     "default": "fiber_neutral"
+    },
+    {
+     "id": "grade",
+     "label": "Grado de contraste (0 suave – 5 duro)",
+     "type": "range",
+     "min": 0,
+     "max": 5,
+     "default": 2.5,
+     "step": 0.5,
+     "unit": ""
+    },
+    {
+     "id": "texture",
+     "label": "Textura de la superficie",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "tone",
+     "label": "Tono propio del papel en los negros",
+     "type": "check",
+     "default": true
+    }
+   ]
+  },
+  {
    "id": "vintage_film",
    "name": "Película vintage",
    "modules": [
@@ -4918,6 +4987,91 @@
      "default": 0,
      "step": 1,
      "unit": ""
+    }
+   ]
+  },
+  {
+   "id": "glass",
+   "name": "Efectos de cristal",
+   "modules": [
+    "optics"
+   ],
+   "desc": "Cristales delante del objetivo: prisma con reflejo desplazado e irisado, arcoíris, bola de cristal y vidrio esmerilado.",
+   "resizes": false,
+   "params": [
+    {
+     "id": "type",
+     "label": "Efecto",
+     "type": "select",
+     "options": [
+      [
+       "prism",
+       "Prisma (doble imagen irisada)"
+      ],
+      [
+       "rainbow",
+       "Arcoíris refractado"
+      ],
+      [
+       "crystal",
+       "Bola de cristal"
+      ],
+      [
+       "frosted",
+       "Cristal esmerilado (bordes)"
+      ]
+     ],
+     "default": "prism"
+    },
+    {
+     "id": "intensity",
+     "label": "Intensidad",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "x",
+     "label": "Posición horizontal",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "y",
+     "label": "Posición vertical",
+     "type": "range",
+     "min": 0,
+     "max": 100,
+     "default": 50,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "size",
+     "label": "Tamaño",
+     "type": "range",
+     "min": 5,
+     "max": 100,
+     "default": 40,
+     "step": 1,
+     "unit": ""
+    },
+    {
+     "id": "angle",
+     "label": "Ángulo",
+     "type": "range",
+     "min": -90,
+     "max": 90,
+     "default": 25,
+     "step": 1,
+     "unit": "°"
     }
    ]
   }

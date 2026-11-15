@@ -222,3 +222,40 @@ def sabattier(img, p, ctx):
         inv = inv + C.smoothstep(0.01, 0.06, e) * 0.25
     nl = l + (np.clip(inv, 0, 1) - l) * p["strength"] / 100.0
     return C.set_luminance(img, nl)
+
+
+PAPERS = {
+    "glossy_rc": ("Brillante RC (neutro)", "#f8f8f6", 0.015, 0.0),
+    "pearl_rc": ("Perla RC", "#f5f3ee", 0.03, 0.35),
+    "matte": ("Mate", "#f1efea", 0.08, 0.5),
+    "fiber_neutral": ("Baritado neutro", "#f4f2ec", 0.02, 0.6),
+    "fiber_warm": ("Baritado cálido", "#f3ead9", 0.035, 0.7),
+    "fiber_cold": ("Baritado frío", "#eef1f3", 0.02, 0.6),
+}
+
+
+@register("paper_sim", "Papel fotográfico", ["plata"], [
+    sel("paper", "Papel", [(k, v[0]) for k, v in PAPERS.items()], "fiber_neutral"),
+    rng("grade", "Grado de contraste (0 suave – 5 duro)", 0, 5, 2.5, step=0.5),
+    rng("texture", "Textura de la superficie", 0, 100, 40),
+    chk("tone", "Tono propio del papel en los negros", True),
+], "Simula la copia sobre papel: blanco del papel, negro máximo (Dmax), grado de contraste y textura de la superficie.")
+def paper_sim(img, p, ctx):
+    name, white_hex, dmax, rough = PAPERS[p["paper"]]
+    l = C.luminance(img)
+    nl = C.s_curve(np.clip(l, 0, 1), (p["grade"] - 2.0) / 3.0 * 0.9)
+    paper_w = C.hex_color(white_hex)
+    black = np.full(3, dmax, np.float32)
+    if p["tone"] and p["paper"] == "fiber_warm":
+        black = black + np.array([0.012, 0.004, -0.004], np.float32)
+    elif p["tone"] and p["paper"] == "fiber_cold":
+        black = black + np.array([-0.004, 0.0, 0.01], np.float32)
+    out = black + (paper_w - black) * nl[..., None]
+    if p["texture"]:
+        rg = ctx.rng(43)
+        h, w = l.shape
+        full = max(ctx.full_w, ctx.full_h) * ctx.k
+        n = C.blur(rg.standard_normal((h, w)).astype(np.float32), max(0.5, 0.0008 * full * (1 + rough * 2)))
+        n = n / (n.std() + 1e-6)
+        out = out * (1.0 + n[..., None] * p["texture"] / 100.0 * 0.025 * (0.5 + rough))
+    return np.clip(out, 0, 1)
