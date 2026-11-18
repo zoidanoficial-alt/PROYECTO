@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0b0b10">
+  <title>CINELAB</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="aperture"></span>CINELAB</div>
+    <div class="tb">
+      <label class="ib" title="Abrir foto">⊕<input type="file" id="file" accept="image/*" hidden></label>
+      <button class="ib" id="btnUndo" title="Deshacer" disabled>↶</button>
+      <button class="ib" id="btnRedo" title="Rehacer" disabled>↷</button>
+      <button class="ib" id="btnCompare" title="Antes / después">◐</button>
+      <button class="ib accent" id="btnExport" title="Exportar" disabled>⤓</button>
+    </div>
+  </header>
+
+  <section id="viewer" class="viewer empty">
+    <canvas id="canvas"></canvas>
+    <canvas id="orig" class="orig"></canvas>
+    <div class="empty-msg">
+      <div class="aperture big"></div>
+      <p>Laboratorio de dirección de fotografía</p>
+      <label class="btn primary">Abrir una foto<input type="file" id="file2" accept="image/*" hidden></label>
+    </div>
+    <span id="tagBefore" class="tag">ANTES</span>
+    <div id="busy" class="busy hidden"></div>
+  </section>
+  <div class="infobar"><span id="info">Sin foto</span><span id="editing" class="editing"></span></div>
+
+  <div class="modes">
+    <button data-mode="director" class="on">Modo Director</button>
+    <button data-mode="pro">Modo Profesional</button>
+  </div>
+
+  <nav id="labs" class="labs"></nav>
+  <main id="panel" class="panel"></main>
+
+  <div id="sheet" class="sheet hidden"></div>
+  <footer class="status"><span id="status"></span></footer>
+
+  <script src="eg-core.js"></script>
+  <script src="eg-filters.js"></script>
+  <script src="eg-filters2.js"></script>
+  <script src="eg-develop.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

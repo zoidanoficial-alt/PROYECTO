@@ -1,0 +1,83 @@
+/* Tema oscuro similar al de Photoshop. */
+:root {
+  --bg: #323232;
+  --bg2: #282828;
+  --line: #444;
+  --text: #ddd;
+  --muted: #999;
+  --accent: #2d8ceb;
+  --accent2: #1f6fbf;
+  --error: #ff6b6b;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text);
+  font: 12px/1.4 "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif; }
+body { padding: 10px 12px 16px; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+h1 { font-size: 15px; margin: 0; letter-spacing: .3px; }
+h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin: 0 0 6px; }
+section { border-top: 1px solid var(--line); padding: 10px 0; }
+.muted { color: var(--muted); }
+.small { font-size: 11px; }
+#docInfo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%; }
+
+.row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.row.col { flex-direction: column; align-items: stretch; }
+.row label { flex: 0 0 64px; color: #bbb; }
+.row.col label { flex: none; }
+.row input[type=range] { flex: 1; min-width: 0; }
+.row output { flex: 0 0 30px; text-align: right; font-variant-numeric: tabular-nums; }
+select, input[type=text] { flex: 1; min-width: 0; background: var(--bg2); color: var(--text);
+  border: 1px solid var(--line); border-radius: 3px; padding: 4px 6px; font: inherit; }
+
+button { background: #454545; color: var(--text); border: 1px solid #555; border-radius: 3px;
+  padding: 6px 10px; font: inherit; cursor: pointer; }
+button:hover:not(:disabled) { background: #505050; }
+button:disabled { opacity: .5; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent2); color: #fff; }
+button.primary:hover:not(:disabled) { background: var(--accent2); }
+
+.seg { display: flex; margin-bottom: 6px; }
+.seg button { flex: 1; border-radius: 0; margin-left: -1px; }
+.seg button:first-child { border-radius: 3px 0 0 3px; margin-left: 0; }
+.seg button:last-child { border-radius: 0 3px 3px 0; }
+.seg button.on { background: var(--accent); border-color: var(--accent2); color: #fff; }
+
+.actions { display: flex; gap: 8px; }
+.actions button { flex: 1; padding: 8px; }
+
+/* Comparador antes / después */
+.preview { border-top: none; padding-top: 0; }
+.compare { position: relative; width: 100%; height: 0; padding-bottom: 100%; background-color: #262626;
+  background-image: linear-gradient(45deg, #2e2e2e 25%, transparent 25%, transparent 75%, #2e2e2e 75%),
+    linear-gradient(45deg, #2e2e2e 25%, transparent 25%, transparent 75%, #2e2e2e 75%);
+  background-size: 16px 16px; background-position: 0 0, 8px 8px;
+  border: 1px solid var(--line); overflow: hidden; user-select: none; cursor: ew-resize; }
+.compare img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain;
+  image-rendering: auto; pointer-events: none; }
+.before-wrap { position: absolute; top: 0; left: 0; bottom: 0; width: 50%; overflow: hidden; border-right: 1px solid #fff8; }
+.before-wrap img { max-width: none; } /* ancho fijado desde JS */
+.handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 0; pointer-events: none; }
+.handle::after { content: ""; position: absolute; top: 50%; left: -7px; width: 14px; height: 14px;
+  margin-top: -7px; border-radius: 50%; background: #fff; box-shadow: 0 0 3px #000; }
+.tag { position: absolute; top: 6px; font-size: 10px; background: #000a; padding: 1px 6px; border-radius: 8px; }
+.tag-l { left: 6px; } .tag-r { right: 6px; }
+.hint { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: none; margin: 0; padding: 20px; text-align: center;
+  align-items: center; justify-content: center; color: var(--muted); }
+.compare.empty .hint { display: flex; }
+.compare.empty img, .compare.empty .handle, .compare.empty .tag, .compare.empty .before-wrap { display: none; }
+.compare.loading { opacity: .5; }
+.focus { margin-top: 6px; }
+
+.progress { position: relative; height: 18px; background: var(--bg2); border: 1px solid var(--line);
+  border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.progress #bar { height: 100%; width: 0; background: var(--accent); transition: width .15s; }
+.progress #stage { position: absolute; top: 0; left: 0; right: 0; text-align: center; font-size: 11px; line-height: 16px; }
+.hidden { display: none; }
+.status { min-height: 16px; margin: 6px 0; word-break: break-word; }
+.status.error { color: var(--error); }
+
+details { border-top: 1px solid var(--line); padding-top: 8px; }
+summary { cursor: pointer; color: var(--muted); }
+pre { white-space: pre-wrap; background: var(--bg2); padding: 6px; border-radius: 3px; max-height: 200px; overflow: auto; }
+pre:empty { display: none; }

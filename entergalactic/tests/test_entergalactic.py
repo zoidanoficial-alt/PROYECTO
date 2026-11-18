@@ -1,0 +1,326 @@
+"""Tests del motor ENTERGALACTIC: python -m pytest entergalactic/tests"""
+import json
+import os
+import sys
+
+import numpy as np
+import pytest
+
+cv2 = pytest.importorskip("cv2")
+ENGINE = os.path.join(os.path.dirname(__file__), "..", "com.entergalactic.panel", "engine")
+sys.path.insert(0, ENGINE)
+import eg  # noqa: E402
+import eg_engine  # noqa: E402
+from eg import core as C, filters_clean  # noqa: E402
+
+
+def photo(h=120, w=160, seed=0):
+    rng = np.random.default_rng(seed)
+    img = np.zeros((h, w, 3), np.float32)
+    img[: h // 2] = [0.3, 0.5, 0.9]                       # cielo
+    img[h // 2:] = [0.25, 0.55, 0.2]                      # hierba
+    cv2.circle(img, (w // 2, h // 2), h // 5, (0.85, 0.6, 0.45), -1)  # tono piel
+    return np.clip(img + rng.normal(0, 0.01, img.shape), 0, 1).astype(np.float32)
+
+
+def ctx_for(img, k=1.0, rect=(0, 0, 1, 1)):
+    h, w = img.shape[:2]
+    return C.Context(h, w, k, rect, 1)
+
+
+@pytest.mark.parametrize("fid", sorted(eg.FILTERS))
+def test_every_filter_runs_with_defaults(fid):
+    if fid == "upscale" and not os.path.isfile(eg.filters_realce.model_path("fast", 2)):
+        pytest.skip("modelos no descargados")
+    img = photo()
+    out, _ = eg.run_stack(img, {"stack": [{"id": fid}]}, ctx_for(img))
+    assert np.isfinite(out).all()
+    assert out.min() >= 0 and out.max() <= 1
+    if not eg.FILTERS[fid].resizes:
+        assert out.shape == img.shape
+
+
+def test_every_preset_is_valid():
+    ids = set(eg.FILTERS)
+    for pr in eg.schema()["presets"]:
+        assert pr["module"] in {m["id"] for m in eg.schema()["modules"]}
+        assert 0 < len(pr["stack"]) <= eg.registry.MAX_STACK
+        for it in pr["stack"]:
+            assert it["id"] in ids, (pr["name"], it["id"])
+            known = {p["id"] for p in eg.FILTERS[it["id"]].params}
+            assert set(it["params"]) <= known, (pr["name"], it["id"], set(it["params"]) - known)
+
+
+def test_stack_limit_of_15():
+    img = photo()
+    stack = [{"id": "vignette"}] * 16
+    with pytest.raises(RuntimeError):
+        eg.run_stack(img, {"stack": stack}, ctx_for(img))
+    out, _ = eg.run_stack(img, {"stack": stack[:15]}, ctx_for(img))
+    assert out.shape == img.shape
+
+
+def test_opacity_zero_and_disabled_do_nothing():
+    img = photo()
+    out, _ = eg.run_stack(img, {"stack": [{"id": "bleach_bypass", "opacity": 0},
+                                          {"id": "dramatic", "enabled": False}]}, ctx_for(img))
+    assert np.allclose(out, img, atol=1e-6)
+
+
+def test_tone_mask_limits_effect_to_shadows():
+    img = np.zeros((10, 20, 3), np.float32)
+    img[:, :10] = 0.05
+    img[:, 10:] = 0.95
+    out, _ = eg.run_stack(img, {"stack": [{"id": "photo_filter", "params": {"type": "red", "density": 100, "preserve": False},
+                                           "mask": {"type": "shadows", "softness": 0}}]}, ctx_for(img))
+    assert np.abs(out[:, :10] - img[:, :10]).max() > 0.01
+    assert np.abs(out[:, 10:] - img[:, 10:]).max() < 0.01
+
+
+def test_bw_conversion_is_neutral_gray():
+    img = photo()
+    out, _ = eg.run_stack(img, {"stack": [{"id": "bw_convert"}]}, ctx_for(img))
+    assert np.allclose(out[..., 0], out[..., 1]) and np.allclose(out[..., 1], out[..., 2])
+
+
+def test_color_filter_changes_bw_rendering_of_sky():
+    img = photo()
+    red, _ = eg.run_stack(img, {"stack": [{"id": "bw_convert", "params": {"filter": "red"}}]}, ctx_for(img))
+    blue, _ = eg.run_stack(img, {"stack": [{"id": "bw_convert", "params": {"filter": "blue"}}]}, ctx_for(img))
+    assert red[5, 5, 0] < blue[5, 5, 0] - 0.1     # filtro rojo oscurece el cielo azul
+
+
+def test_preview_geometry_matches_full_resolution():
+    """Viñeta: la vista previa reducida debe parecerse a la versión completa reducida."""
+    img = photo(240, 320)
+    full, _ = eg.run_stack(img, {"stack": [{"id": "vignette", "params": {"amount": -90}}]}, ctx_for(img))
+    small = cv2.resize(img, (80, 60), interpolation=cv2.INTER_AREA)
+    prev, _ = eg.run_stack(small, {"stack": [{"id": "vignette", "params": {"amount": -90}}]},
+                           C.Context(60, 80, 0.25, (0, 0, 1, 1), 1, (320, 240)))
+    assert np.abs(cv2.resize(full, (80, 60), interpolation=cv2.INTER_AREA) - prev).mean() < 0.01
+
+
+def test_noise_profile_is_measured_accurately():
+    img = photo(200, 260)
+    noisy = np.clip(img + np.random.default_rng(3).normal(0, 0.04, img.shape[:2] + (1,)), 0, 1).astype(np.float32)
+    prof = filters_clean.measure_noise(noisy)
+    assert 0.03 < np.median(prof["luma"]) < 0.05
+
+
+def test_denoise_improves_psnr():
+    img = photo(200, 260)
+    rng = np.random.default_rng(4)
+    # Ruido parecido al de un sensor: grano de luminancia + manchas de color.
+    noise = rng.normal(0, 0.05, img.shape[:2] + (1,)) + C.blur(rng.normal(0, 0.075, img.shape).astype(np.float32), 1.5)
+    noisy = np.clip(img + noise, 0, 1).astype(np.float32)
+    out, _ = eg.run_stack(noisy, {"stack": [{"id": "denoise", "params": {"luma": 60, "chroma": 80}}]}, ctx_for(noisy))
+    psnr = lambda a: cv2.PSNR((img * 255).astype(np.float64), (a * 255).astype(np.float64))
+    assert psnr(out) > psnr(noisy) + 3.5  # medido: +3.9 dB
+
+
+def test_instant_frame_changes_size_and_drops_alpha():
+    img = photo(120, 160)
+    c = ctx_for(img)
+    c.alpha = np.ones(img.shape[:2], np.float32)
+    out, c2 = eg.run_stack(img, {"stack": [{"id": "instant", "params": {"frame": "square", "crop": True}}]}, c)
+    assert out.shape[0] > out.shape[1] and c2.alpha is None
+
+
+def test_cli_roundtrip_16bit_and_preview(tmp_path):
+    img = photo()
+    src = tmp_path / "in.png"
+    cv2.imwrite(str(src), (cv2.cvtColor(img, cv2.COLOR_RGB2BGR) * 65535).astype(np.uint16))
+    recipe = json.dumps({"stack": [{"id": "cinematic"}, {"id": "grain"}]})
+    assert eg_engine.main(["-i", str(src), "-o", str(tmp_path / "o.png"), "--recipe-json", recipe]) == 0
+    out = cv2.imread(str(tmp_path / "o.png"), cv2.IMREAD_UNCHANGED)
+    assert out.dtype == np.uint16 and out.shape == (120, 160, 3)
+    for mode in ("fit", "crop"):
+        assert eg_engine.main(["-i", str(src), "--preview", str(tmp_path / mode), "--preview-mode", mode,
+                               "--preview-size", "64", "--recipe-json", recipe]) == 0
+        assert (tmp_path / mode / "after.png").exists()
+
+
+def test_cli_saves_camera_profile(tmp_path):
+    img = photo()
+    src = tmp_path / "in.png"
+    cv2.imwrite(str(src), (img * 255).astype(np.uint8))
+    assert eg_engine.main(["-i", str(src), "--measure-noise", "--save-profile", "Cámara X ISO 800",
+                           "--profiles-dir", str(tmp_path / "p")]) == 0
+    assert (tmp_path / "p" / "Cámara X ISO 800.json").exists()
+
+
+def test_schema_json_is_up_to_date():
+    path = os.path.join(ENGINE, "..", "client", "schema.json")
+    with open(path, encoding="utf-8") as fh:
+        assert json.load(fh) == json.loads(json.dumps(eg.schema())), \
+            "Ejecuta: python engine/build_schema.py"
+
+
+# ---------------------------------------------------------------------- Cine y vista previa ligera
+def test_cine_module_has_presets_with_descriptions():
+    cine = [p for p in eg.schema()["presets"] if p["module"] == "cine"]
+    assert len(cine) >= 15
+    assert all(p.get("desc") for p in cine)
+    for name in ("Arkapaw", "Crawley", "Hoytema", "Fraser", "Lubezki"):
+        assert any(p["name"].startswith(name) for p in cine), name
+
+
+def test_limited_palette_never_turns_blue_sky_green_or_magenta():
+    sky = np.zeros((20, 20, 3), np.float32) + np.array([0.3, 0.5, 0.9], np.float32)
+    out, _ = eg.run_stack(sky, {"stack": [{"id": "limited_palette", "params": {"target": 35, "strength": 100}}]},
+                          ctx_for(sky))
+    r, g, b = out[10, 10]
+    assert not (g > r + 0.05 and g > b + 0.05), "cielo verde"
+    assert not (r > g + 0.05 and b > g + 0.05), "cielo magenta"
+
+
+def test_letterbox_keeps_size_and_adds_bars():
+    img = photo(120, 160)                         # 1.33:1 -> bandas arriba/abajo para 2.39
+    out, _ = eg.run_stack(img, {"stack": [{"id": "letterbox", "params": {"ratio": "2.39"}}]}, ctx_for(img))
+    assert out.shape == img.shape
+    assert out[0].max() == 0 and out[-1].max() == 0 and out[60].max() > 0
+
+
+def test_preview_from_photoshop_downscale_matches_full_source():
+    """La vista previa desde la exportación reducida de Photoshop debe coincidir con la hecha desde el original."""
+    full = photo(400, 600)
+    small = cv2.resize(full, (300, 200), interpolation=cv2.INTER_AREA)
+    recipe = {"stack": [{"id": "vignette", "params": {"amount": -90}}, {"id": "graduated"}]}
+    w1, c1 = eg_engine.prepare_preview(full, "fit", 150, 0.5, 0.5)
+    w2, c2 = eg_engine.prepare_preview(small, "fit", 150, 0.5, 0.5, (0, 0, 1, 1), (600, 400))
+    a1, _ = eg.run_stack(w1, recipe, c1)
+    a2, _ = eg.run_stack(w2, recipe, c2)
+    assert a1.shape == a2.shape and abs(c1.k - c2.k) < 1e-6
+    assert np.abs(a1 - a2).mean() < 0.01
+
+
+def test_preview_from_photoshop_crop_keeps_full_frame_geometry():
+    full = photo(400, 600)
+    x0, y0 = 300, 100
+    crop = full[y0:y0 + 200, x0:x0 + 200]
+    rect = (x0 / 600, y0 / 400, (x0 + 200) / 600, (y0 + 200) / 400)
+    w, c = eg_engine.prepare_preview(crop, "crop", 100, 0.66, 0.5, rect, (600, 400))
+    recipe = {"stack": [{"id": "vignette", "params": {"amount": -90}}]}
+    prev, _ = eg.run_stack(w, recipe, c)
+    ref, _ = eg.run_stack(full, recipe, ctx_for(full))
+    X0, Y0 = int(round(c.rect[0] * 600)), int(round(c.rect[1] * 400))
+    assert np.abs(prev - ref[Y0:Y0 + 100, X0:X0 + 100]).mean() < 0.005
+
+
+def test_serve_mode_answers_requests(tmp_path):
+    import subprocess
+    img = photo()
+    src = tmp_path / "in.png"
+    cv2.imwrite(str(src), (cv2.cvtColor(img, cv2.COLOR_RGB2BGR) * 255).astype(np.uint8))
+    proc = subprocess.Popen([sys.executable, os.path.join(ENGINE, "eg_engine.py"), "--serve"],
+                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+    try:
+        assert json.loads(proc.stdout.readline())["ready"]
+        for i, size in enumerate((80, 40)):
+            proc.stdin.write(json.dumps({"id": i + 1, "cmd": "preview", "input": str(src), "size": size,
+                                         "recipe": {"stack": [{"id": "cinematic"}]}, "out": str(tmp_path / "p")}) + "\n")
+            proc.stdin.flush()
+            r = json.loads(proc.stdout.readline())
+            assert r["id"] == i + 1 and r["ok"], r
+            assert os.path.exists(r["preview"]["after"])
+        proc.stdin.write(json.dumps({"id": 9, "cmd": "preview", "input": "no_existe.png", "out": str(tmp_path)}) + "\n")
+        proc.stdin.flush()
+        r = json.loads(proc.stdout.readline())
+        assert r["id"] == 9 and r["ok"] is False      # un error no tumba el motor
+    finally:
+        proc.stdin.close()
+        proc.wait(timeout=10)
+
+
+# ---------------------------------------------------------------------- Pop y nuevos directores de fotografía
+def test_pop_silkscreen_uses_flat_palette_colors():
+    from eg import filters_pop as FP
+    img = photo()
+    out, _ = eg.run_stack(img, {"stack": [{"id": "pop_silkscreen", "params": {"texture": 0, "detail": 0, "offset": 0}}]},
+                          ctx_for(img))
+    pal = np.array([C.hex_color(c) for c in FP.PALETTES["pink_turq"][1:]], np.float32)
+    flat = out.reshape(-1, 3)
+    d = np.min(np.abs(flat[:, None, :] - pal[None, :, :]).sum(axis=2), axis=1)
+    # Casi todos los píxeles son uno de los 5 colores de la paleta (salvo el borde suavizado de la tinta).
+    assert (d < 0.02).mean() > 0.9
+
+
+def test_pop_grid_keeps_size_and_tiles_differ():
+    img = photo(120, 160)
+    out, _ = eg.run_stack(img, {"stack": [{"id": "pop_grid", "params": {"grid": "2x2", "texture": 0}}]}, ctx_for(img))
+    assert out.shape == img.shape
+    assert np.abs(out[10:50, 10:70].mean(axis=(0, 1)) - out[70:110, 90:150].mean(axis=(0, 1))).sum() > 0.05
+
+
+def test_diptych_last_column_is_gray():
+    img = photo(120, 160)
+    out, _ = eg.run_stack(img, {"stack": [{"id": "pop_grid", "params": {"grid": "1x2", "diptych_bw": True,
+                                                                         "texture": 0, "detail": 0}}]}, ctx_for(img))
+    right = out[20:100, 100:150]
+    assert np.abs(right[..., 0] - right[..., 1]).max() < 0.01
+
+
+def test_new_cinematographers_present():
+    names = [p["name"] for p in eg.schema()["presets"] if p["module"] == "cine"]
+    for dp in ("Deakins", "Doyle", "Storaro", "Willis", "Kamiński", "Khondji", "Young", "Figueroa", "Sandgren"):
+        assert any(n.startswith(dp) for n in names), dp
+    assert len([p for p in eg.schema()["presets"] if p["module"] == "pop"]) >= 8
+
+
+# ---------------------------------------------------------------------- Película, Óptica y máscaras inteligentes
+def test_more_than_60_film_profiles_all_valid():
+    from eg.film_profiles import PROFILES
+    assert len(PROFILES) > 60
+    img = photo()
+    for pr in PROFILES:
+        out, _ = eg.run_stack(img, {"stack": [{"id": "film_profile", "params": {"profile": pr["id"], "grain": 0, "halation": 0}}]},
+                              ctx_for(img))
+        assert np.isfinite(out).all() and out.min() >= 0 and out.max() <= 1, pr["id"]
+
+
+def test_neutral_film_curve_is_identity_and_white_stays_white():
+    from eg import filters_film as FF
+    x = np.linspace(0, 1, 21).astype(np.float32)
+    lin = FF.srgb_to_lin(x)
+    assert np.abs(FF._char_curve(lin, FF._K_LO, FF._K_HI, 0, 1) - x).max() < 1e-3
+    soft_shoulder = FF._char_curve(lin, FF._K_LO, FF._K_HI * 0.7, 0, 1)
+    assert soft_shoulder[-1] > 0.99 and abs(soft_shoulder[10] - 0.5) < 0.02
+
+
+def test_bw_profiles_are_gray_and_tone_profiles_are_tinted():
+    img = photo()
+    bw, _ = eg.run_stack(img, {"stack": [{"id": "film_profile", "params": {"profile": "bw_hp5", "grain": 0}}]}, ctx_for(img))
+    assert np.abs(bw[..., 0] - bw[..., 2]).max() < 1e-4
+    cy, _ = eg.run_stack(img, {"stack": [{"id": "film_profile", "params": {"profile": "cyanotype_p", "grain": 0}}]}, ctx_for(img))
+    assert cy[..., 2].mean() > cy[..., 0].mean() + 0.05
+
+
+def test_halation_is_red_around_highlights():
+    img = np.full((80, 80, 3), 0.1, np.float32)
+    img[30:50, 30:50] = 1.0
+    out, _ = eg.run_stack(img, {"stack": [{"id": "halation", "params": {"amount": 80}}]}, ctx_for(img))
+    ring = out[25:29, 35:45]
+    assert ring[..., 0].mean() > ring[..., 2].mean() + 0.05
+
+
+def test_sky_mask_finds_top_blue_region():
+    img = photo(120, 160)
+    m = C.build_mask(img, {"type": "sky", "softness": 0}, ctx_for(img))
+    assert m[:40].mean() > 0.5 and m[80:].mean() < 0.1
+
+
+def test_skin_and_subject_masks_find_the_face_disc():
+    img = photo(120, 160)
+    skin = C.build_mask(img, {"type": "skin", "softness": 0}, ctx_for(img))
+    assert skin[55:65, 75:85].mean() > 0.5 and skin[5:15, 5:15].mean() < 0.1
+    subj = C.build_mask(img, {"type": "subject", "softness": 0}, ctx_for(img))
+    assert subj[55:65, 75:85].mean() > subj[5:15, 5:15].mean()
+
+
+def test_optics_tools_brighten_where_expected():
+    img = np.full((90, 120, 3), 0.15, np.float32)
+    img[20:26, 90:96] = 1.0
+    out, _ = eg.run_stack(img, {"stack": [{"id": "lens_flare", "params": {"auto": True}}]}, ctx_for(img))
+    assert out[23, 93].mean() >= 0.99 and out.mean() > img.mean() + 0.005
+    out2, _ = eg.run_stack(img, {"stack": [{"id": "particles", "params": {"type": "snow", "amount": 80}}]}, ctx_for(img))
+    assert (out2.max(axis=2) > 0.5).sum() > 40

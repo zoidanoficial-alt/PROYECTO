@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Realce IA</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Realce IA</h1>
+    <span id="docInfo" class="muted">Sin documento</span>
+  </header>
+
+  <section class="preview">
+    <div id="compare" class="compare empty">
+      <img id="imgAfter" alt="">
+      <div id="beforeWrap" class="before-wrap"><img id="imgBefore" alt=""></div>
+      <div id="handle" class="handle"></div>
+      <span class="tag tag-l">Antes</span><span class="tag tag-r">Después</span>
+      <p id="previewHint" class="hint">Pulsa «Vista previa» para ver el centro de la imagen</p>
+    </div>
+    <div class="row focus">
+      <label>Zona</label>
+      <select id="focus">
+        <option value="0.5,0.5">Centro</option>
+        <option value="0.25,0.25">Arriba izquierda</option>
+        <option value="0.75,0.25">Arriba derecha</option>
+        <option value="0.25,0.75">Abajo izquierda</option>
+        <option value="0.75,0.75">Abajo derecha</option>
+        <option value="0.5,0.3">Arriba (caras)</option>
+      </select>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ampliar</h2>
+    <div class="seg" id="scale">
+      <button data-v="1" class="on">1×</button><button data-v="2">2×</button>
+      <button data-v="3">3×</button><button data-v="4">4×</button>
+    </div>
+    <div class="row">
+      <label for="model">Modelo</label>
+      <select id="model">
+        <option value="fast">IA rápida (FSRCNN)</option>
+        <option value="balance">IA equilibrada (ESPCN)</option>
+        <option value="quality">IA calidad (EDSR, lento)</option>
+        <option value="classic">Clásico (Lanczos)</option>
+      </select>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reducir ruido</h2>
+    <div class="row"><label for="denoise">Fuerza</label><input type="range" id="denoise" min="0" max="100" value="30"><output>30</output></div>
+    <div class="row"><label for="detail">Detalle</label><input type="range" id="detail" min="0" max="100" value="50"><output>50</output></div>
+  </section>
+
+  <section>
+    <h2>Enfocar</h2>
+    <div class="row"><label for="sharpen">Cantidad</label><input type="range" id="sharpen" min="0" max="100" value="25"><output>25</output></div>
+    <div class="row"><label for="radius">Radio</label><input type="range" id="radius" min="0.3" max="5" step="0.1" value="1.0"><output>1.0</output></div>
+  </section>
+
+  <section>
+    <h2>Origen y destino</h2>
+    <div class="row">
+      <label for="source">Procesar</label>
+      <select id="source">
+        <option value="visible">Imagen visible</option>
+        <option value="layer">Sólo capa activa</option>
+      </select>
+    </div>
+    <p class="muted small">Sin ampliar se añade como capa nueva. Al ampliar se abre en un documento nuevo.</p>
+  </section>
+
+  <section class="actions">
+    <button id="btnPreview">Vista previa</button>
+    <button id="btnApply" class="primary">Aplicar</button>
+  </section>
+
+  <div id="progress" class="progress hidden"><div id="bar"></div><span id="stage"></span></div>
+  <p id="status" class="status"></p>
+
+  <details id="settings">
+    <summary>Ajustes</summary>
+    <div class="row col">
+      <label for="python">Comando de Python</label>
+      <input type="text" id="python" placeholder="python3 / py -3 / C:\ruta\python.exe">
+    </div>
+    <div class="row">
+      <button id="btnCheck">Comprobar instalación</button>
+      <button id="btnReset">Valores por defecto</button>
+    </div>
+    <pre id="checkOut" class="small"></pre>
+  </details>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

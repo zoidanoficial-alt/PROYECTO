@@ -1,0 +1,56 @@
+plugins {
+    id "com.android.application"
+}
+
+// La interfaz y el motor (HTML/JS) viven en ../../web y se copian como assets/www.
+def webSrc = file("../../web")
+def webOut = layout.buildDirectory.dir("generated/webassets")
+tasks.register("copyWeb", Copy) {
+    from(webSrc) { include "*.html", "*.css", "*.js", "*.json" }
+    into(webOut.map { it.dir("www") })
+}
+preBuild.dependsOn("copyWeb")
+
+android {
+    namespace "app.entergalactic"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "app.entergalactic"
+        minSdk 26
+        targetSdk 35
+        versionCode 4
+        versionName "2.0.0"
+    }
+
+    signingConfigs {
+        release {
+            // Clave propia para instalar por fuera de Google Play (sideload).
+            // Para publicar en Play Store usa una clave privada que no esté en el repositorio.
+            storeFile file("../keystore/entergalactic.jks")
+            storePassword "entergalactic"
+            keyAlias "entergalactic"
+            keyPassword "entergalactic"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    sourceSets {
+        main { assets.srcDirs += [webOut] }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation "androidx.webkit:webkit:1.12.1"
+}

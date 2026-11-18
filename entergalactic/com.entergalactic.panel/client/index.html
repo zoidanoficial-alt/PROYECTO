@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>ENTERGALACTIC</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="brand">
+    <div class="logo"><span class="orb"></span>ENTERGALACTIC</div>
+    <span id="docInfo" class="muted">Sin documento</span>
+  </header>
+
+  <nav id="tabs" class="tabs"></nav>
+  <p id="moduleDesc" class="module-desc muted"></p>
+
+  <section class="preview">
+    <div id="compare" class="compare empty">
+      <div class="compare-inner">
+        <img id="imgAfter" alt="">
+        <div id="beforeWrap" class="before-wrap"><img id="imgBefore" alt=""></div>
+        <div id="handle" class="handle"></div>
+        <span class="tag tag-l">Antes</span><span class="tag tag-r">Después</span>
+        <p class="hint">Pulsa <b>Vista previa</b> para ver el efecto.<br>Arrastra para comparar.</p>
+      </div>
+    </div>
+    <div class="row toolbar">
+      <select id="previewMode" title="Tipo de vista previa">
+        <option value="fit">Imagen completa</option>
+        <option value="crop">Detalle 100 %</option>
+      </select>
+      <select id="focus" title="Zona del detalle">
+        <option value="0.5,0.5">Centro</option>
+        <option value="0.25,0.25">Arriba izq.</option>
+        <option value="0.75,0.25">Arriba der.</option>
+        <option value="0.25,0.75">Abajo izq.</option>
+        <option value="0.75,0.75">Abajo der.</option>
+        <option value="0.5,0.3">Caras</option>
+      </select>
+      <button id="btnPreview">Vista previa</button>
+    </div>
+  </section>
+
+  <section class="recipes">
+    <div class="row">
+      <select id="presetSelect"></select>
+      <button id="btnSaveRecipe" title="Guardar la pila actual como receta">Guardar</button>
+      <button id="btnDeleteRecipe" title="Borrar receta propia" class="icon">🗑</button>
+    </div>
+    <p id="presetDesc" class="preset-desc hidden"></p>
+    <div id="saveRow" class="row hidden">
+      <input type="text" id="recipeName" placeholder="Nombre de la receta">
+      <button id="btnSaveOk" class="primary-ghost">Guardar</button>
+      <button id="btnSaveCancel" class="icon">✕</button>
+    </div>
+  </section>
+
+  <section class="stack-section">
+    <div class="stack-head">
+      <h2>Filtros <span id="stackCount" class="muted"></span></h2>
+      <button id="btnClear" class="link">Vaciar</button>
+    </div>
+    <div id="stack" class="stack"></div>
+    <div class="row add-row">
+      <select id="addFilter"></select>
+      <button id="btnAdd" class="primary-ghost">＋ Añadir</button>
+    </div>
+  </section>
+
+  <section id="cleanTools" class="clean-tools hidden">
+    <h2>Perfiles de cámara</h2>
+    <p class="muted small">Haz una foto a una superficie lisa (o usa cualquier foto con zonas lisas) con tu cámara y un ISO concreto, y guarda su perfil de ruido.</p>
+    <div class="row">
+      <input type="text" id="profileName" placeholder="Ej.: Canon R6 ISO 6400">
+      <button id="btnMeasure">Medir y guardar</button>
+    </div>
+    <pre id="profileOut" class="small"></pre>
+  </section>
+
+  <section class="output">
+    <h2>Salida</h2>
+    <div class="row"><label>Procesar</label>
+      <select id="source"><option value="visible">Imagen visible</option><option value="layer">Sólo capa activa</option></select>
+    </div>
+    <div class="row"><label>Resultado</label>
+      <select id="target"><option value="layer">Capa nueva</option><option value="doc">Documento nuevo</option></select>
+    </div>
+    <label class="check"><input type="checkbox" id="useMask" checked> Usar la selección como máscara (control localizado)</label>
+  </section>
+
+  <section class="actions">
+    <button id="btnApply" class="primary">Aplicar</button>
+  </section>
+  <div id="progress" class="progress hidden"><div id="bar"></div><span id="stage"></span></div>
+  <p id="status" class="status"></p>
+
+  <details id="settings">
+    <summary>Ajustes</summary>
+    <div class="row col">
+      <label for="python">Comando de Python</label>
+      <input type="text" id="python" placeholder="python / py -3 / C:\ruta\python.exe">
+    </div>
+    <div class="row wrap">
+      <button id="btnCheck">Comprobar instalación</button>
+      <button id="btnOpenFolder">Abrir carpeta de recetas</button>
+      <button id="btnReset">Restablecer</button>
+    </div>
+    <pre id="checkOut" class="small"></pre>
+  </details>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
