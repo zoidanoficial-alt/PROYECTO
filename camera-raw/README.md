@@ -62,6 +62,29 @@ Todos los presets del paquete Óscar incluyen ajustes que hacen parte del trabaj
 
 Como estos presets también fijan Iluminaciones, Sombras, Blancos y Negros, aplícalos primero y después ajusta la exposición y el balance de blancos de cada foto. Para regenerarlos o crear variantes, edita y ejecuta `oscar_presets.py`.
 
+## Versión para Canon Rebel SL3 / 250D
+
+Hay dos grupos más, pensados para la Rebel SL3 con el **50 mm** y el **EF-S 18-55 mm f/4-5.6 IS STM**.
+
+**FOTONEANDO · Óscar SL3** tiene los mismos 15 looks del Óscar, ajustados a esa cámara:
+- **Calibración de color para el sensor Canon.** Piel menos rosada, verdes menos amarillos, azules más limpios y profundos. Camera Raw 10 no tiene los perfiles «Camera Neutral» para la SL3, así que la corrección se hace en el panel de calibración.
+- **Enfoque para 24 MP** y menos ruido de color.
+- **Luces más protegidas** (Iluminaciones −42, Blancos −14), porque la SL3 tiene menos rango dinámico que una cámara de cine.
+- **Corrección de perfil** del 50 mm y del 18-55.
+
+**FOTONEANDO · SL3 Ajustes** tiene tres complementos que solo tocan el ruido y el enfoque. Aplícalos **después** del look, según el ISO de la foto:
+- SL3 · ISO 100-400 (limpio)
+- SL3 · ISO 800-1600
+- SL3 · ISO 3200-6400 (noche)
+
+### Importante: Photoshop CC 2018 no abre los RAW de la SL3
+
+La SL3 salió en 2019. Sus archivos **.CR3** necesitan Camera Raw 11.3 o posterior, y Photoshop CC 2018 llega hasta Camera Raw 10. La solución es gratis:
+
+1. Instala **Adobe DNG Converter**: https://helpx.adobe.com/camera-raw/using/adobe-dng-converter.html
+2. Arrastra tus fotos .CR3, o la carpeta completa, sobre **convertir_cr3_a_dng.bat**.
+3. Los DNG aparecen en una subcarpeta **DNG**, en modo compatible con Camera Raw 7.1 o posterior. Ábrelos en Photoshop y se abrirán en Camera Raw con toda la información RAW.
+
 Cada preset ajusta:
 - la curva de tonos
 - las curvas Rojo, Verde y Azul (el tinte de sombras, medios y luces)
@@ -79,7 +102,7 @@ No toca la exposición ni el balance de blancos, así que puedes ajustarlos desp
 2. Haz doble clic en **instalar_presets.bat**. Copia los presets a `%APPDATA%\Adobe\CameraRaw\Settings`.
 3. Cierra y vuelve a abrir Photoshop.
 4. Abre una foto en Camera Raw. Para un JPG ya abierto: *Filtro › Filtro de Camera Raw* (Ctrl+Mayús+A).
-5. Ve a la pestaña **Ajustes preestablecidos** (icono de capas) y busca los grupos **FOTONEANDO · Frontera**, **FOTONEANDO · Retrato** y **FOTONEANDO · Óscar**.
+5. Ve a la pestaña **Ajustes preestablecidos** (icono de capas) y busca los grupos **FOTONEANDO · Frontera**, **· Retrato**, **· Óscar**, **· Óscar SL3** y **· SL3 Ajustes**.
 
 ## Crea tus propios presets desde cualquier imagen
 

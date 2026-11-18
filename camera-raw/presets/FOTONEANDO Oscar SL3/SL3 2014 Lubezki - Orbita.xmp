@@ -1,0 +1,141 @@
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.6-c140">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/"
+   crs:PresetType="Normal"
+   crs:Cluster=""
+   crs:UUID="B3346CBC52F3465792CCB489B427CDE0"
+   crs:SupportsAmount="False"
+   crs:SupportsColor="True"
+   crs:SupportsMonochrome="True"
+   crs:SupportsHighDynamicRange="True"
+   crs:SupportsNormalDynamicRange="True"
+   crs:SupportsSceneReferred="True"
+   crs:SupportsOutputReferred="True"
+   crs:CameraModelRestriction=""
+   crs:Copyright=""
+   crs:ContactInfo=""
+   crs:Version="10.0"
+   crs:HasSettings="True"
+   crs:ToneCurveName2012="Custom"
+   crs:Saturation="-14"
+   crs:ConvertToGrayscale="False"
+   crs:GrainAmount="4"
+   crs:GrainSize="25"
+   crs:GrainFrequency="50"
+   crs:PostCropVignetteAmount="-22"
+   crs:PostCropVignetteMidpoint="40"
+   crs:PostCropVignetteFeather="70"
+   crs:PostCropVignetteRoundness="0"
+   crs:PostCropVignetteStyle="1"
+   crs:PostCropVignetteHighlightContrast="0"
+   crs:Vibrance="+0"
+   crs:Clarity2012="+10"
+   crs:Dehaze="+4"
+   crs:LensProfileEnable="1"
+   crs:AutoLateralCA="1"
+   crs:Sharpness="32"
+   crs:SharpenRadius="+0.8"
+   crs:SharpenDetail="18"
+   crs:SharpenEdgeMasking="30"
+   crs:LuminanceSmoothing="10"
+   crs:ColorNoiseReduction="28"
+   crs:Highlights2012="-45"
+   crs:Shadows2012="+18"
+   crs:Whites2012="-14"
+   crs:Blacks2012="-15"
+   crs:RedHue="+5"
+   crs:RedSaturation="-4"
+   crs:GreenHue="-6"
+   crs:GreenSaturation="-2"
+   crs:BlueHue="-8"
+   crs:BlueSaturation="+12"
+   crs:ShadowTint="+2"
+   crs:HueAdjustmentRed="+0"
+   crs:SaturationAdjustmentRed="+0"
+   crs:LuminanceAdjustmentRed="+0"
+   crs:HueAdjustmentOrange="+0"
+   crs:SaturationAdjustmentOrange="+4"
+   crs:LuminanceAdjustmentOrange="+4"
+   crs:HueAdjustmentYellow="+0"
+   crs:SaturationAdjustmentYellow="-20"
+   crs:LuminanceAdjustmentYellow="+0"
+   crs:HueAdjustmentGreen="+0"
+   crs:SaturationAdjustmentGreen="-30"
+   crs:LuminanceAdjustmentGreen="-10"
+   crs:HueAdjustmentAqua="-4"
+   crs:SaturationAdjustmentAqua="-10"
+   crs:LuminanceAdjustmentAqua="+0"
+   crs:HueAdjustmentBlue="-6"
+   crs:SaturationAdjustmentBlue="+10"
+   crs:LuminanceAdjustmentBlue="-10"
+   crs:HueAdjustmentPurple="+0"
+   crs:SaturationAdjustmentPurple="+0"
+   crs:LuminanceAdjustmentPurple="+0"
+   crs:HueAdjustmentMagenta="+0"
+   crs:SaturationAdjustmentMagenta="+0"
+   crs:LuminanceAdjustmentMagenta="+0">
+   <crs:Name>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">SL3 2014 Lubezki · Órbita</rdf:li>
+    </rdf:Alt>
+   </crs:Name>
+   <crs:ShortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:ShortName>
+   <crs:SortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:SortName>
+   <crs:Group>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">FOTONEANDO · Óscar SL3</rdf:li>
+    </rdf:Alt>
+   </crs:Group>
+   <crs:Description>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Versión para Canon Rebel SL3 / 250D. Inspirado en Gravity (Emmanuel Lubezki, Óscar a Mejor Fotografía 2014). Negros profundos y luz dura y limpia, como la del sol en el espacio; tonos fríos y metálicos. Interpretación libre, no es el etalonaje oficial.</rdf:li>
+    </rdf:Alt>
+   </crs:Description>
+   <crs:ToneCurvePV2012>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>56, 41</rdf:li>
+     <rdf:li>128, 128</rdf:li>
+     <rdf:li>199, 214</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012>
+   <crs:ToneCurvePV2012Red>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>31, 27</rdf:li>
+     <rdf:li>128, 125</rdf:li>
+     <rdf:li>217, 218</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Red>
+   <crs:ToneCurvePV2012Green>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>31, 31</rdf:li>
+     <rdf:li>128, 128</rdf:li>
+     <rdf:li>217, 218</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Green>
+   <crs:ToneCurvePV2012Blue>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>31, 36</rdf:li>
+     <rdf:li>128, 131</rdf:li>
+     <rdf:li>217, 219</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Blue>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>
