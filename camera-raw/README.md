@@ -27,6 +27,41 @@ Creado a partir de cinco retratos de referencia: luz tropical, pastel, blanco y 
 | **FR 04 Neón lima** | Noche de neón: verdes lima, rojos y turquesas, con un halo de luz alrededor del sujeto |
 | **FR 05 Neón nocturno** | El mismo neón pero más denso, con sombras negras y verdes profundos |
 
+## Paquete «FOTONEANDO · Óscar»
+
+Quince presets inspirados en las películas ganadoras del Óscar a Mejor Fotografía en las ceremonias de 2012 a 2026. Cada uno es una interpretación propia del color y la textura de la película, no el etalonaje oficial.
+
+| Preset | Película · director de fotografía | Look |
+|---|---|---|
+| OS 2012 Richardson · Reloj de ámbar | Hugo · Robert Richardson | Ámbar de lámpara, sombras verde azuladas, brillo suave |
+| OS 2013 Miranda · Océano luminoso | Life of Pi · Claudio Miranda | Limpio y luminoso, turquesas intensos |
+| OS 2014 Lubezki · Órbita | Gravity · Emmanuel Lubezki | Negros profundos, luz dura, tonos fríos y metálicos |
+| OS 2015 Lubezki · Tras bambalinas | Birdman · Emmanuel Lubezki | Tungsteno cálido y verdoso, azules apagados, grano |
+| OS 2016 Lubezki · Luz natural de invierno | The Revenant · Emmanuel Lubezki | Frío, desaturado, luces suaves |
+| OS 2017 Sandgren · Hora mágica musical | La La Land · Linus Sandgren | Violetas y magentas de hora mágica, primarios saturados |
+| OS 2018 Deakins · Bruma naranja | Blade Runner 2049 · Roger Deakins | Bruma naranja casi monocroma, bajo contraste |
+| OS 2019 Cuarón · Plata nítida | Roma · Alfonso Cuarón | Blanco y negro digital limpio, gris plateado |
+| OS 2020 Deakins · Trinchera | 1917 · Roger Deakins | Naturalismo: verdes y amarillos apagados |
+| OS 2021 Messerschmidt · Noche de estudio | Mank · Erik Messerschmidt | Blanco y negro de los años 40: negros densos, brillo, grano |
+| OS 2022 Fraser · Arena y especia | Dune · Greig Fraser | Arena ocre, contraste suave, color contenido |
+| OS 2023 Friend · Frente gris | All Quiet on the Western Front · James Friend | Casi sin color, gris acero, textura áspera |
+| OS 2024 Hoytema · Película gran formato | Oppenheimer · Hoyte van Hoytema | Piel cálida, negros profundos, grano finísimo |
+| OS 2025 Crawley · Hormigón cálido | The Brutalist · Lol Crawley | Terrosos de los años 50, negros lavados, grano |
+| OS 2026 Arkapaw · Delta del Misisipi | Sinners · Autumn Durald Arkapaw | Piel dorada, negros ricos, verdes húmedos |
+
+### La «base cine para APS-C»
+
+Todos los presets del paquete Óscar incluyen ajustes que hacen parte del trabajo que en el cine hacen la cámara y la lente:
+
+- **Corrección de perfil de lente y de aberración cromática.** Quita la distorsión y los bordes de color de los lentes de kit.
+- **Luces que se apagan suavemente**, como en la película: Iluminaciones −35 y Blancos −10, para que el cielo y la piel no se quemen.
+- **Sombras abiertas** (+15) con negros firmes, para un rango dinámico parecido al del cine.
+- **Menos enfoque digital** y un poco de reducción de ruido, para quitar el aspecto «de video».
+- **Grano fino de película**, que da textura y disimula el ruido del sensor.
+- **Viñeta suave**, como la de las lentes de cine.
+
+Como estos presets también fijan Iluminaciones, Sombras, Blancos y Negros, aplícalos primero y después ajusta la exposición y el balance de blancos de cada foto. Para regenerarlos o crear variantes, edita y ejecuta `oscar_presets.py`.
+
 Cada preset ajusta:
 - la curva de tonos
 - las curvas Rojo, Verde y Azul (el tinte de sombras, medios y luces)
@@ -44,7 +79,7 @@ No toca la exposición ni el balance de blancos, así que puedes ajustarlos desp
 2. Haz doble clic en **instalar_presets.bat**. Copia los presets a `%APPDATA%\Adobe\CameraRaw\Settings`.
 3. Cierra y vuelve a abrir Photoshop.
 4. Abre una foto en Camera Raw. Para un JPG ya abierto: *Filtro › Filtro de Camera Raw* (Ctrl+Mayús+A).
-5. Ve a la pestaña **Ajustes preestablecidos** (icono de capas) y busca los grupos **FOTONEANDO · Frontera** y **FOTONEANDO · Retrato**.
+5. Ve a la pestaña **Ajustes preestablecidos** (icono de capas) y busca los grupos **FOTONEANDO · Frontera**, **FOTONEANDO · Retrato** y **FOTONEANDO · Óscar**.
 
 ## Crea tus propios presets desde cualquier imagen
 

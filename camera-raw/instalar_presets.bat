@@ -6,5 +6,5 @@ if not exist "%DEST%" mkdir "%DEST%"
 for /r "%~dp0presets" %%F in (*.xmp) do copy /y "%%F" "%DEST%\" >nul && echo   + %%~nF
 echo.
 echo Listo. Cierra y vuelve a abrir Photoshop.
-echo Los presets aparecen en Camera Raw, pestaña "Ajustes preestablecidos", grupos "FOTONEANDO · Frontera" y "FOTONEANDO · Retrato".
+echo Los presets aparecen en Camera Raw, pestaña "Ajustes preestablecidos", grupos "FOTONEANDO · Frontera", "FOTONEANDO · Retrato" y "FOTONEANDO · Óscar".
 pause
