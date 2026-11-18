@@ -210,9 +210,12 @@ def to_xmp(s, name, group="", description=""):
         "PostCropVignetteFeather": "70", "PostCropVignetteRoundness": "0",
         "PostCropVignetteStyle": "1", "PostCropVignetteHighlightContrast": "0",
     }
-    for k2 in ("Vibrance", "Clarity2012", "Contrast2012", "Highlights2012", "Shadows2012"):
+    for k2 in ("Vibrance", "Clarity2012", "Contrast2012", "Highlights2012", "Shadows2012", "Dehaze"):
         if k2 in s:
             attrs[k2] = "%+d" % s[k2]
+    if s["bw"] and "gray" in s:   # mezcla de canales para el blanco y negro
+        for name_b, _ in BANDS:
+            attrs["GrayMixer" + name_b] = "%+d" % s["gray"].get(name_b, 0)
     for name_b, _ in BANDS:
         h, sa, l = s["hsl"].get(name_b, (0, 0, 0))
         attrs["HueAdjustment" + name_b] = "%+d" % h

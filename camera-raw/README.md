@@ -15,6 +15,18 @@ Creado a partir de cinco fotografías de referencia de color callejero en diapos
 | **FT 04 Sombra dura** | Luz rasante de tarde: negros profundos, sombras verdosas y piel cálida |
 | **FT 05 Muro turquesa** | Pleno sol en la calle: sombras de tinta, turquesas y cartón cálido |
 
+## Paquete «FOTONEANDO · Retrato»
+
+Creado a partir de cinco retratos de referencia: luz tropical, pastel, blanco y negro, y neón de noche.
+
+| Preset | Look |
+|---|---|
+| **FR 01 Trópico** | Retrato con luz de ventana: piel dorada, mar turquesa, negros profundos y grano fino |
+| **FR 02 Pacífico pastel** | Contraste suave, negros lavados, verdes apagados y luces color crema |
+| **FR 03 Plata solar** | Blanco y negro a contraluz: piel luminosa, cielos dramáticos y mucha textura |
+| **FR 04 Neón lima** | Noche de neón: verdes lima, rojos y turquesas, con un halo de luz alrededor del sujeto |
+| **FR 05 Neón nocturno** | El mismo neón pero más denso, con sombras negras y verdes profundos |
+
 Cada preset ajusta:
 - la curva de tonos
 - las curvas Rojo, Verde y Azul (el tinte de sombras, medios y luces)
@@ -22,6 +34,7 @@ Cada preset ajusta:
 - el panel HSL
 - el grano
 - una viñeta suave
+- en los retratos, también la claridad y la neblina (el halo del neón) y la mezcla de blanco y negro
 
 No toca la exposición ni el balance de blancos, así que puedes ajustarlos después según tu foto.
 
@@ -31,7 +44,7 @@ No toca la exposición ni el balance de blancos, así que puedes ajustarlos desp
 2. Haz doble clic en **instalar_presets.bat**. Copia los presets a `%APPDATA%\Adobe\CameraRaw\Settings`.
 3. Cierra y vuelve a abrir Photoshop.
 4. Abre una foto en Camera Raw. Para un JPG ya abierto: *Filtro › Filtro de Camera Raw* (Ctrl+Mayús+A).
-5. Ve a la pestaña **Ajustes preestablecidos** (icono de capas) y busca el grupo **FOTONEANDO · Frontera**.
+5. Ve a la pestaña **Ajustes preestablecidos** (icono de capas) y busca los grupos **FOTONEANDO · Frontera** y **FOTONEANDO · Retrato**.
 
 ## Crea tus propios presets desde cualquier imagen
 
