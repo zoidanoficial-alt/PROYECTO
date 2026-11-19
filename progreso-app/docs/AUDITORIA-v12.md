@@ -1029,3 +1029,58 @@ Capa final de `styles.css` (26.0), aplicada a toda la app sin tocar la lógica:
   - e2e `v34`: rutina HYROX, búsquedas, filtros, vistas, detalle, objetivo, análisis, calendario, resultados con parciales, rankings, sincronización con cambios y novedades, control de calidad y recordatorios.
   - Unitarias del motor: 10/10.
   - Regresión v9–v34: sin fallas.
+
+
+## 28.0 · Mi reloj (Mi Fitness), temporizador HYROX integrado y control remoto
+
+Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fitness. La integración va por las vías que Android sí abre.
+
+**Temporizador HYROX (`hxtimer.js`)**
+- **Modos:** simulación completa (8 × 1 km + estación, 16 parciales), una estación, 1 km fresco, y estación + 1 km bajo fatiga.
+- **Sin escribir tiempos:**
+  - "Cronometrar la prueba" en Plan y en Hoy abre el temporizador de la prueba que toca.
+  - Al terminar, registra solo las pruebas en HYROX Lab: estaciones, 1 km, RDI y simulación. En simulación los parciales de estación se dividen entre 1.08.
+  - El esfuerzo (RPE) es opcional con un toque.
+  - Escribir el tiempo a mano queda como alternativa.
+- **Exactitud:** cada comando guarda su hora real. Las pausas se descuentan, "deshacer" reabre el tramo anterior, y el estado sobrevive a cierres de la app.
+
+**Control desde el reloj (`WatchService.java`)**
+- **Cómo funciona:** el reloj controla la música del teléfono, y un servicio en primer plano se presenta como reproductor (sesión multimedia con audio silencioso).
+- **Botones:** ▶/⏸ inicia o pausa, ⏭ siguiente tramo, ⏮ deshace.
+- **Pantalla de música del reloj:** muestra el tramo, el tiempo, el total y el pulso.
+- **Notificación:** trae los mismos tres botones.
+- **App cerrada:** los toques que llegan sin la página quedan en una cola con su hora y se aplican al volver.
+- **La sesión del día:** también responde al reloj (siguiente = bloque hecho, ⏮ = deshacer, ▶/⏸ = pausa).
+
+**Pulso en vivo (`HrLink.java`)**
+- Usa el perfil Bluetooth estándar Heart Rate (0x180D / 0x2A37): pulso de 8 o 16 bits, contacto e intervalos R-R.
+- Reconexión automática, y el sensor guardado se conecta solo al iniciar el temporizador.
+- Pulso y zona en vivo, pulso medio y máximo por tramo, tiempo en zonas y RMSSD por tramo si el sensor manda R-R.
+- Pulso máximo editable; por defecto se estima con Tanaka (208 − 0.7 × edad).
+
+**Mi Fitness → Health Connect (`HcLink.java`, Android 14+, API del sistema sin librerías)**
+- **Solo lectura:** pulso, pulso en reposo, HRV, sueño, pasos y entrenos.
+- **Recuperación:** el sueño, el pulso en reposo y la HRV llenan el chequeo de recuperación sin sobrescribir lo escrito a mano (`rec.src` marca lo que vino del reloj).
+- **Sesiones sin sensor en vivo:** reciben el pulso de Mi Fitness al sincronizar.
+- **Fuente visible:** detecta si los datos vienen de Mi Fitness (`com.mi.health`).
+- **Privacidad:** pantalla de privacidad requerida por Health Connect (activity-alias `VIEW_PERMISSION_USAGE`).
+
+**Pantalla "Mi reloj"**
+- **Conexión:** pasos para conectar Mi Fitness, permiso de Health Connect, prueba del control remoto ("toca ▶ en tu reloj"), búsqueda de sensores y pulso en vivo.
+- **Dónde aparece:** en Explorar, en HYROX Lab y en el temporizador.
+
+**Permisos nuevos:** FOREGROUND_SERVICE(_MEDIA_PLAYBACK), BLUETOOTH_SCAN (neverForLocation) / CONNECT, BLUETOOTH y BLUETOOTH_ADMIN (≤ API 30), y health.READ_* (6).
+
+**Pruebas**
+- **e2e `v35` con puente Android simulado:**
+  - Health Connect (no sobrescribe lo manual), prueba del control remoto y sensor con pulso en vivo.
+  - Temporizador de 1 km controlado por el reloj, con resultado automático y pulso por tramo.
+  - Simulación de 16 tramos con pausa (descontada), deshacer y un toque recibido con la app cerrada (hora real).
+  - Pulso llenado después desde Mi Fitness y sesión del día controlada por el reloj.
+- **Unitaria del decodificador de pulso Bluetooth:** 6/6 en JVM.
+- **Regresión v9–v35:** sin fallas.
+
+**Sin probar en dispositivo real:** el lado nativo (MediaSession con el Mi Watch, Bluetooth y Health Connect) compila y está escrito sobre las APIs verificadas del SDK 34. Falta comprobar en el teléfono que:
+- el control de música del Mi Watch llega a la sesión multimedia;
+- Mi Fitness escribe en Health Connect para este modelo;
+- el Mi Watch transmite pulso (probablemente no; sí funciona con bandas de pecho).

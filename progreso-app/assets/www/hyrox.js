@@ -267,8 +267,9 @@ function hyroxCard() {
   const p = hx().profile, w = hxWeeks(), m = hxMission(), act = hx().active;
   const days = p.date ? daysBetween(todayStr(), p.date) : null;
   return `<div class="card keep hx-card"><div class="hx-eyebrow">HYROX LAB · ${esc(m.ph.n.toUpperCase())}${w != null && w >= 0 ? ' · FALTAN ' + w + ' SEM' : ''}</div>
-    ${act ? `<h2 style="margin:4px 0">Sesión en curso</h2><p class="small muted">${esc(act.n)} · empezaste a las ${new Date(act.start).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</p><button class="block" id="hx-resume">Continuar sesión</button>`
-    : m.assess ? `<h2 style="margin:4px 0">Prueba de hoy: ${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'running bajo fatiga' : HX_ST[m.assess].n)}</h2><p class="small">${esc(m.why)}</p><button class="block" id="hx-test" data-st="${m.assess}">Registrar la prueba</button>`
+    ${typeof hxt === 'function' && hxt() ? `<h2 style="margin:4px 0">Temporizador en curso</h2><p class="small muted">${esc(HXT_TITLE[hxt().mode])} · ${esc(hxt().segs[hxt().i].n)}</p><button class="block" id="hx-tmr">Volver al temporizador</button>`
+    : act ? `<h2 style="margin:4px 0">Sesión en curso</h2><p class="small muted">${esc(act.n)} · empezaste a las ${new Date(act.start).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</p><button class="block" id="hx-resume">Continuar sesión</button>`
+    : m.assess ? `<h2 style="margin:4px 0">Prueba de hoy: ${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'running bajo fatiga' : HX_ST[m.assess].n)}</h2><p class="small">${esc(m.why)}</p><button class="block" id="hx-test" data-st="${m.assess}">${ico('timer', 18, 'lead')}Cronometrar la prueba</button>`
     : `<h2 style="margin:4px 0">${esc(m.ses.n)}</h2><p class="small muted" style="margin:0 0 6px">${m.ses.min} min · ${esc(m.ses.goal)}</p><p class="small"><b>Por qué hoy:</b> ${esc(m.why)}</p>${m.changes.length ? `<div class="adapt-note">${ico('refresh-cw', 16, 'lead')}${esc(m.changes[0])}</div>` : ''}<button class="block" id="hx-start">Empezar sesión</button>`}
     ${hxTelemetry(days)}
     <div class="row" style="margin-top:4px"><span class="grow"></span><button class="ghost" id="hx-open">Abrir laboratorio →</button></div></div>`;
@@ -276,7 +277,8 @@ function hyroxCard() {
 function bindHyrox(root, rerender) {
   const on = (id, f) => { const b = $('#' + id, root); if (b) b.onclick = f; };
   on('hx-open', () => openHyrox());
-  on('hx-test', e => openHxTest(e.currentTarget.dataset.st, rerender));
+  on('hx-test', e => hxtForAssess(e.currentTarget.dataset.st));
+  on('hx-tmr', () => openHxTimer());
   on('hx-start', () => hxStartSession());
   on('hx-resume', () => openHxSession());
 }
@@ -288,7 +290,9 @@ function openHyrox() {
   const days = p.date ? daysBetween(todayStr(), p.date) : null;
   const doneN = perf.tested.length + (perf.run ? 1 : 0) + (perf.fat ? 1 : 0);
   const items = [
-    ['test', 'clipboard-list', 'Registrar una prueba', 'Estación, 1 km fresco, running bajo fatiga o simulación'],
+    ['timer', 'timer', 'Temporizador', 'Simulación, estación o 1 km · se guarda solo · contrólalo desde tu reloj'],
+    ['watch', 'heart-pulse', 'Mi reloj', DB.watch && DB.watch.hcOn ? 'Mi Fitness conectado' + (DB.watch.hrDev ? ' · pulso en vivo' : '') : 'Mi Fitness, pulso en vivo y control remoto'],
+    ['test', 'clipboard-list', 'Escribir un resultado', 'Si ya lo cronometraste en otro lado'],
     ['st', 'layers', 'Las 8 estaciones', `${perf.tested.length} de 8 medidas · técnica, récords y progreso`],
     ['perf', 'trending-up', 'Rendimiento (HPI)', perf.hpi != null ? `${perf.hpi}/100 · confianza ${perf.conf}` : 'Evaluación incompleta'],
     ['race', 'target', 'Predictor y "¿Y si…?"', pr.ok ? `${hxT(pr.lo)} – ${hxT(pr.hi)}` : 'Necesita 1 km y 6 estaciones'],
@@ -308,7 +312,7 @@ function openHyrox() {
     <p class="small muted" style="margin-top:10px">El HPI y las predicciones son modelos internos de la app, no métricas oficiales de HYROX. Sin afiliación con HYROX.</p>
     <button class="ghost block" id="hx-x">Cerrar</button>`, m => {
     const back = openHyrox;
-    $$('[data-hx]', m).forEach(b => b.onclick = () => ({ test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), method: () => openHxMethod(back), events: () => openEvents(), ranks: () => openHxRanks(back), setup: () => openHxSetup(back) })[b.dataset.hx]());
+    $$('[data-hx]', m).forEach(b => b.onclick = () => ({ timer: () => openHxTimerPicker(back), watch: () => openWatch(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), method: () => openHxMethod(back), events: () => openEvents(), ranks: () => openHxRanks(back), setup: () => openHxSetup(back) })[b.dataset.hx]());
     $('#hx-x', m).onclick = () => { closeModal(); rerenderHx(); };
   });
 }
@@ -356,6 +360,7 @@ function openHxTest(kind, rerender, back) {
     sim: pred && pred.ok ? `Si haces la carrera completa, tu predicción actual es ${hxT(pred.total)}. Para una parcial, anota tu tiempo y lo que hiciste.` : 'Anota el tiempo total y qué incluiste.' }[kind] || st.tip;
   openModal(`<h3>${esc(title)}</h3><p class="small muted" style="margin-top:0">${esc(help)}</p>
     ${ref ? `<p class="small">Carga de referencia (${HX_CATS[p.cat] || 'Open'}): <b>${ref}</b>. Si usas otra, anótala: el récord se marcará como no comparable.</p>` : ''}
+    ${kind !== 'sim' ? `<button class="block" id="ht-timer">${ico('timer', 18, 'lead')}Cronometrar ahora</button><p class="small muted" style="text-align:center;margin:8px 0">o escribe el tiempo si ya lo hiciste</p>` : ''}
     <label>Tiempo (m:ss)<input id="ht-t" inputmode="numeric" placeholder="4:10"></label>
     ${isSt && st.load ? `<label>Carga usada (opcional)<input id="ht-l" placeholder="${ref ? esc(ref) : ''}"></label>` : ''}
     ${kind === 'comp' ? `<label>Después de qué estación<select id="ht-after">${HX_STATIONS.map(s => `<option value="${s.k}">${s.n}</option>`).join('')}<option value="otro">Otro bloque de piernas</option></select></label>` : ''}
@@ -364,6 +369,7 @@ function openHxTest(kind, rerender, back) {
     <label>Notas (opcional)<input id="ht-n" placeholder="Pausas, sensaciones, técnica"></label>
     <div class="row"><button class="secondary" id="ht-c" style="flex:1">${back ? '← Volver' : 'Cancelar'}</button><button id="ht-s" style="flex:1">Guardar</button></div>`, m => {
     $('#ht-rpe', m).oninput = e => { $('#ht-rv', m).textContent = e.target.value; };
+    const tb = $('#ht-timer', m); if (tb) tb.onclick = () => hxtForAssess(kind);
     $('#ht-c', m).onclick = () => back ? back() : closeModal();
     $('#ht-s', m).onclick = () => {
       const sec = hxParse($('#ht-t', m).value);
@@ -577,6 +583,15 @@ function hyroxHero() {
   if (!hxOn()) return `<div class="hero"><div class="eyebrow">HYROX Lab · hoy</div><h3>Configura tu carrera</h3><p>Hoy toca HYROX. Dime tu categoría y fecha para decidir la sesión correcta.</p><button id="hx-open">Configurar HYROX Lab</button></div>`;
   const m = hxMission(), a = hx().active;
   if (a) return `<div class="hero"><div class="eyebrow">HYROX Lab · sesión en curso</div><h3>${esc(a.n)}</h3><p>${hxT(hxElapsed(a))} transcurridos</p><button id="hx-resume">Continuar sesión</button></div>`;
-  if (m.assess) return `<div class="hero"><div class="eyebrow">HYROX Lab · prueba de hoy</div><h3>${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'Running bajo fatiga' : HX_ST[m.assess].n)}</h3><p>${esc(m.why)}</p><button id="hx-test" data-st="${m.assess}">Registrar la prueba</button></div>`;
+  if (typeof hxt === 'function' && hxt()) return `<div class="hero"><div class="eyebrow">HYROX Lab · temporizador en curso</div><h3>${esc(hxt().segs[hxt().i].n)}</h3><p>${esc(HXT_TITLE[hxt().mode])}</p><button id="hx-tmr">Volver al temporizador</button></div>`;
+  if (m.assess) return `<div class="hero"><div class="eyebrow">HYROX Lab · prueba de hoy</div><h3>${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'Running bajo fatiga' : HX_ST[m.assess].n)}</h3><p>${esc(m.why)}</p><button id="hx-test" data-st="${m.assess}">${ico('timer', 18)} Cronometrar la prueba</button></div>`;
   return `<div class="hero"><div class="eyebrow">HYROX Lab · ${esc(m.ph.n)}</div><h3>${esc(m.ses.n)}</h3><p>${m.ses.min} min · ${esc(m.why)}</p><button id="hx-start">${ico('play', 18)} Empezar sesión</button></div>`;
+}
+
+/** Abre el temporizador listo para la prueba que toca (sin escribir tiempos). */
+function hxtForAssess(k) {
+  if (typeof hxt === 'function' && hxt()) return openHxTimer();
+  if (k === 'run1k') hxtCreate('run1k');
+  else if (k === 'comp') hxtPickStation('comp', () => closeModal());
+  else if (HX_ST[k]) hxtCreate('station', k);
 }

@@ -1,0 +1,39 @@
+/* 28.0 · Temporizador HYROX y Mi reloj · tokens del design system 26.0 */
+.hxt-chips { display: inline-flex; gap: 6px; }
+.hxt-seg { margin: 14px 0 0; }
+.hxt-seg small { display: block; font-size: 11px; letter-spacing: .12em; color: var(--text-3); font-weight: 700; }
+.hxt-seg b { display: block; font-size: 30px; font-weight: 800; letter-spacing: -.035em; line-height: 1.1; }
+.hxt-seg span { color: var(--muted); font-size: 14px; }
+.hxt-clock { font-size: 88px !important; text-align: center; margin: 18px 0 14px; color: var(--text); }
+.hxt-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 12px 6px; }
+.hxt-row > div { text-align: center; min-width: 0; }
+.hxt-row > div + div { border-left: 1px solid var(--line); }
+.hxt-row small { display: block; font-size: 10.5px; letter-spacing: .12em; color: var(--text-3); font-weight: 700; }
+.hxt-row b { display: block; font-size: 26px; font-weight: 800; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.hxt-ctl { display: flex; align-items: center; justify-content: center; gap: 26px; margin: 22px 0 8px; }
+.hxt-b { width: 58px !important; height: 58px !important; border-radius: 50% !important; font-size: 22px !important; }
+.hxt-play { width: 96px; height: 96px; border-radius: 50%; padding: 0; font-size: 36px; background: var(--cta); color: var(--on-cta); box-shadow: 0 12px 30px rgba(49, 214, 160, .3); }
+.hxt-play.on { background: var(--surface-3); color: var(--text); box-shadow: none; }
+.hxt-next { text-align: center; min-height: 20px; }
+.live-hr[data-z="1"], .live-zone[data-z="1"] { color: #9aaab3; }
+.live-hr[data-z="2"], .live-zone[data-z="2"] { color: #27d3d0; }
+.live-hr[data-z="3"], .live-zone[data-z="3"] { color: #31d6a0; }
+.live-hr[data-z="4"], .live-zone[data-z="4"] { color: #e7b75e; }
+.live-hr[data-z="5"], .live-zone[data-z="5"] { color: #f16b70; }
+.hxt-zones { display: flex; height: 12px; border-radius: 6px; overflow: hidden; gap: 2px; margin: 10px 0 4px; }
+.hxt-zones i[data-z="1"] { background: #9aaab3; } .hxt-zones i[data-z="2"] { background: #27d3d0; } .hxt-zones i[data-z="3"] { background: #31d6a0; } .hxt-zones i[data-z="4"] { background: #e7b75e; } .hxt-zones i[data-z="5"] { background: #f16b70; }
+.hxt-rpe { display: flex; gap: 8px; margin-bottom: 12px; }
+.hxt-rpe .chip { flex: 1; min-height: 42px; border-radius: 999px; background: var(--surface); color: var(--text); border: 1px solid var(--line); }
+.hxt-rpe .chip.on { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.wt-sec { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 16px; margin-bottom: 12px; }
+.wt-h { display: flex; align-items: center; gap: 10px; }
+.wt-h svg { color: var(--accent); flex: none; }
+.wt-h b { flex: 1; font-size: 16px; }
+.wt-steps { padding-left: 20px; margin: 8px 0; }
+.wt-steps li { margin-bottom: 10px; font-size: 14px; }
+.wt-steps li.ok::marker { color: var(--good); }
+.wt-steps li button { display: block; margin-top: 6px; min-height: 42px; }
+.wt-live { display: flex; align-items: center; gap: 14px; margin: 8px 0; }
+.wt-live b { font-size: 48px; min-width: 80px; }
+.wt-live small { display: block; color: var(--muted); font-size: 12.5px; }
+#wt-devs .kit-item { width: 100%; margin-top: 8px; }

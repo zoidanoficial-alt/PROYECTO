@@ -71,6 +71,12 @@ public class MainActivity extends Activity {
     /** Voz para las carreras guiadas. */
     private TextToSpeech tts;
     private boolean ttsReady;
+    private static final int REQ_BT = 5;
+    private static final int REQ_HC = 6;
+    /** 28.0 · Reloj: pulso por Bluetooth y Health Connect (se crean al usarlos). */
+    private HrLink hr;
+    private HcLink hc;
+    private boolean btScanAfterPermission;
     /** Pestaña a abrir cuando se entra tocando un recordatorio. */
     private volatile String launchTab;
 
@@ -105,6 +111,14 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Bridge(), "AndroidBridge");
 
         launchTab = getIntent() != null ? getIntent().getStringExtra("tab") : null;
+        // Android abre esta pantalla desde Health Connect para mostrar cómo usamos los datos de salud.
+        if (getIntent() != null && ("android.intent.action.VIEW_PERMISSION_USAGE".equals(getIntent().getAction())
+                || "androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE".equals(getIntent().getAction()))) launchTab = "hcprivacy";
+        WatchService.listener = new WatchService.Listener() {
+            @Override public void onCmd(final String c, final long at) {
+                js("window.onWatchCmd && window.onWatchCmd(" + org.json.JSONObject.quote(c) + "," + at + ")");
+            }
+        };
         if (savedInstanceState != null) {
             web.restoreState(savedInstanceState);
         } else {
@@ -270,8 +284,45 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** Ejecuta JS en el hilo principal (los callbacks nativos llegan desde otros hilos). */
+    void js(final String code) {
+        runOnUiThread(new Runnable() { @Override public void run() { if (web != null) web.evaluateJavascript(code, null); } });
+    }
+
+    private HrLink hrLink() {
+        if (hr == null) hr = new HrLink(this, new HrLink.Out() { @Override public void js(String c) { MainActivity.this.js(c); } });
+        return hr;
+    }
+
+    private HcLink hcLink() {
+        if (hc == null) hc = new HcLink(this, new HcLink.Out() { @Override public void js(String c) { MainActivity.this.js(c); } });
+        return hc;
+    }
+
+    private String[] btPerms() {
+        return Build.VERSION.SDK_INT >= 31
+                ? new String[] { "android.permission.BLUETOOTH_SCAN", "android.permission.BLUETOOTH_CONNECT" }
+                : new String[] { Manifest.permission.ACCESS_FINE_LOCATION };
+    }
+
+    private boolean hasAll(String[] perms) {
+        for (String p : perms) if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) return false;
+        return true;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
+        if (requestCode == REQ_BT) {
+            boolean ok = hasAll(btPerms());
+            if (ok && btScanAfterPermission) hrLink().scan();
+            else if (!ok) js("window.onHrStatus && window.onHrStatus('denied')");
+            btScanAfterPermission = false;
+            return;
+        }
+        if (requestCode == REQ_HC) {
+            js("window.onHcStatus && window.onHcStatus(" + org.json.JSONObject.quote(hcLink().status()) + ")");
+            return;
+        }
         if (requestCode == REQ_NOTIF) {
             final boolean ok = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
             web.evaluateJavascript("window.onNotifPermission && window.onNotifPermission(" + ok + ")", null);
@@ -330,10 +381,95 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if (tts != null) tts.shutdown();
+        WatchService.listener = null;
+        if (hr != null) hr.disconnect();
         super.onDestroy();
     }
 
     public class Bridge {
+        /* ---------- 28.0 · Temporizador HYROX controlado desde el reloj ---------- */
+        @JavascriptInterface
+        public void watchStart(String title, String sub) {
+            Intent i = new Intent(MainActivity.this, WatchService.class).setAction("update").putExtra("title", title).putExtra("sub", sub).putExtra("playing", false).putExtra("pos", 0L);
+            startForegroundService(i);
+        }
+
+        @JavascriptInterface
+        public void watchUpdate(String title, String sub, boolean playing, long posMs) {
+            if (!WatchService.running) return;
+            startService(new Intent(MainActivity.this, WatchService.class).setAction("update").putExtra("title", title).putExtra("sub", sub).putExtra("playing", playing).putExtra("pos", posMs));
+        }
+
+        @JavascriptInterface
+        public void watchStop() {
+            if (WatchService.running) startService(new Intent(MainActivity.this, WatchService.class).setAction("stop"));
+        }
+
+        @JavascriptInterface
+        public boolean watchRunning() { return WatchService.running; }
+
+        /** Toques del reloj guardados mientras la página no estaba (JSON [{c, at}]). */
+        @JavascriptInterface
+        public String watchDrain() { return WatchService.drain(MainActivity.this); }
+
+        /* ---------- Pulso en vivo (Bluetooth Heart Rate) ---------- */
+        @JavascriptInterface
+        public void hrScan() {
+            runOnUiThread(new Runnable() { @Override public void run() {
+                if (hasAll(btPerms())) hrLink().scan();
+                else { btScanAfterPermission = true; requestPermissions(btPerms(), REQ_BT); }
+            } });
+        }
+
+        @JavascriptInterface
+        public void hrConnect(final String address) {
+            runOnUiThread(new Runnable() { @Override public void run() { if (hasAll(btPerms())) hrLink().connect(address); } });
+        }
+
+        @JavascriptInterface
+        public void hrDisconnect() {
+            runOnUiThread(new Runnable() { @Override public void run() { if (hr != null) hr.disconnect(); } });
+        }
+
+        /* ---------- Health Connect (Mi Fitness escribe ahí los datos del reloj) ---------- */
+        @JavascriptInterface
+        public String hcStatus() { return hcLink().status(); }
+
+        @JavascriptInterface
+        public void hcRequest() {
+            runOnUiThread(new Runnable() { @Override public void run() {
+                if (HcLink.supported()) requestPermissions(HcLink.PERMS, REQ_HC);
+                else js("window.onHcStatus && window.onHcStatus('unsupported')");
+            } });
+        }
+
+        @JavascriptInterface
+        public void hcRead(String reqId, String fromMs, String toMs) {
+            try { hcLink().read(reqId, Long.parseLong(fromMs), Long.parseLong(toMs)); }
+            catch (NumberFormatException e) { js("window.onHcData && window.onHcData(" + org.json.JSONObject.quote(reqId) + ",{\"error\":\"args\"})"); }
+        }
+
+        @JavascriptInterface
+        public void hcOpenSettings() {
+            runOnUiThread(new Runnable() { @Override public void run() {
+                try {
+                    startActivity(new Intent(Build.VERSION.SDK_INT >= 34 ? "android.health.connect.action.HEALTH_HOME_SETTINGS" : "androidx.health.ACTION_HEALTH_CONNECT_SETTINGS"));
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(MainActivity.this, "Health Connect no está disponible en este teléfono", Toast.LENGTH_LONG).show();
+                }
+            } });
+        }
+
+        @JavascriptInterface
+        public void openMiFitness() {
+            runOnUiThread(new Runnable() { @Override public void run() {
+                Intent i = getPackageManager().getLaunchIntentForPackage("com.mi.health");
+                if (i == null) i = getPackageManager().getLaunchIntentForPackage("com.xiaomi.wearable");
+                if (i != null) startActivity(i);
+                else Toast.makeText(MainActivity.this, "No encontré Mi Fitness instalada", Toast.LENGTH_LONG).show();
+            } });
+        }
+
         /** Lee un texto en voz alta (carreras guiadas). Devuelve false si el motor de voz no está listo. */
         @JavascriptInterface
         public boolean speak(String text) {
