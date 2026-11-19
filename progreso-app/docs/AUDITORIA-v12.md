@@ -953,3 +953,22 @@ Fuente: informe "El entrenamiento de Tom Holland para Spider-Man (2016–2026): 
 - **La semana de menos fatiga** hace que la sesión siguiente empiece en "reducir".
 - **Calentamiento:** con la sentadilla a 70 kg da 27.5 × 8, 42.5 × 5 y 55 × 2; el curl, nada; la prensa después de la sentadilla, 1 serie.
 - **Molestia en la rodilla:** marca 2 ejercicios y los cambia por compuestos sin carga en la rodilla.
+
+## 25.0 · HYROX Lab dentro de Mi Progreso
+
+Módulo nuevo (`assets/www/hyrox.js`, datos en `DB.hyrox`), integrado a la app existente: entrada en Explorar ("HYROX Lab") y tarjeta en Plan cuando el atleta configura su carrera.
+
+- **Perfil de carrera:** categoría (Open, Pro, Doubles, Relay), división, fecha, tiempo objetivo, experiencia, equipo (gimnasio HYROX, convencional, casa, solo running, limitado), días por semana y restricciones.
+- **Evaluación por partes:** 1 km fresco, 8 estaciones y running bajo fatiga, en días distintos. La tarjeta de Plan pide la siguiente prueba que falta. Sin datos suficientes muestra "Evaluación incompleta".
+- **Estaciones:** técnica, errores frecuentes, carga de referencia por categoría (temporada 2024/25, a confirmar en reglamento), historial y récords. Una prueba en condiciones distintas a competencia se marca "no comparable" y no cuenta como récord.
+- **RDI** = ((ritmo fatigado − ritmo fresco) / ritmo fresco) × 100, en s/km, con aviso de que compara condiciones parecidas.
+- **HPI (modelo interno, no oficial):** pilares ponderados 25/25/15/15/10/10 (configurables en `profile.weights`). Cada pilar muestra fuente, puntaje y lo que falta. No se calcula con menos del 60 % de los datos o sin 1 km y 4 estaciones. Confianza baja/media/alta según cobertura.
+- **Cuello de botella:** cada parte se compara contra el nivel general del propio atleta (mediana de sus puntajes) y se ordena por segundos perdidos. Principal, secundario y áreas de mantenimiento, con el dato que lo explica.
+- **Predictor:** 8 km × ritmo fresco × (1 + RDI) + estaciones × 1.08 + Roxzone. Rango según cuántas partes son estimadas. Etiquetas MEDIDO / ESTIMADO / SIMULADO. Requiere 1 km y 6 estaciones. "¿Y si…?" con controles para 1 km, RDI, Wall balls, Sled push, SkiErg y transiciones.
+- **Fases** según semanas a la carrera (Base, Desarrollo, Preparación específica, Rendimiento, Taper, Recuperación), sin plan fijo de 16 semanas.
+- **Misión de hoy:** recuperación si el chequeo diario sale bajo; taper en semana de carrera; si no, la sesión que ataca el cuello de botella. Ajuste por la última sesión del mismo tipo (no completada o RPE ≥ 9 → bajar; RPE ≤ 6 → subir una sola variable; si no, mantener), con "Por qué cambió".
+- **Ejecución persistente:** cronómetro con pausa, bloques hecho/omitir, se guarda en cada paso y se recupera tras cerrar la app. Resumen: qué hiciste, qué mejoraste, qué aprendimos y siguiente objetivo.
+- **Estrategia de carrera** con los datos del atleta (ritmo, sets de wall balls, sled, agarre, transiciones, primera carrera, combustible).
+- Prueba e2e `v33`: flujo completo, HPI nulo con datos insuficientes, RDI = 10 % para 240→264 s/km, predicción con rango, simulación, sesión recuperada tras recargar y ajuste de la siguiente sesión.
+
+**Pendiente (requiere servicios externos, no simulado):** Health Connect / relojes, GPS dentro de la sesión HYROX, nube y Coach con IA. La versión Kotlin/Compose nativa no se hizo por decisión del usuario: el módulo vive en la app WebView existente.

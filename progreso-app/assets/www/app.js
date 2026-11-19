@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '24.0';
+const APP_VERSION = '25.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -123,7 +123,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [],
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null,
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -1233,6 +1233,7 @@ function renderTrain() {
 
   $('#view-train').innerHTML = `
     ${modeSeg}
+    ${typeof hyroxCard === 'function' ? hyroxCard() : ''}
     ${coachPlanCard()}
     ${routineCard()}
     ${compPlanCard()}
@@ -1279,7 +1280,7 @@ function renderTrain() {
   $('#tr-free').onclick = () => { startSession('libre'); renderTrain(); window.scrollTo(0, 0); };
   $$('#view-train [data-howto]').forEach(b => b.onclick = () => openHowTo(b.dataset.howto));
   $('#tr-lib').onclick = () => openExercisePicker(null);
-  bindRoutineCard($("#view-train")); bindCompPlan($("#view-train"), renderTrain); if (typeof bindPerfGuard === "function") bindPerfGuard($("#view-train"), renderTrain);
+  bindRoutineCard($("#view-train")); bindCompPlan($("#view-train"), renderTrain); if (typeof bindPerfGuard === "function") bindPerfGuard($("#view-train"), renderTrain); if (typeof bindHyrox === "function") bindHyrox($("#view-train"), renderTrain);
   bindRetos($('#view-train'));
   foldify($('#view-train'), [['Tu entrenamiento', ['Chequeo', 'Retos']], ['Tu semana y más', '*', true]]);
   $$('#view-train [data-start]').forEach(b => b.onclick = () => { startSession(p.routine, b.dataset.start); renderTrain(); window.scrollTo(0, 0); });

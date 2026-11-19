@@ -114,6 +114,7 @@ function explorarCard() {
     ['run', 'footprints', 'Running', 'Planes, GPS y caminadora'],
     ['retos', 'medal', 'Retos', 'Pruebas de peso corporal'],
     ['ex', 'book-open', 'Ejercicios', 'Técnica de cada ejercicio'],
+    ['hyrox', 'timer', 'HYROX Lab', 'Evaluación, estaciones, predictor y estrategia'],
     ['compite', 'trophy', 'Competir', 'Kit del fisicoculturista: programas, poses y nutrición'],
     ['act', 'activity', 'Otra actividad', 'Caminar, yoga, bici…']
   ];
@@ -131,6 +132,7 @@ function bindExplore(root) {
     else if (k === 'retos') openModal(retosCard().replace('class="card"', 'class="retos-sheet"') + '<button class="ghost block" id="rs-x">Cerrar</button>', m => { bindRetos(m); $('#rs-x', m).onclick = closeModal; });
     else if (k === 'stats') openStatsGate();
     else if (k === 'compite') openCompete();
+    else if (k === 'hyrox') openHyrox();
   });
 }
 function openStatsGate() {
