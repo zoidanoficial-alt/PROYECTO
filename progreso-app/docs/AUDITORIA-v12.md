@@ -972,3 +972,23 @@ Módulo nuevo (`assets/www/hyrox.js`, datos en `DB.hyrox`), integrado a la app e
 - Prueba e2e `v33`: flujo completo, HPI nulo con datos insuficientes, RDI = 10 % para 240→264 s/km, predicción con rango, simulación, sesión recuperada tras recargar y ajuste de la siguiente sesión.
 
 **Pendiente (requiere servicios externos, no simulado):** Health Connect / relojes, GPS dentro de la sesión HYROX, nube y Coach con IA. La versión Kotlin/Compose nativa no se hizo por decisión del usuario: el módulo vive en la app WebView existente.
+
+## 26.0 · Design system HYROX LAB ("el laboratorio personal del atleta")
+
+Capa final de `styles.css` (26.0), aplicada a toda la app sin tocar la lógica:
+
+- **Tokens:** fondo #0A0D0F / #10161A, superficies #151D22 · #1B262D · #23343C, texto #F3F6F7 · #9AAAB3 · #657780, verde #31D6A0 (acciones, progreso, misión), cian #27D3D0 (running y telemetría), estados warning #E7B75E, error #F16B70 y éxito #39D69B. El modo claro premium usa los mismos acentos con más contraste. El modo Ella conserva su paleta.
+- **Tipografía Inter (incluida offline)** con escala `t-display-l/m`, `t-h-l/m/s`, `t-body-l/m/s`, `t-label`, `t-metric` y `t-caption`. Números tabulares con tracking cerrado; las etiquetas en mayúsculas espaciadas.
+- **Componentes:**
+  - Navegación inferior flotante tipo cápsula, con blur.
+  - Tarjetas sin bordes duros.
+  - Misión del día con brillo radial sutil, en vez del triángulo naranja.
+  - Botones en cápsula y FAB verde.
+  - Hojas modales con fondo #10161A y título display.
+  - Campos con foco verde y segmentos en cápsula.
+- **HYROX Lab:**
+  - Fila de telemetría en Plan (HPI, predicción y días); un guion cuando no hay dato.
+  - Cuenta regresiva display en el laboratorio.
+  - Cuello de botella con acento lateral.
+  - Cronómetro de 72 px.
+- **Movimiento:** las tarjetas entran escalonadas y las hojas con curva suave. Todo se desactiva con `prefers-reduced-motion`.

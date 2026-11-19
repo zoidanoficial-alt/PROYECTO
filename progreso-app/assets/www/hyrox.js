@@ -257,6 +257,11 @@ function hxMission() {
 }
 
 /* ---------- Tarjeta en Plan ---------- */
+/** Fila de telemetría: solo muestra números que existen; si falta el dato, un guion. */
+function hxTelemetry(days) {
+  const perf = hxPerformance(), pr = hxPredict();
+  return `<div class="hx-tele"><div><b>${perf.hpi != null ? perf.hpi : '—'}</b><small>HPI</small></div><div><b>${pr.ok ? hxT(pr.total) : '—'}</b><small>Predicción</small></div><div><b>${days != null && days >= 0 ? days : '—'}</b><small>Días</small></div></div>`;
+}
 function hyroxCard() {
   if (!hxOn()) return '';
   const p = hx().profile, w = hxWeeks(), m = hxMission(), act = hx().active;
@@ -265,7 +270,8 @@ function hyroxCard() {
     ${act ? `<h2 style="margin:4px 0">Sesión en curso</h2><p class="small muted">${esc(act.n)} · empezaste a las ${new Date(act.start).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</p><button class="block" id="hx-resume">Continuar sesión</button>`
     : m.assess ? `<h2 style="margin:4px 0">Prueba de hoy: ${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'running bajo fatiga' : HX_ST[m.assess].n)}</h2><p class="small">${esc(m.why)}</p><button class="block" id="hx-test" data-st="${m.assess}">Registrar la prueba</button>`
     : `<h2 style="margin:4px 0">${esc(m.ses.n)}</h2><p class="small muted" style="margin:0 0 6px">${m.ses.min} min · ${esc(m.ses.goal)}</p><p class="small"><b>Por qué hoy:</b> ${esc(m.why)}</p>${m.changes.length ? `<div class="adapt-note">${ico('refresh-cw', 16, 'lead')}${esc(m.changes[0])}</div>` : ''}<button class="block" id="hx-start">Empezar sesión</button>`}
-    <div class="row" style="margin-top:8px">${days != null && days >= 0 ? `<span class="small muted grow">Carrera en ${days} día${days === 1 ? '' : 's'}</span>` : '<span class="grow"></span>'}<button class="ghost" id="hx-open">Laboratorio</button></div></div>`;
+    ${hxTelemetry(days)}
+    <div class="row" style="margin-top:4px"><span class="grow"></span><button class="ghost" id="hx-open">Abrir laboratorio →</button></div></div>`;
 }
 function bindHyrox(root, rerender) {
   const on = (id, f) => { const b = $('#' + id, root); if (b) b.onclick = f; };
@@ -291,7 +297,7 @@ function openHyrox() {
     ['setup', 'sliders-horizontal', 'Mi carrera y perfil', `${HX_CATS[p.cat]} · ${p.sex === 'f' ? 'Mujeres' : 'Hombres'}${p.date ? ' · ' + shortDate(p.date) : ''}`]
   ];
   openModal(`<div class="hx-eyebrow">HYROX LAB · THE SCIENCE OF YOUR NEXT PR</div>
-    <h3 style="margin-top:4px">${days != null && days >= 0 ? `Faltan ${days} días` : 'Tu laboratorio'}</h3>
+    ${days != null && days >= 0 ? `<div class="hx-count"><b class="t-display-l">${days}</b><span>días para<br>tu carrera</span></div>` : '<h3 style="margin-top:4px">Tu laboratorio</h3>'}
     <div class="hx-kpis"><div><b>${perf.hpi != null ? perf.hpi : '—'}</b><small>HPI</small></div><div><b>${pr.ok ? hxT(pr.total) : '—'}</b><small>Predicción</small></div><div><b>${doneN}/10</b><small>Evaluación</small></div></div>
     ${perf.hpi == null ? `<div class="status info"><b>Evaluación incompleta</b>Falta: ${[!perf.run && '1 km fresco', perf.tested.length < 6 && `${6 - perf.tested.length} estación(es) más`, !perf.fat && 'running bajo fatiga'].filter(Boolean).join(', ') || perf.missing.map(k => HX_PILLAR[k]).join(', ')}. Hazlas en días distintos; no hace falta todo junto.</div>` : ''}
     ${bn && bn.main ? `<div class="hx-bn"><small>CUELLO DE BOTELLA PRINCIPAL</small><b>${esc(bn.main.n)}</b><p class="small">${esc(bn.main.why)}</p>${bn.second ? `<small>SECUNDARIO</small><b class="hx-b2">${esc(bn.second.n)}</b>` : ''}${bn.maint.length ? `<p class="small muted">Mantener: ${esc(bn.maint.join(', '))}</p>` : ''}</div>` : ''}
