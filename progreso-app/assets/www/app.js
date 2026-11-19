@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '26.0';
+const APP_VERSION = '27.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -123,7 +123,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null,
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null,
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -306,7 +306,7 @@ function weekRoutine() {
     name: 'Mi semana', desc: 'Tú decides qué entreno toca cada día de la semana.',
     days: WEEKDAYS.map((n, k) => {
       const w = workoutById(DB.plan[k]);
-      return w ? { id: 'w' + k, name: n + ' · ' + w.name, ex: w.ex, wid: w.id } : { id: 'w' + k, name: n + ' · Descanso', rest: true, ex: [] };
+      return w && w.hyrox ? { id: 'w' + k, name: n + ' · HYROX Lab', ex: [], wid: w.id, hyrox: true } : w ? { id: 'w' + k, name: n + ' · ' + w.name, ex: w.ex, wid: w.id } : { id: 'w' + k, name: n + ' · Descanso', rest: true, ex: [] };
     })
   };
 }
@@ -837,6 +837,8 @@ function renderHome() {
     hero = `<div class="hero"><div class="eyebrow">Entreno en curso</div><h3>${esc(act.dayName)}</h3><p>${n} series registradas · ${Math.round((Date.now() - act.start) / 60000)} min</p><button id="home-train">Continuar entreno</button></div>`;
   } else if (nd && nd.rest) {
     hero = restHero();
+  } else if (nd && nd.hyrox && typeof hyroxHero === 'function') {
+    hero = hyroxHero();
   } else if (nd) {
     const photo = (nd.ex.map(e => EX_PHOTO[e[0]]).find(Boolean));   // 18.0: la foto del primer ejercicio con foto
     hero = `<div class="hero mission"><div class="m-top">${photo ? `<div class="m-photo" style="background-image:url('img/ex/${photo}-0.jpg')"></div>` : ''}<div class="m-body"><div class="eyebrow">${typeof dayCoach === 'function' && dayCoach(nd) ? COACHES[dayCoach(nd)].tag : DB.sessions.some(x => x.end) ? 'Tu misión de hoy' : 'Tu primer entreno'}${dl ? ' · descarga' : ''}</div><h3>${esc(nd.name.split('·').pop().trim())}</h3><p>${nd.ex.length} ejercicios · ${Math.round(nd.ex.reduce((a, e) => a + e[1] * ((e[3] || 90) + 40), 0) / 60)} min</p><button id="home-train">${ico('play', 18)} Empezar entrenamiento</button><div class="m-out">${ico('target', 16)}<span>${esc(missionOutcome(nd))}</span></div></div></div></div>`;
@@ -856,6 +858,7 @@ function renderHome() {
   $('#view-home').innerHTML = `
     ${!act && !RUN.st ? `<div class="goal-line">${ico('goal', 16)}<span>${esc(goalLine())}</span></div>` : ''}
     ${hero}
+    ${typeof evGoalCard === 'function' ? evGoalCard() : ''}
     ${comebackCard()}
     ${notifPromptCard()}
     ${isBeginner() ? pathCard() : ''}
@@ -915,6 +918,8 @@ function renderHome() {
       ${DB.achievements.slice(0, 2).map(a => `<div class="badge-row"><span class="badge">${a.pr ? '↑' : '🏆'}</span><span><b>${esc(a.title)}</b><br><small class="muted">${esc(a.detail || '')} · ${shortDate(a.date)}</small></span></div>`).join('')}
     </div>` : ''}`;
 
+  if (typeof bindHyrox === 'function') bindHyrox($('#view-home'), renderHome);
+  if (typeof bindEvGoalCard === 'function') bindEvGoalCard($('#view-home'));
   const tr = $('#home-train');
   if (tr) tr.onclick = () => { if (!act) startSession(p.routine, nd.id); showTab('train'); };
   const hr = $('#home-run'); if (hr) hr.onclick = () => showTab('train');
@@ -1030,6 +1035,7 @@ function openWeightQuick() {
 function startSession(routineKey, dayId, wid) {
   let name, id = null, base = null;
   const w = workoutById(wid);
+  if (w && w.hyrox && typeof hxStartSession === 'function') { if (hx().active) openHxSession(); else hxStartSession(); return; }
   if (w) { name = w.name; base = w.ex; routineKey = 'custom'; }
   else if (routineKey === 'libre') name = 'Entreno libre';
   else {

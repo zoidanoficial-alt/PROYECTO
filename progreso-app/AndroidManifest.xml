@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.zoidan.progreso"
-    android:versionCode="31"
-    android:versionName="26.0">
+    android:versionCode="32"
+    android:versionName="27.0">
 
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+    <!-- 27.0: solo para descargar el catálogo público de competiciones (GET, sin datos del usuario). -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

@@ -2,8 +2,10 @@
 
 > Para evaluarla o adquirirla, ver `venta/00-LEEME.md`. El historial técnico por versión está en `docs/AUDITORIA-v12.md`.
 
-App de entrenamiento y progreso físico. Gratis, sin anuncios, sin cuenta y sin internet:
-todo se guarda en el teléfono y se exporta cuando quieras.
+App de entrenamiento y progreso físico. Gratis, sin anuncios y sin cuenta: todo se guarda en el
+teléfono y se exporta cuando quieras. Desde la 27.0 la app usa internet para una sola cosa:
+descargar el catálogo público de competiciones (una petición GET sin datos del usuario). Todo lo
+demás funciona sin conexión, y el catálogo también (viene una copia dentro de la app).
 
 - **6.0 · Menos fricción:** guardar una serie es un toque (el botón ya trae peso × reps) y el
   botón “＋ Igual” de la barra de descanso repite la serie sin abrir nada. Cambiar de máquina

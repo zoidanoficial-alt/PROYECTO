@@ -15,10 +15,11 @@ const NOTIF_TYPES = {
   commits: { ico: '🤝', name: 'Mis compromisos', desc: 'Si tienes uno pendiente hoy', time: '20:00' },
   comeback: { ico: '👋', name: 'Regreso amable', desc: 'Un solo aviso si llevas 4+ días sin moverte', time: '18:00' },
   weekly: { ico: '📊', name: 'Resumen semanal', desc: 'Domingo en la tarde', time: '19:00' },
+  events: { ico: '🏁', name: 'Competiciones', desc: 'Tu objetivo a 90/30/14/7/1 días y cierres de inscripción', time: '09:00' },
   cycle: { ico: '🌸', name: 'Ciclo (texto discreto)', desc: '2 días antes de la fecha estimada; no dice de qué se trata', time: '09:00' }
 };
-const NOTIF_ORDER = ['run', 'train', 'checkin', 'weigh', 'food', 'water', 'commits', 'comeback', 'weekly', 'cycle'];
-const NOTIF_IDS = { train: 101, run: 102, checkin: 103, weigh: 104, water: 105, food: 106, commits: 107, comeback: 108, weekly: 109, cycle: 110 };
+const NOTIF_ORDER = ['events', 'run', 'train', 'checkin', 'weigh', 'food', 'water', 'commits', 'comeback', 'weekly', 'cycle'];
+const NOTIF_IDS = { train: 101, run: 102, checkin: 103, weigh: 104, water: 105, food: 106, commits: 107, comeback: 108, weekly: 109, cycle: 110, events: 111 };
 const QUIET = [7, 22];   // solo entre 7:00 y 22:00
 const PER_DAY = 4;
 /** Horas elegibles: de 7:00 a 21:45 cada 15 min, en formato de 24 h (el selector nativo de hora corta el a. m./p. m.). */
@@ -86,6 +87,7 @@ function buildReminders(now) {
       const st = cycStats();
       if (st.next && addDays(st.next, -2) === date) add('cycle', T.cycle.time, '🌸 Recordatorio de tu calendario', 'Abre la app para ver los detalles.', 'home');
     }
+    if (on('events') && typeof evReminders === 'function') evReminders(date).slice(0, 1).forEach(([title, text]) => add('events', T.events.time, title, text, 'home'));
     dayOut.sort((a, b) => NOTIF_ORDER.indexOf(a.type) - NOTIF_ORDER.indexOf(b.type));
     out.push(...dayOut.slice(0, PER_DAY));
   }

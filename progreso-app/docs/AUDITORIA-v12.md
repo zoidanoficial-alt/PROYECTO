@@ -992,3 +992,40 @@ Capa final de `styles.css` (26.0), aplicada a toda la app sin tocar la lógica:
   - Cuello de botella con acento lateral.
   - Cronómetro de 72 px.
 - **Movimiento:** las tarjetas entran escalonadas y las hojas con curva suave. Todo se desactiva con `prefers-reduced-motion`.
+
+
+## 27.0 · HYROX Lab en la rutina, competiciones y resultados
+
+- **HYROX Lab como día de "Mi rutina":**
+  - Opción nueva en cada día de la semana.
+  - Ese día, Hoy muestra la misión del laboratorio (prueba o sesión) y "empezar" abre la sesión HYROX persistente.
+  - Si no hay perfil de carrera, lo pide.
+- **Competiciones (`events.js` y `events.css`)** — búsqueda y vistas:
+  - Búsqueda en lenguaje natural, en español e inglés: disciplina con sinónimos y plurales, distancia, país, ciudad con alias, mes, año, "cerca de mí", "este fin de semana", "inscripción abierta", campeonatos, clasificatorios e internacional.
+  - Siempre muestra qué entendió.
+  - Filtros en chips y recomendaciones solo de tus disciplinas, con el motivo.
+  - Vistas de lista por mes, calendario, mapa offline agrupado por región y "Mi temporada".
+- **Detalle del evento:**
+  - Cuenta regresiva y badges de verificación, estado e inscripción.
+  - Solo muestra los datos que tienen fuente, junto con la lista de fuentes y la confianza.
+  - Acciones: guardar, agregar al calendario (.ics), compartir, inscribirme (solo con URL oficial) y seguir.
+- **Hacerlo mi objetivo:**
+  - Periodización según disciplina y semanas disponibles: evaluación, base, desarrollo, específica, simulación, taper y recuperación.
+  - Se integra con HYROX Lab (fecha de carrera) y con el kit del competidor (fecha del show).
+  - Si el catálogo cambia la fecha, el plan se ajusta y te avisa.
+- **Inteligencia y seguimiento:**
+  - Análisis entre eventos: prueba de preparación, demasiado cerca del objetivo, choque de recuperación, viaje, poco tiempo y "confírmalo antes de pagar".
+  - Calendario personal (mes, semana y agenda) con entrenos, sesiones hechas, eventos, objetivo, fases y cierres de inscripción.
+  - Novedades al actualizar el catálogo.
+  - Notificación local "Competiciones".
+- **Resultados y control de calidad:**
+  - Resultado con 16 parciales que alimenta HYROX Lab, con PR detectado.
+  - Resultados y rankings (`hxranks.js`): mis carreras, comparación de parciales contra un atleta de referencia y rankings solo si se conecta un proveedor autorizado.
+  - Panel de control de calidad con pendientes e historial de cambios.
+- **Motor (`events/`):** fetch responsable, extractores, dedup conservador, verificación por evidencia, agenda de revisión, historial de cambios, cola de control de calidad y job diario. Ver `events/README.md` y `docs/HYROX-RESULTADOS-APIS.md`.
+- **Mapa:** Natural Earth 1:110m (dominio público) precalculado como trazo SVG (`worldmap.js`); funciona sin internet.
+- **Privacidad:** se agregó el permiso INTERNET solo para descargar el catálogo público (GET sin datos ni cookies). La ubicación para "cerca de mí" se pide al tocar el chip y se guarda redondeada en el teléfono.
+- **Pruebas:**
+  - e2e `v34`: rutina HYROX, búsquedas, filtros, vistas, detalle, objetivo, análisis, calendario, resultados con parciales, rankings, sincronización con cambios y novedades, control de calidad y recordatorios.
+  - Unitarias del motor: 10/10.
+  - Regresión v9–v34: sin fallas.

@@ -293,6 +293,8 @@ function openHyrox() {
     ['perf', 'trending-up', 'Rendimiento (HPI)', perf.hpi != null ? `${perf.hpi}/100 · confianza ${perf.conf}` : 'Evaluación incompleta'],
     ['race', 'target', 'Predictor y "¿Y si…?"', pr.ok ? `${hxT(pr.lo)} – ${hxT(pr.hi)}` : 'Necesita 1 km y 6 estaciones'],
     ['strat', 'route', 'Estrategia de carrera', 'Ritmos, sets y transiciones con tus datos'],
+    ['events', 'calendar', 'Competiciones', 'Encuentra tu carrera y hazla tu objetivo'],
+    ['ranks', 'trophy', 'Resultados y rankings', 'Tus carreras y los mejores de México y el mundo'],
     ['method', 'book-open', 'Metodología', 'Fases y sesiones: por qué entrenas lo que entrenas'],
     ['setup', 'sliders-horizontal', 'Mi carrera y perfil', `${HX_CATS[p.cat]} · ${p.sex === 'f' ? 'Mujeres' : 'Hombres'}${p.date ? ' · ' + shortDate(p.date) : ''}`]
   ];
@@ -306,7 +308,7 @@ function openHyrox() {
     <p class="small muted" style="margin-top:10px">El HPI y las predicciones son modelos internos de la app, no métricas oficiales de HYROX. Sin afiliación con HYROX.</p>
     <button class="ghost block" id="hx-x">Cerrar</button>`, m => {
     const back = openHyrox;
-    $$('[data-hx]', m).forEach(b => b.onclick = () => ({ test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), method: () => openHxMethod(back), setup: () => openHxSetup(back) })[b.dataset.hx]());
+    $$('[data-hx]', m).forEach(b => b.onclick = () => ({ test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), method: () => openHxMethod(back), events: () => openEvents(), ranks: () => openHxRanks(back), setup: () => openHxSetup(back) })[b.dataset.hx]());
     $('#hx-x', m).onclick = () => { closeModal(); rerenderHx(); };
   });
 }
@@ -559,4 +561,22 @@ function hxSummary(s, prev) {
   L.push(['Qué aprendimos', !s.done ? 'No completaste el bloque principal: la próxima vez de este tipo baja un bloque. No es retroceder, es ajustar la carga a tu estado.' : s.rpe <= 6 ? 'Te sobró margen: la próxima vez de este tipo sube una variable (un bloque o 2–3 s/km).' : s.rpe >= 9 ? 'Fue al límite: la próxima vez repetimos la carga en lugar de subirla.' : 'Carga adecuada: consolidar una vez más antes de subir.']);
   L.push(['Siguiente objetivo', next.assess ? `Próxima prueba: ${next.assess === 'run1k' ? '1 km fresco' : next.assess === 'comp' ? 'running bajo fatiga' : HX_ST[next.assess].n}.` : `Próxima sesión: ${next.ses.n}. ${next.why}`]);
   openModal(`<div class="hx-eyebrow">SESIÓN COMPLETA</div><h3 style="margin-top:4px">${esc(s.n)}</h3>${L.map(([t, x]) => `<div class="pg-rec"><b>${t}</b><small>${esc(x)}</small></div>`).join('')}<button class="block" id="hsum-ok">Listo</button>`, m => { $('#hsum-ok', m).onclick = () => { closeModal(); rerenderHx(); }; });
+}
+
+/* ---------- 27.0 · HYROX Lab como día de tu rutina ---------- */
+/** Pone en ese día de la semana la sesión que decide el laboratorio (un solo entreno reutilizable). */
+function assignHyroxDay(k) {
+  let w = DB.workouts.find(x => x.hyrox);
+  if (!w) { w = { id: uid(), name: 'HYROX Lab', ex: [], hyrox: true, fam: '__hyrox' }; DB.workouts.push(w); }
+  DB.plan[k] = w.id;
+  DB.profile.trainDays = DB.plan.map((x, j) => x ? j : null).filter(x => x != null); DB.profile.weeklyTarget = Math.max(1, DB.profile.trainDays.length);
+  saveData();
+}
+/** Misión de Hoy en un día HYROX: la sesión (o prueba) que decide el laboratorio. */
+function hyroxHero() {
+  if (!hxOn()) return `<div class="hero"><div class="eyebrow">HYROX Lab · hoy</div><h3>Configura tu carrera</h3><p>Hoy toca HYROX. Dime tu categoría y fecha para decidir la sesión correcta.</p><button id="hx-open">Configurar HYROX Lab</button></div>`;
+  const m = hxMission(), a = hx().active;
+  if (a) return `<div class="hero"><div class="eyebrow">HYROX Lab · sesión en curso</div><h3>${esc(a.n)}</h3><p>${hxT(hxElapsed(a))} transcurridos</p><button id="hx-resume">Continuar sesión</button></div>`;
+  if (m.assess) return `<div class="hero"><div class="eyebrow">HYROX Lab · prueba de hoy</div><h3>${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'Running bajo fatiga' : HX_ST[m.assess].n)}</h3><p>${esc(m.why)}</p><button id="hx-test" data-st="${m.assess}">Registrar la prueba</button></div>`;
+  return `<div class="hero"><div class="eyebrow">HYROX Lab · ${esc(m.ph.n)}</div><h3>${esc(m.ses.n)}</h3><p>${m.ses.min} min · ${esc(m.why)}</p><button id="hx-start">${ico('play', 18)} Empezar sesión</button></div>`;
 }
