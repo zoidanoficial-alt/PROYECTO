@@ -1,3 +1,5 @@
 .tools/
 build/
 dist/*-paquete.zip
+.gradle/
+local.properties

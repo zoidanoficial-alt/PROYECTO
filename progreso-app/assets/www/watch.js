@@ -39,7 +39,11 @@ function hrAutoConnect() { const d = wst().hrDev; if (d && hasBridge('hrConnect'
 
 /* ---------- Health Connect ---------- */
 function hcStatus() { try { return hasBridge('hcStatus') ? bridge.hcStatus() : 'web'; } catch (e) { return 'web'; } }
-window.onHcStatus = s => { wst().hcOn = s === 'granted' || s === 'partial'; saveData(); if (wst().hcOn) hcSync(true); if ($('#wt-root')) wtRender(); };
+window.onHcStatus = (s, fromRequest) => {
+  const w = wst(), was = w.hcOn; w.hcOn = s === 'granted' || s === 'partial'; WATCH.hcState = s; saveData();
+  if (w.hcOn && (fromRequest || !was || !w.hcSync || Date.now() - w.hcSync > 30 * 60e3)) hcSync(!!fromRequest).then(() => $('#wt-root') && wtRender());
+  if ($('#wt-root')) wtRender();
+};
 window.onHcData = (id, data) => { const cb = WATCH.hcReq[id]; delete WATCH.hcReq[id]; if (cb) cb(data); };
 function hcRead(fromMs, toMs) {
   return new Promise(res => {
@@ -56,7 +60,7 @@ function hcRead(fromMs, toMs) {
 async function hcSync(manual) {
   const w = wst(); if (!w.hcOn) return null;
   const to = Date.now(), from = to - 3 * 864e5, data = await hcRead(from, to);
-  if (!data || data.error) { if (manual) toast(data && data.error === 'unsupported' ? 'Health Connect requiere Android 14 o más' : 'No pude leer Health Connect'); return null; }
+  if (!data || data.error) { if (manual) toast(data && data.error === 'unavailable' ? 'Health Connect no está listo: instálalo o actualízalo desde Google Play' : 'No pude leer Health Connect'); return null; }
   const day = ms => dateStr(new Date(ms)), touched = new Set();
   const rec = d => { DB.days[d] = DB.days[d] || {}; DB.days[d].rec = DB.days[d].rec || {}; return DB.days[d].rec; };
   const fill = (d, k, v) => { const r = rec(d); if (r[k] == null || (r.src && r.src[k] === 'watch')) { r[k] = v; r.src = Object.assign(r.src || {}, { [k]: 'watch' }); touched.add(d); } };
@@ -110,8 +114,9 @@ function wtRender() {
   const root = $('#wt-root'); if (!root) return;
   const w = wst(), st = hcStatus(), native = !!bridge, live = WATCH.hr && Date.now() - WATCH.hr.at < 10000;
   const hcBlock = st === 'web' ? '<p class="small muted">Disponible en la app de Android.</p>'
-    : st === 'unsupported' ? '<div class="status warn"><b>Requiere Android 14 o superior</b>Health Connect viene integrado desde Android 14. En versiones anteriores llegará en una actualización.</div>'
-    : st === 'unavailable' ? '<div class="status warn"><b>Health Connect no está disponible</b>Actualiza Android o instala Health Connect desde Google Play.</div>'
+    : st === 'unavailable' ? '<div class="status warn"><b>Health Connect no está disponible en este teléfono</b>Necesita Android 8 o superior con Google Play. Los pasos 2 y 3 sí funcionan.</div>'
+    : st === 'install' ? '<div class="status info"><b>Falta Health Connect</b>En Android 13 o anterior es una app gratuita de Google. Instálala (o actualízala) y vuelve aquí.</div><button class="block" id="wt-hci">Instalar Health Connect</button>'
+    : st === 'checking' ? '<p class="small muted">Revisando Health Connect…</p>'
     : `<ol class="wt-steps">
         <li class="${fromMiFitness() ? 'ok' : ''}"><b>En Mi Fitness:</b> Perfil → Health Connect (o “Compartir datos”) → activa pulso, sueño y entrenos.<button class="secondary" id="wt-mif">Abrir Mi Fitness</button></li>
         <li class="${st === 'granted' ? 'ok' : ''}"><b>En Mi Progreso:</b> permite leer esos datos.${st === 'granted' ? ' <span class="ev-ver ok"><i></i>Permitido</span>' : `<button id="wt-hcp">${st === 'partial' ? 'Completar permisos' : 'Dar permiso'}</button>`}</li>
@@ -138,6 +143,7 @@ function wtRender() {
   const on = (id, f) => { const b = $('#' + id, root); if (b) b.onclick = f; };
   on('wt-mif', () => bridge.openMiFitness());
   on('wt-hcp', () => bridge.hcRequest());
+  on('wt-hci', () => bridge.hcInstall());
   on('wt-hcs', () => bridge.hcOpenSettings());
   on('wt-sync', () => hcSync(true).then(() => wtRender()));
   on('wt-test', () => { if (WATCH.testing) { WATCH.testing = false; bridge.watchStop(); } else { WATCH.testing = true; bridge.watchStart('Toca ▶ en tu reloj', 'Prueba de Mi Progreso'); } wtRender(); });

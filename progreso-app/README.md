@@ -67,9 +67,11 @@ Requiere Android 8.0 o superior.
 ./build.sh
 ```
 
-Solo necesita Java 17+, `curl` y `python3`. El script descarga de Maven Central
-`aapt2`, `dx`, `apksig` y las clases de Android, compila, firma (esquema v2) y deja el
-APK en `dist/MiProgreso.apk`.
+Desde la 29.0 compila con Gradle (Android Gradle Plugin 8.11, Kotlin 2.0, compileSdk 36,
+targetSdk 34, minSdk 26) para incluir la librería oficial de Health Connect (Android 8–13).
+Necesita JDK 17+ y el Android SDK (`ANDROID_HOME` o `local.properties`). `./build.sh` usa
+`gradle` o `./gradlew`, firma con `keystore/miprogreso.p12` (esquema v2) y deja el APK en
+`dist/MiProgreso.apk`.
 
 El PDF usa jsPDF y jsPDF-AutoTable (MIT, en `assets/www/vendor/`); el Excel se genera
 sin librerías (`assets/www/export.js`).

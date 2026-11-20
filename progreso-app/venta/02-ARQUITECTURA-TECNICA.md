@@ -4,7 +4,7 @@
 - **App híbrida:** un `WebView` nativo de Android (Java) que carga una app web local (HTML, CSS y JavaScript sin frameworks) desde `assets/www`, servida bajo `https://progreso.local/` con `WebViewAssetLoader`.
 - **Sin backend:** no hay servidor, cuenta ni red. Los datos se guardan en `localStorage` del WebView.
 - **Tamaño:** ~10 800 líneas (JS + CSS + Java), APK de ~4.5 MB, 203 fotos de ejercicios.
-- **Compilación sin Android Studio:** `build.sh` usa `aapt2`, `javac`, `dx` y `apksig` descargados de Maven Central.
+- **Compilación:** Gradle (AGP 8.11, Kotlin 2.0, compileSdk 36) vía `build.sh` o `./gradlew assembleRelease`; no requiere Android Studio. Desde la 29.0 incluye la librería oficial de Health Connect.
 
 ## Estructura del código
 

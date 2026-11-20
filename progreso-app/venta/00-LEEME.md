@@ -30,7 +30,7 @@ Este paquete reúne todo lo necesario para evaluar, compilar, probar y continuar
 
 ```bash
 cd codigo
-./build.sh          # Java 17+, curl y python3. No requiere Android Studio.
+./build.sh          # JDK 17+ y Android SDK; compila con Gradle (no requiere Android Studio).
 ```
 
 Genera `dist/MiProgreso.apk`. Ver `02-ARQUITECTURA-TECNICA.md` para firma y llaves.

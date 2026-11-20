@@ -139,6 +139,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         visible = true;
+        if (hc != null) hc.refresh(false);
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (nm != null) nm.cancel(RestReceiver.NOTIFICATION_ID);
     }
@@ -178,6 +179,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_HC) {   // volvió de la pantalla de permisos de Health Connect
+            hcLink().refresh(true);
+            return;
+        }
         if (requestCode == REQ_FILE && fileCallback != null) {
             fileCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
             fileCallback = null;
@@ -319,10 +324,7 @@ public class MainActivity extends Activity {
             btScanAfterPermission = false;
             return;
         }
-        if (requestCode == REQ_HC) {
-            js("window.onHcStatus && window.onHcStatus(" + org.json.JSONObject.quote(hcLink().status()) + ")");
-            return;
-        }
+
         if (requestCode == REQ_NOTIF) {
             final boolean ok = results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED;
             web.evaluateJavascript("window.onNotifPermission && window.onNotifPermission(" + ok + ")", null);
@@ -437,16 +439,18 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void hcRequest() {
-            runOnUiThread(new Runnable() { @Override public void run() {
-                if (HcLink.supported()) requestPermissions(HcLink.PERMS, REQ_HC);
-                else js("window.onHcStatus && window.onHcStatus('unsupported')");
-            } });
+            runOnUiThread(new Runnable() { @Override public void run() { hcLink().request(REQ_HC); } });
         }
 
         @JavascriptInterface
         public void hcRead(String reqId, String fromMs, String toMs) {
             try { hcLink().read(reqId, Long.parseLong(fromMs), Long.parseLong(toMs)); }
             catch (NumberFormatException e) { js("window.onHcData && window.onHcData(" + org.json.JSONObject.quote(reqId) + ",{\"error\":\"args\"})"); }
+        }
+
+        @JavascriptInterface
+        public void hcInstall() {
+            runOnUiThread(new Runnable() { @Override public void run() { hcLink().install(); } });
         }
 
         @JavascriptInterface

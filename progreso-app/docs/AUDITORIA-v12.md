@@ -1084,3 +1084,27 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
 - el control de música del Mi Watch llega a la sesión multimedia;
 - Mi Fitness escribe en Health Connect para este modelo;
 - el Mi Watch transmite pulso (probablemente no; sí funciona con bandas de pecho).
+
+
+## 29.0 · Compilación con Gradle y Health Connect para Android 8–13
+
+- **Por qué:** en Android 13 y anteriores, Health Connect es una app de Google Play y solo se habla con ella mediante la librería oficial `androidx.health.connect:connect-client`. El pipeline anterior (aapt2 + javac + dx) no podía incluir librerías de Kotlin/AndroidX.
+- **Compilación:**
+  - Gradle 8.14.3, AGP 8.11.1 y Kotlin 2.0.21; compileSdk 36 (lo exige connect-client 1.1.0).
+  - targetSdk 34 y minSdk 26 sin cambios.
+  - Misma estructura de carpetas: el manifiesto, `src/`, `res/` y `assets/` se usan donde estaban.
+  - El paquete y la versión pasan a `build.gradle.kts`.
+  - `build.sh` ahora llama a Gradle, y se agrega el wrapper `./gradlew`.
+- **Firma:** la misma llave (`keystore/miprogreso.p12`, SHA-256 61d0c10a…). Se verificó que el certificado es idéntico al de la 28.0, así que actualiza sin perder datos. Los 282 assets son idénticos.
+- **`HcLink.kt` (reemplaza `HcLink.java`):** API de Jetpack para todas las versiones.
+  - Estados: `unavailable`, `install`, `checking`, `none`, `partial` y `granted`.
+  - Pantalla de permisos de Health Connect con `startActivityForResult`.
+  - Botón para instalar Health Connect desde Google Play.
+  - Al volver a la app, el estado se refresca.
+  - Las lecturas usan el mismo JSON que antes, así que la página no cambió su lógica de importación.
+- **Manifiesto:** `<queries>` para `com.google.android.apps.healthdata`, alias para `ACTION_SHOW_PERMISSIONS_RATIONALE` sin permiso de sistema (Android 8–13) y Bluetooth no obligatorio.
+- **Página:** "Mi reloj" muestra "Instalar Health Connect" cuando falta. Solo sincroniza con aviso cuando vienes de dar permisos; al regresar a la app no repite avisos.
+- **Pruebas:**
+  - e2e `v36` (Android 13): falta Health Connect → instalar → permisos → datos de Mi Fitness → no resincroniza en cada regreso.
+  - Regresión v9–v36: sin fallas.
+- **Sin probar en dispositivo real:** la pantalla de permisos de Health Connect y la lectura real en Android 13.

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zoidan.progreso"
-    android:versionCode="33"
-    android:versionName="28.0">
+<!-- 29.0: el paquete, la versión y el SDK se definen en build.gradle.kts (compilación con Gradle). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+    <!-- Health Connect en Android 8–13 es una app aparte: hay que poder verla. -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
     <!-- 27.0: solo para descargar el catálogo público de competiciones (GET, sin datos del usuario). -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -26,6 +27,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
     <!-- 28.0: lectura de Health Connect (Mi Fitness escribe ahí los datos del reloj). Solo lectura. -->
     <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
     <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" />
@@ -62,6 +64,12 @@
                 <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
                 <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
             </intent-filter>
+        </activity-alias>
+        <!-- Android 8–13: la app Health Connect abre esta pantalla (sin permiso de sistema) -->
+        <activity-alias
+            android:name=".HealthPermissionsRationaleLegacy"
+            android:targetActivity=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
             </intent-filter>
