@@ -10,7 +10,7 @@ function renderHyroxTab() {
       <p class="small muted">Evaluación por partes, tu punto débil, predicción de tiempo, temporizador controlado desde tu reloj y el método de los campeones.</p>
       <button class="block" id="hxp-setup">Configurar mi carrera</button></div>
       ${champMethodCard()}
-      <div class="kit-list">${hxpItem('events', 'calendar', 'Competiciones', 'Encuentra tu carrera y hazla tu objetivo')}${hxpItem('watch', 'heart-pulse', 'Mi reloj', 'Mi Fitness, pulso en vivo y control remoto')}</div>`;
+      <div class="kit-list">${hxpItem('events', 'calendar', 'Competiciones', 'Encuentra tu carrera y hazla tu objetivo')}${hxpItem('watch', 'heart-pulse', 'Mi reloj', 'Mi Fitness, pulso en vivo y control remoto')}${hxpItem('resist', 'dumbbell', 'Resistencia', '¿Más peso o más reps? Programa de 6 semanas')}</div>`;
     hxpBind(root); return;
   }
   const perf = hxPerformance(), bn = hxBottleneck(perf), pr = hxPredict(), p = hx().profile, ph = hxPhase();
@@ -31,6 +31,7 @@ function renderHyroxTab() {
     ${champMethodCard()}
     ${bn && bn.main ? `<div class="hx-bn"><small>CUELLO DE BOTELLA PRINCIPAL</small><b>${esc(bn.main.n)}</b><p class="small">${esc(bn.main.why)}</p>${bn.second ? `<small>SECUNDARIO</small><b class="hx-b2">${esc(bn.second.n)}</b>` : ''}</div>` : perf.hpi == null ? `<div class="status info"><b>Evaluación incompleta</b>Completa tus pruebas con el temporizador: una por sesión es suficiente.</div>` : ''}
     <div class="kit-list">
+      ${hxpItem('resist', 'dumbbell', 'Resistencia', DB.resist && DB.resist.start ? `Semana ${resWeek()} · ${resPhase().n}` : '¿Más peso o más reps? Programa de 6 semanas')}
       ${hxpItem('ladder', 'trophy', 'Mi escalera', typeof ladderSummary === 'function' ? ladderSummary() : '')}
       ${hxpItem('st', 'layers', 'Las 8 estaciones', `${perf.tested.length} de 8 medidas · técnica y récords`)}
       ${hxpItem('perf', 'trending-up', 'Rendimiento (HPI)', perf.hpi != null ? `${perf.hpi}/100 · confianza ${perf.conf}` : 'Evaluación incompleta')}
@@ -47,7 +48,7 @@ function renderHyroxTab() {
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }
 function hxpBind(root) {
   const back = () => closeModal();
-  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), ladder: () => openHxLadder(back), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); renderHyroxTab(); }) };
+  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), ladder: () => openHxLadder(back), resist: () => openResist(back), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); renderHyroxTab(); }) };
   $$('[data-hxp]', root).forEach(b => b.onclick = () => act[b.dataset.hxp]());
   const ch = $('#ch-open', root); if (ch) ch.onclick = () => openChamps();
   const s = $('#hxp-setup', root); if (s) s.onclick = () => openHxSetup(() => { closeModal(); renderHyroxTab(); });

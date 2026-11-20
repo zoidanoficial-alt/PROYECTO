@@ -1168,3 +1168,29 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
 - **Pruebas:**
   - e2e `v39`: migración, alta de rivales, primera simulación (rompe sub 1:30), segunda (supera a un rival y sube de #5 a #4), filtros, siguiente objetivo, eliminar rival, carrera oficial que supera a dos rivales y persistencia.
   - Regresión v9–v39: sin fallas.
+
+
+## 33.0 · Resistencia: ¿más peso o más repeticiones?
+
+- **La evidencia** (detalle en `docs/FUENTES-v33.md`):
+  - Cargas ligeras con muchas repeticiones (20–28 RM) mejoran más la resistencia muscular local: +94 % en Campos et al. 2002.
+  - Las cargas pesadas mejoran más la fuerza máxima.
+  - La fuerza pesada combinada con resistencia mejora la economía de carrera (Rønnestad y Mujika 2014).
+  - Respuesta de la app: las dos, cada una con su función.
+- **Programa `resist.js`:**
+  - Tres sesiones: A local (ligera, muchas repeticiones), B fuerza (4–6 repeticiones, 1 por semana) y C densidad (circuito con descansos cortos).
+  - Fases de 6 semanas: Base 2×15–20 / 60 s, Desarrollo 3×20–25 / 45 s, Densidad 3×20–30 / 30 s (20 s en C), y Prueba y descarga.
+  - Carga sugerida al 60 % del máximo estimado de cada ejercicio (con historial).
+  - Las sesiones corren en el motor de entrenos existente (series, pesos, sugerencias y récords).
+  - "Ponerlo en mi semana" crea A, B y C en Mis entrenos y los asigna a 3 días. Las series se actualizan solas al cambiar de fase.
+  - La siguiente sesión se calcula según lo ya hecho en la semana.
+- **Pruebas medibles:**
+  - Repeticiones al 60 % (la medida de Campos 2002), lagartijas máximas, plancha cronometrada en la app y wall balls sin parar (si tienes HYROX).
+  - Cada una muestra su historial y el % de mejora desde la primera vez.
+- **Dónde aparece:**
+  - Explorar → Resistencia.
+  - Pestaña HYROX → Resistencia (también antes de configurar la carrera).
+  - Tarjeta en Plan con la semana, la fase y la sesión que toca.
+- **Pruebas:**
+  - e2e `v40`: carga al 60 % (62.5 kg de un máximo de ~102), plancha cronometrada, fases por semana, sesión A en el motor y siguiente sesión B, plan semanal L/X/V, actualización a Desarrollo, Densidad y descarga, y mejora de la prueba (+71 %).
+  - Regresión v9–v40: sin fallas.
