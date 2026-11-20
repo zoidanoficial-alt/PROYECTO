@@ -150,6 +150,7 @@ function exAssign(kind, stKey) {
     });
     return;
   }
+  const ladderPrev = kind === 'race' && typeof hxMyBest === 'function' ? (hxMyBest() || {}).sec : null;
   const sec = Math.round((x.end - x.start) / 1000), date = dateStr(new Date(x.start)), base = { date, t: Date.now(), rpe: null, fromWatch: true, note: 'Iniciado en el reloj' };
   const laps = x.laps.map(([a, b]) => Math.round((b - a) / 1000));
   if (kind !== 'keep') {
@@ -166,6 +167,7 @@ function exAssign(kind, stKey) {
     hx().runs = (hx().runs || []).concat({ id, mode: kind, st: stKey || null, date, t0: x.start, t1: x.end, total: sec, segs, hrLive: false, hrFromWatch: !!x.hrAvg, hrAvg: x.hrAvg, hrMax: x.hrMax, hr: x.hr, fromWatch: true });
   }
   w.exInbox.shift(); saveData();
-  toast(kind === 'keep' ? 'Guardado' : 'Registrado en HYROX Lab con el pulso del reloj');
+  const beaten = kind === 'race' && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, sec) : [];
+  toast(beaten.length ? (beaten.some(b => !b.goal) ? '¡Superaste a ' + beaten.filter(b => !b.goal).map(b => b.name).join(', ') + '! Subes en Mi escalera' : '¡Rompiste ' + beaten[0].name + '!') : kind === 'keep' ? 'Guardado' : 'Registrado en HYROX Lab con el pulso del reloj');
   if (typeof render === 'function') render(currentTab);
 }

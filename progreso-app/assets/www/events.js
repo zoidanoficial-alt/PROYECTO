@@ -527,6 +527,7 @@ function openEvResult(e) {
       if (!sec) { toast('Escribe tu tiempo final'); return; }
       const sp = $$('[data-sp]', m).map(i => hxParse(i.value));
       const prev = s.results.filter(x => x.sport === e.sport && x.id !== e.id && x.sec).sort((a, b) => a.sec - b.sec)[0];
+      const ladderPrev = hyroxE && typeof hxMyBest === 'function' ? (hxMyBest() || {}).sec : null;
       const res = { id: e.id, sport: e.sport, name: e.eventName, date: e.startDate, sec, pos: num($('#er-pos', m).value), cpos: num($('#er-cpos', m).value), cat: $('#er-cat', m).value.trim(), note: $('#er-n', m).value.trim(), splits: sp.some(Boolean) ? sp : null, pr: !prev || sec < prev.sec };
       s.results = s.results.filter(x => x.id !== e.id).concat(res);
       if (hyroxE && typeof hx === 'function') {   // la carrera real cuenta como simulación medida y sus estaciones como pruebas
@@ -535,10 +536,11 @@ function openEvResult(e) {
         if (res.splits) HX_STATIONS.forEach((st, k) => { const v = res.splits[k * 2 + 1]; if (v) hx().results.push({ id: 'ev' + st.k + Date.now(), kind: 'st', st: st.k, sec: v / 1.08, date: e.startDate, t: Date.now(), rpe: 10, std: true, eventId: e.id, note: 'Parcial de carrera (÷1.08 para compararlo con pruebas aisladas)' }); });
       }
       saveData();
-      openModal(`<div class="hx-eyebrow">${res.pr ? 'NUEVO RÉCORD PERSONAL' : 'RESULTADO GUARDADO'}</div><h3 style="margin-top:4px">${hxT(sec)}</h3>
+      const beaten = hyroxE && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, sec) : [];
+      openModal(`<div class="hx-eyebrow">${res.pr ? 'NUEVO RÉCORD PERSONAL' : 'RESULTADO GUARDADO'}</div><h3 style="margin-top:4px">${hxT(sec)}</h3>${beaten.length ? hxLadderCelebrateHtml(beaten) : ''}
         ${prev ? `<p class="small">${sec < prev.sec ? `${hxT(prev.sec - sec)} más rápido que ${esc(prev.name)}.` : `Tu mejor marca sigue siendo ${hxT(prev.sec)} (${esc(prev.name)}).`}</p>` : '<p class="small">Tu primera marca en esta disciplina: el punto de partida.</p>'}
         ${hyroxE ? '<p class="small muted">Se agregó a HYROX Lab como simulación medida' + (res.splits ? ' y con tus parciales por estación' : '') + '. Tu predicción y tu cuello de botella ya lo usan.</p>' : ''}
-        <button class="block" id="er-ok">Listo</button>`, mm => { $('#er-ok', mm).onclick = () => openEvent(e.id); });
+        <button class="block" id="er-ok">Listo</button>`, mm => { if (beaten.length) hxLadderBurst(mm); $('#er-ok', mm).onclick = () => openEvent(e.id); });
     };
   });
 }

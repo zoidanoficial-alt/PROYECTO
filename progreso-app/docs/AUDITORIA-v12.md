@@ -1151,3 +1151,20 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
   - e2e `v38`: barra de 6 pestañas sin cortes, acento limón, pestaña vacía y configurada, 4 métodos con fuentes, orden semanal, regla de 3 duras, ciclo McIntyre, fase de rendimiento y quitar método.
   - v33 y v35 se actualizaron a la navegación nueva.
   - Regresión v9–v38: sin fallas.
+
+
+## 32.0 · Mi escalera: ranking personal de la app
+
+- **Evaluación de hyresult.com:** no se extraen datos.
+  - En octubre de 2026 HYROX envió cartas de cese y desista a sitios de resultados (HYRESULT incluido): no otorga licencia para que terceros usen esos datos y señala que no hay consentimiento de los atletas ([the5krunner](https://the5krunner.com/2026/10/15/hyrox-cease-and-desist-scrapers/)).
+  - HYRESULT se declara independiente y no publica una API.
+  - Para una app comercial, extraer nombres y tiempos de atletas sería un riesgo legal y de datos personales.
+- **Cómo funciona `hxladder.js`:**
+  - **Tu tiempo:** tu mejor carrera oficial registrada o simulación completa (temporizador o reloj). Sin ninguna de las dos, la app muestra tu predicción marcada como tal.
+  - **Rivales:** los agregas tú (nombre, país México u otro, categoría, tiempo y parciales opcionales). Se guardan solo en el teléfono, y los "atletas de referencia" de la 27.0 se migran como rivales.
+  - **Metas fijas de la app:** sub 1:00, 1:10, 1:20, 1:30, 1:45 y 2:00.
+  - **Vista:** escalera ordenada con tu posición en limón, filtros Todos / México / Mundo, y el siguiente objetivo con cuánto te falta. Con parciales, se ve en qué tramos ganas o pierdes contra ese rival.
+  - **Celebración:** al guardar una simulación del temporizador, una carrera oficial en Competiciones o un entrenamiento del reloj marcado como simulación, la app detecta a quién superaste o qué meta rompiste y lo celebra con confeti.
+- **Pruebas:**
+  - e2e `v39`: migración, alta de rivales, primera simulación (rompe sub 1:30), segunda (supera a un rival y sube de #5 a #4), filtros, siguiente objetivo, eliminar rival, carrera oficial que supera a dos rivales y persistencia.
+  - Regresión v9–v39: sin fallas.

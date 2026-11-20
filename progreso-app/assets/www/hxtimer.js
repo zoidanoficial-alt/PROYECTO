@@ -131,6 +131,7 @@ function hxtFinish() {
     hrAvg: t.hrLive ? Math.round(segs.filter(s => s.hrAvg).reduce((a, s) => a + s.hrAvg * s.sec, 0) / Math.max(1, segs.filter(s => s.hrAvg).reduce((a, s) => a + s.sec, 0))) : null, hrMax: t.hrLive ? Math.max(...segs.map(s => s.hrMax || 0)) : null };
   hx().runs = (hx().runs || []).concat(run);
   // Registro automático en HYROX Lab (mismas reglas que las pruebas escritas a mano)
+  const ladderPrev = typeof hxMyBest === 'function' ? (hxMyBest() || {}).sec : null;
   const base = { date, t: Date.now(), rpe: null, auto: true, timerId: t.id };
   const prevBest = t.mode === 'station' || t.mode === 'comp' ? hxBest('st', t.st) : t.mode === 'run1k' ? hxBest('run1k') : null;
   let first = null;
@@ -145,11 +146,11 @@ function hxtFinish() {
   }
   hx().timer = null; saveData();
   if (bridge && bridge.watchStop) bridge.watchStop();
-  hxtSummary(run, first, prevBest);
+  hxtSummary(run, first, prevBest, t.mode === 'race' && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, total) : []);
 }
 /** RMSSD de los intervalos R-R del tramo (solo con sensor que los envía). */
 function hxtRmssd(rr) { if (!rr || rr.length < 10) return null; let s = 0, n = 0; for (let i = 1; i < rr.length; i++) { const d = rr[i] - rr[i - 1]; if (Math.abs(d) < 300) { s += d * d; n++; } } return n ? Math.round(Math.sqrt(s / n)) : null; }
-function hxtSummary(run, first, prevBest) {
+function hxtSummary(run, first, prevBest, beaten) {
   const z = run.hrLive && run.hr.length ? (() => { const c = [0, 0, 0, 0, 0, 0]; run.hr.forEach(([, b]) => c[hrZone(b)]++); return c; })() : null;
   const L = [['Qué hiciste', `${HXT_TITLE[run.mode]} · ${hxT(run.total)}${run.hrAvg ? ` · pulso medio ${run.hrAvg} lpm (máx ${run.hrMax})` : ''}.`]];
   if (first && prevBest) L.push(['Qué mejoraste', first.sec < prevBest.sec ? `${hxT(prevBest.sec - first.sec)} más rápido que tu mejor marca (${hxT(prevBest.sec)}). Nuevo récord.` : `Tu mejor marca sigue siendo ${hxT(prevBest.sec)}. Cuenta el mejor de tus últimas 3 pruebas.`]);
@@ -157,11 +158,13 @@ function hxtSummary(run, first, prevBest) {
   if (run.mode === 'race') { const runs = run.segs.filter(s => s.k === 'run'); if (runs.length >= 4) { const a = runs[0].sec, b = runs.slice(-3).reduce((x, s) => x + s.sec, 0) / 3; L.push(['Qué aprendimos', `Tus últimos km fueron ${fmt((b / a - 1) * 100, 1)} % más lentos que el primero. Ya cuenta para tu predicción y tu cuello de botella.`]); } }
   if (!run.hrLive) L.push(['Pulso', DB.watch && DB.watch.hcOn ? 'Se agregará cuando tu reloj sincronice con Mi Fitness (abre la app en unos minutos).' : 'Conecta tu reloj o una banda en Mi reloj para medir el pulso de cada tramo.']);
   openModal(`<div class="hx-eyebrow">GUARDADO EN HYROX LAB</div><h3 style="margin-top:4px">${hxT(run.total)}</h3>
+    ${beaten && beaten.length ? hxLadderCelebrateHtml(beaten) : ''}
     ${z ? `<div class="hxt-zones">${[1, 2, 3, 4, 5].map(k => `<i data-z="${k}" style="flex:${z[k] || 0.0001}"></i>`).join('')}</div><p class="small muted">Tiempo en zonas (pulso máx ${maxHr()} lpm${DB.watch && DB.watch.maxHr ? '' : ', estimado por edad'}).</p>` : ''}
     ${L.map(([a, b]) => `<div class="pg-rec"><b>${a}</b><small>${esc(b)}</small></div>`).join('')}
     ${run.segs.length > 1 ? `<table class="small hx-tbl"><tbody>${run.segs.map(s => `<tr><td>${esc(s.n)}</td><td>${s.hrAvg ? s.hrAvg + ' lpm' : ''}</td><td><b>${hxT(s.sec)}</b></td></tr>`).join('')}</tbody></table>` : ''}
     <p class="small muted">¿Qué tan duro fue? (opcional)</p><div class="hxt-rpe">${[6, 7, 8, 9, 10].map(r => `<button class="chip" data-rpe="${r}">${r}</button>`).join('')}</div>
     <button class="block" id="hts-ok">Listo</button>`, m => {
+    if (beaten && beaten.length) hxLadderBurst(m);
     $$('[data-rpe]', m).forEach(b => b.onclick = () => { hx().results.filter(r => r.timerId === run.id).forEach(r => { r.rpe = Number(b.dataset.rpe); }); saveData(); $$('[data-rpe]', m).forEach(x => x.classList.toggle('on', x === b)); });
     $('#hts-ok', m).onclick = () => { closeModal(); if (typeof render === 'function') render(currentTab); };
   });

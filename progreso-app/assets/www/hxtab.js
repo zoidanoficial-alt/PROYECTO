@@ -31,11 +31,12 @@ function renderHyroxTab() {
     ${champMethodCard()}
     ${bn && bn.main ? `<div class="hx-bn"><small>CUELLO DE BOTELLA PRINCIPAL</small><b>${esc(bn.main.n)}</b><p class="small">${esc(bn.main.why)}</p>${bn.second ? `<small>SECUNDARIO</small><b class="hx-b2">${esc(bn.second.n)}</b>` : ''}</div>` : perf.hpi == null ? `<div class="status info"><b>Evaluación incompleta</b>Completa tus pruebas con el temporizador: una por sesión es suficiente.</div>` : ''}
     <div class="kit-list">
+      ${hxpItem('ladder', 'trophy', 'Mi escalera', typeof ladderSummary === 'function' ? ladderSummary() : '')}
       ${hxpItem('st', 'layers', 'Las 8 estaciones', `${perf.tested.length} de 8 medidas · técnica y récords`)}
       ${hxpItem('perf', 'trending-up', 'Rendimiento (HPI)', perf.hpi != null ? `${perf.hpi}/100 · confianza ${perf.conf}` : 'Evaluación incompleta')}
       ${hxpItem('race', 'target', 'Predictor y "¿Y si…?"', pr.ok ? `${hxT(pr.lo)} – ${hxT(pr.hi)}` : 'Necesita 1 km y 6 estaciones')}
       ${hxpItem('strat', 'route', 'Estrategia de carrera', 'Ritmos, sets y transiciones con tus datos')}
-      ${hxpItem('ranks', 'trophy', 'Resultados y rankings', 'Tus carreras y comparación por parciales')}
+      ${hxpItem('ranks', 'clipboard-list', 'Mis carreras', 'Resultados, parciales y resultados oficiales')}
       ${hxpItem('method', 'book-open', 'Metodología', 'Fases y sesiones: por qué entrenas lo que entrenas')}
       ${hxpItem('setup', 'sliders-horizontal', 'Mi carrera y perfil', `${HX_CATS[p.cat]} · ${p.sex === 'f' ? 'Mujeres' : 'Hombres'}${p.date ? ' · ' + shortDate(p.date) : ''}`)}
     </div>
@@ -46,7 +47,7 @@ function renderHyroxTab() {
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }
 function hxpBind(root) {
   const back = () => closeModal();
-  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); renderHyroxTab(); }) };
+  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), ladder: () => openHxLadder(back), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); renderHyroxTab(); }) };
   $$('[data-hxp]', root).forEach(b => b.onclick = () => act[b.dataset.hxp]());
   const ch = $('#ch-open', root); if (ch) ch.onclick = () => openChamps();
   const s = $('#hxp-setup', root); if (s) s.onclick = () => openHxSetup(() => { closeModal(); renderHyroxTab(); });

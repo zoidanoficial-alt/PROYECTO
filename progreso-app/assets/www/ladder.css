@@ -1,0 +1,21 @@
+/* 32.0 · Mi escalera (ranking personal) */
+.ld-next { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 14px 16px; margin-bottom: 12px; box-shadow: inset 3px 0 0 var(--accent); }
+.ld-next small { display: block; font-size: 11px; letter-spacing: .12em; font-weight: 700; color: var(--accent); }
+.ld-next > b { display: block; font-size: 20px; letter-spacing: -.02em; margin: 2px 0; }
+.ld-next span { color: var(--muted); font-size: 14px; }
+.ld-next span b { color: var(--text); font-size: 18px; }
+.ld-list { display: grid; gap: 6px; margin-bottom: 12px; }
+.ld-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px; min-height: 0; font-weight: 400; }
+.ld-row b { display: block; font-size: 15px; }
+.ld-row small { display: block; color: var(--muted); font-size: 12px; }
+.ld-row.me { background: var(--cta); color: var(--on-cta); border-color: transparent; }
+.ld-row.me small { color: rgba(0, 0, 0, .65); }
+.ld-pos { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-3); font-weight: 800; font-size: 12px; flex: none; }
+.ld-row.me .ld-pos { background: rgba(0, 0, 0, .15); }
+.ld-t { font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; font-size: 16px; }
+.ld-goal { display: flex; align-items: center; gap: 10px; color: var(--text-3); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; padding: 2px 4px; }
+.ld-goal::before, .ld-goal::after { content: ""; flex: 1; border-top: 1px dashed var(--line); }
+.ld-win { position: relative; background: var(--cta); color: var(--on-cta); border-radius: 20px; padding: 14px 16px; margin: 6px 0 12px; }
+.ld-win small { display: block; font-size: 11px; letter-spacing: .12em; font-weight: 800; opacity: .7; }
+.ld-win b { display: block; font-size: 20px; letter-spacing: -.02em; margin: 2px 0; }
+.ld-win span { display: block; font-size: 13.5px; }
