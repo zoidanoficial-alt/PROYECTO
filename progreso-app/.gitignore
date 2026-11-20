@@ -3,3 +3,4 @@ build/
 dist/*-paquete.zip
 .gradle/
 local.properties
+dist/*-codigo.zip
