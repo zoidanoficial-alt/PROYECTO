@@ -8,10 +8,10 @@
  * ===================================================================== */
 
 function hxtSegments(mode, st) {
-  if (mode === 'race') { const out = []; HX_STATIONS.forEach((s, i) => { out.push({ k: 'run', n: `Run ${i + 1}`, d: '1 km' }); out.push({ k: s.k, n: s.n, d: s.d }); }); return out; }
-  if (mode === 'station') return [{ k: st, n: HX_ST[st].n, d: HX_ST[st].d }];
+  if (mode === 'race') { const out = []; HX_STATIONS.forEach((s, i) => { out.push({ k: 'run', n: `Run ${i + 1}`, d: '1 km' }); out.push({ k: s.k, n: pfStName(s.k), d: pfStDose(s.k) }); }); return out; }
+  if (mode === 'station') return [{ k: st, n: pfStName(st), d: pfStDose(st) }];
   if (mode === 'run1k') return [{ k: 'run', n: '1 km fresco', d: 'a tope, bien calentado' }];
-  if (mode === 'comp') return [{ k: st, n: HX_ST[st].n, d: HX_ST[st].d }, { k: 'run', n: '1 km bajo fatiga', d: 'sin descanso' }];
+  if (mode === 'comp') return [{ k: st, n: pfStName(st), d: pfStDose(st) }, { k: 'run', n: '1 km bajo fatiga', d: 'sin descanso' }];
   return [];
 }
 const HXT_TITLE = { race: 'Simulación de carrera', station: 'Prueba de estación', run1k: '1 km fresco', comp: 'Running bajo fatiga' };
@@ -19,7 +19,7 @@ const hxt = () => (DB.hyrox && DB.hyrox.timer) || null;
 let hxtTick = null, hxtLastPush = 0;
 
 function hxtCreate(mode, st) {
-  hx().timer = { id: 'ht' + Date.now(), mode, st: st || null, segs: hxtSegments(mode, st).map(s => ({ ...s, start: null, end: null, hrSum: 0, hrN: 0, hrMax: 0, rr: [] })), i: 0, t0: null, pauses: [], paused: null, hr: [], hrLive: false };
+  hx().timer = { id: 'ht' + Date.now(), mode, pf: typeof hxIsPF === 'function' && hxIsPF(), st: st || null, segs: hxtSegments(mode, st).map(s => ({ ...s, start: null, end: null, hrSum: 0, hrN: 0, hrMax: 0, rr: [] })), i: 0, t0: null, pauses: [], paused: null, hr: [], hrLive: false };
   saveData();
   if (bridge && typeof bridge.watchStart === 'function') bridge.watchStart(hxt().segs[0].n, 'Toca ▶ en tu reloj para empezar');
   if (typeof hrAutoConnect === 'function') hrAutoConnect();
@@ -133,7 +133,7 @@ function hxtFinish() {
   // Registro automático en HYROX Lab (mismas reglas que las pruebas escritas a mano)
   const ladderPrev = typeof hxMyBest === 'function' ? (hxMyBest() || {}).sec : null;
   const base = { date, t: Date.now(), rpe: null, auto: true, timerId: t.id };
-  const prevBest = t.mode === 'station' || t.mode === 'comp' ? hxBest('st', t.st) : t.mode === 'run1k' ? hxBest('run1k') : null;
+  let prevBest = t.mode === 'station' || t.mode === 'comp' ? hxBest('st', t.st) : t.mode === 'run1k' ? hxBest('run1k') : null;
   let first = null;
   if (t.mode === 'race') {
     hx().results.push({ ...base, id: 'tm' + Date.now(), kind: 'sim', sec: total, note: 'Simulación cronometrada' });
@@ -146,7 +146,10 @@ function hxtFinish() {
   }
   hx().timer = null; saveData();
   if (bridge && bridge.watchStop) bridge.watchStop();
-  hxtSummary(run, first, prevBest, t.mode === 'race' && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, total) : []);
+  if (t.pf) hx().results.filter(r => r.timerId === t.id).forEach(r => { if (r.kind === 'sim' || (r.kind === 'st' && PF_SUB[r.st] && !PF_SUB[r.st].comparable)) { r.pf = true; r.std = false; } });
+  if (t.pf && first && first.pf) prevBest = hxBestPF(t.st) && hxResultsPF(t.st).length > 1 ? hxResultsPF(t.st).filter(r => r !== first).reduce((a, r) => !a || r.sec < a.sec ? r : a, null) : null;
+  saveData();
+  hxtSummary(run, first, prevBest, t.mode === 'race' && !t.pf && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, total) : []);
 }
 /** RMSSD de los intervalos R-R del tramo (solo con sensor que los envía). */
 function hxtRmssd(rr) { if (!rr || rr.length < 10) return null; let s = 0, n = 0; for (let i = 1; i < rr.length; i++) { const d = rr[i] - rr[i - 1]; if (Math.abs(d) < 300) { s += d * d; n++; } } return n ? Math.round(Math.sqrt(s / n)) : null; }
@@ -201,7 +204,7 @@ function openHxTimerPicker(back) {
 }
 function hxtPickStation(mode, back) {
   const perf = hxPerformance();
-  openModal(`<h3>${mode === 'comp' ? 'Estación antes del km' : '¿Qué estación?'}</h3><div class="kit-list">${HX_STATIONS.map((s, i) => `<button class="kit-item" data-ps="${s.k}"><span class="hx-n">${String(i + 1).padStart(2, '0')}</span><span class="grow"><b>${s.n} · ${s.d}</b><small>${perf.st[s.k] ? 'Récord ' + hxT(hxBest('st', s.k).sec) : 'Sin medir'}</small></span>${ico('chevron-right', 16)}</button>`).join('')}</div><button class="ghost block" id="ps-x">← Volver</button>`, m => {
+  openModal(`<h3>${mode === 'comp' ? 'Estación antes del km' : '¿Qué estación?'}</h3><div class="kit-list">${HX_STATIONS.map((s, i) => `<button class="kit-item" data-ps="${s.k}"><span class="hx-n">${String(i + 1).padStart(2, '0')}</span><span class="grow"><b>${pfStName(s.k)} · ${pfStDose(s.k)}</b><small>${perf.st[s.k] ? 'Récord ' + hxT(hxBest('st', s.k).sec) : 'Sin medir'}</small></span>${ico('chevron-right', 16)}</button>`).join('')}</div><button class="ghost block" id="ps-x">← Volver</button>`, m => {
     $$('[data-ps]', m).forEach(b => b.onclick = () => hxtCreate(mode, b.dataset.ps));
     $('#ps-x', m).onclick = back;
   });

@@ -19,7 +19,7 @@ function hxRivals() {
 /** Tu mejor tiempo real: carreras oficiales registradas y simulaciones completas. */
 function hxMyBest() {
   const races = ((DB.ev && DB.ev.results) || []).filter(r => r.sport === 'hyrox' && r.sec).map(r => ({ sec: r.sec, src: 'Carrera · ' + r.name, date: r.date, splits: r.splits }));
-  const sims = ((DB.hyrox && DB.hyrox.results) || []).filter(r => r.kind === 'sim' && r.sec).map(r => ({ sec: r.sec, src: r.fromWatch ? 'Simulación (reloj)' : 'Simulación', date: r.date }));
+  const sims = ((DB.hyrox && DB.hyrox.results) || []).filter(r => r.kind === 'sim' && r.sec && !r.pf).map(r => ({ sec: r.sec, src: r.fromWatch ? 'Simulación (reloj)' : 'Simulación', date: r.date }));
   return races.concat(sims).sort((a, b) => a.sec - b.sec)[0] || null;
 }
 function hxLadder(scope) {

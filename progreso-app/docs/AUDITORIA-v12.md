@@ -1194,3 +1194,35 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
 - **Pruebas:**
   - e2e `v40`: carga al 60 % (62.5 kg de un máximo de ~102), plancha cronometrada, fases por semana, sesión A en el motor y siguiente sesión B, plan semanal L/X/V, actualización a Desarrollo, Densidad y descarga, y mejora de la prueba (+71 %).
   - Regresión v9–v40: sin fallas.
+
+
+## 34.0 · HYROX adaptado a Planet Fitness
+
+- **Equipo** (catálogo `pf.js`):
+  - Hay caminadora Matrix 0–15 %, remo, ergómetro de brazos, mancuernas de 2–34 kg, prensa y hack squat; las poleas son probables.
+  - No hay trineos, SkiErg, sandbags ni balones de wall ball.
+- **Sustitutos de trabajo fijo, contra reloj** (`pfhyrox.js`):
+
+  | Estación | Sustituto | ¿Comparable? |
+  |---|---|---|
+  | SkiErg | Ski en polea: 100 jalones con brazos rectos y bisagra (sin poleas: ergómetro de brazos) | No |
+  | Sled push | Empuje en caminadora: 200 m a 15 % con las manos en el tablero y el cuerpo a 45° | No |
+  | Sled pull | 150 m caminando hacia atrás a 15 % + 40 remos sentados pesados | No |
+  | Wall balls | 100 thrusters con mancuernas | No |
+  | Burpee broad jumps | Igual | Sí |
+  | Remo | Igual | Sí |
+  | Farmers carry | 2 × 50 / 35 lb | Sí |
+  | Sandbag lunges | Zancadas goblet 45 / 25 lb | Sí |
+
+- **Honestidad del modelo:**
+  - Los resultados de sustitutos no comparables llevan `pf: true`: tienen sus propios récords y no entran al HPI, al predictor, a las simulaciones estándar ni a Mi escalera.
+  - El predictor en modo PF funciona con 4 estaciones comparables; las otras 4 se estiman con tu nivel, el rango es más ancho y lo dice.
+- **Integración:**
+  - "Planet Fitness" como opción de equipo (se elige sola si tu gimnasio en la app es PF).
+  - La biblioteca de sesiones se adapta sola (`hxSessionLib` envuelve la base con `pfAdaptLib`): textos traducidos, sesiones de estación con ejercicios PF, y running bajo fatiga y simulación con estaciones PF.
+  - La misión del día cuenta las pruebas PF para completar la evaluación. El temporizador usa los nombres y dosis PF.
+  - Si marcaste que tu club no tiene una máquina, se usa la alternativa.
+  - Reglas del club: horas valle y límite de cardio, Lunk Alarm, armar la estación junto a las caminadoras y cargas en libras.
+- **Pruebas:**
+  - e2e `v41`: equipo PF por defecto, 8 estaciones (4 comparables), misión con nombre PF, ski en polea cronometrada y mejora contra marca PF, predicción con 4 comparables y su aviso, sesiones traducidas, club sin poleas, simulación PF fuera de la escalera, y usuario no PF sin cambios.
+  - Regresión v9–v41: sin fallas.

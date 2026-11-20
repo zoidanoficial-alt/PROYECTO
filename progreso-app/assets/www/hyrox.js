@@ -24,7 +24,7 @@ const HX_LOADS = {
   pro: { m: { push: '202 kg (con trineo)', pull: '153 kg (con trineo)', farm: '2 × 32 kg', lunge: '30 kg', wb: '9 kg a 3 m' }, f: { push: '152 kg (con trineo)', pull: '103 kg (con trineo)', farm: '2 × 24 kg', lunge: '20 kg', wb: '6 kg a 2.7 m' } }
 };
 const HX_CATS = { open: 'Open', pro: 'Pro', doubles: 'Doubles', relay: 'Relay' };
-const HX_EQUIP = { full: 'Gimnasio con equipo HYROX', gym: 'Gimnasio convencional', home: 'Home gym', run: 'Solo running', lim: 'Equipo limitado' };
+const HX_EQUIP = { pf: 'Planet Fitness', full: 'Gimnasio con equipo HYROX', gym: 'Gimnasio convencional', home: 'Home gym', run: 'Solo running', lim: 'Equipo limitado' };
 /*
  * Anclas del modelo interno, en segundos (hombres Open). Puntaje 0 = principiante,
  * 100 = élite. Son aproximaciones de resultados públicos, no estándares oficiales.
@@ -55,7 +55,7 @@ function hxT(sec) {
 }
 
 /* ---------- Datos ---------- */
-function hxResults(kind, st) { return hx().results.filter(r => r.kind === kind && (!st || r.st === st)).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.t - b.t); }
+function hxResults(kind, st) { return hx().results.filter(r => r.kind === kind && (!st || r.st === st) && !r.pf).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.t - b.t); }
 function hxLatest(kind, st) { const r = hxResults(kind, st); return r.length ? r[r.length - 1] : null; }
 function hxBest(kind, st) { return hxResults(kind, st).reduce((a, r) => !a || r.sec < a.sec ? r : a, null); }
 /** Mejor de las últimas 3 pruebas: el estado actual sin castigar un mal día aislado. */
@@ -163,7 +163,8 @@ function hxBottleneck(perf) {
 function hxPredict(mod) {
   mod = mod || {};
   const perf = hxPerformance();
-  if (!perf.run || perf.tested.length < 6) return { ok: false, perf };
+  const pfMode = typeof hxIsPF === 'function' && hxIsPF();
+  if (!perf.run || perf.tested.length < (pfMode ? 4 : 6)) return { ok: false, perf };
   const flags = [];
   let fresh = perf.run.sec - (mod.run || 0);
   let rdi = perf.fat ? perf.fat.rdi : null;
@@ -181,7 +182,7 @@ function hxPredict(mod) {
   });
   const rox = (hx().roxzone || 7.5 * 60) - (mod.rox || 0);
   if (!hx().roxzone) flags.push('Roxzone (transiciones) estimada en 7:30 en total');
-  if (est) flags.push(`${est} estación${est > 1 ? 'es' : ''} estimada${est > 1 ? 's' : ''} con tu nivel general`);
+  if (est) flags.push(`${est} ${est > 1 ? 'estaciones estimadas' : 'estación estimada'} con tu nivel general${pfMode ? ' (en Planet Fitness no hay SkiErg, trineos ni wall balls de competencia)' : ''}`);
   const total = runT + stT + rox;
   const spread = 0.03 + est * 0.015 + (perf.fat ? 0 : 0.02) + (hx().roxzone ? 0 : 0.01);
   return { ok: true, total, lo: total * (1 - spread), hi: total * (1 + spread), runT, stT, rox, parts, rdi, fresh, flags, spread, perf };
@@ -200,7 +201,7 @@ function hxPhase() {
   return { k: 'found', n: 'Base', why: 'Faltan muchas semanas: base aeróbica, fuerza y técnica.' };
 }
 /** Sesiones de la metodología. pace(x) devuelve el ritmo por km a partir de tu 1 km fresco. */
-function hxSessionLib(pace) {
+function hxSessionLibBase(pace) {
   const p = f => pace ? hxT(pace * f) + '/km' : (f < 1.15 ? 'ritmo fuerte pero sostenible' : 'ritmo conversacional');
   return {
     comp: { n: 'Running bajo fatiga', goal: 'Mantener el ritmo después de estaciones de piernas.', min: '45–55', blocks: [
@@ -255,12 +256,12 @@ function hxSessionLib(pace) {
 function hxMission() {
   const perf = hxPerformance(), bn = hxBottleneck(perf), ph = hxPhase(), lib = hxSessionLib(perf.run && perf.run.sec);
   const rd = typeof readiness === 'function' ? readiness() : null, changes = [];
-  const missing = HX_STATIONS.filter(s => !perf.st[s.k]);
+  const missing = HX_STATIONS.filter(s => !perf.st[s.k] && !(typeof hxBestPF === 'function' && hxBestPF(s.k)));
   let ses, why, type;
   if (rd && rd.score < 55) { ses = lib.recov; type = 'recov'; why = 'Tu chequeo de hoy muestra poca recuperación; no tiene sentido sumar fatiga.'; changes.push('Cambiada a recuperación por tu chequeo de hoy'); }
   else if (ph.k === 'taper') { ses = lib.taper; type = 'taper'; why = ph.why; }
   else if (!perf.run) return { assess: 'run1k', ph, why: 'Antes de planear necesito tu ritmo fresco: un 1 km a tope, bien calentado.' };
-  else if (missing.length >= 3) return { assess: missing[0].k, ph, why: `Te faltan ${missing.length} estaciones por medir. Una por sesión es suficiente; hoy toca ${missing[0].n}.` };
+  else if (missing.length >= 3) return { assess: missing[0].k, ph, why: `Te faltan ${missing.length} estaciones por medir. Una por sesión es suficiente; hoy toca ${typeof pfStName === 'function' ? pfStName(missing[0].k) : missing[0].n}.` };
   else if (!perf.fat) return { assess: 'comp', ph, why: 'Falta medir cuánto cae tu ritmo después de una estación: es la diferencia entre entrenar en el gym y correr una carrera.' };
   else if (hx().profile.method && typeof hxMethodPick === 'function') {
     const pk = hxMethodPick(lib, bn, ph); ses = pk.ses; type = pk.type; why = pk.why; if (pk.note) changes.push(pk.note);
@@ -294,7 +295,7 @@ function hyroxCard(inTab) {
   return `<div class="card keep hx-card"><div class="hx-eyebrow">HYROX LAB · ${esc(m.ph.n.toUpperCase())}${w != null && w >= 0 ? ' · FALTAN ' + w + ' SEM' : ''}</div>
     ${typeof hxt === 'function' && hxt() ? `<h2 style="margin:4px 0">Temporizador en curso</h2><p class="small muted">${esc(HXT_TITLE[hxt().mode])} · ${esc(hxt().segs[hxt().i].n)}</p><button class="block" id="hx-tmr">Volver al temporizador</button>`
     : act ? `<h2 style="margin:4px 0">Sesión en curso</h2><p class="small muted">${esc(act.n)} · empezaste a las ${new Date(act.start).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</p><button class="block" id="hx-resume">Continuar sesión</button>`
-    : m.assess ? `<h2 style="margin:4px 0">Prueba de hoy: ${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'running bajo fatiga' : HX_ST[m.assess].n)}</h2><p class="small">${esc(m.why)}</p><button class="block" id="hx-test" data-st="${m.assess}">${ico('timer', 18, 'lead')}Cronometrar la prueba</button>`
+    : m.assess ? `<h2 style="margin:4px 0">Prueba de hoy: ${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'running bajo fatiga' : (typeof pfStName === 'function' ? pfStName(m.assess) : HX_ST[m.assess].n))}</h2><p class="small">${esc(m.why)}</p><button class="block" id="hx-test" data-st="${m.assess}">${ico('timer', 18, 'lead')}Cronometrar la prueba</button>`
     : `<h2 style="margin:4px 0">${esc(m.ses.n)}</h2><p class="small muted" style="margin:0 0 6px">${m.ses.min} min · ${esc(m.ses.goal)}</p><p class="small"><b>Por qué hoy:</b> ${esc(m.why)}</p>${m.changes.length ? `<div class="adapt-note">${ico('refresh-cw', 16, 'lead')}${esc(m.changes[0])}</div>` : ''}<button class="block" id="hx-start">Empezar sesión</button>`}
     ${inTab ? '' : hxTelemetry(days)}
     ${inTab ? '</div>' : '<div class="row" style="margin-top:4px"><span class="grow"></span><button class="ghost" id="hx-open">Abrir HYROX Lab →</button></div></div>'}`;
@@ -351,7 +352,7 @@ function rerenderHx() { if (typeof render === 'function' && typeof currentTab !=
 
 /* ---------- Perfil del atleta ---------- */
 function openHxSetup(after) {
-  const p = Object.assign({ cat: 'open', sex: 'm', date: '', goal: '', equip: 'gym', days: 4, exp: 'nuevo', inj: '' }, hx().profile || {});
+  const p = Object.assign({ cat: 'open', sex: 'm', date: '', goal: '', equip: typeof isPF === 'function' && isPF() ? 'pf' : 'gym', days: 4, exp: 'nuevo', inj: '' }, hx().profile || {});
   const opt = (o, v) => Object.entries(o).map(([k, n]) => `<option value="${k}"${k === v ? ' selected' : ''}>${n}</option>`).join('');
   openModal(`<h3>Mi carrera HYROX</h3><p class="small muted" style="margin-top:0">Con esto la app planea tus semanas y ajusta las cargas de referencia.</p>
     <label>Categoría<select id="hs-cat">${opt(HX_CATS, p.cat)}</select></label>
@@ -615,7 +616,7 @@ function hyroxHero() {
   const m = hxMission(), a = hx().active;
   if (a) return `<div class="hero"><div class="eyebrow">HYROX Lab · sesión en curso</div><h3>${esc(a.n)}</h3><p>${hxT(hxElapsed(a))} transcurridos</p><button id="hx-resume">Continuar sesión</button></div>`;
   if (typeof hxt === 'function' && hxt()) return `<div class="hero"><div class="eyebrow">HYROX Lab · temporizador en curso</div><h3>${esc(hxt().segs[hxt().i].n)}</h3><p>${esc(HXT_TITLE[hxt().mode])}</p><button id="hx-tmr">Volver al temporizador</button></div>`;
-  if (m.assess) return `<div class="hero"><div class="eyebrow">HYROX Lab · prueba de hoy</div><h3>${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'Running bajo fatiga' : HX_ST[m.assess].n)}</h3><p>${esc(m.why)}</p><button id="hx-test" data-st="${m.assess}">${ico('timer', 18)} Cronometrar la prueba</button></div>`;
+  if (m.assess) return `<div class="hero"><div class="eyebrow">HYROX Lab · prueba de hoy</div><h3>${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'Running bajo fatiga' : (typeof pfStName === 'function' ? pfStName(m.assess) : HX_ST[m.assess].n))}</h3><p>${esc(m.why)}</p><button id="hx-test" data-st="${m.assess}">${ico('timer', 18)} Cronometrar la prueba</button></div>`;
   return `<div class="hero"><div class="eyebrow">HYROX Lab · ${esc(m.ph.n)}</div><h3>${esc(m.ses.n)}</h3><p>${m.ses.min} min · ${esc(m.why)}</p><button id="hx-start">${ico('play', 18)} Empezar sesión</button></div>`;
 }
 
@@ -626,3 +627,6 @@ function hxtForAssess(k) {
   else if (k === 'comp') hxtPickStation('comp', () => closeModal());
   else if (HX_ST[k]) hxtCreate('station', k);
 }
+
+/** 34.0: la biblioteca se adapta sola a Planet Fitness (pfhyrox.js). */
+function hxSessionLib(pace) { const l = hxSessionLibBase(pace); return typeof hxIsPF === 'function' && hxIsPF() ? pfAdaptLib(l, pace) : l; }

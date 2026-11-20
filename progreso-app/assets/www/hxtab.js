@@ -28,6 +28,7 @@ function renderHyroxTab() {
       <button data-hxp="events">${ico('calendar', 22)}<span>Carreras</span></button>
       <button data-hxp="test">${ico('clipboard-list', 22)}<span>Resultado</span></button>
     </div>
+    ${typeof pfHyroxCard === 'function' ? pfHyroxCard() : ''}
     ${champMethodCard()}
     ${bn && bn.main ? `<div class="hx-bn"><small>CUELLO DE BOTELLA PRINCIPAL</small><b>${esc(bn.main.n)}</b><p class="small">${esc(bn.main.why)}</p>${bn.second ? `<small>SECUNDARIO</small><b class="hx-b2">${esc(bn.second.n)}</b>` : ''}</div>` : perf.hpi == null ? `<div class="status info"><b>Evaluación incompleta</b>Completa tus pruebas con el temporizador: una por sesión es suficiente.</div>` : ''}
     <div class="kit-list">
@@ -51,6 +52,7 @@ function hxpBind(root) {
   const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), ladder: () => openHxLadder(back), resist: () => openResist(back), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); renderHyroxTab(); }) };
   $$('[data-hxp]', root).forEach(b => b.onclick = () => act[b.dataset.hxp]());
   const ch = $('#ch-open', root); if (ch) ch.onclick = () => openChamps();
+  const pfb = $('#pf-open', root); if (pfb) pfb.onclick = () => openPfHyrox();
   const s = $('#hxp-setup', root); if (s) s.onclick = () => openHxSetup(() => { closeModal(); renderHyroxTab(); });
   const d = $('#hxp-date', root); if (d) d.onclick = () => openEvents();
 }
