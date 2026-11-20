@@ -114,6 +114,7 @@ function explorarCard() {
     ['run', 'footprints', 'Running', 'Planes, GPS y caminadora'],
     ['retos', 'medal', 'Retos', 'Pruebas de peso corporal'],
     ['ex', 'book-open', 'Ejercicios', 'Técnica de cada ejercicio'],
+    ['athlete', 'trophy', 'Proyecto Atleta', 'Tu transformación en atleta de alto rendimiento'],
     ['resist', 'dumbbell', 'Resistencia', 'Más reps, más peso o las dos: programa de 6 semanas'],
     ['watch', 'heart-pulse', 'Mi reloj', 'Mi Fitness, pulso en vivo y control del temporizador'],
     ['events', 'calendar', 'Competiciones', 'HYROX, running, triatlón, fisicoculturismo y más'],
@@ -138,6 +139,7 @@ function bindExplore(root) {
     else if (k === 'events') openEvents();
     else if (k === 'watch') openWatch();
     else if (k === 'resist') openResist();
+    else if (k === 'athlete') openAthlete();
   });
 }
 function openStatsGate() {

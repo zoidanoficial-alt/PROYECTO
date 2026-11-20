@@ -1226,3 +1226,43 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
 - **Pruebas:**
   - e2e `v41`: equipo PF por defecto, 8 estaciones (4 comparables), misión con nombre PF, ski en polea cronometrada y mejora contra marca PF, predicción con 4 comparables y su aviso, sesiones traducidas, club sin poleas, simulación PF fuera de la escalera, y usuario no PF sin cambios.
   - Regresión v9–v41: sin fallas.
+
+
+## 35.0 · Proyecto Atleta: la transformación en atleta de alto rendimiento como eje de la app
+
+- **Primera tarjeta de Hoy:** antes de activarlo, invita al proyecto. Ya activo, muestra los años que faltan para los 40, el bloque actual con su semana (de 6), la fase, el año del plan y un anillo con tu perfil (0–100).
+- **Perfil de 9 capacidades contra rangos orientativos** (los del usuario; no son requisitos oficiales). Cada una dice su fuente, y si falta el dato dice qué medir:
+
+  | Capacidad | Cómo se obtiene |
+  |---|---|
+  | VO₂máx | Estimado con VDOT de Daniels (fórmula exacta: 5 km en 20:00 = 49.8) a partir del mejor 5 o 10 km con GPS; si no hay, del 1 km fresco (menos preciso) |
+  | 5 km y 10 km | Mejores tramos con GPS |
+  | Umbral | Ritmo de 10 km × 1.04 o de 5 km × 1.08 |
+  | Fuerza relativa | Máximo estimado ÷ peso; meta 1.5× sentadilla y 2× peso muerto |
+  | Resistencia muscular | % de mejora en las pruebas de Resistencia |
+  | Grasa corporal | Estimada con RFM (Woolcott y Bergman 2018) con cintura y estatura; meta 8–12 % |
+  | Pulso en reposo y HRV | Media de 7 días; meta 40–55 lpm |
+  | Repetir esfuerzos | RDI de HYROX; meta ≤ 5 % |
+
+  Para mujeres, los rangos se ajustan de forma orientativa.
+- **Las 7 áreas** (semáforo y siguiente acción):
+  - **Entrenamiento:** sesiones en 4 semanas.
+  - **Alimentación:** días registrados y días que llegas a tu proteína.
+  - **Sueño:** media de 7 días; meta 7.5 h.
+  - **Recuperación:** energía o chequeo.
+  - **Medicina deportiva:** chequeo, ECG, análisis de sangre y fisioterapeuta, con su periodicidad; se marcan con fecha.
+  - **Psicología:** 4 prácticas semanales (visualizar, plan de carrera, ritual, revisión).
+  - **Tecnología:** Health Connect, sensor de pulso y control remoto.
+- **Periodización hasta los 40, sin mejorar todo a la vez:**
+  - Los años se reparten en Fundamentos, Construcción, Especialización y Rendimiento; el último año siempre es Rendimiento.
+  - Cada año tiene bloques de 6 semanas con 1 foco y lo demás en mantenimiento: motor aeróbico, fuerza, umbral, resistencia muscular, específico, pico y transición.
+  - En Fundamentos y Construcción, el bloque se ajusta a tu brecha más grande si está por debajo de 40.
+- **"Activar este bloque":**
+  - Motor aeróbico → método Rončević; fuerza → McIntyre; umbral → Wenisch; específico → Wietrzyk (todos en HYROX Lab).
+  - Resistencia muscular → programa de Resistencia.
+  - Pico → Competiciones.
+  - Transición → medicina.
+- **Dónde aparece:** Hoy (primera tarjeta), pestaña HYROX y Explorar.
+- **Pruebas:**
+  - e2e `v42`: invitación, configuración (edad 32 → 8 años), capacidades sin datos, fórmulas VDOT y RFM, capacidades con datos reales (GPS, fuerza, cintura, pruebas, reloj), 7 áreas, plan por años, avance a año 2 bloque 3, tarjeta en Hoy, medicina, psicología, activar bloque (Rončević) y persistencia.
+  - Regresión v9–v42: sin fallas.

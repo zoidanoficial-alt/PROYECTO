@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '34.0';
+const APP_VERSION = '35.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -123,7 +123,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null, watch: d.watch || null, resist: d.resist || null,
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null, watch: d.watch || null, resist: d.resist || null, athlete: d.athlete || null,
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -857,6 +857,7 @@ function renderHome() {
   const full = !isSimple();
   $('#view-home').innerHTML = `
     ${!act && !RUN.st ? `<div class="goal-line">${ico('goal', 16)}<span>${esc(goalLine())}</span></div>` : ''}
+    ${typeof athCard === 'function' && !act && !RUN.st ? athCard() : ''}
     ${hero}
     ${typeof evGoalCard === 'function' ? evGoalCard() : ''}
     ${typeof bodyCard === 'function' ? bodyCard() : ''}
@@ -922,6 +923,7 @@ function renderHome() {
   if (typeof bindHyrox === 'function') bindHyrox($('#view-home'), renderHome);
   if (typeof bindEvGoalCard === 'function') bindEvGoalCard($('#view-home'));
   if (typeof bindBodyCard === 'function') bindBodyCard($('#view-home'));
+  if (typeof bindAthCard === 'function') bindAthCard($('#view-home'));
   const tr = $('#home-train');
   if (tr) tr.onclick = () => { if (!act) startSession(p.routine, nd.id); showTab('train'); };
   const hr = $('#home-run'); if (hr) hr.onclick = () => showTab('train');
