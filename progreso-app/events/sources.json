@@ -1,0 +1,22 @@
+{
+  "_doc": "Fuentes de descubrimiento. kind: page (página con enlaces a eventos + JSON-LD), sitemap (URLs de eventos), ics (calendario). official=true solo para el dominio del organizador o federación. 'tested' indica si ya se comprobó que la fuente responde y trae datos estructurados; las no probadas se intentan y su resultado queda en el log.",
+  "sources": [
+    { "id": "hyrox-find", "name": "HYROX · Find my race", "url": "https://hyrox.com/find-my-race/", "kind": "page", "linkPattern": "hyrox\\.com/event/", "sport": "hyrox", "official": true, "tested": false },
+    { "id": "hyrox-mx", "name": "HYROX México", "url": "https://mexico.hyrox.com/", "kind": "page", "linkPattern": "mexico\\.hyrox\\.com/event/", "sport": "hyrox", "official": true, "tested": false },
+    { "id": "ironman-races", "name": "IRONMAN · Races", "url": "https://www.ironman.com/races", "kind": "page", "linkPattern": "ironman\\.com/(races|im703|im)-", "sport": "triathlon", "official": true, "tested": false },
+    { "id": "spartan-mx", "name": "Spartan México", "url": "https://mx.spartan.com/es/race/find-race", "kind": "page", "linkPattern": "spartan\\.com/.+/race", "sport": "fitness_race", "official": true, "tested": false },
+    { "id": "worldtriathlon", "name": "World Triathlon · Events", "url": "https://triathlon.org/events", "kind": "page", "linkPattern": "triathlon\\.org/events/event/", "sport": "triathlon", "official": true, "tested": false }
+  ],
+  "searchTemplates": [
+    "HYROX {country} {year}", "HYROX {city} {year}", "maratón {country} {year}", "marathon {country} {year}", "medio maratón {city} {year}",
+    "triatlón {country} {year}", "IRONMAN 70.3 {country} {year}", "natural bodybuilding competition {country} {year}", "NPC {country} {year} show",
+    "wellness bodybuilding {country} {year}", "powerlifting meet {country} {year}", "CrossFit competition {country} {year}",
+    "Spartan race {country} {year}", "DEKA FIT {country} {year}", "trail running {country} {year}"
+  ],
+  "searchPlaces": [
+    { "country": "México", "cities": ["Ciudad de México", "Monterrey", "Guadalajara", "Cancún", "Mérida", "Puebla"] },
+    { "country": "USA", "cities": ["New York", "Chicago", "Dallas"] },
+    { "country": "España", "cities": ["Madrid", "Barcelona"] }
+  ],
+  "officialDomains": ["hyrox.com", "ironman.com", "triathlon.org", "spartan.com", "dekafit.com", "npcnewsonline.com", "ifbb.com", "wnbf.net", "powerlifting.sport", "iwf.sport", "games.crossfit.com", "21k.cdmx.gob.mx", "maraton.cdmx.gob.mx"]
+}

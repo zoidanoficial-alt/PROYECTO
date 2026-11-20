@@ -1,0 +1,10 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch(); const page = await b.newPage(); const errors = [];
+page.on('pageerror', e => errors.push(e.message));
+await page.goto('http://127.0.0.1:8765/index.html');
+await page.evaluate(() => { localStorage.setItem('miprogreso.v1', JSON.stringify({ profile: { onboarded: true, cycleOn: true }, days: {} })); DB = loadData(); });
+await page.reload(); await page.waitForTimeout(900);
+console.log('legacy consent prompt:', await page.isVisible('#cc-yes'));
+await page.click('#cc-no'); await page.waitForTimeout(100);
+console.log('declined -> cycleOn:', await page.evaluate(() => DB.profile.cycleOn), 'ERRORS', JSON.stringify(errors));
+await b.close();

@@ -1,0 +1,33 @@
+/* 35.0 · Proyecto Atleta */
+.ath-cta { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; width: 100%; text-align: left; color: var(--text); font-weight: 400; box-shadow: inset 3px 0 0 var(--accent); }
+.ath-cta .hx-eyebrow, .ath-cta b, .ath-cta small { grid-column: 1; }
+.ath-cta > svg { grid-column: 2; grid-row: 1 / span 3; align-self: center; color: var(--accent); }
+.ath-cta b { font-size: 18px; letter-spacing: -.02em; }
+.ath-card { display: block; width: 100%; text-align: left; color: var(--text); font-weight: 400; position: relative; overflow: hidden; }
+.ath-card::before { content: ""; position: absolute; right: -70px; top: -70px; width: 220px; height: 220px; pointer-events: none; background: radial-gradient(circle, rgba(198, 244, 50, .14), transparent 65%); }
+.ath-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+.ath-row small { display: block; font-size: 12px; color: var(--muted); }
+.ath-row b { display: block; font-size: 24px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; }
+.ath-row span { display: block; font-size: 13px; color: var(--muted); }
+.ath-ring { --p: 0; flex: none; width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; align-content: center; background: radial-gradient(closest-side, var(--surface) 78%, transparent 80% 100%), conic-gradient(var(--accent) calc(var(--p) * 1%), var(--surface-3) 0); }
+.ath-ring b { font-size: 22px; line-height: 1; } .ath-ring small { font-size: 10px; color: var(--muted); }
+.ath-caps { display: grid; gap: 8px; margin-bottom: 8px; }
+.ath-cap { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; }
+.ath-cap b { font-size: 14px; } .ath-cap .row span { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ath-cap small { display: block; font-size: 11.5px; color: var(--muted); }
+.ath-cap.none .row span { color: var(--text-3); font-weight: 600; }
+.ath-areas { display: grid; gap: 6px; margin-bottom: 8px; }
+.ath-area { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px; min-height: 0; font-weight: 400; }
+.ath-area svg { color: var(--accent); flex: none; }
+.ath-area b { display: block; font-size: 14px; } .ath-area small { display: block; font-size: 12px; color: var(--muted); }
+.ath-area i { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--bad); }
+.ath-area.ok i { background: var(--accent); } .ath-area.warn i { background: var(--warn); }
+.ath-years { display: grid; gap: 6px; margin-bottom: 8px; }
+.ath-years > div { border-left: 3px solid var(--surface-3); padding: 4px 0 4px 12px; }
+.ath-years > div.now { border-left-color: var(--accent); }
+.ath-years > div.done { opacity: .5; }
+.ath-years small { display: block; font-size: 11px; color: var(--text-3); letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+.ath-years b { display: block; font-size: 15px; } .ath-years span { display: block; font-size: 12.5px; color: var(--muted); }
+.ath-blocks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.ath-blocks span { padding: 5px 10px; border-radius: 999px; background: var(--surface-2); font-size: 12px; font-weight: 650; color: var(--muted); }
+.ath-blocks span.now { background: var(--cta); color: var(--on-cta); } .ath-blocks span.done { text-decoration: line-through; opacity: .6; }

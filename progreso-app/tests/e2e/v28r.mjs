@@ -1,0 +1,20 @@
+import { chromium } from 'playwright';
+const D = './out/';
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage();
+const errors = []; page.on('pageerror', e => errors.push(e.message));
+const pause = ms => new Promise(r => setTimeout(r, ms));
+await page.clock.install({ time: new Date('2026-10-15T10:00:00') });
+await page.goto('http://127.0.0.1:8765/index.html');
+await page.click('[data-oblook="f"]'); await page.fill('#ob-name', 'Sofi');
+for (let k = 0; k < 7; k++) await page.click('#ob-next');
+await page.clock.runFor(900); for (let i = 0; i < 4; i++) await page.click('#gd-next'); await page.clock.runFor(2600);
+await page.evaluate(() => scrollTo(0, 0)); await pause(400); await page.screenshot({ path: D + 'v28r-descanso.png' });
+await page.click('#home-anyway'); await page.clock.runFor(400); await pause(400);
+await page.screenshot({ path: D + 'v28r-sesion.png' });
+const n = await page.evaluate(() => sessionExercises(activeSession()).length);
+for (let i = 0; i < n; i++) { const sets = await page.evaluate(i => sessionExercises(activeSession())[i][1], i); await page.evaluate(i => { SESS_UI.open = i; renderSession(activeSession()); }, i);
+  for (let k = 0; k < sets; k++) { await page.fill(`#w-${i}`, '15'); await page.fill(`#r-${i}`, '12'); await page.click(`#save-${i}`); await page.clock.runFor(150); } }
+await page.evaluate(() => stopRest()); await page.click('#ss-finish'); await page.clock.runFor(500); await pause(500);
+await page.screenshot({ path: D + 'v28r-resultado.png' });
+console.log(n, 'ERRORS', JSON.stringify(errors));
+await b.close();

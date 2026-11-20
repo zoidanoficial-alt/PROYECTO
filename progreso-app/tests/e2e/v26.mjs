@@ -1,0 +1,24 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 });
+const page = await ctx.newPage(); const errors = [];
+page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+const D = './out/';
+await page.goto('http://127.0.0.1:8765/index.html');
+await page.fill('#ob-name', 'Daniel'); for (let k = 0; k < 7; k++) await page.click('#ob-next');
+await page.waitForTimeout(900); await page.evaluate(() => { DB.profile.guideSeen = true; DB.profile.notif.asked = true; saveData(); closeModal(); });
+// semana con 3 entrenos y peso
+await page.evaluate(() => { const wk = weekKey(todayStr()); [0, 1, 2].forEach(k => { const d = addDays(wk, k); if (d <= todayStr()) DB.sessions.push({ id: 'x' + k, routine: 'pro', dayId: 'd1', dayName: 'x', date: d, start: 1, end: 2 }); }); for (let i = 0; i < 7; i++) day(addDays(todayStr(), -i)).weight = 88.2; DB.profile.weeklyTarget = 5; saveData(); showTab('home'); });
+await page.waitForTimeout(3200);
+const shot = async n => { await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(250); await page.screenshot({ path: D + 'v26-' + n + '.png' }); };
+await shot('dark');
+const font = await page.evaluate(() => document.fonts.check('16px Inter') && getComputedStyle(document.body).fontFamily);
+const emojiLeft = await page.evaluate(() => { const re = /\p{Extended_Pictographic}/u; return [...document.querySelectorAll('#view-home .f-ico, .tool-row span, .stat-tile, .quick button, header')].filter(e => re.test(e.textContent)).map(e => e.className + ':' + e.textContent.trim().slice(0, 20)); });
+await page.evaluate(() => { DB.profile.theme = 'light'; saveData(); applyTheme(); render('home'); }); await shot('light');
+await page.click('#hdr-ella'); await page.waitForTimeout(300); await shot('ella');
+await page.click('#hdr-ella'); await page.evaluate(() => { DB.profile.theme = 'dark'; saveData(); applyTheme(); showTab('train'); }); await page.waitForTimeout(300); await shot('train');
+await page.evaluate(() => { showTab('more'); }); await shot('more');
+await page.evaluate(() => { showTab('home'); document.querySelector('.more-group').open = true; document.querySelector('.more-group').scrollIntoView(); }); await page.waitForTimeout(300); await page.screenshot({ path: D + 'v26-more-group.png' });
+console.log(JSON.stringify({ font, emojiLeft }));
+console.log('ERRORS', JSON.stringify(errors.slice(0, 5)));
+await b.close();

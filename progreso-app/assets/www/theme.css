@@ -1,0 +1,56 @@
+/* ==================================================================
+ *  31.0 · Negro + verde limón
+ *  Fondo negro puro, superficies grafito y un solo acento: limón #C6F432.
+ *  El limón marca acciones, progreso, la misión y lo que está activo. Nada más.
+ * ================================================================== */
+:root[data-theme="dark"] {
+  --bg: #000000; --bg-2: #0a0a0a; --surface: #121212; --surface-2: #1b1b1b; --surface-3: #262626; --line: rgba(255, 255, 255, .07);
+  --text: #f5f5f5; --muted: #a1a1a1; --text-3: #6b6b6b;
+  --accent: #c6f432; --accent-2: #dcff6e; --accent-soft: rgba(198, 244, 50, .12); --on-accent: #0a0a0a;
+  --cta: #c6f432; --on-cta: #0a0a0a; --hl: #c6f432;
+  --cyan: #e2ff8f; --cyan-2: #efffbf; --blue: #e2ff8f; --blue-soft: rgba(226, 255, 143, .1);
+  --good: #c6f432; --good-soft: rgba(198, 244, 50, .12); --warn: #ffc24b; --warn-soft: rgba(255, 194, 75, .12); --bad: #ff5c5c; --bad-soft: rgba(255, 92, 92, .12);
+  --orange: #c6f432; --orange-2: #dcff6e; --orange-soft: rgba(198, 244, 50, .12);
+  --hero-1: #121212; --hero-2: #121212; --low: #262626;
+  --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 12px 30px rgba(0, 0, 0, .5);
+}
+:root:not([data-theme="dark"]):not([data-look="rosa"]) {
+  --bg: #f4f5f0; --bg-2: #eceee6; --surface: #ffffff; --surface-2: #eef0e8; --surface-3: #e2e5da;
+  --accent: #4d7c0f; --accent-2: #c6f432; --accent-soft: rgba(132, 184, 18, .16); --on-accent: #ffffff;
+  --cta: #c6f432; --on-cta: #0a0a0a; --hl: #4d7c0f; --cyan: #3f6212; --blue: #3f6212; --good: #4d7c0f; --orange: #4d7c0f;
+}
+body { background: var(--bg); }
+.hx-tag.medido { color: var(--accent); }
+.ev-reg.open { color: var(--on-cta); background: var(--cta); }
+.hero::after, .hx-card::before { background: radial-gradient(circle at center, rgba(198, 244, 50, .12), transparent 65%); }
+
+/* ---------- Barra: 6 pestañas, la activa muestra su nombre ---------- */
+nav.tabs { display: flex; gap: 3px; padding: 6px; }
+nav.tabs button { flex: 1 1 0; min-width: 0; flex-direction: row; gap: 7px; padding: 0 6px; height: 100%; border-radius: 20px; font-size: 13px; font-weight: 750; letter-spacing: -.01em; transition: flex-grow .3s var(--ease), background .25s, color .2s; }
+nav.tabs button .tl { display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+nav.tabs button.on { flex-grow: 3.4; background: var(--cta); color: var(--on-cta); }
+nav.tabs button.on .tl { display: inline; }
+nav.tabs button.on svg { stroke-width: 2.3; }
+nav.tabs button[hidden] { display: none; }
+nav.tabs.four { grid-template-columns: none; }
+:root:not([data-theme="dark"]) nav.tabs button.on { color: #0a0a0a; }
+
+/* ---------- Pestaña HYROX Lab ---------- */
+.hxp-hero { background: var(--surface); border: 1px solid var(--line); border-radius: 26px; padding: 20px; margin-bottom: 12px; position: relative; overflow: hidden; }
+.hxp-hero::before { content: ""; position: absolute; right: -90px; top: -90px; width: 260px; height: 260px; pointer-events: none; background: radial-gradient(circle, rgba(198, 244, 50, .14), transparent 65%); }
+.hxp-big { font-size: 30px; font-weight: 800; letter-spacing: -.035em; line-height: 1.08; margin: 8px 0; }
+.hxp-hero .hx-count b { color: var(--accent); }
+.hxp-quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.hxp-quick button { display: flex; flex-direction: column; align-items: center; gap: 6px; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 18px; padding: 14px 4px; min-height: 0; font-size: 12px; font-weight: 650; }
+.hxp-quick button svg { color: var(--accent); }
+.ch-cta { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; width: 100%; text-align: left; color: var(--text); font-weight: 400; }
+.ch-cta .hx-eyebrow, .ch-cta b, .ch-cta span { grid-column: 1; } .ch-cta > svg { grid-column: 2; grid-row: 1 / span 3; align-self: center; color: var(--accent); }
+.ch-cta b { font-size: 17px; letter-spacing: -.02em; }
+.ch-week { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.ch-week span { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: var(--surface-2); font-size: 12.5px; font-weight: 650; color: var(--muted); }
+.ch-week span small { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-3); font-size: 10.5px; color: var(--text); }
+.ch-week span.done { color: var(--text-3); text-decoration: line-through; }
+.ch-week span.now { background: var(--cta); color: var(--on-cta); }
+.ch-week span.now small { background: rgba(0, 0, 0, .15); color: var(--on-cta); }
+.ch-av { width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center; background: var(--cta); color: var(--on-cta); font-weight: 800; font-size: 13px; letter-spacing: .02em; }
+body[data-tab="hyrox"] .fab { display: none; }
