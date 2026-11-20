@@ -80,6 +80,7 @@ async function hcSync(manual) {
     r.segs.forEach(sg => { const p = pts.filter(([t]) => t >= sg.start && t <= sg.end); if (p.length) { sg.hrAvg = Math.round(p.reduce((a, x) => a + x[1], 0) / p.length); sg.hrMax = Math.max(...p.map(x => x[1])); } });
     r.hrAvg = Math.round(pts.reduce((a, x) => a + x[1], 0) / pts.length); r.hrMax = Math.max(...pts.map(x => x[1])); r.hrFromWatch = true; sessionsFilled++;
   });
+  if (typeof bodyIngest === 'function') bodyIngest(data);
   w.hcSync = Date.now(); w.hcOrigins = data.origins || []; saveData();
   const res = { days: touched.size, steps: Object.keys(steps).length, hr: (data.hr || []).length, sessionsFilled, origins: w.hcOrigins };
   if (manual) toast(res.hr || touched.size ? `Sincronizado: ${touched.size} día(s) de recuperación${sessionsFilled ? ` · pulso en ${sessionsFilled} sesión(es)` : ''}` : 'Health Connect no tiene datos nuevos. Abre Mi Fitness para que sincronice tu reloj.');
@@ -127,10 +128,12 @@ function wtRender() {
   root.innerHTML = `<div class="hx-eyebrow">MI RELOJ</div><h3 style="margin-top:4px">Conecta tu reloj</h3>
     <p class="small muted" style="margin-top:0">Xiaomi no permite instalar apps en el Mi Watch, así que Mi Progreso se conecta por tres vías. Todo se queda en tu teléfono.</p>
     <div class="wt-sec"><div class="wt-h">${ico('activity', 20)}<b>1 · Datos de Mi Fitness</b></div>
-      <p class="small">Sueño, pulso en reposo y HRV alimentan tu recuperación; el pulso de cada sesión HYROX se agrega cuando el reloj sincroniza (minutos después).</p>${hcBlock}</div>
+      <p class="small">Sueño con fases, pulso, HRV, presión arterial y oxígeno en sangre. Alimentan tu recuperación y la tarjeta “Tu cuerpo hoy”; el pulso de cada sesión HYROX se agrega cuando el reloj sincroniza.</p>
+      <p class="small muted">Energía y estrés: Xiaomi no los comparte con ninguna app. Mi Progreso calcula los suyos con tu HRV, pulso y sueño.</p>${hcBlock}</div>
     <div class="wt-sec"><div class="wt-h">${ico('play', 20)}<b>2 · Controlar el temporizador desde el reloj</b>${w.remoteOk ? '<span class="ev-ver ok"><i></i>Probado</span>' : ''}</div>
-      <p class="small">Usa el control de <b>música</b> de tu reloj: <b>▶/⏸</b> inicia o pausa, <b>⏭</b> marca la siguiente estación y <b>⏮</b> deshace. En la pantalla de música del reloj verás la estación y el tiempo.</p>
+      <p class="small"><b>En tiempo real:</b> el cronómetro del reloj no se comunica con ninguna app, así que se usa el control de <b>música</b> de tu reloj: <b>▶/⏸</b> inicia o pausa, <b>⏭</b> marca la siguiente estación y <b>⏮</b> deshace. En la pantalla de música del reloj verás la estación y el tiempo.</p>
       ${native ? `<button class="${WATCH.testing ? 'secondary' : ''} block" id="wt-test">${WATCH.testing ? 'Esperando… toca ▶ o ⏭ en tu reloj' : 'Probar con mi reloj'}</button>` : '<p class="small muted">Disponible en la app de Android.</p>'}
+      <p class="small"><b>Desde el modo Entrenamiento del reloj:</b> inicia y para un entrenamiento en tu Mi Watch (carrera, HIIT o libre). Cuando Mi Fitness sincroniza, Mi Progreso te pregunta qué fue (1 km, estación o simulación) y lo registra con su pulso y sus vueltas. No es en vivo: llega minutos después.</p>
       <p class="small muted">Si escuchas música con otra app, el control del reloj manejará la última que empezó a sonar: abre el temporizador después de poner tu música.</p></div>
     <div class="wt-sec"><div class="wt-h">${ico('heart-pulse', 20)}<b>3 · Pulso en vivo</b></div>
       <p class="small">Durante el temporizador ves tu pulso y tu zona en tiempo real. Funciona con bandas de pecho (Polar, Garmin, Coospo…) y con relojes que transmiten el pulso por Bluetooth.</p>

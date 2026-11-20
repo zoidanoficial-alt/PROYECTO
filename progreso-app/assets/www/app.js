@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '29.0';
+const APP_VERSION = '30.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -859,6 +859,7 @@ function renderHome() {
     ${!act && !RUN.st ? `<div class="goal-line">${ico('goal', 16)}<span>${esc(goalLine())}</span></div>` : ''}
     ${hero}
     ${typeof evGoalCard === 'function' ? evGoalCard() : ''}
+    ${typeof bodyCard === 'function' ? bodyCard() : ''}
     ${comebackCard()}
     ${notifPromptCard()}
     ${isBeginner() ? pathCard() : ''}
@@ -920,6 +921,7 @@ function renderHome() {
 
   if (typeof bindHyrox === 'function') bindHyrox($('#view-home'), renderHome);
   if (typeof bindEvGoalCard === 'function') bindEvGoalCard($('#view-home'));
+  if (typeof bindBodyCard === 'function') bindBodyCard($('#view-home'));
   const tr = $('#home-train');
   if (tr) tr.onclick = () => { if (!act) startSession(p.routine, nd.id); showTab('train'); };
   const hr = $('#home-run'); if (hr) hr.onclick = () => showTab('train');

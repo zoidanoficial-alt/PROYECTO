@@ -37,3 +37,18 @@
 .wt-live b { font-size: 48px; min-width: 80px; }
 .wt-live small { display: block; color: var(--muted); font-size: 12.5px; }
 #wt-devs .kit-item { width: 100%; margin-top: 8px; }
+
+/* 30.0 · Tu cuerpo hoy y entrenamientos del reloj */
+.bd-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.bd-tile { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; background: var(--surface-2); color: var(--text); border-radius: 16px; padding: 10px; min-height: 0; font-weight: 400; min-width: 0; }
+.bd-tile small { font-size: 11px; color: var(--muted); font-weight: 650; white-space: nowrap; }
+.bd-tile b { font-size: 22px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.bd-tile span { font-size: 11px; color: var(--muted); line-height: 1.3; overflow-wrap: anywhere; }
+.bd-tile em { font-style: normal; color: var(--cyan); }
+.bd-bars { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; align-items: end; height: 150px; margin: 12px 0; }
+.bd-bars div { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 3px; }
+.bd-bars i { width: 70%; background: var(--accent); border-radius: 6px 6px 3px 3px; opacity: .85; }
+.bd-bars b { font-size: 11px; font-variant-numeric: tabular-nums; } .bd-bars small { font-size: 10px; color: var(--muted); }
+.ex-inbox { box-shadow: inset 3px 0 0 var(--cyan); }
+.ex-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.ex-opts .chip { min-height: 40px; padding: 0 14px; border-radius: 999px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); font-weight: 650; font-size: 13.5px; }

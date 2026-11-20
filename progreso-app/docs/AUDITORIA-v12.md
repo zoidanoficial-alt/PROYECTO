@@ -1108,3 +1108,22 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
   - e2e `v36` (Android 13): falta Health Connect → instalar → permisos → datos de Mi Fitness → no resincroniza en cada regreso.
   - Regresión v9–v36: sin fallas.
 - **Sin probar en dispositivo real:** la pantalla de permisos de Health Connect y la lectura real en Android 13.
+
+
+## 30.0 · Tu cuerpo hoy y entrenamientos iniciados en el reloj
+
+- **Health Connect:** se agregan presión arterial (`READ_BLOOD_PRESSURE`) y oxígeno en sangre (`READ_OXYGEN_SATURATION`); el sueño ahora trae fases (ligero, profundo, REM, despierto). De los entrenamientos se leen también las vueltas, los segmentos y la app de origen.
+- **Por día (`DB.days[d]`):** `sleepStages`, `bp` (última lectura y app de origen), `spo2` (media y mínimo) y `hrDay` (pulso medio del día fuera de entrenamientos). No se pisa lo escrito a mano.
+- **Energía y Estrés:** Xiaomi no los publica en Health Connect, que no tiene esos tipos de dato. Mi Progreso calcula los suyos y los etiqueta como "estimado":
+  - **Energía:** sueño y proporción profundo + REM, HRV y pulso en reposo contra tu media de 7 días, y una sesión dura el día anterior.
+  - **Estrés:** caída de HRV, alza del pulso en reposo y pulso del día por encima del reposo.
+  - El detalle explica qué datos se usaron.
+- **Tarjeta "Tu cuerpo hoy" en Hoy:** seis indicadores, cada uno con su tendencia de 7 días. La presión y el oxígeno se presentan como informativos, no como diagnóstico.
+- **Entrenamientos iniciados en el reloj:** el cronómetro del Mi Watch no se comunica con ninguna app, así que se usa el modo Entrenamiento del reloj.
+  - Al sincronizar, cada entrenamiento nuevo aparece en una bandeja: "¿Qué fue?" (1 km fresco, estación, 1 km bajo fatiga, simulación o solo guardar).
+  - Se registra en HYROX Lab con su pulso; con 16 vueltas, la simulación guarda las 8 estaciones.
+  - No se vuelve a preguntar por el mismo entrenamiento.
+- **Pruebas:**
+  - e2e `v37`: datos del día, estimaciones con su porqué, fuente de la presión, bandeja de entrenamientos (1 km y simulación de 16 vueltas) y que no se repita.
+  - Regresión v9–v37: sin fallas.
+- **Sin probar en dispositivo real:** qué tipos escribe realmente Mi Fitness para el XMWTCL02. Probablemente no escribe presión, porque el reloj no la mide; tampoco sabemos si escribe oxígeno, fases del sueño o vueltas.

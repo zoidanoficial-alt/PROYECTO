@@ -7,7 +7,9 @@ import android.net.Uri
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.OxygenSaturationRecord
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.HeartRateVariabilityRmssdRecord
 import androidx.health.connect.client.records.Record
@@ -44,7 +46,9 @@ class HcLink(private val act: Activity, private val out: Out) {
             HealthPermission.getReadPermission(HeartRateVariabilityRmssdRecord::class),
             HealthPermission.getReadPermission(SleepSessionRecord::class),
             HealthPermission.getReadPermission(StepsRecord::class),
-            HealthPermission.getReadPermission(ExerciseSessionRecord::class)
+            HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+            HealthPermission.getReadPermission(BloodPressureRecord::class),
+            HealthPermission.getReadPermission(OxygenSaturationRecord::class)
         )
     }
 
@@ -117,9 +121,20 @@ class HcLink(private val act: Activity, private val out: Out) {
             grab(HeartRateRecord::class, "hr") { r, a -> r.samples.forEach { a.put(JSONArray().put(it.time.toEpochMilli()).put(it.beatsPerMinute)) } }
             grab(RestingHeartRateRecord::class, "rhr") { r, a -> a.put(JSONArray().put(r.time.toEpochMilli()).put(r.beatsPerMinute)) }
             grab(HeartRateVariabilityRmssdRecord::class, "hrv") { r, a -> a.put(JSONArray().put(r.time.toEpochMilli()).put(r.heartRateVariabilityMillis)) }
-            grab(SleepSessionRecord::class, "sleep") { r, a -> a.put(JSONArray().put(r.startTime.toEpochMilli()).put(r.endTime.toEpochMilli())) }
+            // Sueño con fases: [inicio, fin, [[inicio, fin, tipo]...]] (4 ligero · 5 profundo · 6 REM · 1/7 despierto)
+            grab(SleepSessionRecord::class, "sleep") { r, a ->
+                val st = JSONArray(); r.stages.forEach { st.put(JSONArray().put(it.startTime.toEpochMilli()).put(it.endTime.toEpochMilli()).put(it.stage)) }
+                a.put(JSONArray().put(r.startTime.toEpochMilli()).put(r.endTime.toEpochMilli()).put(st))
+            }
+            grab(BloodPressureRecord::class, "bp") { r, a -> a.put(JSONArray().put(r.time.toEpochMilli()).put(r.systolic.inMillimetersOfMercury).put(r.diastolic.inMillimetersOfMercury).put(r.metadata.dataOrigin.packageName)) }
+            grab(OxygenSaturationRecord::class, "spo2") { r, a -> a.put(JSONArray().put(r.time.toEpochMilli()).put(r.percentage.value)) }
             grab(StepsRecord::class, "steps") { r, a -> a.put(JSONArray().put(r.startTime.toEpochMilli()).put(r.endTime.toEpochMilli()).put(r.count)) }
-            grab(ExerciseSessionRecord::class, "ex") { r, a -> a.put(JSONArray().put(r.startTime.toEpochMilli()).put(r.endTime.toEpochMilli()).put(r.exerciseType).put(r.title ?: "")) }
+            // Entrenamientos del reloj: [inicio, fin, tipo, título, origen, vueltas[[ini, fin]], segmentos[[ini, fin, tipo, reps]]]
+            grab(ExerciseSessionRecord::class, "ex") { r, a ->
+                val laps = JSONArray(); r.laps.forEach { laps.put(JSONArray().put(it.startTime.toEpochMilli()).put(it.endTime.toEpochMilli())) }
+                val segs = JSONArray(); r.segments.forEach { segs.put(JSONArray().put(it.startTime.toEpochMilli()).put(it.endTime.toEpochMilli()).put(it.segmentType).put(it.repetitions)) }
+                a.put(JSONArray().put(r.startTime.toEpochMilli()).put(r.endTime.toEpochMilli()).put(r.exerciseType).put(r.title ?: "").put(r.metadata.dataOrigin.packageName).put(laps).put(segs))
+            }
             res.put("origins", JSONArray(origins))
             done(reqId, res.toString())
         }
