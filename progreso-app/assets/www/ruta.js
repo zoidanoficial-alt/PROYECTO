@@ -116,7 +116,6 @@ function explorarCard() {
     ['ex', 'book-open', 'Ejercicios', 'Técnica de cada ejercicio'],
     ['watch', 'heart-pulse', 'Mi reloj', 'Mi Fitness, pulso en vivo y control del temporizador'],
     ['events', 'calendar', 'Competiciones', 'HYROX, running, triatlón, fisicoculturismo y más'],
-    ['hyrox', 'timer', 'HYROX Lab', 'Evaluación, estaciones, predictor y estrategia'],
     ['compite', 'trophy', 'Competir', 'Kit del fisicoculturista: programas, poses y nutrición'],
     ['act', 'activity', 'Otra actividad', 'Caminar, yoga, bici…']
   ];

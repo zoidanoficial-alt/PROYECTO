@@ -1127,3 +1127,27 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
   - e2e `v37`: datos del día, estimaciones con su porqué, fuente de la presión, bandeja de entrenamientos (1 km y simulación de 16 vueltas) y que no se repita.
   - Regresión v9–v37: sin fallas.
 - **Sin probar en dispositivo real:** qué tipos escribe realmente Mi Fitness para el XMWTCL02. Probablemente no escribe presión, porque el reloj no la mide; tampoco sabemos si escribe oxígeno, fases del sueño o vueltas.
+
+
+## 31.0 · Pestaña HYROX Lab, negro + verde limón, método de campeones y logo nuevo
+
+- **Pestaña HYROX en la barra (6 pestañas):** la barra se rediseñó.
+  - Las pestañas inactivas muestran solo el ícono; la activa se expande con su nombre sobre fondo limón. Así no se cortan "Nutrición", "Progreso" ni "Explorar" (comprobado en v38).
+  - `hxtab.js` reúne todo HYROX en la pestaña: encabezado con cuenta regresiva, HPI, predicción y evaluación; misión del día; accesos rápidos (Temporizador, Mi reloj, Carreras, Resultado); método de campeón; cuello de botella; y estaciones, rendimiento, predictor, estrategia, rankings, metodología y perfil.
+  - HYROX sale de Plan y de Explorar. `openHyrox()` ahora navega a la pestaña.
+- **Tema negro + limón (`theme.css`):**
+  - Fondo #000, superficies #121212, #1B1B1B y #262626, y un solo acento: limón #C6F432 con texto #0A0A0A encima.
+  - Se reemplazaron los verdes fijos en las hojas de estilo. El modo claro usa un verde oliva legible, y el modo Ella conserva su paleta.
+  - La ventana nativa, la barra del sistema y el fondo del ícono pasan a negro.
+- **Entrena como los campeones (`champs.js`; fuentes en `docs/FUENTES-v31.md`):**
+  - **Métodos:** Rončević (volumen de carrera y durabilidad), Wenisch (días altos y bajos), McIntyre (bloques de 8 semanas: 3 de resistencia, 1 de descarga, 3 de fuerza, 1 de descarga) y Wietrzyk (carrera en la mañana y HYROX dos veces por semana).
+  - **Sesiones nuevas en la biblioteca:** tempo, umbral sobre piernas cansadas, durabilidad, fuerza para estaciones, tirada larga, ergómetro suave y aeróbico cruzado.
+  - **Misión del día:** sigue el orden de la semana del método. La estación la decide el cuello de botella; el chequeo bajo manda a recuperación; en la fase de rendimiento el tempo pasa a simulación.
+  - **Regla de los mejores:** con 3 sesiones duras en 7 días, la siguiente dura se cambia por aeróbico suave.
+- **Logo nuevo (`brand/`):**
+  - "M" cuya pierna derecha se vuelve flecha ascendente, de contorno limón con nodos y brillo, según la propuesta del usuario.
+  - Vector `logo.svg` (y variantes rosa y sin brillo), `logo.png` y `logo-rosa.png` de 256 px, y el ícono adaptable de 432 px sobre fondo negro.
+- **Pruebas:**
+  - e2e `v38`: barra de 6 pestañas sin cortes, acento limón, pestaña vacía y configurada, 4 métodos con fuentes, orden semanal, regla de 3 duras, ciclo McIntyre, fase de rendimiento y quitar método.
+  - v33 y v35 se actualizaron a la navegación nueva.
+  - Regresión v9–v38: sin fallas.

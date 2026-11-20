@@ -1505,21 +1505,21 @@ nav.tabs button svg { padding: 2px 10px; }
 /* 25.0 · HYROX Lab (paleta propia del laboratorio: fondo #0B0E12, superficie #141920, acento #35D39A) */
 .hx-card { background: linear-gradient(160deg, #141920, #0b0e12); color: #f5f7fa; border-color: #1d252e; }
 .hx-card .muted, .hx-card .small.muted { color: #929eac; }
-.hx-card button:not(.ghost) { background: #35d39a; color: #0b0e12; }
-.hx-card button.ghost { color: #35d39a; }
-.hx-card .adapt-note { background: rgba(53, 211, 154, .1); color: #f5f7fa; }
-.hx-eyebrow { font-size: 11px; letter-spacing: .12em; font-weight: 700; color: #35d39a; }
+.hx-card button:not(.ghost) { background: #c6f432; color: #0b0e12; }
+.hx-card button.ghost { color: #c6f432; }
+.hx-card .adapt-note { background: rgba(198, 244, 50, .1); color: #f5f7fa; }
+.hx-eyebrow { font-size: 11px; letter-spacing: .12em; font-weight: 700; color: #c6f432; }
 .hx-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin: 10px 0 12px; }
 .hx-kpis div { background: var(--surface-2); border-radius: 14px; padding: 10px; text-align: center; min-width: 0; }
 .hx-kpis b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .hx-kpis small { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
-.hx-bn { border: 1px solid #35d39a; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+.hx-bn { border: 1px solid #c6f432; border-radius: 14px; padding: 12px; margin-bottom: 10px; }
 .hx-bn small { display: block; font-size: 11px; letter-spacing: .1em; color: var(--muted); font-weight: 700; }
 .hx-bn b { display: block; font-size: 18px; margin: 2px 0 4px; } .hx-bn .hx-b2 { font-size: 15px; }
-.hx-n { font-weight: 800; color: #35d39a; font-variant-numeric: tabular-nums; width: 24px; }
+.hx-n { font-weight: 800; color: #c6f432; font-variant-numeric: tabular-nums; width: 24px; }
 .hx-bar { display: inline-block; width: 54px; height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; flex: none; }
 .hx-bar.wide { display: block; width: 100%; margin: 6px 0 4px; }
-.hx-bar i { display: block; height: 100%; background: #35d39a; }
+.hx-bar i { display: block; height: 100%; background: #c6f432; }
 .hx-tag { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 1px 6px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
 .hx-tag.medido { color: #0f9f6e; } .hx-tag.simulado { color: #5b8fe0; } .hx-tag.estimado { color: #b8862b; }
 .hx-sim { display: flex; align-items: baseline; gap: 10px; padding: 12px; border-radius: 14px; background: var(--surface-2); margin: 6px 0 12px; }
@@ -1527,9 +1527,9 @@ nav.tabs button svg { padding: 2px 10px; }
 .hx-clock { font-size: 48px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; margin: 6px 0; }
 .hx-block { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; }
 .hx-block b { display: block; font-size: 15px; } .hx-block small { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; }
-.hx-block.done { border-color: #35d39a; } .hx-block.skip { opacity: .5; }
+.hx-block.done { border-color: #c6f432; } .hx-block.skip { opacity: .5; }
 .hx-block button { min-height: 40px; padding: 0 12px; flex: none; }
-.hx-now { border-color: #35d39a; }
+.hx-now { border-color: #c6f432; }
 .hx-kpis b.sm { font-size: 15px; line-height: 1.6; }
 .hx-tbl td:last-child { white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
 
@@ -1543,11 +1543,11 @@ nav.tabs button svg { padding: 2px 10px; }
   /* Claro premium: marfil frío, tinta grafito, mismos acentos con más contraste */
   --bg: #f4f6f6; --bg-2: #eceff0; --surface: #ffffff; --surface-2: #eef1f2; --surface-3: #e3e8ea; --line: rgba(10, 13, 15, .08);
   --text: #0a0d0f; --muted: #5b6b73; --text-3: #8a989f;
-  --accent: #10a876; --accent-2: #31d6a0; --accent-soft: rgba(49, 214, 160, .14); --on-accent: #04130d;
+  --accent: #10a876; --accent-2: #c6f432; --accent-soft: rgba(198, 244, 50, .14); --on-accent: #04130d;
   --cta: #10a876; --on-cta: #ffffff; --hl: #10a876;
   --cyan: #0fa9a6; --cyan-2: #27d3d0; --blue: #0fa9a6; --blue-soft: rgba(39, 211, 208, .13);
   --good: #12a877; --good-soft: rgba(57, 214, 155, .14); --warn: #b88420; --warn-soft: rgba(231, 183, 94, .16); --bad: #d9474d; --bad-soft: rgba(241, 107, 112, .13);
-  --orange: #10a876; --orange-2: #31d6a0; --orange-soft: rgba(49, 214, 160, .14);
+  --orange: #10a876; --orange-2: #c6f432; --orange-soft: rgba(198, 244, 50, .14);
   --hero-1: #ffffff; --hero-2: #ffffff; --low: #dfe5e7;
   --shadow: 0 1px 2px rgba(10, 13, 15, .04), 0 8px 24px rgba(10, 13, 15, .05);
   --radius: 22px; --r-sm: 14px; --r-pill: 999px;
@@ -1557,11 +1557,11 @@ nav.tabs button svg { padding: 2px 10px; }
 :root[data-theme="dark"] {
   --bg: #0a0d0f; --bg-2: #10161a; --surface: #151d22; --surface-2: #1b262d; --surface-3: #23343c; --line: rgba(255, 255, 255, .06);
   --text: #f3f6f7; --muted: #9aaab3; --text-3: #657780;
-  --accent: #31d6a0; --accent-2: #6fe6bf; --accent-soft: rgba(49, 214, 160, .12); --on-accent: #04130d;
-  --cta: #31d6a0; --on-cta: #04130d; --hl: #31d6a0;
+  --accent: #c6f432; --accent-2: #6fe6bf; --accent-soft: rgba(198, 244, 50, .12); --on-accent: #04130d;
+  --cta: #c6f432; --on-cta: #04130d; --hl: #c6f432;
   --cyan: #27d3d0; --cyan-2: #7ee8e6; --blue: #27d3d0; --blue-soft: rgba(39, 211, 208, .12);
   --good: #39d69b; --good-soft: rgba(57, 214, 155, .12); --warn: #e7b75e; --warn-soft: rgba(231, 183, 94, .12); --bad: #f16b70; --bad-soft: rgba(241, 107, 112, .12);
-  --orange: #31d6a0; --orange-2: #6fe6bf; --orange-soft: rgba(49, 214, 160, .12);
+  --orange: #c6f432; --orange-2: #6fe6bf; --orange-soft: rgba(198, 244, 50, .12);
   --hero-1: #151d22; --hero-2: #151d22; --low: #23343c;
   --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 10px 30px rgba(0, 0, 0, .35);
 }
@@ -1605,7 +1605,7 @@ table td, table th { border-color: var(--line) !important; }
 /* ---------- Misión del día (hero) ---------- */
 .hero { background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 26px; padding: 22px; box-shadow: var(--shadow); }
 .hero::after { content: ""; position: absolute; inset: auto -30% 55% auto; width: 260px; height: 260px; clip-path: none; opacity: 1;
-  background: radial-gradient(circle at center, rgba(49, 214, 160, .16), transparent 65%); }
+  background: radial-gradient(circle at center, rgba(198, 244, 50, .16), transparent 65%); }
 .hero .eyebrow { color: var(--accent); opacity: 1; }
 .hero h3 { color: var(--text); font-size: 30px; font-weight: 800; letter-spacing: -.035em; line-height: 1.08; margin: 6px 0 8px; }
 .hero p { color: var(--muted); opacity: 1; font-size: 15px; }
@@ -1632,7 +1632,7 @@ nav.tabs button { border-radius: 20px; color: var(--text-3); font-size: 10.5px; 
 nav.tabs button svg { padding: 0; width: 22px; height: 22px; background: none !important; }
 nav.tabs button.on { color: var(--accent); background: var(--accent-soft); }
 body { padding-bottom: calc(var(--nav-h) + 40px + env(safe-area-inset-bottom)); }
-.fab { background: var(--cta); color: var(--on-cta); border-radius: 50%; width: 56px; height: 56px; box-shadow: 0 10px 26px rgba(49, 214, 160, .28); bottom: calc(var(--nav-h) + 26px + env(safe-area-inset-bottom)); }
+.fab { background: var(--cta); color: var(--on-cta); border-radius: 50%; width: 56px; height: 56px; box-shadow: 0 10px 26px rgba(198, 244, 50, .28); bottom: calc(var(--nav-h) + 26px + env(safe-area-inset-bottom)); }
 
 /* ---------- Hojas modales ---------- */
 .modal-bg { background: rgba(4, 6, 7, .62); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
@@ -1656,7 +1656,7 @@ label { color: var(--muted); font-size: 13px; font-weight: 600; }
 
 /* ---------- HYROX Lab con los tokens del sistema ---------- */
 .hx-card { background: var(--surface); color: var(--text); border-color: var(--line); position: relative; overflow: hidden; }
-.hx-card::before { content: ""; position: absolute; right: -80px; top: -80px; width: 240px; height: 240px; pointer-events: none; background: radial-gradient(circle, rgba(49, 214, 160, .14), transparent 65%); }
+.hx-card::before { content: ""; position: absolute; right: -80px; top: -80px; width: 240px; height: 240px; pointer-events: none; background: radial-gradient(circle, rgba(198, 244, 50, .14), transparent 65%); }
 .hx-card h2 { font-size: 26px; font-weight: 800; letter-spacing: -.035em; line-height: 1.1; }
 .hx-card .muted, .hx-card .small.muted { color: var(--muted); }
 .hx-card button:not(.ghost) { background: var(--cta); color: var(--on-cta); min-height: 54px; }

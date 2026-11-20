@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '30.0';
+const APP_VERSION = '31.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -715,7 +715,7 @@ function bar(value, goal) { return `<div class="bar"><div style="width:${goal ? 
 /* ------------------------------------------------------------------ *
  *  Navegación y modales
  * ------------------------------------------------------------------ */
-const TITLES = { home: 'Hoy', train: 'Plan', food: 'Nutrición', progress: 'Progreso', more: 'Explorar' };
+const TITLES = { home: 'Hoy', train: 'Plan', hyrox: 'HYROX Lab', food: 'Nutrición', progress: 'Progreso', more: 'Explorar' };
 let currentTab = 'home';
 function showTab(tab) {
   currentTab = tab;
@@ -735,7 +735,7 @@ function showTab(tab) {
   window.scrollTo(0, 0);
 }
 function render(tab) {
-  ({ home: renderHome, train: renderTrain, food: renderFood, progress: renderProgress, more: renderMore })[tab]();
+  ({ home: renderHome, train: renderTrain, hyrox: renderHyroxTab, food: renderFood, progress: renderProgress, more: renderMore })[tab]();
   const p = DB.profile;
   $('#hdr-sub').textContent = tab === 'home' ? longDate(todayStr()) : (p.name ? p.name + ' · ' : '') + longDate(todayStr());
 }
@@ -1241,7 +1241,6 @@ function renderTrain() {
 
   $('#view-train').innerHTML = `
     ${modeSeg}
-    ${typeof hyroxCard === 'function' ? hyroxCard() : ''}
     ${coachPlanCard()}
     ${routineCard()}
     ${compPlanCard()}

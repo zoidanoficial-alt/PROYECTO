@@ -81,8 +81,8 @@
 .ev-ag small { color: var(--muted); width: 52px; flex: none; font-variant-numeric: tabular-nums; }
 .ev-ag.k-goal, .ev-ag.k-event, .ev-ag.k-reg, .ev-ag.k-train, .ev-ag.k-hyrox, .ev-ag.k-done, .ev-ag.k-phase { background: var(--surface); box-shadow: none; }
 .ev-ag.k-goal { border-left-color: var(--accent); } .ev-ag.k-event { border-left-color: var(--warn); } .ev-ag.k-reg { border-left-color: var(--bad); } .ev-ag.k-hyrox { border-left-color: var(--cyan); } .ev-ag.k-done { border-left-color: var(--good); }
-.ph-eval { background: #657780; } .ph-base { background: #27d3d0; } .ph-dev { background: #2fb7a6; } .ph-spec { background: #31d6a0; } .ph-sim { background: #e7b75e; } .ph-taper { background: #9aaab3; } .ph-race { background: #f3f6f7; } .ph-rec { background: #23343c; }
-.ph-bg-eval, .ph-bg-base, .ph-bg-dev, .ph-bg-spec, .ph-bg-sim, .ph-bg-taper { background-image: linear-gradient(0deg, rgba(49, 214, 160, .08), rgba(49, 214, 160, .08)); }
+.ph-eval { background: #657780; } .ph-base { background: #7fa320; } .ph-dev { background: #a3cc29; } .ph-spec { background: #c6f432; } .ph-sim { background: #e7b75e; } .ph-taper { background: #9aaab3; } .ph-race { background: #f3f6f7; } .ph-rec { background: #23343c; }
+.ph-bg-eval, .ph-bg-base, .ph-bg-dev, .ph-bg-spec, .ph-bg-sim, .ph-bg-taper { background-image: linear-gradient(0deg, rgba(198, 244, 50, .08), rgba(198, 244, 50, .08)); }
 .ph-bg-taper, .ph-bg-sim { background-image: linear-gradient(0deg, rgba(231, 183, 94, .1), rgba(231, 183, 94, .1)); }
 .ph-bg-race { box-shadow: inset 0 0 0 1.5px var(--accent); }
 .ev-phbar { display: flex; gap: 2px; height: 8px; border-radius: 4px; overflow: hidden; margin: 10px 0; }

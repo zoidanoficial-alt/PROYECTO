@@ -225,6 +225,29 @@ function hxSessionLib(pace) {
       ['Enfriamiento', '10 min suave'] ], measure: 'Registra el tiempo total y cada km para ver tu caída real.' },
     taper: { n: 'Activación pre-carrera', goal: 'Llegar fresco y con el ritmo en la cabeza.', min: '25–30', blocks: [
       ['Trote', '15 min suave'], ['Ritmo', `3 × 400 m a ${p(1.05)} · 2 min`], ['Estaciones', '5 wall balls + 10 m de sled ligero'] ], measure: 'Debes terminar con ganas de más.' },
+    // 31.0 · Sesiones de los métodos de campeones (ver champs.js y docs/FUENTES-v31.md)
+    tempo: { n: 'Tempo a ritmo de carrera', goal: 'Sostener tu ritmo HYROX muchos km seguidos (como los tempos de 12–15 km de Rončević).', min: '45–60', hard: true, blocks: [
+      ['Calentamiento', '12 min suave + 4 aceleraciones'],
+      ['Tempo', `6–10 km continuos a ${p(1.12)} (principiante: 4–5 km). Respiración controlada: podrías decir frases cortas`],
+      ['Enfriamiento', '8 min suave'] ], measure: 'El último km no debe ser más lento que el primero.' },
+    thrHeavy: { n: 'Umbral sobre piernas cansadas', goal: 'Correr a ritmo de umbral con las piernas cargadas (el "día alto" de Wenisch).', min: '70–90', hard: true, blocks: [
+      ['Fuerza de piernas', 'Sentadilla o prensa 4 × 5 pesado · zancadas caminando 3 × 20 m · sled push 4 × 15 m'],
+      ['Umbral', `5–8 × 1 km a ${p(1.06)} · 75 s trotando (Wenisch llega a 10 × 1 km)`],
+      ['Enfriamiento', '8 min suave'] ], measure: 'Todos los km dentro de ±5 s del primero.' },
+    durability: { n: 'Durabilidad', goal: 'Una gran sesión de acondicionamiento para moverte bien con piernas fatigadas.', min: '60–75', hard: true, blocks: [
+      ['Calentamiento', '10 min suave + movilidad'],
+      ['3 rondas', `2 km a ${p(1.15)} → 500 m SkiErg → 25 m sled push → 25 m lunges → 30 wall balls`],
+      ['Enfriamiento', '10 min suave'] ], measure: 'El km de cada ronda no debe caer más de 10 s.' },
+    strengthLegs: { n: 'Fuerza para estaciones', goal: 'Bloque de fuerza: piernas, empuje y jalón pesados.', min: '60–70', hard: true, blocks: [
+      ['Calentamiento', '8 min remo + movilidad de cadera'],
+      ['Fuerza', 'Sentadilla 5 × 5 · peso muerto rumano 4 × 6 · sled push pesado 5 × 20 m · sled pull 5 × 20 m'],
+      ['Core y agarre', 'Plancha 3 × 45 s · farmers carry pesado 4 × 40 m'] ], measure: 'Sube carga solo si todas las series salen con técnica limpia.' },
+    long: { n: 'Tirada larga', goal: 'Volumen aeróbico: la base de todo HYROX.', min: '60–90', blocks: [
+      ['Carrera continua', `60–90 min a ${p(1.35)} (zona 2: puedes conversar)`] ], measure: 'Mismo ritmo con menos pulso semana a semana.' },
+    easyErg: { n: 'Ergómetro suave', goal: 'Aeróbico sin impacto (el "día bajo").', min: '35–45', blocks: [
+      ['Ergómetro', '35–45 min en remo, SkiErg o bici en zona 2'], ['Movilidad', '10 min cadera, tobillo y torácica'] ], measure: 'Terminar con ganas de más.' },
+    cross: { n: 'Aeróbico cruzado', goal: 'Sumar motor sin sumar impacto (Rončević usa bici o natación en vez de km lentos).', min: '45–60', blocks: [
+      ['Bici o natación', '45–60 min suave, zona 2'] ], measure: 'Sin dolor de piernas al día siguiente.' },
     recov: { n: 'Recuperación activa', goal: 'Moverte sin sumar fatiga.', min: '20–30', blocks: [
       ['Movimiento suave', '20–30 min caminando, bici o remo muy suave'], ['Movilidad', 'Cadera, tobillo y columna torácica 10 min'] ], measure: 'Sin cansancio al terminar.' }
   };
@@ -239,7 +262,9 @@ function hxMission() {
   else if (!perf.run) return { assess: 'run1k', ph, why: 'Antes de planear necesito tu ritmo fresco: un 1 km a tope, bien calentado.' };
   else if (missing.length >= 3) return { assess: missing[0].k, ph, why: `Te faltan ${missing.length} estaciones por medir. Una por sesión es suficiente; hoy toca ${missing[0].n}.` };
   else if (!perf.fat) return { assess: 'comp', ph, why: 'Falta medir cuánto cae tu ritmo después de una estación: es la diferencia entre entrenar en el gym y correr una carrera.' };
-  else if (bn && bn.main) {
+  else if (hx().profile.method && typeof hxMethodPick === 'function') {
+    const pk = hxMethodPick(lib, bn, ph); ses = pk.ses; type = pk.type; why = pk.why; if (pk.note) changes.push(pk.note);
+  } else if (bn && bn.main) {
     type = bn.main.k === 'comp' ? 'comp' : bn.main.k === 'run' ? (ph.k === 'found' ? 'z2' : 'run') : 'station';
     ses = type === 'station' ? lib.station(bn.main.k) : lib[type];
     if (ph.k === 'perf' && type !== 'station') { ses = lib.sim; type = 'sim'; }
@@ -262,7 +287,7 @@ function hxTelemetry(days) {
   const perf = hxPerformance(), pr = hxPredict();
   return `<div class="hx-tele"><div><b>${perf.hpi != null ? perf.hpi : '—'}</b><small>HPI</small></div><div><b>${pr.ok ? hxT(pr.total) : '—'}</b><small>Predicción</small></div><div><b>${days != null && days >= 0 ? days : '—'}</b><small>Días</small></div></div>`;
 }
-function hyroxCard() {
+function hyroxCard(inTab) {
   if (!hxOn()) return '';
   const p = hx().profile, w = hxWeeks(), m = hxMission(), act = hx().active;
   const days = p.date ? daysBetween(todayStr(), p.date) : null;
@@ -271,8 +296,8 @@ function hyroxCard() {
     : act ? `<h2 style="margin:4px 0">Sesión en curso</h2><p class="small muted">${esc(act.n)} · empezaste a las ${new Date(act.start).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</p><button class="block" id="hx-resume">Continuar sesión</button>`
     : m.assess ? `<h2 style="margin:4px 0">Prueba de hoy: ${esc(m.assess === 'run1k' ? '1 km fresco' : m.assess === 'comp' ? 'running bajo fatiga' : HX_ST[m.assess].n)}</h2><p class="small">${esc(m.why)}</p><button class="block" id="hx-test" data-st="${m.assess}">${ico('timer', 18, 'lead')}Cronometrar la prueba</button>`
     : `<h2 style="margin:4px 0">${esc(m.ses.n)}</h2><p class="small muted" style="margin:0 0 6px">${m.ses.min} min · ${esc(m.ses.goal)}</p><p class="small"><b>Por qué hoy:</b> ${esc(m.why)}</p>${m.changes.length ? `<div class="adapt-note">${ico('refresh-cw', 16, 'lead')}${esc(m.changes[0])}</div>` : ''}<button class="block" id="hx-start">Empezar sesión</button>`}
-    ${hxTelemetry(days)}
-    <div class="row" style="margin-top:4px"><span class="grow"></span><button class="ghost" id="hx-open">Abrir laboratorio →</button></div></div>`;
+    ${inTab ? '' : hxTelemetry(days)}
+    ${inTab ? '</div>' : '<div class="row" style="margin-top:4px"><span class="grow"></span><button class="ghost" id="hx-open">Abrir HYROX Lab →</button></div></div>'}`;
 }
 function bindHyrox(root, rerender) {
   const on = (id, f) => { const b = $('#' + id, root); if (b) b.onclick = f; };
@@ -285,6 +310,12 @@ function bindHyrox(root, rerender) {
 
 /* ---------- Hub ---------- */
 function openHyrox() {
+  // 31.0: HYROX Lab vive en su propia pestaña
+  if (typeof showTab === 'function' && document.getElementById('view-hyrox')) {
+    closeModal();
+    if (!hxOn()) { openHxSetup(() => { closeModal(); showTab('hyrox'); }); return; }
+    showTab('hyrox'); return;
+  }
   if (!hxOn()) return openHxSetup(openHyrox);
   const perf = hxPerformance(), bn = hxBottleneck(perf), pr = hxPredict(), p = hx().profile, ph = hxPhase();
   const days = p.date ? daysBetween(todayStr(), p.date) : null;

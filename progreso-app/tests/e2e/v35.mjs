@@ -55,7 +55,7 @@ await shot('v35-mi-reloj.png');
 await page.click('#wt-x');
 
 // 4) Plan: la prueba que toca se cronometra (sin escribir tiempos)
-await page.click('#tabs [data-tab=train]'); await page.clock.runFor(400);
+await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(400);
 R.cardBtn = await page.evaluate(() => (document.querySelector('#hx-test') || {}).innerText);
 await page.click('#hx-test'); await page.clock.runFor(300);   // 1 km fresco
 R.timerOpen = await page.evaluate(() => hxt() && hxt().mode);
