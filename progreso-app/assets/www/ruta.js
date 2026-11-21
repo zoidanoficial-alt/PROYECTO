@@ -109,7 +109,6 @@ function levelCard() {
 }
 function explorarCard() {
   const items = [
-    ['food', 'utensils', 'Nutrición', 'Calorías, proteína, agua y comidas'],
     ['stats', 'trending-up', 'Estadísticas', isBeginner() ? 'Tendencias y fuerza por músculo (avanzado)' : 'Tendencias, fuerza y balance'],
     ['run', 'footprints', 'Running', 'Planes, GPS y caminadora'],
     ['retos', 'medal', 'Retos', 'Pruebas de peso corporal'],
@@ -121,7 +120,7 @@ function explorarCard() {
     ['compite', 'trophy', 'Competir', 'Kit del fisicoculturista: programas, poses y nutrición'],
     ['act', 'activity', 'Otra actividad', 'Caminar, yoga, bici…']
   ];
-  return `<div class="card keep explore-card"><h2>Explorar</h2>
+  return `<div class="card keep explore-card"><h2>Herramientas y laboratorios</h2>
     <div class="ex-grid">${items.map(([k, i, t, s]) => `<button class="ex-item" data-explore="${k}">${ico(i, 22)}<b>${t}</b><small>${s}</small></button>`).join('')}</div></div>`;
 }
 function bindExplore(root) {

@@ -13,7 +13,7 @@ await page.clock.runFor(900); for (let i = 0; i < 4; i++) await page.click('#gd-
 await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(400); await pause(400);
 R.nav = await page.evaluate(() => { const bs = [...document.querySelectorAll('#tabs button:not([hidden])')], on = document.querySelector('#tabs button.on .tl'), nav = document.querySelector('#tabs');
   return { tabs: bs.map(x => x.dataset.tab), activeLabel: on.textContent, labelFits: on.scrollWidth <= on.clientWidth + 1, navFits: nav.scrollWidth <= nav.clientWidth + 1, accent: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(), bg: getComputedStyle(document.body).backgroundColor, title: document.querySelector('#hdr-title').textContent }; });
-for (const t of ['progress', 'more', 'food']) { await page.click(`#tabs [data-tab=${t}]`); await page.clock.runFor(200); await pause(600); R['fits_' + t] = await page.evaluate(() => { const on = document.querySelector('#tabs button.on .tl'); return on.scrollWidth <= on.clientWidth + 1; }); }
+for (const t of ['progress', 'more', 'hyrox']) { await page.click(`#tabs [data-tab=${t}]`); await page.clock.runFor(200); await pause(600); R['fits_' + t] = await page.evaluate(() => { const on = document.querySelector('#tabs button.on .tl'); return on.scrollWidth <= on.clientWidth + 1; }); }
 await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(300);
 R.empty = await page.evaluate(() => !!document.querySelector('#hxp-setup') && !!document.querySelector('#ch-open'));
 // Configurar con datos y elegir método
@@ -22,7 +22,7 @@ await page.evaluate(() => { hx().profile = { cat: 'open', sex: 'm', date: '2027-
   [['ski', 255], ['push', 230], ['pull', 300], ['bbj', 320], ['row', 250], ['farm', 115], ['lunge', 400], ['wb', 330]].forEach(([s, t]) => add(s, t));
   hx().results.push({ id: 'r', kind: 'run1k', sec: 235, date: '2026-11-09', t: 1, rpe: 9 }, { id: 'c', kind: 'comp', sec: 290, date: '2026-11-15', t: 1, rpe: 9 }); saveData(); render('hyrox'); });
 await page.clock.runFor(300);
-R.hub = await page.evaluate(() => ({ items: [...document.querySelectorAll('[data-hxp]')].map(x => x.dataset.hxp), count: document.querySelector('.hx-count b').textContent, mission: document.querySelector('.hx-card h2').textContent }));
+R.hub = await page.evaluate(() => ({ items: [...document.querySelectorAll('[data-hxp]')].map(x => x.dataset.hxp), count: document.querySelector('.cp-count b').textContent, mission: document.querySelector('.hx-card h2').textContent }));
 await page.click('#ch-open'); await page.clock.runFor(200);
 R.champs = await page.$$eval('[data-champ]', x => x.map(y => y.dataset.champ));
 await page.click('[data-champ=roncevic]'); await page.clock.runFor(200);

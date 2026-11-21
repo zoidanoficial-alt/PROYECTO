@@ -96,8 +96,7 @@ function bodyCard() {
       ${tile('energy', '⚡', 'Energía', en ? en.v : '—', en ? energyLabel(en.v) : 'faltan datos', true)}
       ${tile('stress', '🧠', 'Estrés', sr ? sr.v : '—', sr ? stressLabel(sr.v) : 'faltan datos', true)}
     </div>
-    ${DB.watch.hcSync ? `<p class="small muted" style="margin:8px 0 0">Del reloj vía Mi Fitness · ${new Date(DB.watch.hcSync).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}. Energía y estrés los calcula Mi Progreso.</p>` : ''}</div>
-    ${exInboxCard()}`;
+    ${DB.watch.hcSync ? `<p class="small muted" style="margin:8px 0 0">Del reloj vía Mi Fitness · ${new Date(DB.watch.hcSync).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}. Energía y estrés los calcula Mi Progreso.</p>` : ''}</div>`;
 }
 function bindBodyCard(root) {
   $$('[data-bd]', root).forEach(b => b.onclick = () => openBodyDetail(b.dataset.bd));

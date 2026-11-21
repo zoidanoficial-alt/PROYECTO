@@ -27,7 +27,7 @@ R.prog = await page.evaluate(() => ({ tabs: [...document.querySelectorAll('#view
 await page.screenshot({ path: D + 'v27-prog.png' });
 await page.evaluate(() => showTab('more')); await page.waitForTimeout(300);
 await page.screenshot({ path: D + 'v27-explorar.png' });
-await page.click('[data-explore="food"]'); R.food = await page.evaluate(() => currentTab);
+await page.click('#pf-food'); R.food = await page.evaluate(() => currentTab);
 await page.evaluate(() => showTab('more'));
 await page.click('[data-explore="stats"]'); await page.waitForTimeout(150); R.gate = await page.evaluate(() => !!document.querySelector('#st-adv'));
 await page.evaluate(() => closeModal());

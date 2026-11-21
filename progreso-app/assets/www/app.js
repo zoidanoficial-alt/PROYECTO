@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '35.0';
+const APP_VERSION = '36.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -715,16 +715,15 @@ function bar(value, goal) { return `<div class="bar"><div style="width:${goal ? 
 /* ------------------------------------------------------------------ *
  *  Navegación y modales
  * ------------------------------------------------------------------ */
-const TITLES = { home: 'Hoy', train: 'Plan', hyrox: 'HYROX Lab', food: 'Nutrición', progress: 'Progreso', more: 'Explorar' };
+const TITLES = { home: 'Hoy', train: 'Plan', hyrox: 'Competir', food: 'Nutrición', progress: 'Progreso', more: 'Perfil' };
 let currentTab = 'home';
 function showTab(tab) {
   currentTab = tab;
-  $$('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  // 36.0: cinco secciones (Hoy, Plan, Competir, Progreso, Perfil). Nutrición vive en Perfil y en Hoy.
+  const navTab = tab === 'food' ? 'more' : tab;
+  $$('nav.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === navTab));
   $$('section.view').forEach(s => s.classList.toggle('active', s.id === 'view-' + tab));
-  const fourTabs = isSimple() || isBeginner();   // 19.0: principiante → Nutrición vive en Explorar
-  $('#tabs').classList.toggle('four', fourTabs);
-  $('#tabs [data-tab=food]').hidden = fourTabs;
-  $('#tabs [data-tab=food]').classList.toggle('on', tab === 'food');
+  $('#tabs [data-tab=food]').hidden = true;
   const ht = $('#hdr-title');
   if (tab === 'home') ht.innerHTML = DB.profile.name ? `<span class="hi">${esc(greeting())},</span><b>${esc(DB.profile.name)}</b>` : esc(greeting()); else ht.textContent = TITLES[tab];
   document.body.dataset.tab = tab;
@@ -853,14 +852,18 @@ function renderHome() {
     else if (!rs) hero = `<div class="hero"><div class="eyebrow">Running</div><h3>${esc(rec.title)}</h3><p>${esc(rec.text)}</p><button id="home-runplan">Ir a correr</button></div>`;
   }
   if (!act && stage() === 1) hero = starterHero();
-  if (!act && !RUN.st) hero = hero.replace(/<\/div>\s*$/, weekDotsHtml() + '</div>');   // 17.0.1: motivación a la vista
   const full = !isSimple();
   $('#view-home').innerHTML = `
-    ${!act && !RUN.st ? `<div class="goal-line">${ico('goal', 16)}<span>${esc(goalLine())}</span></div>` : ''}
-    ${typeof athCard === 'function' && !act && !RUN.st ? athCard() : ''}
+    ${!act && !RUN.st ? todayGoalHtml() : ''}
     ${hero}
-    ${typeof evGoalCard === 'function' ? evGoalCard() : ''}
-    ${typeof bodyCard === 'function' ? bodyCard() : ''}
+    ${typeof exInboxCard === 'function' ? exInboxCard() : ''}
+    ${todayRecoveryHtml()}
+    ${todayWeekHtml()}
+    ${todayKpisHtml()}
+    ${full ? todayFoodHtml() : ''}
+    ${typeof evGoalCard === 'function' && todayGoal().k !== 'hyrox' ? evGoalCard() : ''}
+    ${typeof athCard === 'function' && !athOn() ? athCard().replace('class="card keep ath-cta"', 'data-fold-title="Proyecto Atleta" data-fold-sum="Tu transformación hasta los 40" class="card ath-cta"') : ''}
+    ${typeof bodyCard === 'function' ? bodyCard().replace('class="card keep bd-card"', 'data-fold-title="Tu cuerpo hoy" data-fold-sum="Datos del reloj vía Mi Fitness" class="card bd-card"') : ''}
     ${comebackCard()}
     ${notifPromptCard()}
     ${isBeginner() ? pathCard() : ''}
@@ -874,16 +877,6 @@ function renderHome() {
       <button data-q="log">${ico('clipboard-list', 22)}<span>Registro</span>${ico('chevron-right', 16, 'qa-chev')}</button>
     </div>
 
-    ${full ? `<div class="card" data-fold-title="Comida y agua" data-fold-ico="🍽️" data-fold-sum="${tot.kcal.toLocaleString('es-MX')} de ${tg.kcal.toLocaleString('es-MX')} kcal · ${Math.round(tot.p)} g proteína · ${fmt(tot.water / 1000, 1)} L">
-      <div class="row spread" style="margin-bottom:10px"><h2 style="margin:0">Hoy</h2><span class="small muted">${tg.kcal.toLocaleString('es-MX')} kcal objetivo</span></div>
-      <div class="rings">
-        <div>${ring(tot.kcal, tg.kcal, 'var(--accent)', Math.round(tot.kcal / Math.max(1, tg.kcal) * 100) + '%')}<div class="ring-label"><b>${tot.kcal.toLocaleString('es-MX')}</b>kcal</div></div>
-        <div>${ring(tot.p, tg.protein, 'var(--orange)', Math.round(tot.p) + 'g')}<div class="ring-label"><b>de ${tg.protein} g</b>proteína</div></div>
-        <div>${ring(tot.water, tg.water, 'var(--blue)', fmt(tot.water / 1000, 1) + 'L')}<div class="ring-label"><b>de ${fmt(tg.water / 1000, 1)} L</b>agua</div></div>
-      </div>
-      ${tot.s > tg.sugar ? `<div class="status bad"><b>Azúcar: ${Math.round(tot.s)} g</b>Pasaste el máximo de ${tg.sugar} g de hoy.</div>` : ''}
-    </div>` : ''}
-
     <div class="card" data-fold-title="Peso" data-fold-sum="${esc(adv.title)}" data-fold-badge="${r1 == null ? '' : signed(r1, 2) + ' kg/sem'}">
       <div class="row spread">
         <div><div class="small muted">Peso · media 7 días</div><div class="big">${fmt(cur)}<span class="muted" style="font-size:17px;font-weight:600"> kg</span></div></div>
@@ -896,8 +889,7 @@ function renderHome() {
       <div class="status ${adv.cls}"><b>${esc(adv.title)}</b>${esc(adv.text)}</div>
     </div>
 
-    ${missionsCard().replace('class="card missions-card"', 'class="card missions-card open"')}
-    ${weekCard()}
+    ${missionsCard()}
     ${stage() >= 2 ? agendaCard() : ''}
     ${challengesCard()}
     ${commitsCard()}
@@ -924,6 +916,8 @@ function renderHome() {
   if (typeof bindEvGoalCard === 'function') bindEvGoalCard($('#view-home'));
   if (typeof bindBodyCard === 'function') bindBodyCard($('#view-home'));
   if (typeof bindAthCard === 'function') bindAthCard($('#view-home'));
+  bindToday($('#view-home'));
+  if (typeof bindExInbox === 'function') bindExInbox($('#view-home'));
   const tr = $('#home-train');
   if (tr) tr.onclick = () => { if (!act) startSession(p.routine, nd.id); showTab('train'); };
   const hr = $('#home-run'); if (hr) hr.onclick = () => showTab('train');
@@ -1393,7 +1387,7 @@ function renderSession(s) {
     </div>
     ${typeof coachBanner === 'function' ? coachBanner(s) : ''}
     ${typeof painAskCard === 'function' ? painAskCard(s) : ''}
-    ${guided ? '' : !s.adjustDone && !isSimple() ? `<div class="card ck-prompt"><b>¿Cómo llegas hoy?</b><p class="small muted" style="margin:2px 0 8px">30 s para ajustar series e intensidad a tu recuperación.</p><div class="row"><button id="ss-ck" style="flex:2">Hacer chequeo</button><button class="secondary" id="ss-ck-skip" style="flex:1">Omitir</button></div></div>`
+    ${guided ? '' : !s.adjustDone && !isSimple() ? `<div class="ck-mini">${ico('gauge', 18)}<span><b>¿Cómo llegas hoy?</b><small>30 s para ajustar la sesión a tu recuperación</small></span><button class="secondary" id="ss-ck">Chequeo</button><button class="ghost" id="ss-ck-skip" aria-label="Omitir chequeo">${ico('x', 16)}</button></div>`
       : s.adjust ? `<div class="adapt-note" style="margin:0 0 12px">${PLAN_INFO[s.adjust].icon} <b>Plan ${PLAN_INFO[s.adjust].name.toLowerCase()}:</b> ${PLAN_INFO[s.adjust].text} <button class="ghost" id="ss-ck" style="padding:0 4px">Cambiar</button></div>` : ''}
     ${guided ? `<div class="g-intro">${ico('list-checks', 18)}<span>${exs.length} ejercicios, en orden. Toca uno para ver cómo se hace; al guardar cada serie empieza tu descanso.</span></div>` : `<div class="env-row"><span class="small muted">📍 Hoy entreno en</span>${Object.keys(ENVS).map(k => `<button class="chip-btn ${(s.env || 'gym') === k ? 'on' : ''}" data-env="${k}">${ENVS[k][0]} ${ENVS[k][1]}</button>`).join('')}</div>`}
     ${s.short ? '<div class="adapt-note" style="margin:0 0 12px">⏱️ <b>Versión corta:</b> 4 ejercicios y 2 series. Hecho es mejor que perfecto.</div>' : ''}
@@ -2392,7 +2386,7 @@ function renderProgress() {
   if (!tabs.some(([k]) => k === progMode)) progMode = tabs[0][0];   // 19.0: principiante ve un resumen sencillo
   const seg = `<div class="seg wrap scroll">${tabs.map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   const v = $('#view-progress');
-  v.innerHTML = seg + '<div id="prog-body"></div><button class="secondary block" id="prog-export" style="margin-top:4px">📄 Exportar PDF / Excel para analizar con IA</button>';
+  v.innerHTML = progressHero() + seg + '<div id="prog-body"></div><button class="secondary block" id="prog-export" style="margin-top:4px">📄 Exportar PDF / Excel para analizar con IA</button>';
   $('#prog-export').onclick = openExport;
   $$('#view-progress .seg button').forEach(b => b.onclick = () => { progMode = b.dataset.mode; redrawChart = () => {}; renderProgress(); });
   ({ resumen: renderBeginnerProgress, fuerza: el => { el.innerHTML = strengthScoreCard() + weeklySetsCard(); const i = $('#str-info', el); if (i) i.onclick = explainScore; }, analysis: renderAnalysis, historia: renderHistory, ciclo: renderCycle, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
@@ -2765,6 +2759,7 @@ function shrinkImage(file, maxSide, quality) {
 function renderMore() {
   const p = DB.profile, tg = targets(), t = todayStr(), s = (DB.days[t] && DB.days[t].supps) || {};
   $('#view-more').innerHTML = `
+    ${perfilHeader()}
     ${explorarCard()}
     ${levelCard()}
     ${feedbackCard()}
@@ -2931,7 +2926,7 @@ function renderMore() {
   $('#st-pause').onchange = e => { const k = weekKey(todayStr()); DB.pauses = DB.pauses.filter(x => x !== k).concat(e.target.checked ? [k] : []); saveData(); toast(e.target.checked ? 'Semana en pausa. Descansa ' + g('tranquilo.', 'tranquila.') : 'Pausa quitada'); };
   $('#st-gamify').onchange = e => { DB.profile.gamify = e.target.checked; saveData(); };
   bindNotifSettings($('#view-more'), renderMore);
-  bindExplore($('#view-more')); bindFeedbackCard($('#view-more'));
+  bindExplore($('#view-more')); bindFeedbackCard($('#view-more')); bindPerfil($('#view-more'));
   $('#st-rest').onchange = e => { DB.profile.restAlerts = e.target.checked; saveData(); if (e.target.checked) requestNotifications(); };
   $$('#view-more [data-theme]').forEach(b => b.onclick = () => { DB.profile.theme = b.dataset.theme; saveData(); applyTheme(); renderMore(); });
   $$('#view-more [data-look]').forEach(b => b.onclick = () => { DB.profile.look = b.dataset.look; saveData(); applyTheme(); keepScroll(renderMore); });

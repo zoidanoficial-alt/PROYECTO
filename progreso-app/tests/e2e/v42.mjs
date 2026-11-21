@@ -13,7 +13,7 @@ await page.clock.runFor(900); for (let i = 0; i < 4; i++) await page.click('#gd-
 // Hoy invita al proyecto antes de activarlo
 await page.click('#tabs [data-tab=home]'); await page.clock.runFor(300);
 R.cta = await page.evaluate(() => (document.querySelector('.ath-cta') || {}).innerText);
-await page.click('#ath-open'); await page.clock.runFor(200);
+await page.evaluate(() => document.querySelectorAll('#view-home details').forEach(d => d.open = true)); await page.click('#ath-open'); await page.clock.runFor(200);
 await page.fill('#as-age', '32'); await page.selectOption('#as-goal', 'ag'); await page.click('#as-s'); await page.clock.runFor(300);
 R.empty = await page.evaluate(() => ({ caps: athCapacities().map(c => c.k + ':' + (c.show || 'sin medir')), plan: (({ years, cur, week }) => ({ years, cur, week }))(athPlan()) }));
 await pause(400); await page.screenshot({ path: D + 'v42-atleta-vacio.png' });
@@ -44,9 +44,9 @@ R.later = await page.evaluate(() => { ath().start = addDays(todayStr(), -7 * (52
 await page.evaluate(() => { ath().start = todayStr(); });
 // Hoy: tarjeta del proyecto con anillo de perfil
 await page.evaluate(() => render('home')); await page.clock.runFor(300);
-R.card = await page.evaluate(() => document.querySelector('.ath-card').innerText.replace(/\s+/g, ' '));
+R.card = await page.evaluate(() => document.querySelector('#td-goal').innerText.replace(/\s+/g, ' '));
 await pause(400); await page.screenshot({ path: D + 'v42-hoy.png' });
-await page.click('#ath-open'); await page.clock.runFor(300);
+await page.click('#td-goal'); await page.clock.runFor(300);
 await pause(400); await page.screenshot({ path: D + 'v42-atleta.png' });
 // Medicina: marcar chequeo; psicología: marcar práctica
 await page.click('[data-area=med]'); await page.clock.runFor(200);

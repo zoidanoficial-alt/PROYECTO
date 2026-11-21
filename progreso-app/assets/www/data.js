@@ -143,7 +143,8 @@ const LIMITS = {
 function limitsFor(name, limits) {
   const x = EX[name];
   if (!x) return [];
-  return (limits || []).filter(k => LIMITS[k] && (LIMITS[k].patterns.includes(x.p) || LIMITS[k].ex.includes(name)));
+  const ks = Array.isArray(limits) ? limits : typeof limits === 'string' ? [limits] : limits && typeof limits === 'object' ? Object.keys(limits).filter(k => limits[k]) : [];   // 36.0: datos antiguos guardaban el dolor como objeto
+  return ks.filter(k => LIMITS[k] && (LIMITS[k].patterns.includes(x.p) || LIMITS[k].ex.includes(name)));
 }
 
 const GROUPS = {

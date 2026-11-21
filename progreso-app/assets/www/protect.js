@@ -127,7 +127,7 @@ function painAskCard(s) {
       <p class="small" style="margin:4px 0 8px">${hit ? `${hit} ejercicio${hit > 1 ? 's la cargan' : ' la carga'}. Calienta más ligero y usa un rango sin dolor; si duele, toca "Me duele" o ⇄.` : 'Ningún ejercicio de hoy la carga directamente. Si algo duele, para.'}</p>
       ${hit ? '<button class="secondary block" id="pa-swap">Cambiar los que la cargan</button>' : ''}<button class="ghost block" id="pa-clear" style="margin-top:6px">Ya no me molesta</button></div>`;
   }
-  return `<div class="card pain-card"><b>¿Alguna molestia hoy?</b>
+  return `<div class="card pain-card pain-ask"><b>¿Alguna molestia hoy?</b>
     <div class="chips" style="margin-top:8px"><button class="chip-btn" id="pa-no">No, todo bien</button>${Object.keys(LIMITS).filter(k => k !== 'impacto').map(k => `<button class="chip-btn" data-pa="${k}">${esc(LIMITS[k].name)}</button>`).join('')}</div></div>`;
 }
 function painNote(s, name) {

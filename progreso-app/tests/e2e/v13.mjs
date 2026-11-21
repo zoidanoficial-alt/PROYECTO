@@ -19,7 +19,7 @@ await page.screenshot({ path: 'v13-train.png', fullPage: true });
 await page.click('#cp-start'); await page.waitForTimeout(200);
 console.log('session started:', await page.evaluate(() => !!activeSession()));
 await page.click('#ss-cancel'); await page.waitForTimeout(200);
-await page.click('nav button[data-tab=food]'); await page.waitForTimeout(300);
+await page.click('[data-tab=more]'); await page.click('#pf-food'); await page.waitForTimeout(300);
 await page.screenshot({ path: 'v13-food.png', fullPage: true });
 await page.locator('#view-food [data-fold*="hambre"] > summary').click(); await page.click('#fd-hunger'); await page.waitForTimeout(100);
 console.log('hunger modal:', await page.isVisible('[data-hq="any|1"]'));

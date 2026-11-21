@@ -1,26 +1,69 @@
 'use strict';
 /* =====================================================================
- *  31.0 · Pestaña HYROX Lab: todo lo de HYROX en un solo lugar
+ *  36.0 · COMPETIR: HYROX, carreras y objetivos en una sola sección
+ *  Orden: Preparación → Sesión de hoy → Diagnóstico → Predictor →
+ *  Estaciones → Herramientas. Siempre se distingue medido / estimado / objetivo.
  * ===================================================================== */
+const HX_FIX = {   // qué entrenar según tu punto débil (lo aplica hxMission al elegir la sesión)
+  run: 'Intervalos de 1 km a ritmo de carrera y un rodaje largo suave por semana.',
+  comp: 'Una sesión de carrera bajo fatiga por semana: 1 km justo después de cada estación.',
+  st: 'Técnica y volumen específico de la estación, 2 veces por semana, al peso de competencia.'
+};
 function renderHyroxTab() {
   const root = $('#view-hyrox'); if (!root) return;
   if (!hxOn()) {
-    root.innerHTML = `<div class="hxp-hero"><div class="hx-eyebrow">HYROX LAB · THE SCIENCE OF YOUR NEXT PR</div>
-      <h2 class="hxp-big">Prepárate para tu HYROX</h2>
-      <p class="small muted">Evaluación por partes, tu punto débil, predicción de tiempo, temporizador controlado desde tu reloj y el método de los campeones.</p>
-      <button class="block" id="hxp-setup">Configurar mi carrera</button></div>
+    root.innerHTML = `<div class="cp-hero"><div class="hx-eyebrow">TU CENTRO DE COMPETENCIA</div>
+      <h2 class="cp-big">¿Para qué te preparas?</h2>
+      <p class="cp-lead">Elige tu carrera y la app arma tu preparación: evaluación por partes, punto débil, predicción y sesiones específicas.</p>
+      <button class="block" id="hxp-setup">${ico('timer', 18, 'lead')}Preparar un HYROX</button>
+      <button class="secondary block" data-hxp="events" style="margin-top:8px">${ico('calendar', 18, 'lead')}Buscar una competencia</button></div>
       ${champMethodCard()}
-      <div class="kit-list">${hxpItem('events', 'calendar', 'Competiciones', 'Encuentra tu carrera y hazla tu objetivo')}${hxpItem('watch', 'heart-pulse', 'Mi reloj', 'Mi Fitness, pulso en vivo y control remoto')}${hxpItem('resist', 'dumbbell', 'Resistencia', '¿Más peso o más reps? Programa de 6 semanas')}</div>`;
+      <div class="ds-h">Herramientas</div>
+      <div class="kit-list">${hxpItem('watch', 'heart-pulse', 'Mi reloj', 'Mi Fitness, pulso en vivo y control remoto')}${hxpItem('resist', 'dumbbell', 'Resistencia', '¿Más peso o más reps? Programa de 6 semanas')}${hxpItem('athlete', 'trophy', 'Proyecto Atleta', 'Tu transformación hasta los 40')}</div>`;
     hxpBind(root); return;
   }
   const perf = hxPerformance(), bn = hxBottleneck(perf), pr = hxPredict(), p = hx().profile, ph = hxPhase();
   const days = p.date ? daysBetween(todayStr(), p.date) : null, doneN = perf.tested.length + (perf.run ? 1 : 0) + (perf.fat ? 1 : 0);
   const ev = typeof evById === 'function' && p.eventId ? evById(p.eventId) : null;
-  root.innerHTML = `<div class="hxp-hero">
-      <div class="hx-eyebrow">${esc(ph.n.toUpperCase())}${ev ? ' · ' + esc(ev.eventName.toUpperCase()) : ''}</div>
-      ${days != null && days >= 0 ? `<div class="hx-count"><b class="t-display-l">${days}</b><span>días para<br>tu carrera</span></div>` : `<h2 class="hxp-big">Tu laboratorio</h2><button class="ghost" id="hxp-date">Elegir mi carrera →</button>`}
-      <div class="hx-tele"><div><b>${perf.hpi != null ? perf.hpi : '—'}</b><small>HPI</small></div><div><b>${pr.ok ? hxT(pr.total) : '—'}</b><small>Predicción</small></div><div><b>${doneN}/10</b><small>Evaluación</small></div></div>
-    </div>
+
+  // A · Preparación
+  const prep = `<div class="cp-hero">
+      <div class="hx-eyebrow">PREPARACIÓN · FASE ${esc(ph.n.toUpperCase())}</div>
+      ${days != null && days >= 0 ? `<div class="cp-count"><b>${days}</b><span>días para<br>${ev ? esc(ev.eventName) : 'tu carrera'}</span></div>` : `<h2 class="cp-big">Elige tu carrera</h2><button class="ghost" id="hxp-date">Ver competencias →</button>`}
+      <p class="cp-lead">${esc(ph.why)}</p>
+      <div class="cp-meta"><span>${esc(HX_CATS[p.cat])} · ${p.sex === 'f' ? 'Mujeres' : 'Hombres'}</span>${p.date ? `<span>${esc(longDate(p.date))}</span>` : ''}<span>Evaluación ${doneN}/10</span></div>
+    </div>`;
+
+  // C · Diagnóstico (solo con datos reales)
+  let diag;
+  if (bn && bn.main) {
+    const m = bn.main, fix = HX_FIX[m.k === 'run' || m.k === 'comp' ? m.k : 'st'];
+    diag = `<section class="cp-sec"><div class="ds-h">Diagnóstico</div><div class="cp-diag">
+      <small>TU PRINCIPAL ÁREA DE OPORTUNIDAD</small><b>${esc(m.n)}</b>
+      <dl><dt>Evidencia</dt><dd>${esc(m.why)}</dd>
+      <dt>Impacto</dt><dd>≈ ${hxT(Math.round(m.lost))} perdidos por carrera frente a tu nivel general.</dd>
+      <dt>Recomendación</dt><dd>${esc(fix)}</dd></dl>
+      ${bn.second ? `<p class="cp-second">Después: <b>${esc(bn.second.n)}</b></p>` : ''}</div></section>`;
+  } else {
+    const left = 10 - doneN;
+    diag = `<section class="cp-sec"><div class="ds-h">Diagnóstico</div><div class="cp-diag empty"><b>Aún no hay diagnóstico</b>
+      <p>Necesito al menos 4 pruebas para comparar tus partes entre sí. ${left > 0 ? `Te faltan ${left} de 10; una por sesión es suficiente.` : ''} No invento puntuaciones.</p>
+      <span class="td-bar"><i style="--w:${doneN * 10}%"></i></span></div></section>`;
+  }
+
+  // E · Predictor
+  const pred = pr.ok ? `<section class="cp-sec"><div class="ds-h">Predictor <em class="ds-est">estimación</em></div><button class="cp-pred" data-hxp="race">
+      <div class="cp-pred-top"><b>${hxT(pr.total)}</b><span>rango ${hxT(pr.lo)} – ${hxT(pr.hi)}</span></div>
+      <div class="cp-split">${[['Running', pr.runT], ['Estaciones', pr.stT], ['Roxzone', pr.rox]].map(([n, v]) => `<span style="flex:${Math.round(v)}"><i></i><small>${n}</small><b>${hxT(v)}</b></span>`).join('')}</div>
+      ${pr.flags.length ? `<p class="cp-flag">${ico('info', 14)}${esc(pr.flags[0])}</p>` : ''}</button></section>`
+    : `<section class="cp-sec"><div class="ds-h">Predictor</div><div class="cp-diag empty"><b>Sin predicción todavía</b><p>Necesita tu 1 km fresco${perf.run ? ' ✓' : ''} y ${hxIsPF && hxIsPF() ? 4 : 6} estaciones medidas (llevas ${perf.tested.length}).</p></div></section>`;
+
+  // F · Estaciones
+  const sts = `<section class="cp-sec"><div class="ds-h">Estaciones <span class="ds-h-r">${perf.tested.length} de 8 medidas</span></div>
+    <div class="cp-st">${HX_STATIONS.map((s, i) => { const x = perf.st[s.k], weak = bn && bn.main && bn.main.k === s.k; return `<button class="${x ? 'on' : ''}${weak ? ' weak' : ''}" data-cpst="${s.k}"><small>${String(i + 1).padStart(2, '0')}</small><b>${esc(typeof pfStName === 'function' ? pfStName(s.k) : s.n)}</b><span>${x ? hxT(x.sec) : 'sin medir'}</span></button>`; }).join('')}</div></section>`;
+
+  root.innerHTML = `${prep}
+    <div class="ds-h">Sesión de hoy</div>
     ${hyroxCard(true)}
     <div class="hxp-quick">
       <button data-hxp="timer">${ico('timer', 22)}<span>Temporizador</span></button>
@@ -28,24 +71,26 @@ function renderHyroxTab() {
       <button data-hxp="events">${ico('calendar', 22)}<span>Carreras</span></button>
       <button data-hxp="test">${ico('clipboard-list', 22)}<span>Resultado</span></button>
     </div>
+    ${diag}
+    ${pred}
+    ${sts}
     ${typeof pfHyroxCard === 'function' ? pfHyroxCard() : ''}
     ${champMethodCard()}
-    ${bn && bn.main ? `<div class="hx-bn"><small>CUELLO DE BOTELLA PRINCIPAL</small><b>${esc(bn.main.n)}</b><p class="small">${esc(bn.main.why)}</p>${bn.second ? `<small>SECUNDARIO</small><b class="hx-b2">${esc(bn.second.n)}</b>` : ''}</div>` : perf.hpi == null ? `<div class="status info"><b>Evaluación incompleta</b>Completa tus pruebas con el temporizador: una por sesión es suficiente.</div>` : ''}
+    <div class="ds-h">Herramientas</div>
     <div class="kit-list">
+      ${hxpItem('perf', 'trending-up', 'Perfil de rendimiento', perf.hpi != null ? `HPI ${perf.hpi}/100 · confianza ${perf.conf}` : 'Running, fuerza, fatiga y estaciones')}
+      ${hxpItem('strat', 'route', 'Estrategia de carrera', 'Ritmos, sets y transiciones con tus datos')}
+      ${hxpItem('ladder', 'trophy', 'Mi escalera', typeof ladderSummary === 'function' ? ladderSummary() : '')}
+      ${hxpItem('ranks', 'clipboard-list', 'Mis carreras', 'Resultados, parciales y comparaciones')}
       ${hxpItem('athlete', 'trophy', 'Proyecto Atleta', typeof athOn === 'function' && athOn() ? 'Bloque: ' + ATH_BLOCKS[athPlan().cur].n : 'Tu transformación hasta los 40')}
       ${hxpItem('resist', 'dumbbell', 'Resistencia', DB.resist && DB.resist.start ? `Semana ${resWeek()} · ${resPhase().n}` : '¿Más peso o más reps? Programa de 6 semanas')}
-      ${hxpItem('ladder', 'trophy', 'Mi escalera', typeof ladderSummary === 'function' ? ladderSummary() : '')}
-      ${hxpItem('st', 'layers', 'Las 8 estaciones', `${perf.tested.length} de 8 medidas · técnica y récords`)}
-      ${hxpItem('perf', 'trending-up', 'Rendimiento (HPI)', perf.hpi != null ? `${perf.hpi}/100 · confianza ${perf.conf}` : 'Evaluación incompleta')}
-      ${hxpItem('race', 'target', 'Predictor y "¿Y si…?"', pr.ok ? `${hxT(pr.lo)} – ${hxT(pr.hi)}` : 'Necesita 1 km y 6 estaciones')}
-      ${hxpItem('strat', 'route', 'Estrategia de carrera', 'Ritmos, sets y transiciones con tus datos')}
-      ${hxpItem('ranks', 'clipboard-list', 'Mis carreras', 'Resultados, parciales y resultados oficiales')}
-      ${hxpItem('method', 'book-open', 'Metodología', 'Fases y sesiones: por qué entrenas lo que entrenas')}
+      ${hxpItem('method', 'book-open', 'Metodología', 'Por qué entrenas lo que entrenas')}
       ${hxpItem('setup', 'sliders-horizontal', 'Mi carrera y perfil', `${HX_CATS[p.cat]} · ${p.sex === 'f' ? 'Mujeres' : 'Hombres'}${p.date ? ' · ' + shortDate(p.date) : ''}`)}
     </div>
     <p class="small muted" style="margin-top:10px">El HPI y las predicciones son modelos internos de la app, no métricas oficiales. Sin afiliación con HYROX ni con los atletas.</p>`;
   bindHyrox(root, renderHyroxTab);
   hxpBind(root);
+  $$('[data-cpst]', root).forEach(b => b.onclick = () => openHxStation(b.dataset.cpst, () => closeModal()));
 }
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }
 function hxpBind(root) {

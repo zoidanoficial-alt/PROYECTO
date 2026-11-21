@@ -45,7 +45,7 @@ await page.evaluate(() => document.querySelectorAll('details.fold').forEach(d =>
 await page.click('[data-mode="analysis"]'); await page.waitForTimeout(200); await page.click('#goal-add'); await page.selectOption('#g-ex', 'Press banca con barra'); await page.fill('#g-t', '130'); await page.click('#g-save'); await page.waitForTimeout(300);
 await page.screenshot({ path: 'v10-analysis.png', fullPage: true });
 // pwo restart/cancel + water undo
-await page.click('nav button[data-tab=food]'); await page.waitForTimeout(200);
+await page.click('[data-tab=more]'); await page.click('#pf-food'); await page.waitForTimeout(200);
 await page.evaluate(() => document.querySelectorAll('details.fold').forEach(d => d.open = true)); // OPENFOLDS
 await page.click('[data-wat="500"]'); await page.click('[data-wat="250"]'); await page.click('[data-wat="undo"]');
 console.log('water:', await page.evaluate(() => DB.days[todayStr()].water));

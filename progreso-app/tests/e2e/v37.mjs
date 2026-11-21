@@ -47,6 +47,7 @@ R.data = await page.evaluate(() => { const d = DB.days[todayStr()]; return { sle
 R.energy = await page.evaluate(() => bodyEnergy()); R.stress = await page.evaluate(() => bodyStress());
 R.tiles = await page.$$eval('.bd-tile', t => t.map(x => x.innerText.replace(/\s+/g, ' ')));
 R.inbox = await page.evaluate(() => DB.watch.exInbox.map(x => ({ type: x.type, laps: x.laps.length, hr: x.hrAvg, dur: Math.round((x.end - x.start) / 1000) })));
+await page.evaluate(() => document.querySelectorAll('#view-home details').forEach(d => d.open = true));
 await page.evaluate(() => document.querySelector('.bd-card').scrollIntoView({ block: 'start' })); await pause(600);
 await page.screenshot({ path: D + 'v37-cuerpo.png' });
 await page.click('[data-bd=stress]'); await page.clock.runFor(200);

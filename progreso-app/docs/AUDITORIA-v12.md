@@ -1266,3 +1266,19 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
 - **Pruebas:**
   - e2e `v42`: invitación, configuración (edad 32 → 8 años), capacidades sin datos, fórmulas VDOT y RFM, capacidades con datos reales (GPS, fuerza, cintura, pruebas, reloj), 7 áreas, plan por años, avance a año 2 bloque 3, tarjeta en Hoy, medicina, psicología, activar bloque (Rončević) y persistencia.
   - Regresión v9–v42: sin fallas.
+
+## 36.0 · Rediseño "Centro de preparación"
+
+**Auditoría (antes):** WebView + JS global, datos en localStorage (`miprogreso.v1`), 6 pestañas. Problemas: Hoy sin recuperación ni rendimiento visibles (la semana iba dentro de la misión y el resto escondido en "Más de hoy"); HYROX era un muro de 10 filas con iconos limón; el limón pintaba agua, proteína, gráficas e iconos (`--blue`, `--cyan`, `--orange` = limón); Nutrición ocupaba una pestaña; Progreso empezaba directo en pestañas sin resumen; el inicio de sesión ponía 2 tarjetas grandes antes del primer ejercicio; `limitsFor` fallaba con dolor guardado en formato antiguo (error en v11).
+
+**Cambios:**
+- Navegación de 5: Hoy · Plan · Competir · Progreso · Perfil (los `data-tab` internos no cambian: `hyrox`, `more`). Nutrición vive en Perfil y en Hoy; la vista `food` sigue existiendo.
+- `today.js`: Hoy = objetivo principal con barra → misión → recuperación (solo métricas registradas; estado vacío útil) → semana (X de Y + próxima) → rendimiento (máx. 3 indicadores según objetivo, solo con dato) → nutrición en una línea → "Más de hoy".
+- `hxtab.js`: Competir = Preparación → Sesión de hoy → Diagnóstico (evidencia, impacto, recomendación) → Predictor (estimación, rango, reparto) → 8 estaciones en cuadrícula → Herramientas. Sin datos: "no invento puntuaciones".
+- `today.js` · Progreso: "Tu transformación" + Análisis basado en reglas (fuerza 4 sem, sesiones 3 vs 3 sem, volumen de carrera); calla con datos insuficientes.
+- `perfil.js`: cabecera de atleta, objetivo, Nutrición, Salud y reloj; "Explorar" pasa a "Herramientas y laboratorios".
+- `ds.css`: tokens (espaciado, radios, tipografía, duraciones), colores de datos neutros, iconos neutros, microinteracciones (presión, entrada de vista, barras animadas) y `prefers-reduced-motion`.
+- Sesión: chequeo compacto en una línea; chips neutros salvo el seleccionado.
+- `data.js`: `limitsFor` acepta datos antiguos.
+
+**Pruebas:** e2e v9–v42 + persist en verde; v9/v10/v13/v27/v37/v38/v42 ajustadas a la nueva navegación. Overflow 320/360/393 sin errores. Build Gradle OK (versionCode 41).
