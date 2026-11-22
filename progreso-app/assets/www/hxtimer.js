@@ -16,10 +16,24 @@ function hxtSegments(mode, st) {
 }
 const HXT_TITLE = { race: 'Simulación de carrera', station: 'Prueba de estación', run1k: '1 km fresco', comp: 'Running bajo fatiga' };
 const hxt = () => (DB.hyrox && DB.hyrox.timer) || null;
+/** 37.0 · Tu fantasma: tu mejor versión anterior del mismo tramo, en tiempo acumulado por segmento (s). */
+function hxtGhost(mode, st) {
+  const prev = (hx().runs || []).filter(r => r.mode === mode && (r.st || null) === (st || null) && r.segs && r.segs.length === hxtSegments(mode, st).length);
+  const best = prev.reduce((b, r) => !b || r.total < b.total ? r : b, null);
+  if (best) { let c = 0; return { src: 'tu mejor ' + (mode === 'race' ? 'simulación' : 'intento') + ' (' + shortDate(best.date) + ')', cum: best.segs.map(x => (c += x.sec)) }; }
+  const one = mode === 'run1k' ? hxBest('run1k') : mode === 'station' ? hxBest('st', st) : null;
+  return one ? { src: 'tu récord (' + shortDate(one.date) + ')', cum: [one.sec] } : null;
+}
+function hxtGhostTxt(t, short) {
+  const g = t && t.ghost; if (!g || !t.t0) return '';
+  const n = hxtNow(t), tot = n.total / 1000, i = Math.min(t.i, g.cum.length - 1), left = g.cum[i] - tot;
+  if (short) return left >= 0 ? ` · récord en ${hxT(left)}` : ` · +${hxT(-left)} vs récord`;
+  return left >= 0 ? `Te quedan <b>${hxT(left)}</b> para ganarle a tu fantasma en este tramo` : `Tu fantasma ya cerró este tramo: vas <b>+${hxT(-left)}</b>`;
+}
 let hxtTick = null, hxtLastPush = 0;
 
 function hxtCreate(mode, st) {
-  hx().timer = { id: 'ht' + Date.now(), mode, pf: typeof hxIsPF === 'function' && hxIsPF(), st: st || null, segs: hxtSegments(mode, st).map(s => ({ ...s, start: null, end: null, hrSum: 0, hrN: 0, hrMax: 0, rr: [] })), i: 0, t0: null, pauses: [], paused: null, hr: [], hrLive: false };
+  hx().timer = { id: 'ht' + Date.now(), mode, pf: typeof hxIsPF === 'function' && hxIsPF(), st: st || null, segs: hxtSegments(mode, st).map(s => ({ ...s, start: null, end: null, hrSum: 0, hrN: 0, hrMax: 0, rr: [] })), i: 0, t0: null, pauses: [], paused: null, hr: [], hrLive: false, ghost: hxtGhost(mode, st) };
   saveData();
   if (bridge && typeof bridge.watchStart === 'function') bridge.watchStart(hxt().segs[0].n, 'Toca ▶ en tu reloj para empezar');
   if (typeof hrAutoConnect === 'function') hrAutoConnect();
@@ -70,7 +84,7 @@ function hxtPush(force) {
   const now = Date.now(); if (!force && now - hxtLastPush < 5000) return; hxtLastPush = now;
   const seg = t.segs[t.i], n = hxtNow(t), hr = WATCH.hr && now - WATCH.hr.at < 10000 ? ` · ${WATCH.hr.bpm} lpm` : '';
   const title = t.t0 ? `${seg.n} · ${hxT(n.seg / 1000)}` : `${seg.n} · listo`;
-  const sub = t.t0 ? `Total ${hxT(n.total / 1000)}${hr}${t.paused != null ? ' · en pausa' : ''}` : 'Toca ▶ para empezar';
+  const sub = t.t0 ? `Total ${hxT(n.total / 1000)}${hr}${hxtGhostTxt(t, true)}${t.paused != null ? ' · en pausa' : ''}` : 'Toca ▶ para empezar';
   bridge.watchUpdate(title, sub, !!t.t0 && t.paused == null, Math.round(n.seg));
 }
 
@@ -90,6 +104,7 @@ function openHxTimer() {
       <button class="icon-btn hxt-b" id="hxt-next" aria-label="Siguiente">⏭</button>
     </div>
     <p class="small muted hxt-next" id="hxt-nexttxt"></p>
+    <div class="hxt-ghost" id="hxt-ghost" hidden></div>
     <div id="hxt-splits"></div>
     <p class="small muted">Desde el reloj: control de música ▶/⏸ inicia o pausa, ⏭ siguiente, ⏮ deshace. Puedes bloquear el teléfono: los tiempos usan la hora real de cada toque.</p>
     <div class="row" style="gap:8px"><button class="ghost" id="hxt-min">Minimizar</button><span class="grow"></span><button class="ghost" id="hxt-del" style="color:var(--bad)">Descartar</button></div>
@@ -117,6 +132,8 @@ function hxtPaint() {
   const chip = el('hxt-hrchip'), live = WATCH.hr && Date.now() - WATCH.hr.at < 10000;
   if (chip) { chip.className = 'ev-ver ' + (live ? 'ok' : ''); chip.lastChild.textContent = live ? 'Pulso en vivo' : (DB.watch && DB.watch.hcOn ? 'Pulso: llega de Mi Fitness al terminar' : 'Sin pulso en vivo'); }
   if (!live) $$('.live-hr').forEach(e => { e.textContent = '—'; });
+  const gh = el('hxt-ghost');
+  if (gh) { const tx = hxtGhostTxt(t); gh.hidden = !t.ghost; gh.className = 'hxt-ghost' + (tx.includes('+') ? ' behind' : ''); gh.innerHTML = t.ghost ? `<small>👻 CONTRA ${esc(t.ghost.src.toUpperCase())}</small><span>${tx || 'Empieza y compites contra tu mejor versión'}</span>` : ''; }
   const done = t.segs.filter(s => s.end);
   el('hxt-splits').innerHTML = done.length ? `<table class="small hx-tbl"><tbody>${done.slice().reverse().map(s => `<tr><td>${esc(s.n)}</td><td>${s.hrN ? Math.round(s.hrSum / s.hrN) + ' lpm' : ''}</td><td><b>${hxT(hxtActive(t, s.start, s.end) / 1000)}</b></td></tr>`).join('')}</tbody></table>` : '';
 }

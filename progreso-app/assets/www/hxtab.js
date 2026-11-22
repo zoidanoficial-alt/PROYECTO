@@ -90,6 +90,7 @@ function renderHyroxTab() {
     <p class="small muted" style="margin-top:10px">El HPI y las predicciones son modelos internos de la app, no métricas oficiales. Sin afiliación con HYROX ni con los atletas.</p>`;
   bindHyrox(root, renderHyroxTab);
   hxpBind(root);
+  if (typeof liveCheck === 'function') liveToast(liveCheck());
   $$('[data-cpst]', root).forEach(b => b.onclick = () => openHxStation(b.dataset.cpst, () => closeModal()));
 }
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }

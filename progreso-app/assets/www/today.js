@@ -9,7 +9,8 @@
 /** Objetivo principal del atleta con una barra de avance. */
 function todayGoal() {
   const p = DB.profile, t = todayStr();
-  if (typeof hxOn === 'function' && hxOn() && hx().profile.date && daysBetween(t, hx().profile.date) >= 0) {
+  const sp = typeof mainSport === 'function' ? mainSport() : 'fuerza';
+  if (sp === 'hyrox' && typeof hxOn === 'function' && hxOn() && hx().profile.date && daysBetween(t, hx().profile.date) >= 0) {
     const hp = hx().profile, days = daysBetween(t, hp.date), ph = hxPhase();
     const ev = typeof evById === 'function' && hp.eventId ? evById(hp.eventId) : null;
     const span = 16 * 7, pct = Math.max(4, Math.min(100, (1 - days / span) * 100));
@@ -18,6 +19,12 @@ function todayGoal() {
   if (typeof athOn === 'function' && athOn()) {
     const P = athPlan(), B = ATH_BLOCKS[P.cur];
     return { k: 'ath', tag: 'Proyecto Atleta', title: B.n, meta: `Semana ${P.weekInBlock} de 6 del bloque · año ${P.yearIdx + 1} de ${P.years}`, pct: P.weekInBlock / 6 * 100, go: () => openAthlete() };
+  }
+  if (['run', 'tri', 'spartan', 'bici'].includes(sp)) {
+    const ge = DB.ev && DB.ev.goal && typeof evById === 'function' ? evById(DB.ev.goal) : null, n = sessionsThisWeek(), g = weekTarget();
+    if (ge && ge.startDate >= t) { const days = daysBetween(t, ge.startDate); return { k: sp, tag: SPORTS[sp].n, title: ge.eventName, meta: `${days} días para tu competencia`, pct: Math.max(4, Math.min(100, (1 - days / 112) * 100)), go: () => { progMode = 'evol'; showTab('progress'); } }; }
+    const tt = sp === 'bici' ? 'Más forma sobre la bici' : sp === 'tri' ? 'Construir tu motor de triatleta' : `Tu mejor ${RUN_DIST[runGoalKm()] || runGoalKm() + ' km'}`;
+    return { k: sp, tag: SPORTS[sp].n, title: tt, meta: `${n} de ${g} sesiones esta semana`, pct: Math.min(100, n / g * 100), go: () => { progMode = 'evol'; showTab('progress'); } };
   }
   if (p.trainMode === 'running' && DB.runPlan && typeof RUN_PLANS === 'object' && RUN_PLANS[DB.runPlan.type]) {
     const n = sessionsThisWeek(), g = weekTarget();
@@ -30,12 +37,13 @@ function todayGoal() {
     return { k: 'weight', tag: p.phase === 'definicion' ? 'Perder grasa' : 'Ganar músculo', title: `${p.phase === 'definicion' ? 'Bajar' : 'Subir'} a ${fmt(p.goalWeight)} kg`, meta: left < 0.3 ? '¡Estás en tu meta!' : `Te faltan ${fmt(left)} kg · vas en ${fmt(cur)} kg`, pct, go: () => { progMode = 'weight'; showTab('progress'); } };
   }
   const n = sessionsThisWeek(), g = weekTarget();
+  if (!p.sport && typeof openSportPicker === 'function') return { k: 'consist', tag: 'Elige tu disciplina', title: 'Ganar fuerza semana a semana', meta: `${n} de ${g} sesiones · toca para elegir para qué te preparas`, pct: Math.min(100, n / g * 100), go: () => openSportPicker() };
   return { k: 'consist', tag: 'Construir constancia', title: 'Ganar fuerza semana a semana', meta: `${n} de ${g} sesiones esta semana`, pct: Math.min(100, n / g * 100), go: () => { progMode = 'fuerza'; showTab('progress'); } };
 }
 function todayGoalHtml() {
-  const g = todayGoal();
+  const g = todayGoal(), live = typeof goalLive === 'function' ? goalLive() : null;
   return `<button class="td-goal keep" id="td-goal"><span class="td-goal-top"><small>${esc(g.tag)}</small>${ico('chevron-right', 16)}</span>
-    <b>${esc(g.title)}</b><span class="td-bar"><i style="--w:${Math.round(g.pct)}%"></i></span><span class="td-goal-meta">${esc(g.meta)}</span></button>`;
+    <b>${esc(g.title)}</b>${live ? `<span class="td-live ${live.dir > 0 ? 'up' : live.dir < 0 ? 'down' : ''}"><small>${esc(live.label)}${live.est ? ' · estimado' : ''}</small><b>${esc(live.val)}</b><em>${esc(live.chg)}</em></span>` : ''}<span class="td-bar"><i style="--w:${Math.round(g.pct)}%"></i></span><span class="td-goal-meta">${esc(g.meta)}</span></button>`;
 }
 
 /** Recuperación: solo métricas que existen hoy. */

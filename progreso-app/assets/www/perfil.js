@@ -10,6 +10,7 @@ function perfilHeader() {
   return `<div class="pf-head keep"><div class="pf-av">${esc(init)}</div><div class="grow"><b>${esc(p.name || 'Atleta')}</b>
       <small>${userLevel() === 'avanzado' ? 'Nivel avanzado' : 'Nivel principiante'}${p.age ? ' · ' + p.age + ' años' : ''}${since != null ? ' · día ' + (since + 1) : ''}</small></div></div>
     <div class="pf-stats"><div><b>${done}</b><small>entrenos</small></div><div><b>${trainingStreakWeeks()}</b><small>semanas de racha</small></div><div><b>${DB.achievements.filter(a => a.pr).length}</b><small>récords</small></div></div>
+    <button class="pf-row" id="pf-sport">${ico(SPORTS[mainSport()].ico, 20)}<span class="grow"><b>Mi disciplina: ${esc(SPORTS[mainSport()].n)}</b><small>${DB.profile.sport ? 'Decide tus métricas, gráficas y lo que ves en Hoy' : 'Elige para qué te preparas'}</small></span>${ico('chevron-right', 16)}</button>
     ${goal ? `<button class="pf-row" id="pf-goal">${ico('target', 20)}<span class="grow"><b>Objetivo: ${esc(goal.tag)}</b><small>${esc(goal.title)}</small></span>${ico('chevron-right', 16)}</button>` : ''}
     ${isSimple() ? '' : `<button class="pf-row" id="pf-food">${ico('utensils', 20)}<span class="grow"><b>Nutrición</b><small>Hoy: ${tot.kcal.toLocaleString('es-MX')} de ${tg.kcal.toLocaleString('es-MX')} kcal · ${Math.round(tot.p)} g proteína</small></span>${ico('chevron-right', 16)}</button>`}
     <button class="pf-row" id="pf-health">${ico('heart-pulse', 20)}<span class="grow"><b>Salud y reloj</b><small>${DB.watch && DB.watch.hcOn ? 'Mi Fitness conectado' : 'Sueño, pulso y datos de Mi Fitness'}</small></span>${ico('chevron-right', 16)}</button>`;
@@ -17,6 +18,7 @@ function perfilHeader() {
 function bindPerfil(root) {
   const on = (id, f) => { const b = $('#' + id, root); if (b) b.onclick = f; };
   on('pf-goal', () => todayGoal().go());
+  on('pf-sport', () => openSportPicker(() => render(currentTab)));
   on('pf-food', () => showTab('food'));
   on('pf-health', () => openWatch());
 }

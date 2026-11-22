@@ -1282,3 +1282,16 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
 - `data.js`: `limitsFor` acepta datos antiguos.
 
 **Pruebas:** e2e v9–v42 + persist en verde; v9/v10/v13/v27/v37/v38/v42 ajustadas a la nueva navegación. Overflow 320/360/393 sin errores. Build Gradle OK (versionCode 41).
+
+## 37.0 · Tu objetivo en vivo, Evolución, reloj como herramienta y fluidez
+
+- **Disciplinas** (`trend.js`): HYROX, Running, Triatlón, Spartan/OCR, Ciclismo, Fisicoculturismo, Fuerza. `DB.profile.sport` (y `runKm`) decide la métrica principal; si no se elige se infiere (HYROX activo → hyrox; modo running → run; volumen/definición → fisico).
+- **Métricas calculables a cualquier fecha** (para graficar hacia atrás sin guardar copias): predicción HYROX (filtrando resultados ≤ fecha), tiempo previsto de carrera (Riegel sobre el mejor esfuerzo de 120 días), VO₂máx (VDOT), fuerza, peso 7 d, % grasa RFM, forma (CTL), minutos de cardio, pulso en reposo y HRV (medias 7 d). Sin datos → la métrica no aparece.
+- **En vivo**: `liveCheck()` compara la métrica principal con la última vista (`DB.live`) y, si mejoró, avisa con el delta ("Predicción 1:23:38 → 1:22:55, −0:43"). Hoy muestra valor y cambio en 7 días.
+- **Evolución** (primera pestaña de Progreso): selector de métrica, gráfica semanal de 16 semanas (si menos es mejor el eje se invierte: mejorar siempre sube), mejor marca, lectura de 4 semanas y **Cómo sostenerlo** con estado (al día / pronto / perdiendo) y fuente: Bickel 2011 (fuerza), Hickson 1985 y Mujika y Padilla 2000 (aeróbico), Morton 2018 (proteína), Gabbett 2016 (relación de carga), Seiler 2010 (80/20), Bellenger 2016 y Plews 2013 (pulso/HRV).
+- **Forma y fatiga**: carga sRPE = minutos × esfuerzo (Foster 2001); gimnasio usa 10 − RIR medio; sin dato se supone y se dice cuántas sesiones. CTL 42 d / ATL 7 d (Banister), frescura y relación aguda/crónica.
+- **Reloj** (`watchgoal.js`): los botones de música del Mi Watch controlan lo que estés haciendo: HYROX (igual que antes), gimnasio (▶ descanso con el tiempo planeado, ⏭ saltar, ⏮ +15 s) y carrera (▶ pausa, ⏭ ritmo y distancia hablados). La pantalla de música del reloj muestra descanso, serie, ritmo y pulso. **Descanso guiado por pulso**: “listo” al bajar del 40 % de tu reserva cardiaca (guía práctica) con vibración. Panel “Tu reloj para tu objetivo” por disciplina. Se puede apagar para gimnasio y carrera.
+- **Fantasma** en el temporizador HYROX: tu mejor intento del mismo tramo (o tu récord) en pantalla y en el reloj.
+- **Fluidez** (`flow.js`): barra “en curso” (entreno, carrera, temporizador o sesión HYROX) siempre a un toque; el atrás de Android usa el “← Volver” de cada hoja antes de cerrar; ✕ fijo arriba en todas las hojas.
+- Prueba nueva v43; suite completa en verde; build versionCode 42.
+- **Sin probar en dispositivo real:** controles de música del Mi Watch en gimnasio y carrera, vibración del descanso guiado.
