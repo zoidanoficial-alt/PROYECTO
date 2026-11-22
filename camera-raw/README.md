@@ -87,25 +87,30 @@ La SL3 salió en 2019. Sus archivos **.CR3** necesitan Camera Raw 11.3 o posteri
 
 ## Paquete «FOTONEANDO · Reels»
 
-Dos presets copiados de los ajustes de Lightroom que aparecen en capturas de reels, y traducidos a Camera Raw 10.
+Siete presets copiados de los ajustes de Lightroom que aparecen en reels (un PDF de capturas y cinco videos), y traducidos a Camera Raw 10.
 
 | Preset | Look |
 |---|---|
 | **RL Glow** | Brillo suave y difuso: sombras muy abiertas, negros lavados, verdes y amarillos apagados, sombras azuladas |
 | **RL Weirdcore** | Onírico: muy luminoso y lavado, saturación muy alta con tinte magenta, morados girados al azul, mucho grano |
+| **RL Twin Peaks** | Bosque húmedo y misterioso: verdes apagados, azules oscuros, sombras magenta, luces doradas, grano |
+| **RL Resident Evil** | Noche de nieve con farolas: sombras muy azules, luces amarillas de sodio, negros levantados, grano |
+| **RL Pacific Northwest** | Bosque con niebla: sombras abiertas y azules, medios turquesa, contraste suave, grano |
+| **RL Succession** | Ciudad nublada: sombras azul acero, luces cálidas, sombras muy abiertas, grano discreto |
+| **RL Winter** | Invierno nevado: mucho contraste con negros lavados, verdes casi sin color, toque frío |
 
-Cada uno viene en dos versiones:
+Los que en el reel cambian la Exposición vienen en dos versiones:
 - **sin Exposición**, para usarlo en cualquier foto;
-- **«(valores exactos)»**, con la Exposición del reel: +0.90 en Glow y +1.15 en Weirdcore. Esa versión sirve para fotos oscuras como la del reel.
+- **«(valores exactos)»**, con la Exposición del reel: Glow +0.90, Weirdcore +1.15, Resident Evil +0.16, Succession −0.85.
 
 Lo que Camera Raw 10 no tiene se tradujo así:
 
 | En el reel (Lightroom) | En Camera Raw 10 |
 |---|---|
 | Gradación de color: sombras y luces | Dividir tonos, con los mismos tono y saturación |
-| Gradación de color: medios tonos (Weirdcore: tono 54, sat. 20) | Curvas Rojo / Verde / Azul en los medios tonos |
+| Gradación de color: medios tonos | Curvas Rojo / Verde / Azul en los medios tonos |
 | Temperatura y Matiz relativos (+4/+16 y +15/+39) | Curvas Rojo / Verde / Azul, para que funcione igual en RAW y en JPG |
-| Textura (−4 y 0) | Se omite: no existe en Camera Raw 10 y el efecto es mínimo |
+| Textura (−4 a +15) | Se omite: no existe en Camera Raw 10. Si quieres el +15, sube un poco el Enfoque |
 | Glow 51 (efecto de Lightroom) | No existe en Camera Raw. Termínalo en Photoshop: duplica la capa, aplica Desenfoque gaussiano de 20–40 px, ponla en modo Trama al 20–35%, o usa los pinceles «FT Luz · Lens Glow» |
 
 Cada preset ajusta:
