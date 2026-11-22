@@ -1,0 +1,58 @@
+name: MezclaMaster (compilar plugin)
+
+on:
+  push:
+    paths:
+      - "MezclaMaster/**"
+      - ".github/workflows/mezclamaster.yml"
+  workflow_dispatch:
+
+jobs:
+  test-linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependencias
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libfreetype6-dev libfontconfig1-dev libx11-dev \
+            libxrandr-dev libxinerama-dev libxcursor-dev libxext-dev libgl1-mesa-dev
+      - name: Configurar
+        run: cmake -S MezclaMaster -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Compilar prueba
+        run: cmake --build build --target MezclaMasterTest -j4
+      - name: Prueba offline del DSP
+        run: ./build/MezclaMasterTest_artefacts/Release/MezclaMasterTest
+
+  windows:
+    needs: test-linux
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        arch: [x64, Win32]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar
+        run: cmake -S MezclaMaster -B build -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DMM_BUILD_TESTS=OFF
+      - name: Compilar VST3
+        run: cmake --build build --config Release --target MezclaMaster_VST3 --parallel
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MezclaMaster-Windows-${{ matrix.arch }}
+          path: build/MezclaMaster_artefacts/Release/VST3/MezclaMaster.vst3
+
+  macos:
+    needs: test-linux
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar
+        run: cmake -S MezclaMaster -B build -G Xcode -DMM_BUILD_TESTS=OFF
+      - name: Compilar VST3 y AU
+        run: cmake --build build --config Release --target MezclaMaster_VST3 MezclaMaster_AU -- -quiet
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MezclaMaster-macOS
+          path: |
+            build/MezclaMaster_artefacts/Release/VST3/MezclaMaster.vst3
+            build/MezclaMaster_artefacts/Release/AU/MezclaMaster.component
