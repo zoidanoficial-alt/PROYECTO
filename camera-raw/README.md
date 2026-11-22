@@ -85,6 +85,29 @@ La SL3 salió en 2019. Sus archivos **.CR3** necesitan Camera Raw 11.3 o posteri
 2. Arrastra tus fotos .CR3, o la carpeta completa, sobre **convertir_cr3_a_dng.bat**.
 3. Los DNG aparecen en una subcarpeta **DNG**, en modo compatible con Camera Raw 7.1 o posterior. Ábrelos en Photoshop y se abrirán en Camera Raw con toda la información RAW.
 
+## Paquete «FOTONEANDO · Reels»
+
+Dos presets copiados de los ajustes de Lightroom que aparecen en capturas de reels, y traducidos a Camera Raw 10.
+
+| Preset | Look |
+|---|---|
+| **RL Glow** | Brillo suave y difuso: sombras muy abiertas, negros lavados, verdes y amarillos apagados, sombras azuladas |
+| **RL Weirdcore** | Onírico: muy luminoso y lavado, saturación muy alta con tinte magenta, morados girados al azul, mucho grano |
+
+Cada uno viene en dos versiones:
+- **sin Exposición**, para usarlo en cualquier foto;
+- **«(valores exactos)»**, con la Exposición del reel: +0.90 en Glow y +1.15 en Weirdcore. Esa versión sirve para fotos oscuras como la del reel.
+
+Lo que Camera Raw 10 no tiene se tradujo así:
+
+| En el reel (Lightroom) | En Camera Raw 10 |
+|---|---|
+| Gradación de color: sombras y luces | Dividir tonos, con los mismos tono y saturación |
+| Gradación de color: medios tonos (Weirdcore: tono 54, sat. 20) | Curvas Rojo / Verde / Azul en los medios tonos |
+| Temperatura y Matiz relativos (+4/+16 y +15/+39) | Curvas Rojo / Verde / Azul, para que funcione igual en RAW y en JPG |
+| Textura (−4 y 0) | Se omite: no existe en Camera Raw 10 y el efecto es mínimo |
+| Glow 51 (efecto de Lightroom) | No existe en Camera Raw. Termínalo en Photoshop: duplica la capa, aplica Desenfoque gaussiano de 20–40 px, ponla en modo Trama al 20–35%, o usa los pinceles «FT Luz · Lens Glow» |
+
 Cada preset ajusta:
 - la curva de tonos
 - las curvas Rojo, Verde y Azul (el tinte de sombras, medios y luces)
@@ -102,7 +125,7 @@ No toca la exposición ni el balance de blancos, así que puedes ajustarlos desp
 2. Haz doble clic en **instalar_presets.bat**. Copia los presets a `%APPDATA%\Adobe\CameraRaw\Settings`.
 3. Cierra y vuelve a abrir Photoshop.
 4. Abre una foto en Camera Raw. Para un JPG ya abierto: *Filtro › Filtro de Camera Raw* (Ctrl+Mayús+A).
-5. Ve a la pestaña **Ajustes preestablecidos** (icono de capas) y busca los grupos **FOTONEANDO · Frontera**, **· Retrato**, **· Óscar**, **· Óscar SL3** y **· SL3 Ajustes**.
+5. Ve a la pestaña **Ajustes preestablecidos** (icono de capas) y busca los grupos **FOTONEANDO · Frontera**, **· Retrato**, **· Óscar**, **· Óscar SL3**, **· SL3 Ajustes** y **· Reels**.
 
 ## Crea tus propios presets desde cualquier imagen
 
