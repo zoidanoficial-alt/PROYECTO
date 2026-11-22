@@ -22,10 +22,10 @@ Casi todos los pinceles son «sellos»: **haz un clic** para estampar, o pinta c
 | **Piel** · texturas (Skin Texture Fine, Pore Scatter, Skin Grain, Micro Wrinkle, Imperfection) | Luz suave o Superponer, opacidad 10–30% | Gris oscuro o el tono de la piel un poco más oscuro. Devuelve textura a la piel que quedó plástica tras el retoque |
 | **Piel** · Freckle Natural | Multiplicar, 20–50% | Marrón cálido. Varía el tamaño entre clic y clic |
 | **Piel** · Beauty Soft, Skin Highlight, Skin Shadow | Luz suave (luces y sombras) o Color (maquillaje) | Blanco cálido para luces, marrón frío para sombras: dodge & burn orgánico |
-| **Luz** | Trama o Sobreexponer color (lineal) | Elige el color de la luz: ámbar para Window Light y Sunset Glow, azul para Blue Hour, rosa o turquesa para Neon. Duplica la capa y desenfócala para más brillo |
+| **Luz** | Trama o Sobreexposición lineal (añadir) | Elige el color de la luz: ámbar para Window Light y Sunset Glow, azul para Blue Hour, rosa o turquesa para Neon. Duplica la capa y desenfócala para más brillo |
 | **Atmósfera** · niebla, bruma, humo, vapor | Normal o Trama, opacidad 20–60% | Blanco o gris azulado. Haz varios clics a distintos tamaños para que no se vea repetido |
 | **Atmósfera** · Heat Distortion Texture | Úsalo como mapa | Píntalo en un documento aparte y úsalo con Filtro › Distorsionar › Desplazar para simular el calor |
-| **Partículas** · chispas, brasas, fuego, polvo mágico y dorado | Sobreexponer color (lineal) | Naranja para fuego, dorado para Gold Dust. Añade un estilo de capa «Resplandor exterior» |
+| **Partículas** · chispas, brasas, fuego, polvo mágico y dorado | Sobreexposición lineal (añadir) | Naranja para fuego, dorado para Gold Dust. Añade un estilo de capa «Resplandor exterior» |
 | **Partículas** · nieve, lluvia, gotas, salpicadura | Trama | Blanco. Aplica Desenfoque de movimiento a la lluvia según la dirección del viento |
 | **Partículas** · Debris | Normal | Negro o el color del entorno |
 | **Partículas** · Bokeh | Trama, y luego desenfoque gaussiano leve | Colores de las luces de la escena |
