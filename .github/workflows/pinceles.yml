@@ -1,0 +1,38 @@
+name: Pinceles FOTONEANDO
+
+on:
+  push:
+    branches: [claude/hopeful-hawking-hwp68i]
+    paths:
+      - "pinceles/**"
+      - ".github/workflows/pinceles.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generar las puntas
+        run: |
+          pip install numpy opencv-python-headless
+          mkdir -p dist/pinceles-fotoneando
+          python pinceles/generar_pinceles.py dist/pinceles-fotoneando/puntas --muestra dist/pinceles-fotoneando/muestra.jpg
+          test "$(ls dist/pinceles-fotoneando/puntas/*.png | wc -l)" -eq 63
+          cp pinceles/instalar_pinceles.jsx pinceles/README.md pinceles/generar_pinceles.py dist/pinceles-fotoneando/
+          cd dist && zip -qr ../pinceles-fotoneando.zip pinceles-fotoneando
+      - name: Publicar descarga
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete pinceles --yes --cleanup-tag || true
+          gh release create pinceles pinceles-fotoneando.zip \
+            --target "${{ github.sha }}" --prerelease \
+            --title "Pinceles FOTONEANDO" \
+            --notes "63 pinceles cinematográficos para Photoshop CC 2018 o posterior: Piel, Luz, Atmósfera, Partículas, Texturas y Medios. Descomprime y ejecuta instalar_pinceles.jsx desde Archivo > Secuencias de comandos > Explorar."
