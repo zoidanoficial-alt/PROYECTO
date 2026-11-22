@@ -1295,3 +1295,26 @@ Xiaomi no permite apps de terceros en el Mi Watch (XMWTCL02) ni dentro de Mi Fit
 - **Fluidez** (`flow.js`): barra “en curso” (entreno, carrera, temporizador o sesión HYROX) siempre a un toque; el atrás de Android usa el “← Volver” de cada hoja antes de cerrar; ✕ fijo arriba en todas las hojas.
 - Prueba nueva v43; suite completa en verde; build versionCode 42.
 - **Sin probar en dispositivo real:** controles de música del Mi Watch en gimnasio y carrera, vibración del descanso guiado.
+
+## 38.0 · Nutrición inteligente
+
+Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
+
+- **Mi estrategia:** volumen, definición, recomposición, mantenimiento y rendimiento.
+- **Motor:** Mifflin-St Jeor con factor de actividad, calibrado con tus registros. Macros por evidencia: ISSN, ACSM 2016, Helms 2014, Iraki 2019, Morton 2018.
+- **Pisos de seguridad:** nunca por debajo del basal ni de 1500 (H) / 1200 (M), y grasa ≥0.6 g/kg.
+- **Registro:**
+  - 80 alimentos (USDA/SMAE) con estado crudo o cocido y unidades familiares.
+  - Búsqueda, recientes con un toque, favoritos, comidas guardadas, platos con varios ingredientes y horarios (desayuno, comida, cena, snack).
+- **Plan de alimentación:**
+  - Ajusta gramos a tus macros y elige 3, 4 o 5 comidas.
+  - Filtros: económico, vegetariano, sin lácteos, sin cerdo.
+  - Puedes cambiar ingredientes y cantidades, y registrar con un toque.
+- **Motor de adaptación:** mínimo 14 días, siempre por tendencia. Propone y explica; nunca aplica solo y no baja del mínimo seguro.
+- **Fases:** periodización con revisión por resultados, nunca por fecha.
+- **Conexiones:**
+  - Entrenamiento: consejo del día según fuerza, resistencia o descanso. No suma calorías del ejercicio.
+  - `NutriAPI.snapshot()` para Campamento, más una misión diaria de nutrición.
+- **Biblioteca:** cada recomendación marcada como evidencia científica, práctica de atletas o estimación.
+- **Correcciones de texto:** "ventana anabólica de 30 minutos" y "3.3 g/kg de proteína" corregidos con la evidencia actual.
+- **Pruebas:** 29 unitarias del motor y e2e v44. Suite completa en verde; build versionCode 43.

@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '37.0';
+const APP_VERSION = '38.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -123,7 +123,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null, watch: d.watch || null, resist: d.resist || null, athlete: d.athlete || null, live: d.live || null,
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null, watch: d.watch || null, resist: d.resist || null, athlete: d.athlete || null, live: d.live || null, nutri: d.nutri || null,
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -251,6 +251,8 @@ function targets() {
   const lb = currentWeight() * KG_TO_LB;
   const factor = KCAL_FACTOR[p.phase] || 12;
   const s = SOMATOTYPES[p.somatotype] || SOMATOTYPES.meso;
+  // 38.0: con una estrategia activa, el motor nutricional es la única fuente de objetivos
+  if (p.autoMacros && typeof nOn === 'function' && nOn()) { const n = nTargets(); return { kcal: n.kcal, protein: n.protein, carbs: n.carbs, fat: n.fat, lb, factor: null, soma: s, water: p.waterGoal, sugar: p.sugarMax, n }; }
   let kcal, protein;
   if (p.autoMacros) {
     kcal = round10(lb * factor);
@@ -2107,7 +2109,7 @@ function renderFood() {
     <div class="card" data-fold-sum="${tg.kcal.toLocaleString('es-MX')} kcal · P ${tg.protein} g · C ${tg.carbs} g · G ${tg.fat} g">
       <h2>Tu objetivo diario</h2>
       <div class="big">${tg.kcal.toLocaleString('es-MX')} <span class="muted" style="font-size:16px;font-weight:500">kcal</span></div>
-      <p class="small muted" style="margin:4px 0 10px">${p.autoMacros
+      <p class="small muted" style="margin:4px 0 10px">${tg.n ? `Estrategia ${esc(NUTRI_MODES[DB.nutri.mode].n.toLowerCase())} · estimación calibrada con tus datos.` : p.autoMacros
         ? `${fmt(currentWeight())} kg = ${Math.round(tg.lb)} lb × ${tg.factor} (${p.phase === 'definicion' ? 'definición' : p.phase === 'volumen' ? 'volumen' : 'mantenimiento'}) · fórmula de Marc McLean. Se recalcula sola con tu peso.`
         : 'Calorías y proteína manuales (cámbialo en Más → Perfil).'}</p>
       <div class="grid3">
@@ -2141,8 +2143,8 @@ function renderFood() {
 
     ${left != null ? pwoCard() : `
     <div class="card">
-      <h2>Ventana post-entreno</h2>
-      <p class="small" style="margin-top:0">De 30 a 45 min después de entrenar el cuerpo pasa de catabólico a anabólico. En los primeros 5–15 min:</p>
+      <h2>Después de entrenar</h2>
+      <p class="small" style="margin-top:0">No existe una ventana estricta de 30 minutos: lo que más cuenta es la proteína total del día repartida en 3–4 comidas (Schoenfeld y col., 2013). Una comida con proteína y carbohidratos en las siguientes horas ayuda a recuperar:</p>
       <ul class="list-plain small">${PWO_ITEMS.map(([, n, s]) => `<li><b>${esc(n)}</b> · <span class="muted">${esc(s)}</span></li>`).join('')}</ul>
       <p class="small muted">Arranca sola al terminar un entreno.</p>
       <button class="secondary block" id="fd-pwo">Iniciar ventana ahora</button>
@@ -2151,7 +2153,7 @@ function renderFood() {
     <div class="card">
       <h2>Proteína completa</h2>
       <div class="chips">${PROTEIN_SOURCES.map(x => `<span class="chip">${esc(x)}</span>`).join('')}</div>
-      <p class="small muted" style="margin:10px 0 0">Los libros llegan a 1.5 g por libra (~3.3 g/kg) en hipertrofia avanzada. Tu objetivo actual, según el reparto por somatotipo, es ${tg.protein} g (${fmt(tg.protein / currentWeight(), 1)} g/kg).</p>
+      <p class="small muted" style="margin:10px 0 0">La evidencia sitúa el beneficio en ≈1.6 g/kg/día y hasta 2.2 g/kg (Morton y col., 2018); en definición puede convenir más. Tu objetivo actual es ${tg.protein} g (${fmt(tg.protein / currentWeight(), 1)} g/kg).</p>
     </div>
     ${gutCard()}
     ${microbiomeCard()}
