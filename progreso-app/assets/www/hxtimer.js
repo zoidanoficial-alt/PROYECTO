@@ -151,9 +151,9 @@ function hxtFinish() {
   const ladderPrev = typeof hxMyBest === 'function' ? (hxMyBest() || {}).sec : null;
   const base = { date, t: Date.now(), rpe: null, auto: true, timerId: t.id };
   let prevBest = t.mode === 'station' || t.mode === 'comp' ? hxBest('st', t.st) : t.mode === 'run1k' ? hxBest('run1k') : null;
-  let first = null;
+  let first = null, hxtSim = null;
   if (t.mode === 'race') {
-    hx().results.push({ ...base, id: 'tm' + Date.now(), kind: 'sim', sec: total, note: 'Simulación cronometrada' });
+    first = null; hx().results.push(hxtSim = { ...base, id: 'tm' + Date.now(), kind: 'sim', sec: total, note: 'Simulación cronometrada' });
     segs.filter(s => s.k !== 'run').forEach(s => hx().results.push({ ...base, id: 'tm' + s.k + Date.now(), kind: 'st', st: s.k, sec: Math.round(s.sec / 1.08), std: true, note: 'Parcial de simulación (÷1.08)' }));
   } else if (t.mode === 'station') { first = { ...base, id: 'tm' + Date.now(), kind: 'st', st: t.st, sec: segs[0].sec, std: true }; hx().results.push(first); }
   else if (t.mode === 'run1k') { first = { ...base, id: 'tm' + Date.now(), kind: 'run1k', sec: segs[0].sec }; hx().results.push(first); }
@@ -166,6 +166,7 @@ function hxtFinish() {
   if (t.pf) hx().results.filter(r => r.timerId === t.id).forEach(r => { if (r.kind === 'sim' || (r.kind === 'st' && PF_SUB[r.st] && !PF_SUB[r.st].comparable)) { r.pf = true; r.std = false; } });
   if (t.pf && first && first.pf) prevBest = hxBestPF(t.st) && hxResultsPF(t.st).length > 1 ? hxResultsPF(t.st).filter(r => r !== first).reduce((a, r) => !a || r.sec < a.sec ? r : a, null) : null;
   saveData();
+  if (typeof hxRecReact === 'function') { const rr = hxtSim || first; setTimeout(() => hxRecReact(rr), 700); }
   hxtSummary(run, first, prevBest, t.mode === 'race' && !t.pf && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, total) : []);
 }
 /** RMSSD de los intervalos R-R del tramo (solo con sensor que los envía). */

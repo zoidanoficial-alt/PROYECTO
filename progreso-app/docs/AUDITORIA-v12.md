@@ -1351,3 +1351,18 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
 - **Vitrina por disciplina:** todas sus medallas agrupadas por categoría, con progreso y "Mostrar todas".
 - Récords y Estadísticas se movieron a la misma pestaña. Perfil y "Logros recientes" de Hoy llevan ahí.
 - Prueba v45 actualizada; suite completa en verde; build versionCode 45.
+
+## 41.0 · Estaciones con ilustración, estaciones individuales, LOGRO DESBLOQUEADO y Apollo Creed
+
+- **Ilustraciones** (`hxart.js`): figuras SVG originales y animadas (dos poses en bucle) de las 8 estaciones y del 1 km, en versión competencia (SkiErg, trineos, kettlebells, saco, balón y diana) y Planet Fitness (polea alta, caminadora al 15 %, mancuernas, goblet, thrusters). Sin fotos ni marcas de terceros; se pausan si el sistema pide reducir movimiento.
+- **Cada estación es un ejercicio individual** (`hxstation.js`):
+  - En Competir hay una rejilla con ilustraciones, incluso sin una carrera configurada.
+  - La ficha de cada estación tiene: selector Competencia / Planet Fitness, récord, última marca, intentos y puntaje.
+  - Botones "Entrenar esta estación sola" (temporizador, también desde el reloj), "Estación + 1 km" y "Escribir un tiempo".
+  - Incluye técnica, errores, por qué funciona la adaptación e historial. El temporizador respeta la versión elegida.
+- **Reacciones** (`hype.js`):
+  - Récord roto → aviso estilo consola "LOGRO DESBLOQUEADO" (insignia, cápsula que se abre y sonido propio generado con WebAudio).
+  - Sin récord → «¡Demonios, Rocky! ¿Qué te pasa?» — Apollo Creed, con la marca de hoy y cuánto faltó.
+  - Aplica en HYROX (temporizador y registro manual), en el gimnasio (Apollo solo al terminar las series planeadas de un ejercicio, no en cada serie) y en carreras.
+  - Las dos se pueden apagar en Logros.
+- **Pruebas:** e2e v46. La suite completa se corre en segundo plano porque ya pasa de 10 minutos. Build versionCode 46.

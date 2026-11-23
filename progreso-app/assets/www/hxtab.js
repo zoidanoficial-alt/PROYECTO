@@ -17,10 +17,11 @@ function renderHyroxTab() {
       <p class="cp-lead">Elige tu carrera y la app arma tu preparación: evaluación por partes, punto débil, predicción y sesiones específicas.</p>
       <button class="block" id="hxp-setup">${ico('timer', 18, 'lead')}Preparar un HYROX</button>
       <button class="secondary block" data-hxp="events" style="margin-top:8px">${ico('calendar', 18, 'lead')}Buscar una competencia</button></div>
+      <div class="ds-h">Entrena una estación <span class="ds-h-r">sin preparar una carrera</span></div>${hxsGrid(null, null)}
       ${champMethodCard()}
       <div class="ds-h">Herramientas</div>
       <div class="kit-list">${hxpItem('watch', 'heart-pulse', 'Mi reloj', 'Mi Fitness, pulso en vivo y control remoto')}${hxpItem('resist', 'dumbbell', 'Resistencia', '¿Más peso o más reps? Programa de 6 semanas')}${hxpItem('athlete', 'trophy', 'Proyecto Atleta', 'Tu transformación hasta los 40')}</div>`;
-    hxpBind(root); return;
+    hxpBind(root); $$('[data-cpst]', root).forEach(b => b.onclick = () => openHxStation(b.dataset.cpst, () => closeModal())); return;
   }
   const perf = hxPerformance(), bn = hxBottleneck(perf), pr = hxPredict(), p = hx().profile, ph = hxPhase();
   const days = p.date ? daysBetween(todayStr(), p.date) : null, doneN = perf.tested.length + (perf.run ? 1 : 0) + (perf.fat ? 1 : 0);
@@ -59,8 +60,7 @@ function renderHyroxTab() {
     : `<section class="cp-sec"><div class="ds-h">Predictor</div><div class="cp-diag empty"><b>Sin predicción todavía</b><p>Necesita tu 1 km fresco${perf.run ? ' ✓' : ''} y ${hxIsPF && hxIsPF() ? 4 : 6} estaciones medidas (llevas ${perf.tested.length}).</p></div></section>`;
 
   // F · Estaciones
-  const sts = `<section class="cp-sec"><div class="ds-h">Estaciones <span class="ds-h-r">${perf.tested.length} de 8 medidas</span></div>
-    <div class="cp-st">${HX_STATIONS.map((s, i) => { const x = perf.st[s.k], weak = bn && bn.main && bn.main.k === s.k; return `<button class="${x ? 'on' : ''}${weak ? ' weak' : ''}" data-cpst="${s.k}"><small>${String(i + 1).padStart(2, '0')}</small><b>${esc(typeof pfStName === 'function' ? pfStName(s.k) : s.n)}</b><span>${x ? hxT(x.sec) : 'sin medir'}</span></button>`; }).join('')}</div></section>`;
+  const sts = `<section class="cp-sec"><div class="ds-h">Estaciones <span class="ds-h-r">cada una se entrena sola · ${perf.tested.length} de 8 medidas</span></div>${hxsGrid(perf, bn)}</section>`;
 
   root.innerHTML = `${prep}
     <div class="ds-h">Sesión de hoy</div>

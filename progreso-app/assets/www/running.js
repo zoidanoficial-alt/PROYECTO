@@ -145,6 +145,7 @@ function saveRun(run, pts) {
   run.best = computeBests(pts);
   Object.keys(run.best).forEach(k => { if (!prev.rec[k] || run.best[k] < prev.rec[k].t) prs.push(Number(k)); });
   const longPR = prev.longest && run.km > prev.longest.km;
+  if (typeof runRecReact === 'function') setTimeout(() => runRecReact(run, prs, longPR, prev), 700);
   DB.runs = (DB.runs || []).concat(run);
   const firstRun = DB.runs.length === 1;
   if (firstRun) addEvent(run.date, 'run', 'Tu primera carrera registrada: ' + fmt(run.km, 2) + ' km', '🏃');

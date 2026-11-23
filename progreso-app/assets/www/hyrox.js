@@ -413,6 +413,7 @@ function openHxTest(kind, rerender, back) {
       if (kind === 'comp') r.after = $('#ht-after', m).value;
       if (kind === 'sim' && pred && pred.ok) r.pred = Math.round(pred.total);
       hx().results.push(r); saveData();
+      if (typeof hxRecReact === 'function') setTimeout(() => hxRecReact(r), 500);
       const pr = prevBest && sec < prevBest.sec && (!isSt || (r.std && prevBest.std !== false));
       hxResultSheet(r, prevBest, pr, rerender);
     };
