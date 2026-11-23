@@ -1318,3 +1318,28 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
 - **Biblioteca:** cada recomendación marcada como evidencia científica, práctica de atletas o estimación.
 - **Correcciones de texto:** "ventana anabólica de 30 minutos" y "3.3 g/kg de proteína" corregidos con la evidencia actual.
 - **Pruebas:** 29 unitarias del motor y e2e v44. Suite completa en verde; build versionCode 43.
+
+## 39.0 · Protocolo de medallas, récords y estadísticas
+
+- **Catálogo** (`medals.js`): 1,070 medallas con id estable, en 14 categorías.
+  - Fuerza máxima: 12 grupos de ejercicio × 19 cargas.
+  - Repeticiones con un peso: 14 pesos × hasta 10 reps.
+  - Peso corporal, fuerza relativa, progresión (+% de 1RM y sesiones por ejercicio), récords, constancia y volumen.
+  - Running: total, más larga, número de carreras y tiempos "sub" en 1 km, 5 km, 10 km, 21 km y 42 km.
+  - HYROX: puntaje y pruebas por estación, simulación, HPI, 1 km fresco.
+  - Nutrición, cuerpo, bienestar y exploración.
+- **Niveles:** Bronce → Plata → Oro → Platino → Diamante → Leyenda.
+  - Se asignan por dificultad dentro de cada familia.
+  - En repeticiones con peso dependen de la fuerza equivalente (Epley).
+- **Diseño:** SVG generado por medalla, con forma por categoría, degradado metálico por nivel, icono, cifra y unidad. Listón desde Oro, facetas desde Diamante y destellos en Leyenda. Las bloqueadas se ven en gris con barra de progreso.
+- **Detección:**
+  - Al guardar cada serie (envuelve `checkSetRecords`) y al pintar cualquier pantalla (`render`).
+  - Una medalla ganada no se pierde.
+  - La primera revisión con historial previo otorga en silencio (`retro`).
+  - Aviso animado con la medalla más difícil del momento.
+- **Pantalla "Logros, estadísticas y medallas"** (Progreso → 🏅 Logros, y una fila en Perfil):
+  - Medallas: total, conteo por nivel, "Muy cerca", últimas ganadas, colección por categoría con filtro y detalle con su familia.
+  - Récords: por ejercicio (peso máximo, 1RM estimado, tabla de récords de repeticiones por peso), running, HYROX y récords recientes.
+  - Estadísticas: totales, sesiones por mes, toneladas por semana y ejercicios más entrenados.
+- **Catálogo completo:** `docs/MEDALLAS-v39.md` e imagen `dist/medallas-catalogo.png`.
+- **Pruebas:** e2e v45 (140 kg → medalla al guardar; 50 × 50 kg → "50 reps con 50 kg"). Suite completa en verde; build versionCode 44.

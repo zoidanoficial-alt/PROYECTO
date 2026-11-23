@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '38.0';
+const APP_VERSION = '39.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -123,7 +123,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null, watch: d.watch || null, resist: d.resist || null, athlete: d.athlete || null, live: d.live || null, nutri: d.nutri || null,
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null, watch: d.watch || null, resist: d.resist || null, athlete: d.athlete || null, live: d.live || null, nutri: d.nutri || null, medals: d.medals || null,
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -2384,15 +2384,15 @@ let progMode = 'evol';
 function renderProgress() {
   if (progMode === 'logros' && !gamify()) progMode = 'weight';
   if (progMode === 'ciclo' && !cycleOn()) progMode = 'analysis';
-  const tabs = isBeginner() ? [['evol', 'Evolución'], ['resumen', 'Resumen'], ['weight', 'Peso']].concat(cycleOn() ? [['ciclo', 'Ciclo']] : []).concat([['photos', 'Fotos']]).concat(gamify() && unlocked('three') ? [['logros', 'Logros']] : [])
-    : [['evol', '📈 Evolución'], ['fuerza', '💪 Fuerza'], ['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', 'Logros']] : []);
+  const tabs = isBeginner() ? [['evol', 'Evolución'], ['resumen', 'Resumen'], ['weight', 'Peso']].concat(cycleOn() ? [['ciclo', 'Ciclo']] : []).concat([['photos', 'Fotos']]).concat(gamify() ? [['logros', '🏅 Logros']] : [])
+    : [['evol', '📈 Evolución'], ['fuerza', '💪 Fuerza'], ['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', '🏅 Logros']] : []);
   if (!tabs.some(([k]) => k === progMode)) progMode = tabs[0][0];   // 19.0: principiante ve un resumen sencillo
   const seg = `<div class="seg wrap scroll">${tabs.map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   const v = $('#view-progress');
   v.innerHTML = progressHero() + seg + '<div id="prog-body"></div><button class="secondary block" id="prog-export" style="margin-top:4px">📄 Exportar PDF / Excel para analizar con IA</button>';
   $('#prog-export').onclick = openExport;
   $$('#view-progress .seg button').forEach(b => b.onclick = () => { progMode = b.dataset.mode; redrawChart = () => {}; renderProgress(); });
-  ({ evol: renderEvolution, resumen: renderBeginnerProgress, fuerza: el => { el.innerHTML = strengthScoreCard() + weeklySetsCard(); const i = $('#str-info', el); if (i) i.onclick = explainScore; }, analysis: renderAnalysis, historia: renderHistory, ciclo: renderCycle, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: renderAchievements })[progMode]($('#prog-body'));
+  ({ evol: renderEvolution, resumen: renderBeginnerProgress, fuerza: el => { el.innerHTML = strengthScoreCard() + weeklySetsCard(); const i = $('#str-info', el); if (i) i.onclick = explainScore; }, analysis: renderAnalysis, historia: renderHistory, ciclo: renderCycle, weight: renderWeight, measures: renderMeasures, strength: renderStrength, photos: renderPhotos, logros: typeof renderLogros === 'function' ? renderLogros : renderAchievements })[progMode]($('#prog-body'));
 }
 
 function renderWeight(el) {

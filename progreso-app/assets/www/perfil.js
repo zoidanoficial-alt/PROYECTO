@@ -13,6 +13,7 @@ function perfilHeader() {
     <button class="pf-row" id="pf-sport">${ico(SPORTS[mainSport()].ico, 20)}<span class="grow"><b>Mi disciplina: ${esc(SPORTS[mainSport()].n)}</b><small>${DB.profile.sport ? 'Decide tus métricas, gráficas y lo que ves en Hoy' : 'Elige para qué te preparas'}</small></span>${ico('chevron-right', 16)}</button>
     ${goal ? `<button class="pf-row" id="pf-goal">${ico('target', 20)}<span class="grow"><b>Objetivo: ${esc(goal.tag)}</b><small>${esc(goal.title)}</small></span>${ico('chevron-right', 16)}</button>` : ''}
     ${isSimple() ? '' : `<button class="pf-row" id="pf-food">${ico('utensils', 20)}<span class="grow"><b>Nutrición</b><small>Hoy: ${tot.kcal.toLocaleString('es-MX')} de ${tg.kcal.toLocaleString('es-MX')} kcal · ${Math.round(tot.p)} g proteína</small></span>${ico('chevron-right', 16)}</button>`}
+    ${gamify() ? `<button class="pf-row" id="pf-medals">${ico('medal', 20)}<span class="grow"><b>Logros, estadísticas y medallas</b><small>${typeof mdCatalog === 'function' ? Object.keys(mdState().got).length + ' de ' + mdCatalog().length.toLocaleString('es-MX') + ' medallas' : 'Tus récords'}</small></span>${ico('chevron-right', 16)}</button>` : ''}
     <button class="pf-row" id="pf-health">${ico('heart-pulse', 20)}<span class="grow"><b>Salud y reloj</b><small>${DB.watch && DB.watch.hcOn ? 'Mi Fitness conectado' : 'Sueño, pulso y datos de Mi Fitness'}</small></span>${ico('chevron-right', 16)}</button>`;
 }
 function bindPerfil(root) {
@@ -21,4 +22,5 @@ function bindPerfil(root) {
   on('pf-sport', () => openSportPicker(() => render(currentTab)));
   on('pf-food', () => showTab('food'));
   on('pf-health', () => openWatch());
+  on('pf-medals', () => { progMode = 'logros'; mdView = 'med'; showTab('progress'); });
 }
