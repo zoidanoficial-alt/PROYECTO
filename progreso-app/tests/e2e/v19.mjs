@@ -16,7 +16,7 @@ await page.fill('#w-0', '60'); await page.fill('#r-0', '10');
 await page.evaluate(() => { SESS_UI.n[0] = 4; }); await page.click('#save-0'); await page.waitForTimeout(800);
 console.log('confetti with reduced motion:', await page.locator('.confetti').count());
 // home hero for running plan
-await page.click('#ss-cancel'); await page.evaluate(() => { DB.profile.trainMode = 'running'; DB.runPlan = buildRunPlan('5k', 3, null, null, 8); DB.runPlan.weeks[0].sessions[0].date = todayStr(); });
+await page.click('#ss-cancel'); await page.evaluate(() => { planSetDisc('run'); DB.profile.trainMode = 'running'; DB.runPlan = buildRunPlan('5k', 3, null, null, 8); DB.runPlan.weeks[0].sessions[0].date = todayStr(); });
 await page.click('nav button[data-tab=home]'); await page.waitForTimeout(200);
 console.log('home hero:', (await page.textContent('.hero')).replace(/\s+/g, ' ').slice(0, 120));
 await page.screenshot({ path: 'v19-home-run.png' });

@@ -8,7 +8,8 @@ const D = './out/';
 await page.goto('http://127.0.0.1:8765/index.html');
 await page.fill('#ob-name', 'Dan'); for (let k = 0; k < 7; k++) await page.click('#ob-next'); await page.waitForTimeout(900); await page.evaluate(() => { /*__guideFix*/ /*__lvlFix*/ DB.profile.guideSeen = true; DB.profile.level = 'avanzado'; if (DB.profile.routine === 'custom') DB.profile.routine = 'pro'; saveData(); showTab(currentTab); if (document.querySelector('.guide')) closeModal(); });
 await page.waitForTimeout(3500);
-await page.evaluate(() => { window.__now = Date.now(); Date.now = () => window.__now; showTab('train'); document.querySelectorAll('details.fold').forEach(d => d.open = true); });
+await page.evaluate(() => { window.__now = Date.now(); Date.now = () => window.__now; showTab('more'); });
+await page.click('#pf-retos'); await page.waitForTimeout(200);   // 43.0: los retos viven en Perfil
 await page.locator('[data-reto="cindy"]').scrollIntoViewIfNeeded(); await page.waitForTimeout(400);
 await page.screenshot({ path: D + 'v22-card.png' });
 await page.click('[data-reto="cindy"]'); await page.waitForTimeout(200);
@@ -33,7 +34,7 @@ const l1 = await page.evaluate(async () => { runReto('escalera', 3, 'estricta');
 const l2 = await page.evaluate(async () => { runReto('escalera', 3, 'estricta'); document.querySelector('#rt-next').click(); document.querySelector('#rt-next').click(); window.__now += 30000; document.querySelector('#rt-stop').click(); await new Promise(r => setTimeout(r, 50)); const r = DB.retos[4]; closeModal(); return { complete: r.complete, pr: r.pr, txt: retoScoreTxt(r), best: retoScoreTxt(retoBest('escalera|3|estricta')) }; });
 // routine and info
 const rt = await page.evaluate(() => { const bad = ROUTINES.heroe.days.flatMap(d => d.ex.map(e => e[0])).filter(n => !EX[n]); DB.profile.routine = 'heroe'; saveData(); renderTrain(); return { bad, nd: nextDay('heroe').name, inSelect: !!document.querySelector('#rt-sel option[value="heroe"]') }; });
-await page.evaluate(() => { document.querySelectorAll('details.fold').forEach(d => d.open = true); }); await page.click('#reto-info'); await page.waitForTimeout(200);
+await page.evaluate(() => { closeModal(true); showTab('more'); }); await page.click('#pf-retos'); await page.waitForTimeout(200); await page.click('#reto-info'); await page.waitForTimeout(200);
 await page.screenshot({ path: D + 'v22-info.png' });
 const info = await page.evaluate(() => document.querySelector('.modal').scrollWidth - document.querySelector('.modal').clientWidth);
 console.log(JSON.stringify({ lockClose, c1, c2, c3, l1, l2, rt, info }));

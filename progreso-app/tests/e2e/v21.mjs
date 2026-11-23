@@ -9,7 +9,7 @@ await page.goto('http://127.0.0.1:8765/index.html');
 await page.fill('#ob-name', 'Dan'); for (let k = 0; k < 7; k++) await page.click('#ob-next'); await page.waitForTimeout(900); await page.evaluate(() => { /*__guideFix*/ /*__lvlFix*/ DB.profile.guideSeen = true; DB.profile.level = 'avanzado'; if (DB.profile.routine === 'custom') DB.profile.routine = 'pro'; saveData(); showTab(currentTab); if (document.querySelector('.guide')) closeModal(); });
 await page.waitForTimeout(3500);
 // --- running view with toggle
-await page.evaluate(() => { showTab('train'); DB.profile.trainMode = 'running'; renderTrain(); });
+await page.evaluate(() => { showTab('train'); planSetDisc('run'); DB.profile.trainMode = 'running'; renderTrain(); });
 await page.click('[data-where="cinta"]'); await page.waitForTimeout(150);
 const btn = await page.textContent('#rn-free');
 await page.evaluate(() => document.querySelectorAll('details.fold').forEach(d => d.open = false));
@@ -55,7 +55,7 @@ await page.click('[data-pf="smith"][data-v="no"]');   // quitar la marca
 await page.screenshot({ path: D + 'v21-pf.png' });
 await page.click('#pf-ok'); await page.waitForTimeout(200);
 const sm = await page.evaluate(() => ({ equipSmith: DB.profile.equip.includes('smith'), btn: document.querySelector('#mo-pf small').textContent }));
-const spa = await page.evaluate(() => { DB.days[todayStr()] = Object.assign(DB.days[todayStr()] || {}, { rec: { sleepH: 4, sleepQ: 1, energy: 1, soreness: 5, stress: 5 } }); DB.profile.trainMode = 'fuerza'; saveData(); const nd = nextDay(DB.profile.routine); return todayMissions().map(m => m.why).join(' | ') + ' ##rest:' + (nd && nd.rest); });
+const spa = await page.evaluate(() => { DB.days[todayStr()] = Object.assign(DB.days[todayStr()] || {}, { rec: { sleepH: 4, sleepQ: 1, energy: 1, soreness: 5, stress: 5 } }); planSetDisc('gym'); DB.profile.trainMode = 'fuerza'; saveData(); const nd = nextDay(DB.profile.routine); return todayMissions().map(m => m.why).join(' | ') + ' ##rest:' + (nd && nd.rest); });
 const acts = await page.evaluate(() => { openActivityForm(); const t = [...document.querySelectorAll('[data-at]')].map(b => b.dataset.at); closeModal(); return t; });
 console.log(JSON.stringify({ btn, s0, track: { ...track, splits: track.splits }, man, beforeReload, rest, est, saved, plan, street, pf, sheet, sm, spa, acts }, null, 0));
 console.log('ERRORS', JSON.stringify(errors.slice(0, 5)));

@@ -25,8 +25,8 @@ for (const tab of ['home', 'train', 'food', 'progress', 'more']) {
   await page.evaluate(t => showTab(t), tab); await page.waitForTimeout(150); await probe(tab);
 }
 for (const m of ['fuerza', 'analysis', 'historia', 'weight', 'measures', 'strength', 'photos', 'logros']) { await page.evaluate(m => { showTab('progress'); progMode = m; renderProgress(); }, m); await probe('prog-' + m); }
-await page.evaluate(() => { showTab('train'); DB.profile.trainMode = 'running'; renderTrain(); }); await probe('running');
-await page.evaluate(() => { DB.profile.trainMode = 'fuerza'; startSession('libre'); const s = activeSession(); s.adjustDone = true; renderTrain(); }); await probe('session');
+await page.evaluate(() => { showTab('train'); planSetDisc('run'); DB.profile.trainMode = 'running'; renderTrain(); }); await probe('running');
+await page.evaluate(() => { planSetDisc('gym'); DB.profile.trainMode = 'fuerza'; startSession('libre'); const s = activeSession(); s.adjustDone = true; renderTrain(); }); await probe('session');
 const modals = { checkin: 'openCheckin()', quick: "document.querySelector('.fab').click()", tech: "techniqueSheet(Object.keys(EX)[0])", cycle: 'openCycleConsent()', runsetup: "openRunPlanSetup && openRunPlanSetup()", treadmill: 'openTreadmillPicker()', pf: "DB.profile.gym='pf'; DB.profile.pfMember='black'; openPfSheet()", act: 'openActivityForm()', retoset: "openRetoSetup('escalera')", retoinfo: 'openHollandInfo()', retolive: "closeModal(); runReto('escalera', 10, 'remo')", tmlive: "closeModal(); DB.profile.runIndoor=true; startRun({title:'t', segs: tmWorkouts().int.segs}); showTab('train')" };
 for (const [k, js] of Object.entries(modals)) { try { await page.evaluate(js => { closeModal && closeModal(); eval(js); }, js); await page.waitForTimeout(200); await probe('modal-' + k); } catch (e) { console.log('skip', k, e.message.slice(0, 80)); } }
 await page.evaluate(() => { closeModal(); openCheckin(); }); await page.waitForTimeout(250); await probe('final');

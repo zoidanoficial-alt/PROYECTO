@@ -128,7 +128,7 @@ function bindExplore(root) {
   $$('[data-explore]', root).forEach(b => b.onclick = () => {
     const k = b.dataset.explore;
     if (k === 'food') showTab('food');
-    else if (k === 'run') { DB.profile.trainMode = 'running'; saveData(); showTab('train'); }
+    else if (k === 'run') { DB.profile.trainMode = 'running'; if (typeof planSetDisc === 'function') planSetDisc('run'); saveData(); showTab('train'); }
     else if (k === 'ex') openExercisePicker(null);
     else if (k === 'act') openActivityForm();
     else if (k === 'retos') openModal(retosCard().replace('class="card"', 'class="retos-sheet"') + '<button class="ghost block" id="rs-x">Cerrar</button>', m => { bindRetos(m); $('#rs-x', m).onclick = closeModal; });
