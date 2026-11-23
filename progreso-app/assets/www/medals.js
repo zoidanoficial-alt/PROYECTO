@@ -344,3 +344,59 @@ window.addEventListener('load', () => {
   const r0 = render; render = function (tab) { r0(tab); mdScanSoon(); };
   const c0 = checkSetRecords; checkSetRecords = function (set) { const out = c0(set); mdScanSoon(); return out; };
 });
+
+/* =====================================================================
+ *  40.0 · Pestaña LOGROS: estante de medallas por disciplina
+ * ===================================================================== */
+const SHELVES = [
+  { k: 'gym', n: 'Gimnasio', ico: 'dumbbell', cats: ['fuerza', 'reps', 'rel', 'prog', 'peso_c', 'pr', 'vol'], d: 'Fuerza, repeticiones, récords y volumen' },
+  { k: 'hyrox', n: 'HYROX', ico: 'timer', cats: ['hyrox'], d: 'Estaciones, simulaciones y HPI' },
+  { k: 'run', n: 'Running', ico: 'footprints', cats: ['run'], d: 'Distancias, tiempos y kilómetros' },
+  { k: 'const', n: 'Constancia', ico: 'calendar', cats: ['const', 'expl'], d: 'Sesiones, rachas y exploración' },
+  { k: 'cuerpo', n: 'Cuerpo y nutrición', ico: 'utensils', cats: ['nut', 'cuerpo'], d: 'Alimentación, peso y cintura' },
+  { k: 'bien', n: 'Bienestar', ico: 'moon', cats: ['bien'], d: 'Recuperación, sueño y hábitos' }
+];
+let lgView = 'shelf';
+function renderLogrosTab() {
+  const root = $('#view-logros'); if (!root) return;
+  medalScan();
+  const seg = `<div class="seg md-seg">${[['shelf', 'Estante'], ['rec', 'Récords'], ['est', 'Estadísticas']].map(([k, n]) => `<button data-lgv="${k}" class="${lgView === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
+  root.innerHTML = seg + '<div id="lg-body"></div>';
+  $$('[data-lgv]', root).forEach(b => b.onclick = () => { lgView = b.dataset.lgv; redrawChart = () => {}; renderLogrosTab(); });
+  const body = $('#lg-body', root);
+  if (lgView === 'rec') return mdRecords(body);
+  if (lgView === 'est') return mdStats(body);
+  const cat = mdCatalog(), st = mdState(), c = mdCtx(), got = cat.filter(m => st.got[m.id]);
+  const best = got.slice().sort((a, b) => b.tier - a.tier || b.score - a.score).slice(0, 3);
+  const shelf = S => {
+    const all = cat.filter(m => S.cats.includes(m.cat)), mine = all.filter(m => st.got[m.id]).sort((a, b) => b.tier - a.tier || b.score - a.score);
+    const next = all.filter(m => !st.got[m.id]).map(m => ({ m, p: mdProgress(m, c) })).sort((a, b) => b.p - a.p).slice(0, mine.length ? 2 : 5).map(x => x.m);
+    const items = mine.slice(0, 10).concat(next);
+    const rows = []; for (let i = 0; i < items.length; i += 5) rows.push(items.slice(i, i + 5));
+    return `<section class="sh" data-shelf="${S.k}"><div class="sh-h">${ico(S.ico, 20)}<span><b>${S.n}</b><small>${S.d}</small></span><em>${mine.length}<small>/${all.length}</small></em></div>
+      <span class="td-bar"><i style="--w:${mine.length / all.length * 100}%"></i></span>
+      ${rows.map(r => `<div class="sh-row">${r.map(m => `<button class="sh-m ${st.got[m.id] ? 'on' : 'off'}" data-md="${m.id}" aria-label="${esc(m.n)}">${mdSvg(m, !!st.got[m.id], 58)}</button>`).join('')}</div><div class="sh-plank"></div>`).join('')}
+      <button class="ghost sh-all" data-shall="${S.k}">${mine.length ? 'Ver toda la vitrina' : 'Ver cómo ganarlas'} ›</button></section>`;
+  };
+  body.innerHTML = `<div class="lg-hero"><div><small>TU VITRINA</small><b>${got.length}</b><span>de ${cat.length.toLocaleString('es-MX')} medallas</span></div>
+      <div class="lg-best">${best.length ? best.map(m => `<button data-md="${m.id}">${mdSvg(m, true, 64)}</button>`).join('') : `<p class="small muted">Tu primera medalla llega con tu primera serie.</p>`}</div></div>
+    ${SHELVES.map(shelf).join('')}`;
+  $$('[data-md]', body).forEach(b => b.onclick = () => openMedal(b.dataset.md));
+  $$('[data-shall]', body).forEach(b => b.onclick = () => openShelf(b.dataset.shall));
+}
+let shLimit = 60;
+function openShelf(k, keep) {
+  const S = SHELVES.find(x => x.k === k), cat = mdCatalog(), st = mdState(), c = mdCtx();
+  if (!keep) shLimit = 60;
+  const groups = S.cats.map(ct => ({ ct, l: cat.filter(m => m.cat === ct).sort((a, b) => (!!st.got[b.id] - !!st.got[a.id]) || (a.fam < b.fam ? -1 : a.fam > b.fam ? 1 : a.ord - b.ord)) }));
+  const per = g => shLimit > 60 ? g.l.length : Math.max(12, g.l.filter(m => st.got[m.id]).length + 6);
+  openModal(`<div class="hx-eyebrow">VITRINA</div><h3 style="margin:2px 0 10px">${esc(S.n)}</h3>
+    ${groups.map(g => { const take = g.l.slice(0, per(g)); return take.length ? `<div class="ds-h">${esc(MD_CATS[g.ct].n)} <span class="ds-h-r">${g.l.filter(m => st.got[m.id]).length}/${g.l.length}</span></div>
+      <div class="sh-grid">${take.map(m => `<button class="sh-m ${st.got[m.id] ? 'on' : 'off'}" data-md="${m.id}" aria-label="${esc(m.n)}">${mdSvg(m, !!st.got[m.id], 52)}${st.got[m.id] ? '' : `<i style="--p:${Math.round(mdProgress(m, c) * 100)}%"></i>`}</button>`).join('')}</div>` : ''; }).join('')}
+    ${groups.some(g => g.l.length > per(g)) ? '<button class="secondary block" id="sh-more">Mostrar todas</button>' : ''}
+    <button class="ghost block" id="sh-x">← Volver</button>`, md => {
+    $$('[data-md]', md).forEach(b => b.onclick = () => { openMedal(b.dataset.md); const x = $('#md-x'); if (x) x.onclick = () => openShelf(k, true); });
+    const mo = $('#sh-more', md); if (mo) mo.onclick = () => { shLimit = 9999; openShelf(k, true); };
+    $('#sh-x', md).onclick = () => closeModal();
+  });
+}

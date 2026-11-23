@@ -22,5 +22,5 @@ function bindPerfil(root) {
   on('pf-sport', () => openSportPicker(() => render(currentTab)));
   on('pf-food', () => showTab('food'));
   on('pf-health', () => openWatch());
-  on('pf-medals', () => { progMode = 'logros'; mdView = 'med'; showTab('progress'); });
+  on('pf-medals', () => showTab('logros'));
 }

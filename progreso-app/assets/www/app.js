@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '39.0';
+const APP_VERSION = '40.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -717,7 +717,7 @@ function bar(value, goal) { return `<div class="bar"><div style="width:${goal ? 
 /* ------------------------------------------------------------------ *
  *  Navegación y modales
  * ------------------------------------------------------------------ */
-const TITLES = { home: 'Hoy', train: 'Plan', hyrox: 'Competir', food: 'Nutrición', progress: 'Progreso', more: 'Perfil' };
+const TITLES = { home: 'Hoy', train: 'Plan', hyrox: 'Competir', food: 'Nutrición', progress: 'Progreso', logros: 'Logros', more: 'Perfil' };
 let currentTab = 'home';
 function showTab(tab) {
   currentTab = tab;
@@ -736,7 +736,7 @@ function showTab(tab) {
   window.scrollTo(0, 0);
 }
 function render(tab) {
-  ({ home: renderHome, train: renderTrain, hyrox: renderHyroxTab, food: renderFood, progress: renderProgress, more: renderMore })[tab]();
+  ({ home: renderHome, train: renderTrain, hyrox: renderHyroxTab, food: renderFood, progress: renderProgress, logros: () => renderLogrosTab(), more: renderMore })[tab]();
   const p = DB.profile;
   $('#hdr-sub').textContent = tab === 'home' ? longDate(todayStr()) : (p.name ? p.name + ' · ' : '') + longDate(todayStr());
 }
@@ -933,7 +933,7 @@ function renderHome() {
   });
   bindPwo($('#view-home'));
   if (full) bindRecovery($('#view-home'), renderHome);
-  const ach = $('#home-ach'); if (ach) ach.onclick = () => { progMode = 'logros'; showTab('progress'); };
+  const ach = $('#home-ach'); if (ach) ach.onclick = () => showTab('logros');
   const vh = $('#view-home');
   bindComeback(vh, renderHome); bindNotifPrompt(vh, renderHome); bindCycleInvite(vh, renderHome); bindCycleCard(vh, renderHome); bindStage(vh, renderHome); bindStarter(vh); bindAgenda(vh, renderHome); bindCommits(vh, renderHome);
   bindGlance(vh); bindStats(vh);
@@ -2384,8 +2384,8 @@ let progMode = 'evol';
 function renderProgress() {
   if (progMode === 'logros' && !gamify()) progMode = 'weight';
   if (progMode === 'ciclo' && !cycleOn()) progMode = 'analysis';
-  const tabs = isBeginner() ? [['evol', 'Evolución'], ['resumen', 'Resumen'], ['weight', 'Peso']].concat(cycleOn() ? [['ciclo', 'Ciclo']] : []).concat([['photos', 'Fotos']]).concat(gamify() ? [['logros', '🏅 Logros']] : [])
-    : [['evol', '📈 Evolución'], ['fuerza', '💪 Fuerza'], ['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]).concat(gamify() ? [['logros', '🏅 Logros']] : []);
+  const tabs = isBeginner() ? [['evol', 'Evolución'], ['resumen', 'Resumen'], ['weight', 'Peso']].concat(cycleOn() ? [['ciclo', 'Ciclo']] : []).concat([['photos', 'Fotos']])
+    : [['evol', '📈 Evolución'], ['fuerza', '💪 Fuerza'], ['analysis', '📊 Análisis'], ['historia', '📖 Historia']].concat(cycleOn() ? [['ciclo', '🌙 Ciclo']] : []).concat([['weight', 'Peso'], ['measures', 'Medidas'], ['strength', 'Fuerza'], ['photos', 'Fotos']]);
   if (!tabs.some(([k]) => k === progMode)) progMode = tabs[0][0];   // 19.0: principiante ve un resumen sencillo
   const seg = `<div class="seg wrap scroll">${tabs.map(([k, n]) => `<button data-mode="${k}" class="${progMode === k ? 'on' : ''}">${n}</button>`).join('')}</div>`;
   const v = $('#view-progress');

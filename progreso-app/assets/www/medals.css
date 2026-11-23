@@ -54,3 +54,24 @@
 .md-bars b { font-size: 10px; } .md-bars small { font-size: 9.5px; color: var(--muted); }
 .md-top > div { display: grid; grid-template-columns: 1fr 90px 34px; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: var(--fs-sm); }
 .md-top i { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--accent) var(--w), var(--surface-3) var(--w)); } .md-top b { text-align: right; }
+
+/* 40.0 · Estante de medallas */
+.lg-hero { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px; margin-bottom: 14px; }
+.lg-hero small { font-size: 11px; font-weight: 800; letter-spacing: .08em; color: var(--accent); }
+.lg-hero b { display: block; font-size: 42px; font-weight: 850; letter-spacing: -.04em; line-height: 1; } .lg-hero span { font-size: var(--fs-sm); color: var(--muted); }
+.lg-best { display: flex; gap: 2px; } .lg-best button { min-height: 0; padding: 0; background: none; box-shadow: none; }
+.sh { background: linear-gradient(180deg, var(--surface), var(--bg-2)); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px 14px 8px; margin-bottom: 14px; }
+.sh-h { display: flex; align-items: center; gap: 10px; } .sh-h > svg { color: var(--accent); flex: none; }
+.sh-h span { flex: 1; display: flex; flex-direction: column; } .sh-h b { font-size: var(--fs-lg); } .sh-h span small { font-size: var(--fs-xs); color: var(--muted); }
+.sh-h em { font-style: normal; font-size: 22px; font-weight: 850; } .sh-h em small { font-size: var(--fs-sm); color: var(--muted); font-weight: 600; }
+.sh .td-bar { margin: 10px 0 4px; height: 4px; }
+.sh-row { display: flex; justify-content: space-around; align-items: flex-end; min-height: 74px; padding: 10px 4px 0; }
+.sh-plank { height: 10px; margin: 0 -4px 6px; border-radius: 3px; background: linear-gradient(180deg, #3a3a3a, #1c1c1c 60%, #0c0c0c); box-shadow: 0 6px 12px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .12); }
+:root:not([data-theme="dark"]) .sh-plank { background: linear-gradient(180deg, #d9dccf, #b9bcae 60%, #9a9d90); box-shadow: 0 6px 10px rgba(0, 0, 0, .15); }
+.sh-m { position: relative; min-height: 0; padding: 0; background: none; border: 0; box-shadow: none; }
+.sh-m.on .md-svg { filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .55)); }
+.sh-m.off .md-svg { opacity: .35; }
+.sh-m > i { position: absolute; left: 8px; right: 8px; bottom: -4px; height: 3px; border-radius: 2px; background: var(--surface-3); overflow: hidden; }
+.sh-m > i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--p); background: var(--accent); }
+.sh-all { display: block; width: 100%; min-height: 36px; font-size: var(--fs-sm); color: var(--muted); }
+.sh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 10px 4px; margin-bottom: 8px; justify-items: center; }

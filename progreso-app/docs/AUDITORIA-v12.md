@@ -1343,3 +1343,11 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
   - Estadísticas: totales, sesiones por mes, toneladas por semana y ejercicios más entrenados.
 - **Catálogo completo:** `docs/MEDALLAS-v39.md` e imagen `dist/medallas-catalogo.png`.
 - **Pruebas:** e2e v45 (140 kg → medalla al guardar; 50 × 50 kg → "50 reps con 50 kg"). Suite completa en verde; build versionCode 44.
+
+## 40.0 · Pestaña Logros con estante de medallas
+
+- Nueva pestaña **Logros** en la barra (6 secciones: Hoy, Plan, Competir, Progreso, Logros, Perfil).
+- **Estante:** tu vitrina (total y tus 3 medallas más difíciles) y 6 repisas: Gimnasio, HYROX, Running, Constancia, Cuerpo y nutrición, Bienestar. Cada repisa muestra sus medallas ganadas (de la más difícil a la más fácil) y las siguientes por ganar en gris.
+- **Vitrina por disciplina:** todas sus medallas agrupadas por categoría, con progreso y "Mostrar todas".
+- Récords y Estadísticas se movieron a la misma pestaña. Perfil y "Logros recientes" de Hoy llevan ahí.
+- Prueba v45 actualizada; suite completa en verde; build versionCode 45.
