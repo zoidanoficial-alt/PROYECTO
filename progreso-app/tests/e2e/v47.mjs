@@ -51,6 +51,10 @@ R.hyrox = await page.evaluate(() => ({
 await shot('v47-hyrox.png');
 await shot('v47-hyrox-radar.png', '.pv-radar');
 await shot('v47-hyrox-carrera.png', '.pv-race');
+R.rivals = await page.evaluate(() => ({ rows: [...document.querySelectorAll('.pl-riv')[0].querySelectorAll('tr')].map(t => t.innerText.replace(/\s+/g, ' ').trim()), all: document.querySelectorAll('.pl-all tr').length }));
+await page.evaluate(() => document.querySelector('.pl-riv').scrollIntoView({ block: 'center' })); await shot('v47-rivales.png');
+await page.click('.pl-riv [data-plriv]'); await page.clock.runFor(200);
+R.rivalAdded = await page.evaluate(() => hxRivals().map(r => r.name + ' ' + hxT(r.sec) + ' ' + r.cat));
 await page.click('[data-plf="gdl-pro"]'); await page.clock.runFor(200);
 R.gdlPro = await page.evaluate(() => ({ on: document.querySelector('.pl-fields .on').textContent, sub: document.querySelector('.pv-head small').textContent }));
 await page.evaluate(() => closeModal(true));

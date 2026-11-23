@@ -51,6 +51,7 @@ function renderWodProgress(el, disc) {
 function psLab(el, fn, attr, setter) {
   el.innerHTML = fn() + `<button class="secondary block" id="ps-lab">${ico('trending-up', 18, 'lead')}Abrir laboratorio completo</button>`;
   $$(`[data-${attr}]`, el).forEach(b => b.onclick = () => { setter(b.dataset[attr]); psLab(el, fn, attr, setter); });
+  $$('[data-plriv]', el).forEach(b => b.onclick = () => { plAddRival(b.dataset.plriv); psLab(el, fn, attr, setter); });
   $('#ps-lab', el).onclick = () => openPerfLab(attr === 'plf' ? 'hyrox' : attr === 'plr' ? 'run' : 'gym', () => closeModal());
 }
 const PS_EXTRA = {

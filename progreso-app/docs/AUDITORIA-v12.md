@@ -1426,3 +1426,7 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
   - e2e v48.
   - Las pruebas anteriores usan `MP_DEFAULT_PLAN` para entrar directo al Plan de gimnasio.
   - Build versionCode 48.
+- **Versión personal con nombres** (`hxnames.js`): nombres del top 100 de los 4 rankings, validados uno a uno contra sus tiempos. Solo para el uso del dueño como referencia de entrenamiento.
+  - En el laboratorio aparecen "Tus rivales de referencia": los atletas justo arriba y abajo de tu marca, con su diferencia. También el top 100 completo y un botón + para agregar a cualquiera a "Mi escalera".
+  - Los avisos dicen a quién superaste.
+  - **Antes de distribuir la app a otras personas, borra `hxnames.js`** (y su `<script>` en `index.html`). Sin ese archivo la app solo muestra tiempos.

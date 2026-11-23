@@ -21,6 +21,30 @@ function fieldPlace(f, sec) {
 }
 function fieldTargets(f, sec) { return FIELD_TARGETS.map(([r, n]) => ({ r, n, t: f.t[r - 1], gap: sec ? sec - f.t[r - 1] : null, done: !!sec && sec <= f.t[r - 1] })); }
 function fieldName(f) { return `${f.city} ${f.div}`; }
+/** Nombres del top 100 (solo en la versión personal: hxnames.js). */
+function fieldNames(f) { return typeof HX_NAMES === 'object' && HX_NAMES && HX_NAMES[f.k] ? HX_NAMES[f.k] : null; }
+function plRivalBtn(f, i) { const on = hxRivals && typeof hx === 'function' && DB.hyrox && hxRivals().some(r => r.rk === f.k + '|' + i); return `<button class="pl-add${on ? ' on' : ''}" data-plriv="${f.k}|${i}" aria-label="Agregar a mi escalera">${on ? ico('check', 14) : '+'}</button>`; }
+/** Los atletas justo arriba y abajo de tu marca, y el top 100 completo. */
+function plRivalsHtml(f, sec) {
+  const N = fieldNames(f); if (!N) return '';
+  const faster = sec ? f.t.filter(x => x < sec).length : 0, from = sec ? Math.max(0, Math.min(faster - 3, f.t.length - 5)) : 0, idx = [];
+  for (let i = from; i < Math.min(f.t.length, from + 5); i++) idx.push(i);
+  const row = (i, shift) => `<tr><td class="muted">${shift && sec && i >= faster ? i + 2 : i + 1}</td><td>${esc(N[i])}</td><td><b>${hxT(f.t[i])}</b></td><td class="${sec && f.t[i] < sec ? 'hx-lose' : 'hx-win'}">${sec ? (f.t[i] < sec ? '−' : '+') + hxT(Math.abs(sec - f.t[i])) : ''}</td><td>${plRivalBtn(f, i)}</td></tr>`;
+  const me = `<tr class="pl-me"><td>${faster < 100 ? faster + 1 : '—'}</td><td><b>${esc(DB.profile.name || 'Tú')}</b></td><td><b>${hxT(sec)}</b></td><td></td><td></td></tr>`;
+  let body = '';
+  idx.forEach(i => { if (sec && i === faster) body += me; body += row(i, true); });
+  if (sec && faster >= idx[idx.length - 1] + 1) body += me;
+  return `<div class="pv-card"><div class="pv-head"><div><b>${sec ? 'Tus rivales de referencia' : 'Los más rápidos'}</b><small>${sec ? 'Quién está justo arriba y abajo de tu marca' : 'Agrega tu marca para ver a quién tienes cerca'} · toca + para llevarlo a tu escalera</small></div></div>
+    <table class="small hx-tbl pl-riv"><tbody>${body}</tbody></table>
+    <details class="pl-all"><summary>Ver el top 100 de ${esc(fieldName(f))}</summary><table class="small hx-tbl pl-riv"><tbody>${f.t.map((t, i) => row(i)).join('')}</tbody></table></details></div>`;
+}
+function plAddRival(key) {
+  const [k, i] = key.split('|'), f = fieldOf(k), N = fieldNames(f); if (!f || !N) return;
+  const id = k + '|' + i, R = hxRivals();
+  if (R.some(r => r.rk === id)) { hx().rivals = R.filter(r => r.rk !== id); toast('Quitado de tu escalera'); }
+  else { R.push({ id: 'rv' + Date.now(), rk: id, name: N[i], country: 'MX', cat: `${f.city} ${f.div} 2026 · #${Number(i) + 1}`, sec: f.t[i], splits: null, src: 'ranking' }); toast(`${N[i]} está en tu escalera`); }
+  saveData();
+}
 function hxFieldDiv() { const p = (DB.hyrox && DB.hyrox.profile) || {}; return p.cat === 'pro' ? 'Pro' : 'Open'; }
 let plField = null, plTab = null, plRun = null, plLift = null, plAct = null;
 function plPct(p) { return p < 1 ? fmt(p, 1) : p < 10 ? fmt(p, 1) : Math.round(p); }
@@ -143,6 +167,7 @@ function plHyrox() {
   const sub = pl ? (pl.inTop ? `Quedarías <b>#${pl.rank}</b> de ${f.n.toLocaleString('es-MX')}` : `Fuera del top 100 de ${f.n.toLocaleString('es-MX')} · te faltan <b>${hxT(pl.gap)}</b>`) : `${f.n.toLocaleString('es-MX')} atletas · ${esc(f.ev)}`;
   h += pvCard('Tiempo total', me ? hxT(sec) : '', sub, badge, pvDist(f.t, sec, { fmt: v => hxT(Math.round(v / 60) * 60), cutX: f.t[f.t.length - 1], aria: 'Distribución del top 100 de ' + fieldName(f) }),
     `Curva: los 100 más rápidos de ${f.n.toLocaleString('es-MX')} (${esc(f.ev)}, ${esc(f.div)} varonil). La línea marca el lugar 100.`);
+  h += plRivalsHtml(f, sec);
   // Metas
   h += `<div class="ds-h">Récords por romper <span class="ds-h-r">${esc(fieldName(f))}</span></div><div class="pl-goals">${T.map(x => `<div class="pl-goal${x.done ? ' done' : ''}${next && x.r === next.r ? ' next' : ''}"><span>${x.done ? ico('check', 16) : ''}${esc(x.n)}</span><b>${hxT(x.t)}</b><small>${sec ? x.done ? 'lo tienes' : '−' + hxT(x.gap) : ''}</small></div>`).join('')}</div>`;
   if (next && sec) {
@@ -169,7 +194,7 @@ function plHyrox() {
     h += pvCard('Carrera contra tu récord', '', `${esc(last.name)} (${shortDate(last.date)}) vs ${esc(best.name)} (${shortDate(best.date)})`, end >= 0 ? `+${hxT(end)}` : `−${hxT(-end)}`, pvRace(rows),
       'Arriba de la línea vas adelante de tu récord. Los números son las 8 estaciones.');
   }
-  h += `<p class="pv-src">Rankings: páginas públicas de resultados de 2026 (hyresult.com) que guardaste en PDF; solo tiempos, sin nombres. ${fem ? 'Por ahora solo hay divisiones varoniles: en tu caso es una referencia. ' : ''}Sin afiliación con HYROX.</p>`;
+  h += `<p class="pv-src">Rankings: páginas públicas de resultados de 2026 (hyresult.com) que guardaste en PDF${fieldNames(f) ? '; versión personal con nombres, solo para tu uso' : '; solo tiempos, sin nombres'}. ${fem ? 'Por ahora solo hay divisiones varoniles: en tu caso es una referencia. ' : ''}Sin afiliación con HYROX.</p>`;
   return h;
 }
 
@@ -259,6 +284,7 @@ function openPerfLab(tab, back) {
     <div id="pl-body">${PL_TABS[plTab][1]()}</div><button class="ghost block" id="pl-x">← Volver</button></div>`, m => {
     $$('[data-plt]', m).forEach(b => b.onclick = () => openPerfLab(b.dataset.plt, back));
     $$('[data-plf]', m).forEach(b => b.onclick = () => { plField = b.dataset.plf; openPerfLab(plTab, back); });
+    $$('[data-plriv]', m).forEach(b => b.onclick = () => { plAddRival(b.dataset.plriv); const y = m.scrollTop; openPerfLab(plTab, back); $('#modal').scrollTop = y; });
     $$('[data-plr]', m).forEach(b => b.onclick = () => { plRun = Number(b.dataset.plr); openPerfLab(plTab, back); });
     $$('[data-pll]', m).forEach(b => b.onclick = () => { plLift = b.dataset.pll; openPerfLab(plTab, back); });
     $$('[data-pla]', m).forEach(b => b.onclick = () => { plAct = b.dataset.pla; openPerfLab(plTab, back); });
@@ -280,5 +306,5 @@ function fieldReact(prevSec, newSec) {
     const t = FIELD_TARGETS.find(([r]) => newSec <= f.t[r - 1] && !(prevSec && prevSec <= f.t[r - 1]));
     if (t && (!best || t[0] < best.t[0])) best = { f, t, p: fieldPlace(f, newSec) };
   });
-  if (best) achToast(`Entraste al ${best.t[1]} · ${best.f.ev.replace('HYROX ', '')} ${best.f.div}`, `${hxT(newSec)} · quedarías #${best.p.rank} de ${best.f.n.toLocaleString('es-MX')}`);
+  if (best) { const N = fieldNames(best.f), r = best.p.rank; achToast(`Entraste al ${best.t[1]} · ${best.f.ev.replace('HYROX ', '')} ${best.f.div}`, `${hxT(newSec)} · quedarías #${r} de ${best.f.n.toLocaleString('es-MX')}${N && N[r - 1] ? ' · superaste a ' + N[r - 1] : ''}`); }
 }

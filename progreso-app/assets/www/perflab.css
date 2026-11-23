@@ -40,3 +40,9 @@
 .pl-fields.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border-radius: var(--r-md); } .pl-fields.g2 button { width: 100%; }
 .pv-bar { fill: var(--surface-3); } .pv-bar.rec { fill: var(--muted); } .pv-bar.last { fill: var(--accent); }
 .pv-tick.b { fill: var(--text); font-weight: 800; }
+.pl-riv td:first-child { width: 26px; } .pl-riv td:nth-child(3), .pl-riv td:nth-child(4) { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pl-riv td:nth-child(2) { overflow-wrap: anywhere; } .pl-riv td:last-child { width: 34px; text-align: right; }
+.pl-me td { color: var(--accent); background: rgba(198, 244, 50, .07); }
+.pl-add { min-height: 28px; width: 28px; padding: 0; border-radius: 50%; background: var(--surface-3); color: var(--text); box-shadow: none; font-weight: 900; display: inline-grid; place-items: center; }
+.pl-add.on { background: var(--accent); color: #111; }
+.pl-all summary { padding: 10px 0 4px; font-size: 13px; font-weight: 800; cursor: pointer; color: var(--text); }
