@@ -50,6 +50,7 @@ function hxRecReact(r) {
   const list = r.pf && typeof hxResultsPF === 'function' && r.kind === 'st' ? hxResultsPF(r.st) : hx().results.filter(x => x.kind === r.kind && (r.kind !== 'st' || x.st === r.st) && !x.pf && x.std !== false);
   const prev = list.filter(x => x.id !== r.id).reduce((a, x) => !a || x.sec < a.sec ? x : a, null);
   const name = r.kind === 'st' ? (r.pf && typeof PF_SUB === 'object' && PF_SUB[r.st] ? PF_SUB[r.st].n : HX_ST[r.st].n) : HX_KIND_N[r.kind] || 'HYROX';
+  if (r.kind === 'sim' && !r.pf && typeof fieldReact === 'function') { const o = typeof hxMyBest === 'function' ? [].concat(((DB.ev && DB.ev.results) || []).filter(x => x.sport === 'hyrox' && x.sec), hx().results.filter(x => x.kind === 'sim' && x.sec && !x.pf && x.id !== r.id)).reduce((a, x) => !a || x.sec < a ? x.sec : a, null) : null; setTimeout(() => fieldReact(o, r.sec), 5200); }
   if (!prev) return achToast(`Primera marca · ${name}`, `${hxT(r.sec)} · desde aquí empieza tu historia`);
   if (r.sec < prev.sec) return achToast(`Nuevo récord · ${name}`, `${hxT(r.sec)} · ${hxT(prev.sec - r.sec)} más rápido`);
   apolloToast(`${name}: ${hxT(r.sec)}. Tu récord sigue en ${hxT(prev.sec)} (te faltaron ${hxT(r.sec - prev.sec)}). Levántate y vuelve.`);

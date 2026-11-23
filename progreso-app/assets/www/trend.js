@@ -247,7 +247,7 @@ function renderEvolution(el) {
   const ks = sportMetrics(false), have = ks.filter(k => metricAt(k, todayStr()) != null);
   const sp = SPORTS[mainSport()];
   if (!progMetric || !have.includes(progMetric)) progMetric = have[0] || null;
-  const head = `<button class="evo-sport" id="evo-sport">${ico(sp.ico, 18)}<span>Tu disciplina: <b>${esc(sp.n)}</b></span>${ico('chevron-right', 14)}</button>`;
+  const head = `<button class="evo-sport" id="evo-sport">${ico(sp.ico, 18)}<span>Tu disciplina: <b>${esc(sp.n)}</b></span>${ico('chevron-right', 14)}</button>` + (typeof openPerfLab === 'function' ? `<button class="pl-card-btn" id="evo-lab">${ico('trending-up', 24)}<span><b>Laboratorio de rendimiento</b><small>Tu lugar, tu radar y el siguiente récord por romper</small></span>${ico('chevron-right', 16)}</button>` : '');
   if (!progMetric) {
     el.innerHTML = head + `<div class="cp-diag empty"><b>Tus gráficas aparecen con tus primeros datos</b><p>Para ${esc(sp.n.toLowerCase())} la app sigue: ${ks.map(k => esc(mName(k, 'short'))).join(', ')}.</p>
       <dl>${ks.slice(0, 3).map(k => `<dt>${esc(mName(k, 'short'))}</dt><dd>${esc(METRICS[k].how)}</dd>`).join('')}</dl></div>`;
@@ -281,6 +281,7 @@ function renderEvolution(el) {
 function bindEvolution(el) {
   $$('[data-metric]', el).forEach(b => b.onclick = () => { progMetric = b.dataset.metric; renderEvolution(el); });
   const s = $('#evo-sport', el); if (s) s.onclick = () => openSportPicker(() => renderProgress());
+  const lb = $('#evo-lab', el); if (lb) lb.onclick = () => openPerfLab(null, () => closeModal());
 }
 
 /* ---------- Elegir disciplina ---------- */

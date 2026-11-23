@@ -17,6 +17,7 @@ function renderHyroxTab() {
       <p class="cp-lead">Elige tu carrera y la app arma tu preparación: evaluación por partes, punto débil, predicción y sesiones específicas.</p>
       <button class="block" id="hxp-setup">${ico('timer', 18, 'lead')}Preparar un HYROX</button>
       <button class="secondary block" data-hxp="events" style="margin-top:8px">${ico('calendar', 18, 'lead')}Buscar una competencia</button></div>
+      <div class="ds-h">Rankings México 2026</div><button class="pl-card-btn" data-hxp="lab">${ico('trending-up', 24)}<span><b>Laboratorio de rendimiento</b><small>${esc(plSummary())}</small></span>${ico('chevron-right', 16)}</button>
       <div class="ds-h">Entrena una estación <span class="ds-h-r">sin preparar una carrera</span></div>${hxsGrid(null, null)}
       ${champMethodCard()}
       <div class="ds-h">Herramientas</div>
@@ -60,7 +61,7 @@ function renderHyroxTab() {
     : `<section class="cp-sec"><div class="ds-h">Predictor</div><div class="cp-diag empty"><b>Sin predicción todavía</b><p>Necesita tu 1 km fresco${perf.run ? ' ✓' : ''} y ${hxIsPF && hxIsPF() ? 4 : 6} estaciones medidas (llevas ${perf.tested.length}).</p></div></section>`;
 
   // F · Estaciones
-  const sts = `<section class="cp-sec"><div class="ds-h">Estaciones <span class="ds-h-r">cada una se entrena sola · ${perf.tested.length} de 8 medidas</span></div>${hxsGrid(perf, bn)}</section>`;
+  const sts = `<section class="cp-sec"><div class="ds-h">Rankings México 2026 <span class="ds-h-r">CDMX y Guadalajara</span></div><button class="pl-card-btn" data-hxp="lab">${ico('trending-up', 24)}<span><b>Laboratorio de rendimiento</b><small>${esc(plSummary())}</small></span>${ico('chevron-right', 16)}</button></section><section class="cp-sec"><div class="ds-h">Estaciones <span class="ds-h-r">cada una se entrena sola · ${perf.tested.length} de 8 medidas</span></div>${hxsGrid(perf, bn)}</section>`;
 
   root.innerHTML = `${prep}
     <div class="ds-h">Sesión de hoy</div>
@@ -96,7 +97,7 @@ function renderHyroxTab() {
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }
 function hxpBind(root) {
   const back = () => closeModal();
-  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), ladder: () => openHxLadder(back), resist: () => openResist(back), athlete: () => openAthlete(), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); renderHyroxTab(); }) };
+  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), lab: () => openPerfLab('hyrox', back), ladder: () => openHxLadder(back), resist: () => openResist(back), athlete: () => openAthlete(), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); renderHyroxTab(); }) };
   $$('[data-hxp]', root).forEach(b => b.onclick = () => act[b.dataset.hxp]());
   const ch = $('#ch-open', root); if (ch) ch.onclick = () => openChamps();
   const pfb = $('#pf-open', root); if (pfb) pfb.onclick = () => openPfHyrox();

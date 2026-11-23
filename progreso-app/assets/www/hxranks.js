@@ -23,11 +23,13 @@ async function openHxRanks(back) {
     <button class="secondary block" id="rk-ref">Agregar atleta de referencia</button>
     <div class="rir-label"><span>Los mejores · México y mundo</span></div>
     ${boards && boards.boards && boards.boards.length ? boards.boards.map(b => `<div class="pg-rec"><b>${esc(b.title)}</b><small>${esc(b.season || '')} · fuente: ${esc(boards.source)} · ${esc((boards.generatedAt || '').slice(0, 10))}</small><table class="small hx-tbl"><tbody>${b.rows.slice(0, 10).map(x => `<tr><td>${x.rank}. ${esc(x.name)} <small class="muted">${esc(x.country || '')}</small></td><td>${hxT(x.time)}</td></tr>`).join('')}</tbody></table></div>`).join('')
+      : typeof openPerfLab === 'function' ? `<p class="small muted">Tu lugar contra los rankings reales de CDMX y Guadalajara 2026 está en el Laboratorio de rendimiento.</p><button class="secondary block" id="rk-lab">Ver mi lugar en los rankings</button>`
       : `<div class="status info"><b>Sin rankings conectados</b>HYROX no ofrece una API pública oficial y no muestro tablas inventadas. Para verlos aquí hay que conectar un proveedor autorizado (ver documentación). Mientras, los resultados oficiales están en su sitio.</div>
       <a class="ev-link-btn" href="https://results.hyrox.com/" target="_blank" rel="noopener">Resultados oficiales de HYROX ↗</a>`}
     <button class="ghost block" id="rk-x">← Volver</button>`, m => {
     $('#rk-ref', m).onclick = () => openHxRef(() => openHxRanks(back));
     $('#rk-x', m).onclick = back;
+    const lb = $('#rk-lab', m); if (lb) lb.onclick = () => openPerfLab('hyrox', () => openHxRanks(back));
   });
 }
 function hxCompareHtml(mine, ref) {

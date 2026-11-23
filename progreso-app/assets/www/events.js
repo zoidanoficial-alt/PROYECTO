@@ -537,6 +537,7 @@ function openEvResult(e) {
       }
       saveData();
       const beaten = hyroxE && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, sec) : [];
+      if (hyroxE && typeof fieldReact === 'function') setTimeout(() => fieldReact(ladderPrev, sec), 900);
       openModal(`<div class="hx-eyebrow">${res.pr ? 'NUEVO RÉCORD PERSONAL' : 'RESULTADO GUARDADO'}</div><h3 style="margin-top:4px">${hxT(sec)}</h3>${beaten.length ? hxLadderCelebrateHtml(beaten) : ''}
         ${prev ? `<p class="small">${sec < prev.sec ? `${hxT(prev.sec - sec)} más rápido que ${esc(prev.name)}.` : `Tu mejor marca sigue siendo ${hxT(prev.sec)} (${esc(prev.name)}).`}</p>` : '<p class="small">Tu primera marca en esta disciplina: el punto de partida.</p>'}
         ${hyroxE ? '<p class="small muted">Se agregó a HYROX Lab como simulación medida' + (res.splits ? ' y con tus parciales por estación' : '') + '. Tu predicción y tu cuello de botella ya lo usan.</p>' : ''}

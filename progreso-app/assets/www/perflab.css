@@ -1,0 +1,42 @@
+/* 42.0 · Laboratorio de rendimiento */
+.pl-tabs { margin-bottom: 12px; } .pl-tabs button { font-size: 13px; padding-left: 6px; padding-right: 6px; }
+.pl-hero { padding: 14px 16px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); margin-bottom: 10px; }
+.pl-hero small { display: block; color: var(--muted); font-size: var(--fs-xs); font-weight: 700; }
+.pl-hero > b { display: block; font-size: 38px; font-weight: 900; letter-spacing: -.02em; line-height: 1.1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.pl-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pl-chips span { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: var(--r-pill); background: var(--surface-3); color: var(--text); }
+.pl-fields { margin: 4px 0 10px; } .pl-fields button { font-size: 12.5px; min-height: 34px; }
+.pv-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px 10px; margin-bottom: 10px; color: var(--muted); }
+.pv-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+.pv-head b { display: block; color: var(--text); font-size: 14.5px; } .pv-head b span { font-variant-numeric: tabular-nums; margin-left: 4px; }
+.pv-head small { display: block; font-size: 12px; color: var(--text-3); margin-top: 2px; } .pv-head small b { display: inline; font-size: inherit; color: var(--text); }
+.pv-badge { flex: none; font-style: normal; font-size: 12.5px; font-weight: 900; padding: 4px 10px; border-radius: var(--r-pill); background: var(--accent); color: #111; white-space: nowrap; }
+.pv-card svg { display: block; width: 100%; height: auto; overflow: visible; }
+.pv-tick { font-size: 9.5px; fill: var(--text-3); font-variant-numeric: tabular-nums; }
+.pv-line { color: var(--muted); } .pv-area { color: var(--muted); }
+.pv-me { fill: var(--accent); stroke: var(--bg, #000); stroke-width: 2; } .pv-me-l { stroke: var(--accent); stroke-dasharray: 3 3; stroke-width: 1.2; }
+.pv-cut { stroke: var(--text-3); stroke-dasharray: 2 3; stroke-width: 1; }
+.pv-ring { fill: none; stroke: var(--line-2, rgba(255, 255, 255, .12)); stroke-width: 1; }
+.pv-now { fill: var(--accent); fill-opacity: .28; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.pv-prev { fill: none; stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 3; }
+.pv-dot { fill: var(--accent); }
+.pv-lab { font-size: 10.5px; font-weight: 700; fill: var(--text); } .pv-lab.off { fill: var(--text-3); font-weight: 500; }
+.pv-zero { stroke: var(--text-3); stroke-width: 1; } .pv-grid { stroke: var(--line); stroke-dasharray: 2 3; }
+.pv-race .pv-line { color: var(--text); }
+.pv-ahead { fill: var(--accent); } .pv-behind { fill: var(--danger, #ff5c5c); }
+.pv-foot { margin: 6px 0 0; font-size: 12px; color: var(--text-3); line-height: 1.4; } .pv-foot b { color: var(--text); }
+.pv-src { font-size: 11.5px; color: var(--text-3); margin: 8px 2px 12px; line-height: 1.4; }
+.pl-goals { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+.pl-goal { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border-radius: var(--r-sm); background: var(--surface); border: 1px solid var(--line); text-align: center; min-width: 0; }
+.pl-goal span { display: flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 800; color: var(--muted); white-space: nowrap; }
+.pl-goal b { font-size: 13px; font-variant-numeric: tabular-nums; } .pl-goal small { font-size: 10.5px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.pl-goal.done { border-color: var(--accent); } .pl-goal.done span { color: var(--accent); }
+.pl-goal.next { border-color: var(--text); box-shadow: 0 0 0 1px var(--text) inset; } .pl-goal.next small { color: var(--text); font-weight: 800; }
+.pl-plan td:nth-child(2), .pl-plan td:nth-child(3) { text-align: right; font-variant-numeric: tabular-nums; }
+.pl-card-btn { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); color: var(--text); font-weight: 400; box-shadow: none; margin-bottom: 10px; }
+.pl-card-btn b { display: block; font-size: 14.5px; } .pl-card-btn small { display: block; color: var(--text-3); font-size: 12px; }
+.pl-card-btn > svg:first-child { color: var(--accent); flex: none; } .pl-card-btn > svg:last-child { margin-left: auto; color: var(--text-3); flex: none; }
+@media (max-width: 360px) { .pl-goal b { font-size: 11.5px; } .pl-hero > b { font-size: 32px; } }
+.pl-fields.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; border-radius: var(--r-md); } .pl-fields.g2 button { width: 100%; }
+.pv-bar { fill: var(--surface-3); } .pv-bar.rec { fill: var(--muted); } .pv-bar.last { fill: var(--accent); }
+.pv-tick.b { fill: var(--text); font-weight: 800; }

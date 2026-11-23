@@ -1366,3 +1366,25 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
   - Aplica en HYROX (temporizador y registro manual), en el gimnasio (Apollo solo al terminar las series planeadas de un ejercicio, no en cada serie) y en carreras.
   - Las dos se pueden apagar en Logros.
 - **Pruebas:** e2e v46. La suite completa se corre en segundo plano porque ya pasa de 10 minutos. Build versionCode 46.
+
+## 42.0 · Laboratorio de rendimiento y rankings reales de HYROX México 2026
+
+- **Rankings reales** (`hxfields.js`): top 100 de CDMX 2026 (Open 2,949 y Pro 405 atletas) y Guadalajara 2026 (Open 1,361 y Pro 203), división varonil, tomados de los PDF que guardó el usuario (hyresult.com, 23/11/2026). Solo se guardan **tiempos y tamaño del campo, sin nombres**. Extracción validada: 100 tiempos por campo, en orden.
+- **Laboratorio de rendimiento** (`perflab.js`, `perflab.css`), desde Competir, Progreso → Evolución y Mis carreras:
+  - **HYROX:**
+    - Tu mejor carrera o simulación (o tu predicción, marcada "estimado") contra cada campo: lugar #, percentil y curva de distribución del top 100 con tu punto y la línea del lugar 100.
+    - "Récords por romper": podio, top 10, 25, 50 y 100 con lo que te falta.
+    - "Cómo llegar": ritmo de 1 km y tiempo por estación para la siguiente meta.
+    - Radar de rendimiento: running y 8 estaciones, actual vs hace 8 semanas.
+    - "Carrera contra tu récord": diferencia acumulada por segmento entre tu última carrera o simulación con parciales y la mejor.
+  - **Running:** récord por distancia, lugar entre tus intentos y radar por distancia (VDOT).
+  - **Gimnasio:** 1RM estimado por sesión, "para romper tu récord: X × reps", radar de fuerza relativa (escala orientativa).
+  - **Bici, natación y remo:** velocidad o ritmo por sesión.
+  - Con menos de 8 intentos se muestran barras por fecha en lugar de curva.
+- **Aviso al entrar a un top real:** "LOGRO DESBLOQUEADO · Entraste al Top 50 · Guadalajara 2026 Open", al guardar una simulación o una carrera.
+- **Límites honestos:**
+  - Solo hay top 100 (no el campo completo), así que fuera del top 100 se muestra cuánto falta para entrar.
+  - Por ahora solo hay divisiones varoniles; para mujeres es una referencia.
+  - En running, gimnasio y bici no hay rankings con licencia: la comparación es contra tu propio historial.
+- **Pendiente de decisión:** HYROX envió cartas a sitios de resultados por el uso de datos sin licencia. Para una versión pública conviene confirmar el permiso o reemplazar estos datos por una fuente con licencia.
+- **Pruebas:** e2e v47. Build versionCode 47.
