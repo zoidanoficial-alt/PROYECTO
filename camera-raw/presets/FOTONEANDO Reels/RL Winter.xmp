@@ -1,0 +1,132 @@
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.6-c140">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/"
+   crs:PresetType="Normal"
+   crs:Cluster=""
+   crs:UUID="F538A519F5F44421912EFA5DF5266885"
+   crs:SupportsAmount="False"
+   crs:SupportsColor="True"
+   crs:SupportsMonochrome="True"
+   crs:SupportsHighDynamicRange="True"
+   crs:SupportsNormalDynamicRange="True"
+   crs:SupportsSceneReferred="True"
+   crs:SupportsOutputReferred="True"
+   crs:CameraModelRestriction=""
+   crs:Copyright=""
+   crs:ContactInfo=""
+   crs:Version="10.0"
+   crs:HasSettings="True"
+   crs:ToneCurveName2012="Custom"
+   crs:Saturation="+34"
+   crs:ConvertToGrayscale="False"
+   crs:GrainAmount="0"
+   crs:GrainSize="25"
+   crs:GrainFrequency="50"
+   crs:PostCropVignetteAmount="-18"
+   crs:PostCropVignetteMidpoint="50"
+   crs:PostCropVignetteFeather="50"
+   crs:PostCropVignetteRoundness="0"
+   crs:PostCropVignetteStyle="1"
+   crs:PostCropVignetteHighlightContrast="0"
+   crs:Vibrance="-9"
+   crs:Clarity2012="-30"
+   crs:Dehaze="-22"
+   crs:Contrast2012="+80"
+   crs:Highlights2012="-55"
+   crs:Shadows2012="+49"
+   crs:Whites2012="+58"
+   crs:Blacks2012="-3"
+   crs:SplitToningShadowHue="210"
+   crs:SplitToningShadowSaturation="9"
+   crs:SplitToningHighlightHue="37"
+   crs:SplitToningHighlightSaturation="5"
+   crs:SplitToningBalance="0"
+   crs:HueAdjustmentRed="+22"
+   crs:SaturationAdjustmentRed="-1"
+   crs:LuminanceAdjustmentRed="+0"
+   crs:HueAdjustmentOrange="-31"
+   crs:SaturationAdjustmentOrange="-25"
+   crs:LuminanceAdjustmentOrange="-2"
+   crs:HueAdjustmentYellow="+0"
+   crs:SaturationAdjustmentYellow="-34"
+   crs:LuminanceAdjustmentYellow="+0"
+   crs:HueAdjustmentGreen="-46"
+   crs:SaturationAdjustmentGreen="-68"
+   crs:LuminanceAdjustmentGreen="-5"
+   crs:HueAdjustmentAqua="+49"
+   crs:SaturationAdjustmentAqua="-32"
+   crs:LuminanceAdjustmentAqua="+0"
+   crs:HueAdjustmentBlue="-13"
+   crs:SaturationAdjustmentBlue="-19"
+   crs:LuminanceAdjustmentBlue="-4"
+   crs:HueAdjustmentPurple="+0"
+   crs:SaturationAdjustmentPurple="-21"
+   crs:LuminanceAdjustmentPurple="+1"
+   crs:HueAdjustmentMagenta="-3"
+   crs:SaturationAdjustmentMagenta="-17"
+   crs:LuminanceAdjustmentMagenta="+1">
+   <crs:Name>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">RL Winter</rdf:li>
+    </rdf:Alt>
+   </crs:Name>
+   <crs:ShortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:ShortName>
+   <crs:SortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:SortName>
+   <crs:Group>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">FOTONEANDO · Reels</rdf:li>
+    </rdf:Alt>
+   </crs:Group>
+   <crs:Description>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Invierno nevado: mucho contraste con negros lavados, verdes girados al azul y casi sin color, aguas azules y un toque frío en las sombras.</rdf:li>
+    </rdf:Alt>
+   </crs:Description>
+   <crs:ToneCurvePV2012>
+    <rdf:Seq>
+     <rdf:li>0, 49</rdf:li>
+     <rdf:li>69, 61</rdf:li>
+     <rdf:li>111, 87</rdf:li>
+     <rdf:li>182, 158</rdf:li>
+     <rdf:li>255, 253</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012>
+   <crs:ToneCurvePV2012Red>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>64, 64</rdf:li>
+     <rdf:li>128, 127</rdf:li>
+     <rdf:li>191, 191</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Red>
+   <crs:ToneCurvePV2012Green>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>64, 63</rdf:li>
+     <rdf:li>128, 126</rdf:li>
+     <rdf:li>191, 190</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Green>
+   <crs:ToneCurvePV2012Blue>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>64, 65</rdf:li>
+     <rdf:li>128, 130</rdf:li>
+     <rdf:li>191, 193</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Blue>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>

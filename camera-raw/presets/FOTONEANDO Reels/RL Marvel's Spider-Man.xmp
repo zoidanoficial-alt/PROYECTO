@@ -1,0 +1,132 @@
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.6-c140">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/"
+   crs:PresetType="Normal"
+   crs:Cluster=""
+   crs:UUID="77FE38F34CE44110A7782744D7D19188"
+   crs:SupportsAmount="False"
+   crs:SupportsColor="True"
+   crs:SupportsMonochrome="True"
+   crs:SupportsHighDynamicRange="True"
+   crs:SupportsNormalDynamicRange="True"
+   crs:SupportsSceneReferred="True"
+   crs:SupportsOutputReferred="True"
+   crs:CameraModelRestriction=""
+   crs:Copyright=""
+   crs:ContactInfo=""
+   crs:Version="10.0"
+   crs:HasSettings="True"
+   crs:ToneCurveName2012="Custom"
+   crs:Saturation="+12"
+   crs:ConvertToGrayscale="False"
+   crs:GrainAmount="0"
+   crs:GrainSize="25"
+   crs:GrainFrequency="50"
+   crs:PostCropVignetteAmount="+0"
+   crs:PostCropVignetteMidpoint="50"
+   crs:PostCropVignetteFeather="50"
+   crs:PostCropVignetteRoundness="0"
+   crs:PostCropVignetteStyle="1"
+   crs:PostCropVignetteHighlightContrast="0"
+   crs:Vibrance="+17"
+   crs:Clarity2012="-8"
+   crs:Dehaze="-15"
+   crs:Contrast2012="+68"
+   crs:Highlights2012="-33"
+   crs:Shadows2012="+60"
+   crs:Whites2012="+43"
+   crs:Blacks2012="+36"
+   crs:SplitToningShadowHue="210"
+   crs:SplitToningShadowSaturation="9"
+   crs:SplitToningHighlightHue="61"
+   crs:SplitToningHighlightSaturation="14"
+   crs:SplitToningBalance="0"
+   crs:HueAdjustmentRed="+22"
+   crs:SaturationAdjustmentRed="-1"
+   crs:LuminanceAdjustmentRed="+0"
+   crs:HueAdjustmentOrange="-31"
+   crs:SaturationAdjustmentOrange="-25"
+   crs:LuminanceAdjustmentOrange="-2"
+   crs:HueAdjustmentYellow="+0"
+   crs:SaturationAdjustmentYellow="-34"
+   crs:LuminanceAdjustmentYellow="+0"
+   crs:HueAdjustmentGreen="-46"
+   crs:SaturationAdjustmentGreen="-68"
+   crs:LuminanceAdjustmentGreen="-5"
+   crs:HueAdjustmentAqua="+49"
+   crs:SaturationAdjustmentAqua="-32"
+   crs:LuminanceAdjustmentAqua="+0"
+   crs:HueAdjustmentBlue="-13"
+   crs:SaturationAdjustmentBlue="-19"
+   crs:LuminanceAdjustmentBlue="-4"
+   crs:HueAdjustmentPurple="+0"
+   crs:SaturationAdjustmentPurple="-21"
+   crs:LuminanceAdjustmentPurple="+1"
+   crs:HueAdjustmentMagenta="-3"
+   crs:SaturationAdjustmentMagenta="-17"
+   crs:LuminanceAdjustmentMagenta="+1">
+   <crs:Name>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">RL Marvel's Spider-Man</rdf:li>
+    </rdf:Alt>
+   </crs:Name>
+   <crs:ShortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:ShortName>
+   <crs:SortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:SortName>
+   <crs:Group>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">FOTONEANDO · Reels</rdf:li>
+    </rdf:Alt>
+   </crs:Group>
+   <crs:Description>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Ciudad al atardecer de videojuego: mucho contraste, negros lavados, luces cálidas doradas, verdes girados al azul y aguas intensas.</rdf:li>
+    </rdf:Alt>
+   </crs:Description>
+   <crs:ToneCurvePV2012>
+    <rdf:Seq>
+     <rdf:li>0, 46</rdf:li>
+     <rdf:li>68, 58</rdf:li>
+     <rdf:li>110, 86</rdf:li>
+     <rdf:li>181, 171</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012>
+   <crs:ToneCurvePV2012Red>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>64, 68</rdf:li>
+     <rdf:li>128, 134</rdf:li>
+     <rdf:li>191, 195</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Red>
+   <crs:ToneCurvePV2012Green>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>64, 60</rdf:li>
+     <rdf:li>128, 121</rdf:li>
+     <rdf:li>191, 187</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Green>
+   <crs:ToneCurvePV2012Blue>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>64, 61</rdf:li>
+     <rdf:li>128, 123</rdf:li>
+     <rdf:li>191, 188</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Blue>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>

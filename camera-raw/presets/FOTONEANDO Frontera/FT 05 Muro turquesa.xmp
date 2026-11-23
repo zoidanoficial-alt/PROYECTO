@@ -1,0 +1,119 @@
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.6-c140">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/"
+   crs:PresetType="Normal"
+   crs:Cluster=""
+   crs:UUID="5E1CC1140ED14927A899C7C33DF07C62"
+   crs:SupportsAmount="False"
+   crs:SupportsColor="True"
+   crs:SupportsMonochrome="True"
+   crs:SupportsHighDynamicRange="True"
+   crs:SupportsNormalDynamicRange="True"
+   crs:SupportsSceneReferred="True"
+   crs:SupportsOutputReferred="True"
+   crs:CameraModelRestriction=""
+   crs:Copyright=""
+   crs:ContactInfo=""
+   crs:Version="10.0"
+   crs:HasSettings="True"
+   crs:ToneCurveName2012="Custom"
+   crs:Saturation="+16"
+   crs:ConvertToGrayscale="False"
+   crs:GrainAmount="14"
+   crs:GrainSize="25"
+   crs:GrainFrequency="50"
+   crs:PostCropVignetteAmount="-10"
+   crs:PostCropVignetteMidpoint="40"
+   crs:PostCropVignetteFeather="70"
+   crs:PostCropVignetteRoundness="0"
+   crs:PostCropVignetteStyle="1"
+   crs:PostCropVignetteHighlightContrast="0"
+   crs:HueAdjustmentRed="+4"
+   crs:SaturationAdjustmentRed="+10"
+   crs:LuminanceAdjustmentRed="+4"
+   crs:HueAdjustmentOrange="+0"
+   crs:SaturationAdjustmentOrange="+4"
+   crs:LuminanceAdjustmentOrange="+4"
+   crs:HueAdjustmentYellow="-4"
+   crs:SaturationAdjustmentYellow="-12"
+   crs:LuminanceAdjustmentYellow="-6"
+   crs:HueAdjustmentGreen="+16"
+   crs:SaturationAdjustmentGreen="+10"
+   crs:LuminanceAdjustmentGreen="-8"
+   crs:HueAdjustmentAqua="-6"
+   crs:SaturationAdjustmentAqua="+20"
+   crs:LuminanceAdjustmentAqua="-6"
+   crs:HueAdjustmentBlue="+0"
+   crs:SaturationAdjustmentBlue="+0"
+   crs:LuminanceAdjustmentBlue="+0"
+   crs:HueAdjustmentPurple="+0"
+   crs:SaturationAdjustmentPurple="+0"
+   crs:LuminanceAdjustmentPurple="+0"
+   crs:HueAdjustmentMagenta="+0"
+   crs:SaturationAdjustmentMagenta="+0"
+   crs:LuminanceAdjustmentMagenta="+0">
+   <crs:Name>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">FT 05 Muro turquesa</rdf:li>
+    </rdf:Alt>
+   </crs:Name>
+   <crs:ShortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:ShortName>
+   <crs:SortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:SortName>
+   <crs:Group>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">FOTONEANDO · Frontera</rdf:li>
+    </rdf:Alt>
+   </crs:Group>
+   <crs:Description>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Calle mexicana a pleno sol: sombras negras como tinta, muros turquesa y cartón cálido.</rdf:li>
+    </rdf:Alt>
+   </crs:Description>
+   <crs:ToneCurvePV2012>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>56, 24</rdf:li>
+     <rdf:li>107, 93</rdf:li>
+     <rdf:li>158, 153</rdf:li>
+     <rdf:li>255, 247</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012>
+   <crs:ToneCurvePV2012Red>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>103, 105</rdf:li>
+     <rdf:li>128, 135</rdf:li>
+     <rdf:li>217, 233</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Red>
+   <crs:ToneCurvePV2012Green>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>103, 103</rdf:li>
+     <rdf:li>128, 127</rdf:li>
+     <rdf:li>217, 215</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Green>
+   <crs:ToneCurvePV2012Blue>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>103, 92</rdf:li>
+     <rdf:li>128, 113</rdf:li>
+     <rdf:li>217, 200</rdf:li>
+     <rdf:li>255, 248</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Blue>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>

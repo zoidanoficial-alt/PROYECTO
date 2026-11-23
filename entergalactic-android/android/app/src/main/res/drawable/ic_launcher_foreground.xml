@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Orbe violeta con anillo: icono original de ENTERGALACTIC. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:strokeColor="#22D3EE" android:strokeWidth="2.5" android:fillColor="#00000000"
+        android:pathData="M18,58 C18,50 36,44 54,44 C72,44 90,50 90,58 C90,66 72,70 54,70 C36,70 18,66 18,58 Z" />
+    <path android:pathData="M54,54 m-18,0 a18,18 0 1,0 36,0 a18,18 0 1,0 -36,0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="47" android:centerY="47" android:gradientRadius="24"
+                android:startColor="#FFFFFF" android:centerColor="#A78BFA" android:endColor="#4C1D95" />
+        </aapt:attr>
+    </path>
+    <path android:strokeColor="#22D3EE" android:strokeWidth="2.5" android:fillColor="#00000000"
+        android:pathData="M27,62 C38,67 70,67 81,62" />
+</vector>

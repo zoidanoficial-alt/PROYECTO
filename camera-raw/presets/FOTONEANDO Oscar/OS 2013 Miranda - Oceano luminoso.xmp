@@ -1,0 +1,131 @@
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.6-c140">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/"
+   crs:PresetType="Normal"
+   crs:Cluster=""
+   crs:UUID="50F297B459CB431C86AD8E076CDC93D4"
+   crs:SupportsAmount="False"
+   crs:SupportsColor="True"
+   crs:SupportsMonochrome="True"
+   crs:SupportsHighDynamicRange="True"
+   crs:SupportsNormalDynamicRange="True"
+   crs:SupportsSceneReferred="True"
+   crs:SupportsOutputReferred="True"
+   crs:CameraModelRestriction=""
+   crs:Copyright=""
+   crs:ContactInfo=""
+   crs:Version="10.0"
+   crs:HasSettings="True"
+   crs:ToneCurveName2012="Custom"
+   crs:Saturation="+10"
+   crs:ConvertToGrayscale="False"
+   crs:GrainAmount="6"
+   crs:GrainSize="25"
+   crs:GrainFrequency="50"
+   crs:PostCropVignetteAmount="-10"
+   crs:PostCropVignetteMidpoint="40"
+   crs:PostCropVignetteFeather="70"
+   crs:PostCropVignetteRoundness="0"
+   crs:PostCropVignetteStyle="1"
+   crs:PostCropVignetteHighlightContrast="0"
+   crs:Vibrance="+25"
+   crs:Clarity2012="+6"
+   crs:Dehaze="+6"
+   crs:LensProfileEnable="1"
+   crs:AutoLateralCA="1"
+   crs:Sharpness="28"
+   crs:SharpenRadius="+1.0"
+   crs:SharpenDetail="20"
+   crs:SharpenEdgeMasking="25"
+   crs:LuminanceSmoothing="8"
+   crs:ColorNoiseReduction="25"
+   crs:Highlights2012="-35"
+   crs:Shadows2012="+15"
+   crs:Whites2012="-10"
+   crs:Blacks2012="-5"
+   crs:HueAdjustmentRed="+0"
+   crs:SaturationAdjustmentRed="+0"
+   crs:LuminanceAdjustmentRed="+0"
+   crs:HueAdjustmentOrange="+0"
+   crs:SaturationAdjustmentOrange="+6"
+   crs:LuminanceAdjustmentOrange="+4"
+   crs:HueAdjustmentYellow="+0"
+   crs:SaturationAdjustmentYellow="+0"
+   crs:LuminanceAdjustmentYellow="+0"
+   crs:HueAdjustmentGreen="+8"
+   crs:SaturationAdjustmentGreen="+6"
+   crs:LuminanceAdjustmentGreen="+0"
+   crs:HueAdjustmentAqua="-4"
+   crs:SaturationAdjustmentAqua="+28"
+   crs:LuminanceAdjustmentAqua="+4"
+   crs:HueAdjustmentBlue="-6"
+   crs:SaturationAdjustmentBlue="+22"
+   crs:LuminanceAdjustmentBlue="-6"
+   crs:HueAdjustmentPurple="-6"
+   crs:SaturationAdjustmentPurple="+14"
+   crs:LuminanceAdjustmentPurple="+0"
+   crs:HueAdjustmentMagenta="+0"
+   crs:SaturationAdjustmentMagenta="+0"
+   crs:LuminanceAdjustmentMagenta="+0">
+   <crs:Name>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">OS 2013 Miranda · Océano luminoso</rdf:li>
+    </rdf:Alt>
+   </crs:Name>
+   <crs:ShortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:ShortName>
+   <crs:SortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:SortName>
+   <crs:Group>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">FOTONEANDO · Óscar</rdf:li>
+    </rdf:Alt>
+   </crs:Group>
+   <crs:Description>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Inspirado en Life of Pi (Claudio Miranda, Óscar a Mejor Fotografía 2013). Color limpio y luminoso, con aguas y cielos turquesa intensos, como una pintura brillante. Interpretación libre, no es el etalonaje oficial.</rdf:li>
+    </rdf:Alt>
+   </crs:Description>
+   <crs:ToneCurvePV2012>
+    <rdf:Seq>
+     <rdf:li>0, 3</rdf:li>
+     <rdf:li>64, 61</rdf:li>
+     <rdf:li>128, 133</rdf:li>
+     <rdf:li>191, 201</rdf:li>
+     <rdf:li>255, 250</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012>
+   <crs:ToneCurvePV2012Red>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>31, 28</rdf:li>
+     <rdf:li>217, 220</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Red>
+   <crs:ToneCurvePV2012Green>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>31, 31</rdf:li>
+     <rdf:li>217, 218</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Green>
+   <crs:ToneCurvePV2012Blue>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>31, 35</rdf:li>
+     <rdf:li>217, 215</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Blue>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>

@@ -1,0 +1,42 @@
+name: Presets de Camera Raw
+
+on:
+  push:
+    branches: [claude/hopeful-hawking-hwp68i]
+    paths:
+      - "camera-raw/**"
+      - ".github/workflows/camera-raw-presets.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comprobar presets
+        run: |
+          python - <<'PY'
+          import glob, xml.dom.minidom
+          files = glob.glob("camera-raw/presets/**/*.xmp", recursive=True)
+          assert files, "no hay presets"
+          for f in files:
+              xml.dom.minidom.parse(f)
+          print(len(files), "presets válidos")
+          PY
+      - name: Empaquetar
+        run: |
+          mkdir -p dist/camera-raw-presets
+          cp -r camera-raw/presets camera-raw/*.bat camera-raw/*.py camera-raw/README.md dist/camera-raw-presets/
+          cd dist && zip -r ../camera-raw-presets.zip camera-raw-presets
+      - name: Publicar descarga
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete camera-raw-presets --yes --cleanup-tag || true
+          gh release create camera-raw-presets camera-raw-presets.zip \
+            --target "${{ github.sha }}" --prerelease \
+            --title "Presets de Camera Raw · FOTONEANDO" \
+            --notes "Presets .xmp para Camera Raw (Photoshop CC 2018 o posterior) y la herramienta para crear presets desde imágenes de referencia. Descomprime y ejecuta instalar_presets.bat."

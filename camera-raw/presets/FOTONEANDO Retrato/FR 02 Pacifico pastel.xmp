@@ -1,0 +1,123 @@
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.6-c140">
+ <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about=""
+    xmlns:crs="http://ns.adobe.com/camera-raw-settings/1.0/"
+   crs:PresetType="Normal"
+   crs:Cluster=""
+   crs:UUID="0C7681FA267F4E908ECBCF39215C8EBF"
+   crs:SupportsAmount="False"
+   crs:SupportsColor="True"
+   crs:SupportsMonochrome="True"
+   crs:SupportsHighDynamicRange="True"
+   crs:SupportsNormalDynamicRange="True"
+   crs:SupportsSceneReferred="True"
+   crs:SupportsOutputReferred="True"
+   crs:CameraModelRestriction=""
+   crs:Copyright=""
+   crs:ContactInfo=""
+   crs:Version="10.0"
+   crs:HasSettings="True"
+   crs:ToneCurveName2012="Custom"
+   crs:Saturation="-18"
+   crs:ConvertToGrayscale="False"
+   crs:GrainAmount="10"
+   crs:GrainSize="25"
+   crs:GrainFrequency="50"
+   crs:PostCropVignetteAmount="-8"
+   crs:PostCropVignetteMidpoint="40"
+   crs:PostCropVignetteFeather="70"
+   crs:PostCropVignetteRoundness="0"
+   crs:PostCropVignetteStyle="1"
+   crs:PostCropVignetteHighlightContrast="0"
+   crs:Clarity2012="-6"
+   crs:HueAdjustmentRed="+4"
+   crs:SaturationAdjustmentRed="-6"
+   crs:LuminanceAdjustmentRed="+0"
+   crs:HueAdjustmentOrange="+0"
+   crs:SaturationAdjustmentOrange="-4"
+   crs:LuminanceAdjustmentOrange="+6"
+   crs:HueAdjustmentYellow="-6"
+   crs:SaturationAdjustmentYellow="-18"
+   crs:LuminanceAdjustmentYellow="-10"
+   crs:HueAdjustmentGreen="-8"
+   crs:SaturationAdjustmentGreen="-22"
+   crs:LuminanceAdjustmentGreen="-12"
+   crs:HueAdjustmentAqua="-4"
+   crs:SaturationAdjustmentAqua="-14"
+   crs:LuminanceAdjustmentAqua="-6"
+   crs:HueAdjustmentBlue="-6"
+   crs:SaturationAdjustmentBlue="-20"
+   crs:LuminanceAdjustmentBlue="+6"
+   crs:HueAdjustmentPurple="+0"
+   crs:SaturationAdjustmentPurple="+0"
+   crs:LuminanceAdjustmentPurple="+0"
+   crs:HueAdjustmentMagenta="+0"
+   crs:SaturationAdjustmentMagenta="+0"
+   crs:LuminanceAdjustmentMagenta="+0">
+   <crs:Name>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">FR 02 Pacífico pastel</rdf:li>
+    </rdf:Alt>
+   </crs:Name>
+   <crs:ShortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:ShortName>
+   <crs:SortName>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default"></rdf:li>
+    </rdf:Alt>
+   </crs:SortName>
+   <crs:Group>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">FOTONEANDO · Retrato</rdf:li>
+    </rdf:Alt>
+   </crs:Group>
+   <crs:Description>
+    <rdf:Alt>
+     <rdf:li xml:lang="x-default">Mar y selva en calma: contraste suave, negros lavados, verdes apagados y luces color crema.</rdf:li>
+    </rdf:Alt>
+   </crs:Description>
+   <crs:ToneCurvePV2012>
+    <rdf:Seq>
+     <rdf:li>0, 18</rdf:li>
+     <rdf:li>64, 69</rdf:li>
+     <rdf:li>128, 133</rdf:li>
+     <rdf:li>191, 194</rdf:li>
+     <rdf:li>255, 240</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012>
+   <crs:ToneCurvePV2012Red>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>38, 35</rdf:li>
+     <rdf:li>86, 86</rdf:li>
+     <rdf:li>217, 216</rdf:li>
+     <rdf:li>238, 233</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Red>
+   <crs:ToneCurvePV2012Green>
+    <rdf:Seq>
+     <rdf:li>0, 0</rdf:li>
+     <rdf:li>38, 41</rdf:li>
+     <rdf:li>86, 86</rdf:li>
+     <rdf:li>217, 220</rdf:li>
+     <rdf:li>238, 239</rdf:li>
+     <rdf:li>255, 255</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Green>
+   <crs:ToneCurvePV2012Blue>
+    <rdf:Seq>
+     <rdf:li>0, 2</rdf:li>
+     <rdf:li>38, 39</rdf:li>
+     <rdf:li>86, 78</rdf:li>
+     <rdf:li>217, 213</rdf:li>
+     <rdf:li>238, 238</rdf:li>
+     <rdf:li>255, 250</rdf:li>
+    </rdf:Seq>
+   </crs:ToneCurvePV2012Blue>
+  </rdf:Description>
+ </rdf:RDF>
+</x:xmpmeta>

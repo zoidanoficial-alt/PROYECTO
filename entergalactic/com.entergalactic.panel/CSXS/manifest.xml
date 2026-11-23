@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ENTERGALACTIC: panel CEP 8 para Photoshop CC 2018 (19.x) y posteriores. -->
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.entergalactic.panel" ExtensionBundleVersion="1.3.0"
+                   ExtensionBundleName="ENTERGALACTIC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ExtensionList>
+    <Extension Id="com.entergalactic.panel.main" Version="1.3.0"/>
+  </ExtensionList>
+  <ExecutionEnvironment>
+    <HostList>
+      <Host Name="PHSP" Version="[19.0,99.9]"/>
+      <Host Name="PHXS" Version="[19.0,99.9]"/>
+    </HostList>
+    <LocaleList>
+      <Locale Code="All"/>
+    </LocaleList>
+    <RequiredRuntimeList>
+      <RequiredRuntime Name="CSXS" Version="8.0"/>
+    </RequiredRuntimeList>
+  </ExecutionEnvironment>
+  <DispatchInfoList>
+    <Extension Id="com.entergalactic.panel.main">
+      <DispatchInfo>
+        <Resources>
+          <MainPath>./client/index.html</MainPath>
+          <ScriptPath>./host/host.jsx</ScriptPath>
+          <CEFCommandLine>
+            <Parameter>--enable-nodejs</Parameter>
+            <Parameter>--mixed-context</Parameter>
+          </CEFCommandLine>
+        </Resources>
+        <Lifecycle>
+          <AutoVisible>true</AutoVisible>
+        </Lifecycle>
+        <UI>
+          <Type>Panel</Type>
+          <Menu>ENTERGALACTIC</Menu>
+          <Geometry>
+            <Size><Height>860</Height><Width>380</Width></Size>
+            <MinSize><Height>420</Height><Width>280</Width></MinSize>
+            <MaxSize><Height>2000</Height><Width>900</Width></MaxSize>
+          </Geometry>
+        </UI>
+      </DispatchInfo>
+    </Extension>
+  </DispatchInfoList>
+</ExtensionManifest>
