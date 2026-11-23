@@ -87,7 +87,7 @@ La SL3 salió en 2019. Sus archivos **.CR3** necesitan Camera Raw 11.3 o posteri
 
 ## Paquete «FOTONEANDO · Reels»
 
-Siete presets copiados de los ajustes de Lightroom que aparecen en reels (un PDF de capturas y cinco videos), y traducidos a Camera Raw 10.
+Once presets copiados de los ajustes de Lightroom que aparecen en reels (un PDF de capturas y nueve videos), y traducidos a Camera Raw 10.
 
 | Preset | Look |
 |---|---|
@@ -98,10 +98,14 @@ Siete presets copiados de los ajustes de Lightroom que aparecen en reels (un PDF
 | **RL Pacific Northwest** | Bosque con niebla: sombras abiertas y azules, medios turquesa, contraste suave, grano |
 | **RL Succession** | Ciudad nublada: sombras azul acero, luces cálidas, sombras muy abiertas, grano discreto |
 | **RL Winter** | Invierno nevado: mucho contraste con negros lavados, verdes casi sin color, toque frío |
+| **RL Anime** | Anime de día: sombras muy abiertas y azul cielo, colores limpios, contraste suave, grano |
+| **RL GTA Vice City** | Noche de neón de los 80: cálido, sombras magenta, luces turquesa, negros lavados, grano |
+| **RL Retro** | Película de los 70: muy lavada y suave, luces contenidas, toque cálido, grano |
+| **RL Marvel's Spider-Man** | Ciudad al atardecer: mucho contraste, negros lavados, luces doradas, verdes girados al azul |
 
 Los que en el reel cambian la Exposición vienen en dos versiones:
 - **sin Exposición**, para usarlo en cualquier foto;
-- **«(valores exactos)»**, con la Exposición del reel: Glow +0.90, Weirdcore +1.15, Resident Evil +0.16, Succession −0.85.
+- **«(valores exactos)»**, con la Exposición del reel: Glow +0.90, Weirdcore +1.15, Resident Evil +0.16, Succession −0.85, Anime +0.30, GTA Vice City +0.65, Retro +0.30.
 
 Lo que Camera Raw 10 no tiene se tradujo así:
 

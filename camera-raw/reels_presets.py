@@ -157,6 +157,44 @@ LOOKS = [
              "Aqua": (49, -32, 0), "Blue": (-13, -19, -4), "Purple": (0, -21, 1), "Magenta": (-3, -17, 1)},
         split=split((210, 9), (37, 5)), rgb=grade_offsets(temp=-4, tint=5, mid=(308, 2)),
     ),
+    dict(
+        key="Anime", name="Anime",
+        desc="Look de anime de día: sombras muy abiertas y azul cielo, blancos contenidos, colores limpios con "
+             "verdes apagados, contraste suave por la curva y grano.",
+        basic=basic(0.30, 44, -42, 84, -12, 26), vibrance=0, saturation=-1, clarity=-33, dehaze=-7, vignette=0,
+        grain=56, curve=[(0, 0.046), (0.196, 0.205), (0.756, 0.744), (1, 0.926)], hsl=HSL_PNW,
+        split=split((203, 26), (0, 0)), rgb=grade_offsets(temp=7, tint=20),
+    ),
+    dict(
+        key="ViceCity", name="GTA Vice City",
+        desc="Noche de neón de los 80: cálido y luminoso, sombras magenta, luces turquesa, negros lavados por la "
+             "curva, aguas giradas al azul y grano.",
+        basic=basic(0.65, 36, -40, 87, 31, 48), vibrance=24, saturation=2, clarity=-22, dehaze=-22, vignette=-18,
+        grain=45, curve=[(0, 0.221), (0.253, 0.234), (0.431, 0.331), (0.724, 0.624), (1, 1)],
+        hsl={"Red": (4, -1, 0), "Orange": (-13, -25, -2), "Yellow": (0, -34, 0), "Green": (3, -68, -5),
+             "Aqua": (49, -32, 0), "Blue": (-20, -19, -4), "Purple": (0, -21, 1), "Magenta": (-3, -17, 1)},
+        split=split((294, 33), (191, 40)), rgb=grade_offsets(temp=24, tint=-3),
+    ),
+    dict(
+        key="Retro", name="Retro",
+        desc="Foto de película de los 70: muy lavada y suave, luces muy contenidas, sombras abiertas, verdes "
+             "apagados, un toque cálido y grano.",
+        basic=basic(0.30, -2, -74, 89, 49, 57), vibrance=0, saturation=17, clarity=-17, dehaze=-5, vignette=0,
+        grain=54, curve=[(0, 0.057), (0.205, 0.198), (0.753, 0.74), (1, 0.947)],
+        hsl={"Red": (10, -15, 0), "Orange": (-13, -13, 13), "Yellow": (0, -25, 11), "Green": (18, -71, 0),
+             "Aqua": (0, -36, 0), "Blue": (-21, -10, -7), "Purple": (0, -22, 0), "Magenta": (-9, -15, 0)},
+        split=split((47, 7), (0, 0)), rgb=grade_offsets(temp=5, tint=18),
+    ),
+    dict(
+        key="Spiderman", name="Marvel's Spider-Man",
+        desc="Ciudad al atardecer de videojuego: mucho contraste, negros lavados, luces cálidas doradas, "
+             "verdes girados al azul y aguas intensas.",
+        basic=basic(0, 68, -33, 60, 43, 36), vibrance=17, saturation=12, clarity=-8, dehaze=-15, vignette=0,
+        grain=0, curve=[(0, 0.181), (0.267, 0.226), (0.431, 0.337), (0.708, 0.67), (1, 1)],
+        hsl={"Red": (22, -1, 0), "Orange": (-31, -25, -2), "Yellow": (0, -34, 0), "Green": (-46, -68, -5),
+             "Aqua": (49, -32, 0), "Blue": (-13, -19, -4), "Purple": (0, -21, 1), "Magenta": (-3, -17, 1)},
+        split=split((210, 9), (61, 14)), rgb=grade_offsets(temp=15, tint=22, mid=(308, 2)),
+    ),
 ]
 
 
