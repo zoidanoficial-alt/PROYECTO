@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 const D = './';
-const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; });
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'hyrox'; });
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('dialog', d => d.accept());
 const pause = ms => new Promise(r => setTimeout(r, ms));
@@ -12,7 +12,7 @@ await page.click('[data-ch="level|avanzado"]'); await page.click('#ob-next');
 await page.clock.runFor(900); for (let i = 0; i < 4; i++) await page.click('#gd-next'); await page.clock.runFor(2600);
 // Explorar → HYROX Lab → perfil
 await page.click('#tabs [data-tab=more]'); await page.clock.runFor(300);
-await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(300); await page.click('#hxp-setup'); await page.clock.runFor(300);
+await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300); await page.click('#hxp-setup'); await page.clock.runFor(300);
 await page.selectOption('#hs-cat', 'open'); await page.fill('#hs-date', '2027-01-28'); await page.fill('#hs-goal', '1:20:00');
 await page.click('#hs-s'); await page.clock.runFor(300);
 R.hubEmpty = await page.evaluate(() => document.querySelector('.status.info') && document.querySelector('.status.info').innerText.slice(0, 60));
@@ -39,17 +39,17 @@ R.pred = await page.evaluate(() => { const p = hxPredict(); return { ok: p.ok, t
 R.whatif = await page.evaluate(() => hxT(hxPredict({ rdi: 10 }).total));
 R.rdiFormula = await page.evaluate(() => hxRDI(240, 264));   // 10 %
 R.noFakeHpi = await page.evaluate(() => { const s = JSON.stringify(hx().results); hx().results = hx().results.filter(r => r.kind === 'run1k'); const h = hxPerformance().hpi; hx().results = JSON.parse(s); return h; });
-if (await page.$('.modal-bg.open')) await page.evaluate(() => closeModal()); await page.click('#tabs [data-tab=train]'); await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(300);
-R.card = await page.evaluate(() => document.querySelector('#view-hyrox') && document.querySelector('.hx-card').innerText.replace(/\s+/g, ' ').slice(0, 260));
+if (await page.$('.modal-bg.open')) await page.evaluate(() => closeModal()); await page.click('#tabs [data-tab=train]'); await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300);
+R.card = await page.evaluate(() => document.querySelector('#view-train') && document.querySelector('.hx-card').innerText.replace(/\s+/g, ' ').slice(0, 260));
 await page.evaluate(() => window.scrollTo(0, 0)); await pause(300); await page.screenshot({ path: D + 'v33-plan.png' });
 await pause(300); await page.screenshot({ path: D + 'v33-hub.png' });
-await page.click('[data-hxp=race]'); await page.clock.runFor(300);
+await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(300); await page.click('[data-hxp=race]'); await page.clock.runFor(300);
 await page.$eval('[data-w=rdi]', e => { e.value = 8; e.dispatchEvent(new Event('input')); });
 R.simUI = await page.textContent('#pp-sim'); await pause(300); await page.screenshot({ path: D + 'v33-predictor.png' });
 await page.click('#pp-x'); await page.clock.runFor(200);
 await page.click('[data-hxp=perf]'); await page.clock.runFor(200); await pause(300); await page.screenshot({ path: D + 'v33-hpi.png' });
 await page.click('#hp-x'); await page.clock.runFor(200);
-await page.click('[data-hxp=strat]'); await page.clock.runFor(200); R.strat = await page.evaluate(() => [...document.querySelectorAll('.pg-rec b')].map(x => x.textContent));
+await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300); await page.click('[data-hxp=strat]'); await page.clock.runFor(200); R.strat = await page.evaluate(() => [...document.querySelectorAll('.pg-rec b')].map(x => x.textContent));
 await page.click('#sg-x'); await page.clock.runFor(200);
 // Sesión: empezar, marcar, recargar, continuar, terminar
 await page.click('#hx-start'); await page.clock.runFor(1200);
@@ -57,7 +57,7 @@ await page.click('[data-done="0"]'); await page.clock.runFor(200);
 await page.screenshot({ path: D + 'v33-sesion.png' });
 await page.evaluate(() => flushSave());
 await page.reload(); await page.clock.runFor(800);
-await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(300);
+await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300);
 R.resumed = await page.evaluate(() => !!document.querySelector('#hx-resume') && hx().active.blocks[0].done);
 await page.click('#hx-resume'); await page.clock.runFor(300);
 for (const i of [1, 2]) await page.click(`[data-done="${i}"]`).catch(() => {});

@@ -2581,7 +2581,7 @@ async function renderPhotos(el) {
   el.innerHTML = '<div class="empty">Cargando fotos…</div>';
   try { photoCache = await photoStore.all(); }
   catch (e) { el.innerHTML = '<div class="empty">No se pudieron abrir las fotos: ' + esc(e.message) + '</div>'; return; }
-  if (progMode !== 'photos' || currentTab !== 'progress') return;
+  if (progMode !== 'photos' || currentTab !== 'progress' || !el.isConnected) return;
   const list = photoCache;
   if (!list.find(p => p.id === cmpA)) cmpA = null;
   if (!list.find(p => p.id === cmpB)) cmpB = null;

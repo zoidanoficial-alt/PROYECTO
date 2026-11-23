@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 const D = './';
-const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; });
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'hyrox'; });
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(m.text()); });
 page.on('dialog', d => d.accept());
 const pause = ms => new Promise(r => setTimeout(r, ms));
@@ -12,7 +12,7 @@ await page.click('[data-ch="level|avanzado"]'); await page.click('#ob-next');
 await page.clock.runFor(900); for (let i = 0; i < 4; i++) await page.click('#gd-next'); await page.clock.runFor(2600);
 // Socio de Planet Fitness: el perfil HYROX propone "Planet Fitness" solo
 await page.evaluate(() => { DB.profile.gym = 'pf'; saveData(); });
-await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(300);
+await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300);
 await page.click('#hxp-setup'); await page.clock.runFor(200);
 R.equipDefault = await page.$eval('#hs-eq', s => s.value);
 await page.fill('#hs-date', '2027-03-19'); await page.click('#hs-s'); await page.clock.runFor(300);

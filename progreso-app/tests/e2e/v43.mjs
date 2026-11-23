@@ -64,7 +64,7 @@ R.liveToast = await page.evaluate(() => (document.querySelector('.snack') || doc
 R.liveLog = await page.evaluate(() => (DB.live.log || []).map(e => e.k + ' ' + Math.round(e.from) + '→' + Math.round(e.to)));
 
 // Progreso → Evolución (por defecto)
-await page.click('#tabs [data-tab=progress]'); await page.clock.runFor(400);
+await page.click('#tabs [data-tab=progress]'); await page.clock.runFor(400); await page.click('[data-pshead=general]'); await page.clock.runFor(300);
 R.evDefault = await page.evaluate(() => progMode);
 R.evChips = await page.$$eval('[data-metric]', x => x.map(y => y.dataset.metric));
 await page.evaluate(() => window.scrollTo(0, 260)); await shot('v43-evolucion-hyrox.png');

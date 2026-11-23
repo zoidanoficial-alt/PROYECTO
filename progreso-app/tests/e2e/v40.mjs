@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 const D = './';
-const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; });
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'hyrox'; });
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(m.text()); });
 page.on('dialog', d => d.accept());
 const pause = ms => new Promise(r => setTimeout(r, ms));
@@ -53,7 +53,7 @@ await page.evaluate(() => openResist()); await page.clock.runFor(200);
 await page.click('[data-rt=rep60]'); await page.clock.runFor(200); await page.fill('#rt-v', '24'); await page.click('#rt-s'); await page.clock.runFor(200);
 R.testDelta = await page.evaluate(() => document.querySelector('[data-rt=rep60] em').textContent);
 // HYROX tab incluye Resistencia
-await page.evaluate(() => closeModal()); await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(300);
+await page.evaluate(() => closeModal()); await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300);
 R.hyroxItem = await page.evaluate(() => !!document.querySelector('[data-hxp=resist]'));
 console.log(JSON.stringify(R, null, 1));
 console.log('ERRORS', JSON.stringify(errors));
