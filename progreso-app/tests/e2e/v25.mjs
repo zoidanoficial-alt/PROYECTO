@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 });
-const page = await ctx.newPage(); const errors = [];
+const page = await ctx.newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; }); const errors = [];
 page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('dialog', d => { errors.push('DIALOG ' + d.message()); d.accept(); });
 const D = './out/';

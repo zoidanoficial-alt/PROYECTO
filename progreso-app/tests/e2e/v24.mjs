@@ -6,7 +6,7 @@ await ctx.addInitScript(() => {
     requestNotifications() { window.__req = (window.__req || 0) + 1; }, notifyNow(t, x) { window.__test = [t, x]; }, takeLaunchTab() { const t = localStorage.getItem('__launch') || ''; localStorage.removeItem('__launch'); return t; }, openNotifSettings() { window.__opened = 1; } };
   window.AndroidBridge = new Proxy(o, { get: (t, k) => k in t ? t[k] : () => false });
 });
-const page = await ctx.newPage(); const errors = [];
+const page = await ctx.newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; }); const errors = [];
 page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('dialog', d => d.accept());
 await page.clock.install({ time: new Date('2026-10-14T06:00:00') });

@@ -9,15 +9,29 @@ const HX_FIX = {   // qué entrenar según tu punto débil (lo aplica hxMission 
   comp: 'Una sesión de carrera bajo fatiga por semana: 1 km justo después de cada estación.',
   st: 'Técnica y volumen específico de la estación, 2 veces por semana, al peso de competencia.'
 };
-function renderHyroxTab() {
-  const root = $('#view-hyrox'); if (!root) return;
+/** 43.0 · mode 'res' (pestaña HYROX: resultados, rankings, HYROX Lab y tus tiempos) o 'train' (Plan). */
+function renderHyroxTab(root0, mode) {
+  const root = root0 || $('#view-hyrox'); if (!root) return;
+  mode = mode || 'res';
+  const rer = mode === 'train' ? () => render(currentTab) : renderHyroxTab;
+  const lab = `<button class="pl-card-btn" data-hxp="lab">${ico('trending-up', 24)}<span><b>Rankings y laboratorio</b><small>${esc(plSummary())}</small></span>${ico('chevron-right', 16)}</button>`;
+  if (!hxOn() && mode === 'res') {
+    const me = typeof hxMyBest === 'function' ? hxMyBest() : null;
+    root.innerHTML = `<div class="cp-hero"><div class="hx-eyebrow">TUS RESULTADOS HYROX</div>
+      ${me ? `<h2 class="cp-big">${hxT(me.sec)}</h2><p class="cp-lead">${esc(me.src)} · tu mejor marca</p>` : `<h2 class="cp-big">Aún sin tiempos</h2><p class="cp-lead">Entrena desde <b>Plan → HYROX</b> y cada tiempo que hagas aparece aquí: récords por estación, simulaciones, carreras y tu lugar en los rankings.</p>`}
+      <button class="secondary block" data-hxp="toplan">${ico('timer', 18, 'lead')}Ir a entrenar HYROX</button></div>
+      <div class="ds-h">Rankings México 2026</div>${lab}
+      <div class="ds-h">Tus tiempos <span class="ds-h-r">récord por estación</span></div>${hxsGrid(null, null)}
+      <div class="ds-h">Resultados</div>
+      <div class="kit-list">${hxpItem('ranks', 'clipboard-list', 'Mis carreras', 'Resultados, parciales y comparaciones')}${hxpItem('ladder', 'trophy', 'Mi escalera', typeof ladderSummary === 'function' ? ladderSummary() : '')}${hxpItem('events', 'calendar', 'Competencias', 'Calendario y registrar tu resultado')}</div>`;
+    hxpBind(root); $$('[data-cpst]', root).forEach(b => b.onclick = () => openHxStation(b.dataset.cpst, () => closeModal())); return;
+  }
   if (!hxOn()) {
     root.innerHTML = `<div class="cp-hero"><div class="hx-eyebrow">TU CENTRO DE COMPETENCIA</div>
       <h2 class="cp-big">¿Para qué te preparas?</h2>
       <p class="cp-lead">Elige tu carrera y la app arma tu preparación: evaluación por partes, punto débil, predicción y sesiones específicas.</p>
       <button class="block" id="hxp-setup">${ico('timer', 18, 'lead')}Preparar un HYROX</button>
       <button class="secondary block" data-hxp="events" style="margin-top:8px">${ico('calendar', 18, 'lead')}Buscar una competencia</button></div>
-      <div class="ds-h">Rankings México 2026</div><button class="pl-card-btn" data-hxp="lab">${ico('trending-up', 24)}<span><b>Laboratorio de rendimiento</b><small>${esc(plSummary())}</small></span>${ico('chevron-right', 16)}</button>
       <div class="ds-h">Entrena una estación <span class="ds-h-r">sin preparar una carrera</span></div>${hxsGrid(null, null)}
       ${champMethodCard()}
       <div class="ds-h">Herramientas</div>
@@ -61,9 +75,10 @@ function renderHyroxTab() {
     : `<section class="cp-sec"><div class="ds-h">Predictor</div><div class="cp-diag empty"><b>Sin predicción todavía</b><p>Necesita tu 1 km fresco${perf.run ? ' ✓' : ''} y ${hxIsPF && hxIsPF() ? 4 : 6} estaciones medidas (llevas ${perf.tested.length}).</p></div></section>`;
 
   // F · Estaciones
-  const sts = `<section class="cp-sec"><div class="ds-h">Rankings México 2026 <span class="ds-h-r">CDMX y Guadalajara</span></div><button class="pl-card-btn" data-hxp="lab">${ico('trending-up', 24)}<span><b>Laboratorio de rendimiento</b><small>${esc(plSummary())}</small></span>${ico('chevron-right', 16)}</button></section><section class="cp-sec"><div class="ds-h">Estaciones <span class="ds-h-r">cada una se entrena sola · ${perf.tested.length} de 8 medidas</span></div>${hxsGrid(perf, bn)}</section>`;
-
-  root.innerHTML = `${prep}
+  const tested = `${perf.tested.length} de 8 medidas`;
+  const note = '<p class="small muted" style="margin-top:10px">El HPI y las predicciones son modelos internos de la app, no métricas oficiales. Sin afiliación con HYROX ni con los atletas.</p>';
+  if (mode === 'train') {
+    root.innerHTML = `${prep}
     <div class="ds-h">Sesión de hoy</div>
     ${hyroxCard(true)}
     <div class="hxp-quick">
@@ -73,23 +88,37 @@ function renderHyroxTab() {
       <button data-hxp="test">${ico('clipboard-list', 22)}<span>Resultado</span></button>
     </div>
     ${diag}
-    ${pred}
-    ${sts}
+    <section class="cp-sec"><div class="ds-h">Entrena por estación <span class="ds-h-r">${tested}</span></div>${hxsGrid(perf, bn)}</section>
     ${typeof pfHyroxCard === 'function' ? pfHyroxCard() : ''}
     ${champMethodCard()}
     <div class="ds-h">Herramientas</div>
     <div class="kit-list">
-      ${hxpItem('perf', 'trending-up', 'Perfil de rendimiento', perf.hpi != null ? `HPI ${perf.hpi}/100 · confianza ${perf.conf}` : 'Running, fuerza, fatiga y estaciones')}
       ${hxpItem('strat', 'route', 'Estrategia de carrera', 'Ritmos, sets y transiciones con tus datos')}
-      ${hxpItem('ladder', 'trophy', 'Mi escalera', typeof ladderSummary === 'function' ? ladderSummary() : '')}
-      ${hxpItem('ranks', 'clipboard-list', 'Mis carreras', 'Resultados, parciales y comparaciones')}
       ${hxpItem('athlete', 'trophy', 'Proyecto Atleta', typeof athOn === 'function' && athOn() ? 'Bloque: ' + ATH_BLOCKS[athPlan().cur].n : 'Tu transformación hasta los 40')}
       ${hxpItem('resist', 'dumbbell', 'Resistencia', DB.resist && DB.resist.start ? `Semana ${resWeek()} · ${resPhase().n}` : '¿Más peso o más reps? Programa de 6 semanas')}
       ${hxpItem('method', 'book-open', 'Metodología', 'Por qué entrenas lo que entrenas')}
       ${hxpItem('setup', 'sliders-horizontal', 'Mi carrera y perfil', `${HX_CATS[p.cat]} · ${p.sex === 'f' ? 'Mujeres' : 'Hombres'}${p.date ? ' · ' + shortDate(p.date) : ''}`)}
-    </div>
-    <p class="small muted" style="margin-top:10px">El HPI y las predicciones son modelos internos de la app, no métricas oficiales. Sin afiliación con HYROX ni con los atletas.</p>`;
-  bindHyrox(root, renderHyroxTab);
+      ${hxpItem('results', 'trophy', 'Mis resultados y rankings', 'En la pestaña HYROX')}
+    </div>${note}`;
+  } else {
+    const me = typeof hxMyBest === 'function' ? hxMyBest() : null;
+    root.innerHTML = `<div class="cp-hero"><div class="hx-eyebrow">TUS RESULTADOS HYROX · ${esc(HX_CATS[p.cat].toUpperCase())}</div>
+      ${me ? `<h2 class="cp-big">${hxT(me.sec)}</h2><p class="cp-lead">${esc(me.src)} · tu mejor marca${days != null && days >= 0 ? ` · faltan ${days} días para ${ev ? esc(ev.eventName) : 'tu carrera'}` : ''}</p>` : `<h2 class="cp-big">Sin simulación todavía</h2><p class="cp-lead">Tus tiempos aparecen aquí en cuanto entrenes desde Plan → HYROX.</p>`}
+      <button class="secondary block" data-hxp="toplan">${ico('timer', 18, 'lead')}Ir a entrenar</button></div>
+    <div class="ds-h">Rankings México 2026 <span class="ds-h-r">CDMX y Guadalajara</span></div>${lab}
+    <div class="ds-h">HYROX Lab</div>
+    ${diag}
+    ${pred}
+    <div class="kit-list">${hxpItem('perf', 'trending-up', 'Perfil de rendimiento', perf.hpi != null ? `HPI ${perf.hpi}/100 · confianza ${perf.conf}` : 'Running, fuerza, fatiga y estaciones')}</div>
+    <section class="cp-sec"><div class="ds-h">Tus tiempos <span class="ds-h-r">${tested}</span></div>${hxsGrid(perf, bn)}</section>
+    <div class="ds-h">Resultados</div>
+    <div class="kit-list">
+      ${hxpItem('ranks', 'clipboard-list', 'Mis carreras', 'Resultados, parciales y comparaciones')}
+      ${hxpItem('ladder', 'trophy', 'Mi escalera', typeof ladderSummary === 'function' ? ladderSummary() : '')}
+      ${hxpItem('events', 'calendar', 'Competencias', 'Calendario y registrar tu resultado')}
+    </div>${note}`;
+  }
+  bindHyrox(root, rer);
   hxpBind(root);
   if (typeof liveCheck === 'function') liveToast(liveCheck());
   $$('[data-cpst]', root).forEach(b => b.onclick = () => openHxStation(b.dataset.cpst, () => closeModal()));
@@ -97,10 +126,10 @@ function renderHyroxTab() {
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }
 function hxpBind(root) {
   const back = () => closeModal();
-  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), lab: () => openPerfLab('hyrox', back), ladder: () => openHxLadder(back), resist: () => openResist(back), athlete: () => openAthlete(), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); renderHyroxTab(); }) };
+  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), lab: () => openPerfLab('hyrox', back), toplan: () => { if (typeof planSetDisc === 'function') planSetDisc('hyrox'); showTab('train'); }, results: () => showTab('hyrox'), ladder: () => openHxLadder(back), resist: () => openResist(back), athlete: () => openAthlete(), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); render(currentTab); }) };
   $$('[data-hxp]', root).forEach(b => b.onclick = () => act[b.dataset.hxp]());
   const ch = $('#ch-open', root); if (ch) ch.onclick = () => openChamps();
   const pfb = $('#pf-open', root); if (pfb) pfb.onclick = () => openPfHyrox();
-  const s = $('#hxp-setup', root); if (s) s.onclick = () => openHxSetup(() => { closeModal(); renderHyroxTab(); });
+  const s = $('#hxp-setup', root); if (s) s.onclick = () => openHxSetup(() => { closeModal(); render(currentTab); });
   const d = $('#hxp-date', root); if (d) d.onclick = () => openEvents();
 }

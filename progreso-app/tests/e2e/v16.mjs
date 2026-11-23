@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'fs';
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2, acceptDownloads: true, permissions: ['geolocation'], geolocation: { latitude: 19.4326, longitude: -99.1332, accuracy: 5 } });
-const page = await ctx.newPage(); const errors = [];
+const page = await ctx.newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; }); const errors = [];
 page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('dialog', d => d.accept());
 await page.goto('http://127.0.0.1:8765/index.html');

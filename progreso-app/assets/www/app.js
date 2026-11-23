@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '42.0';
+const APP_VERSION = '43.0';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {
@@ -123,7 +123,7 @@ function loadData() {
         customEx: d.customEx || [],
         pauses: d.pauses || [],
         goals: d.goals || [], challenges: d.challenges || null,
-        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null, watch: d.watch || null, resist: d.resist || null, athlete: d.athlete || null, live: d.live || null, nutri: d.nutri || null, medals: d.medals || null,
+        activities: d.activities || [], runs: d.runs || [], runPlan: d.runPlan || null, commits: d.commits || [], events: d.events || [], hardWeeks: d.hardWeeks || [], moves: d.moves || {}, feedback: d.feedback || [], metrics: d.metrics || null, posing: d.posing || [], checkins: d.checkins || [], hyrox: d.hyrox || null, ev: d.ev || null, watch: d.watch || null, resist: d.resist || null, athlete: d.athlete || null, live: d.live || null, nutri: d.nutri || null, medals: d.medals || null, wod: d.wod || null,
         ...(d.workouts ? { workouts: d.workouts, plan: d.plan || def.plan } : migrateWorkouts(d.custom))
       };
     }
@@ -717,7 +717,7 @@ function bar(value, goal) { return `<div class="bar"><div style="width:${goal ? 
 /* ------------------------------------------------------------------ *
  *  Navegación y modales
  * ------------------------------------------------------------------ */
-const TITLES = { home: 'Hoy', train: 'Plan', hyrox: 'Competir', food: 'Nutrición', progress: 'Progreso', logros: 'Logros', more: 'Perfil' };
+const TITLES = { home: 'Hoy', train: 'Plan', hyrox: 'HYROX', food: 'Nutrición', progress: 'Progreso', logros: 'Logros', more: 'Perfil' };
 let currentTab = 'home';
 function showTab(tab) {
   currentTab = tab;

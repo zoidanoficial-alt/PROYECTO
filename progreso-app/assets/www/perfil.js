@@ -14,6 +14,8 @@ function perfilHeader() {
     ${goal ? `<button class="pf-row" id="pf-goal">${ico('target', 20)}<span class="grow"><b>Objetivo: ${esc(goal.tag)}</b><small>${esc(goal.title)}</small></span>${ico('chevron-right', 16)}</button>` : ''}
     ${isSimple() ? '' : `<button class="pf-row" id="pf-food">${ico('utensils', 20)}<span class="grow"><b>Nutrición</b><small>Hoy: ${tot.kcal.toLocaleString('es-MX')} de ${tg.kcal.toLocaleString('es-MX')} kcal · ${Math.round(tot.p)} g proteína</small></span>${ico('chevron-right', 16)}</button>`}
     ${gamify() ? `<button class="pf-row" id="pf-medals">${ico('medal', 20)}<span class="grow"><b>Logros, estadísticas y medallas</b><small>${typeof mdCatalog === 'function' ? Object.keys(mdState().got).length + ' de ' + mdCatalog().length.toLocaleString('es-MX') + ' medallas' : 'Tus récords'}</small></span>${ico('chevron-right', 16)}</button>` : ''}
+    <button class="pf-row" id="pf-check">${ico('activity', 20)}<span class="grow"><b>Chequeo de hoy</b><small>${(() => { const r = typeof readiness === 'function' ? readiness() : null; return r ? `Listo para entrenar: ${r.score}/100` : 'Sueño, energía y cansancio antes de entrenar'; })()}</small></span>${ico('chevron-right', 16)}</button>
+    <button class="pf-row" id="pf-retos">${ico('award', 20)}<span class="grow"><b>Retos de peso corporal</b><small>${(DB.retos || []).length ? (DB.retos || []).length + ' intentos registrados' : 'Rondas y escaleras contra el reloj'}</small></span>${ico('chevron-right', 16)}</button>
     <button class="pf-row" id="pf-health">${ico('heart-pulse', 20)}<span class="grow"><b>Salud y reloj</b><small>${DB.watch && DB.watch.hcOn ? 'Mi Fitness conectado' : 'Sueño, pulso y datos de Mi Fitness'}</small></span>${ico('chevron-right', 16)}</button>`;
 }
 function bindPerfil(root) {
@@ -23,4 +25,6 @@ function bindPerfil(root) {
   on('pf-food', () => showTab('food'));
   on('pf-health', () => openWatch());
   on('pf-medals', () => showTab('logros'));
+  on('pf-check', () => openCheckin(() => render(currentTab)));
+  on('pf-retos', () => openModal(`${retosCard()}<button class="ghost block" id="pr-x">← Volver</button>`, m => { bindRetos(m); $('#pr-x', m).onclick = () => closeModal(); }));
 }

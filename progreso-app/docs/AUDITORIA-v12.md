@@ -1388,3 +1388,41 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
   - En running, gimnasio y bici no hay rankings con licencia: la comparación es contra tu propio historial.
 - **Pendiente de decisión:** HYROX envió cartas a sitios de resultados por el uso de datos sin licencia. Para una versión pública conviene confirmar el permiso o reemplazar estos datos por una fuente con licencia.
 - **Pruebas:** e2e v47. Build versionCode 47.
+
+## 43.0 · Plan minimalista, HYROX dividido, Progreso por disciplina y escena de medalla
+
+- **Plan en 3–4 pasos** (`plan.js`, `plan.css`):
+  - Disciplina: Gimnasio, Running, HYROX, Spartan, CrossFit, Cardio, Yoga o Pilates.
+  - Cómo competir: **Por tiempo** (sesión contra el reloj) o **Por ejercicio** (récord por ejercicio).
+  - Gimnasio: objetivo (bajar de peso, masa muscular, fuerza o resistencia), luego días, minutos, lugar y nivel.
+  - Quien ya usaba la app entra directo a su disciplina, sin repetir el asistente.
+- **Coach IA de gimnasio:**
+  - Arma la rutina de cuerpo completo, torso/pierna, torso/pierna + empuje/jalón/pierna, o empuje/jalón/pierna según los días.
+  - Aplica las reps, series y descansos del objetivo (Schoenfeld 2016 y 2017; ACSM 2009).
+  - Usa el equipo del lugar, las molestias y el tiempo disponible.
+  - Con tus datos: suma una serie a grupos rezagados y cambia ejercicios estancados (3 semanas sin subir el 1RM estimado).
+  - Se recalcula cada 4 semanas con 6+ entrenos nuevos, o con "Recalcular".
+  - Corre en el teléfono, sin internet ni servidores. No es un modelo de lenguaje.
+- **Programas guiados:**
+  - 6 de CrossFit (por tiempo, AMRAP y EMOM), 5 de Spartan, 5 de cardio (zona 2, 4×4 de Helgerud 2007, 20/10, contrarreloj de 5 km y pirámide), 4 de yoga y 4 de pilates.
+  - Se escalan por nivel.
+  - Reproductor con cuenta regresiva, rondas y EMOM real (terminas las reps y descansas hasta el siguiente minuto).
+  - Posturas de "lo más que aguantes", pausa y resumen con esfuerzo percibido (RPE).
+  - Récord por sesión y por ejercicio, con "LOGRO DESBLOQUEADO" o Apollo Creed.
+  - Cada sesión se guarda también como actividad.
+  - Gimnasio "por tiempo": cada entreno completo guarda su mejor duración.
+- **HYROX dividido:**
+  - Plan → HYROX: preparación, sesión de hoy, temporizador, diagnóstico, estaciones para entrenar, Planet Fitness, metodología y herramientas.
+  - Pestaña **HYROX**: resultados, rankings, HYROX Lab (diagnóstico, predictor y perfil de rendimiento) y tus tiempos por estación.
+- **Progreso por disciplina** (`progsec.js`):
+  - Gimnasio, HYROX, CrossFit, Spartan, Yoga, Pilates, Running, Cardio, Cuerpo y Evolución general.
+  - Todo minimizado: abres una sección a la vez.
+- **Perfil:** ahora incluye "Chequeo de hoy" y "Retos de peso corporal" (ya no aparecen en Plan).
+- **Escena de medalla** (`zelda.js`):
+  - Pantalla oscura, cofre que se abre, rayos de luz y medalla que sube y flota con destellos.
+  - Cuadro de diálogo de aventura con el texto letra por letra.
+  - Melodía y diseño originales; respeta "reducir movimiento".
+- **Pruebas:**
+  - e2e v48.
+  - Las pruebas anteriores usan `MP_DEFAULT_PLAN` para entrar directo al Plan de gimnasio.
+  - Build versionCode 48.

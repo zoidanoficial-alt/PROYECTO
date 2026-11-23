@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 // 42.0 · Laboratorio de rendimiento: rankings reales HYROX México 2026, curvas, radar,
 // carrera contra tu récord y la misma lectura para running, gimnasio y bici.
 const D = './';
-const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage();
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; });
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(m.text()); });
 page.on('dialog', d => d.accept());
 const pause = ms => new Promise(r => setTimeout(r, ms));
@@ -72,6 +72,7 @@ await page.evaluate(() => {
   saveData();
 });
 await page.click('#tabs [data-tab=progress]'); await page.clock.runFor(400);
+await page.click('[data-pshead=general]'); await page.clock.runFor(300);
 R.evoBtn = await page.evaluate(() => !!document.querySelector('#evo-lab'));
 await page.click('#evo-lab'); await page.clock.runFor(300);
 await page.click('[data-plt=run]'); await page.clock.runFor(200);

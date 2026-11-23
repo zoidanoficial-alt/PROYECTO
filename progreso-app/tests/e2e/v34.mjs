@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
 const D = './';
-const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 }); const page = await ctx.newPage();
+const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 }); const page = await ctx.newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; });
 const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push(m.text()); });
 page.on('dialog', d => d.accept());
 const pause = ms => new Promise(r => setTimeout(r, ms));

@@ -1,5 +1,5 @@
 import { chromium } from 'playwright';
-const b = await chromium.launch(); const page = await b.newPage(); const errors = [];
+const b = await chromium.launch(); const page = await b.newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; }); const errors = [];
 page.on('pageerror', e => errors.push(e.message));
 await page.goto('http://127.0.0.1:8765/index.html');
 await page.fill('#ob-name', 'Dan'); for (let k = 0; k < 7; k++) await page.click('#ob-next'); await page.waitForTimeout(900); await page.evaluate(() => { /*__guideFix*/ /*__lvlFix*/ DB.profile.guideSeen = true; DB.profile.level = 'avanzado'; if (DB.profile.routine === 'custom') DB.profile.routine = 'pro'; saveData(); showTab(currentTab); if (document.querySelector('.guide')) closeModal(); });

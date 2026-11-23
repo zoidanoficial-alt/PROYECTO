@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 const D = './out/';
-const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage();
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'gym'; });
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 const pause = ms => new Promise(r => setTimeout(r, ms));
 await page.clock.install({ time: new Date('2026-10-15T10:00:00') });
