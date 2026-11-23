@@ -8,7 +8,7 @@ page.on('dialog', d => d.accept());
 await page.goto('http://127.0.0.1:8765/index.html');
 await page.fill('#ob-name', 'Dan'); for (let k = 0; k < 7; k++) await page.click('#ob-next'); await page.waitForTimeout(900); await page.evaluate(() => { /*__guideFix*/ /*__lvlFix*/ DB.profile.guideSeen = true; DB.profile.level = 'avanzado'; if (DB.profile.routine === 'custom') DB.profile.routine = 'pro'; saveData(); showTab(currentTab); if (document.querySelector('.guide')) closeModal(); });
 await page.waitForTimeout(300);
-await page.click('nav button[data-tab=train]'); await page.click('[data-tmode="running"]'); await page.waitForTimeout(200);
+await page.click('nav button[data-tab=train]'); await page.evaluate(() => { planSetDisc('run'); render('train'); }); await page.waitForTimeout(200);
 await page.screenshot({ path: 'v16-running-empty.png', fullPage: true });
 // 1) Real geolocation wiring
 await page.click('#rn-free'); await page.waitForTimeout(1500);

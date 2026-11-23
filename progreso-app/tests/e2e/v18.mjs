@@ -32,7 +32,7 @@ console.log('missions (red check-in):', JSON.stringify(red), '| progress mission
 // run plan session today
 await page.evaluate(() => { delete day(todayStr()).rec; DB.runPlan = buildRunPlan('10k', 3, null, null, 10); DB.runPlan.weeks[0].sessions[0].date = todayStr(); });
 console.log('missions with run plan:', JSON.stringify(await page.evaluate(() => todayMissions().map(m => m.kind + ': ' + m.title))));
-await page.click('nav button[data-tab=progress]'); await page.click('[data-mode="historia"]'); await page.waitForTimeout(200);
+await page.click('nav button[data-tab=progress]'); await page.evaluate(() => { progMode = 'historia'; render('progress'); }); await page.waitForTimeout(200);
 console.log('levels:', await page.evaluate(() => JSON.stringify({ f: activityLevels().fuerza.level, r: activityLevels().running.level })));
 await page.screenshot({ path: 'v18-historia.png', fullPage: true });
 // extra sets message no longer rewards excess

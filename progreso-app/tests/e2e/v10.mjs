@@ -25,14 +25,14 @@ await page.screenshot({ path: 'v10-home.png', fullPage: true });
 await page.click('nav button[data-tab=train]'); await page.waitForTimeout(200);
 await page.evaluate(() => document.querySelectorAll('details.fold').forEach(d => d.open = true)); // OPENFOLDS
 await page.screenshot({ path: 'v10-train.png', fullPage: true });
-await page.click('#view-train #ck-open');
+await page.click('nav button[data-tab=more]'); await page.waitForTimeout(200); await page.click('#pf-check');  // 43.0: el chequeo vive en Perfil
 await page.click('[data-sl="-0.5"]'); await page.click('[data-sl="-0.5"]'); await page.click('[data-sl="-0.5"]'); await page.click('[data-sl="-0.5"]');
 await page.click('[data-ck="sleepQ|2"]'); await page.click('[data-ck="energy|2"]'); await page.click('[data-ck="soreness|4"]');
 await page.click('#ck-next'); await page.waitForTimeout(200);
 await page.screenshot({ path: 'v10-ready.png', fullPage: true });
 console.log('recommended:', await page.evaluate(() => JSON.stringify({ s: readiness().score, p: readiness().plan })));
 await page.click('.plan-pick button.on'); await page.waitForTimeout(200);
-await page.evaluate(() => { startSession(DB.profile.routine, nextDay(DB.profile.routine).id); renderTrain(); });
+await page.evaluate(() => { showTab('train'); startSession(DB.profile.routine, nextDay(DB.profile.routine).id); renderTrain(); });
 await page.evaluate(() => document.querySelectorAll('details.fold').forEach(d => d.open = true)); // OPENFOLDS
 await page.waitForTimeout(200);
 console.log('adjust:', await page.evaluate(() => activeSession().adjust), 'sets:', await page.evaluate(() => sessionExercises(activeSession()).map(e => e[1]).join(',')));
@@ -42,7 +42,7 @@ await page.screenshot({ path: 'v10-summary.png', fullPage: true });
 await page.click('#sum-ok');
 await page.click('nav button[data-tab=progress]'); await page.waitForTimeout(300);
 await page.evaluate(() => document.querySelectorAll('details.fold').forEach(d => d.open = true)); // OPENFOLDS
-await page.click('[data-mode="analysis"]'); await page.waitForTimeout(200); await page.click('#goal-add'); await page.selectOption('#g-ex', 'Press banca con barra'); await page.fill('#g-t', '130'); await page.click('#g-save'); await page.waitForTimeout(300);
+await page.evaluate(() => { progMode = 'analysis'; render('progress'); }); await page.waitForTimeout(200); await page.click('#goal-add'); await page.selectOption('#g-ex', 'Press banca con barra'); await page.fill('#g-t', '130'); await page.click('#g-save'); await page.waitForTimeout(300);
 await page.screenshot({ path: 'v10-analysis.png', fullPage: true });
 // pwo restart/cancel + water undo
 await page.click('[data-tab=more]'); await page.click('#pf-food'); await page.waitForTimeout(200);

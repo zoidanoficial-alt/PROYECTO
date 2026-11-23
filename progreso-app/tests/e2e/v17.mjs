@@ -18,7 +18,7 @@ console.log(await page.evaluate(() => Object.keys(RUN_PLANS).map(k => {
 // 2) Riegel: 5K in 25:00 -> 10K
 console.log('riegel 5k 25:00 -> 10k:', await page.evaluate(() => durStr(riegel(1500, 5, 10))));
 // 3) create plan via UI and run a guided session with coordination
-await page.click('nav button[data-tab=train]'); await page.click('[data-tmode="running"]'); await page.waitForTimeout(200);
+await page.click('nav button[data-tab=train]'); await page.evaluate(() => { planSetDisc('run'); render('train'); }); await page.waitForTimeout(200);
 await page.screenshot({ path: 'v17-norec.png' });
 await page.click('#rp-new'); await page.click('[data-rpt="10k"]'); await page.click('[data-rpd="3"]'); await page.fill('#rp-goal', '52:00'); await page.click('#rp-make'); await page.waitForTimeout(200);
 // make today a quality session, seed leg strength yesterday + a recent 5K best

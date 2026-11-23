@@ -47,7 +47,7 @@ console.log('mission after pain:', await page.locator('.mission').first().textCo
 await page.fill('#w-0', '0'); await page.fill('#r-0', '12'); await page.click('#save-0'); await page.waitForTimeout(200);
 await page.click('#ss-finish'); await page.waitForTimeout(400);
 await page.locator('[data-help="musica"]').click(); await page.click('#sum-ok');
-await page.click('nav button[data-tab=progress]'); await page.click('[data-mode="historia"]'); await page.waitForTimeout(200);
+await page.click('nav button[data-tab=progress]'); await page.evaluate(() => { progMode = 'historia'; render('progress'); }); await page.waitForTimeout(200);
 await page.evaluate(() => document.querySelectorAll('details.fold').forEach(d => d.open = true)); // OPENFOLDS
 await page.screenshot({ path: 'v11-history.png', fullPage: true });
 await page.click('nav button[data-tab=more]'); await page.waitForTimeout(200);
