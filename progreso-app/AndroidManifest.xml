@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 29.0: el paquete, la versión y el SDK se definen en build.gradle.kts (compilación con Gradle). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Health Connect en Android 8–13 es una app aparte: hay que poder verla. -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
+    <!-- 27.0: solo para descargar el catálogo público de competiciones (GET, sin datos del usuario). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!-- 28.0: temporizador HYROX controlado desde el reloj (sesión multimedia en primer plano) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- 28.0: pulso en vivo por Bluetooth (perfil estándar Heart Rate) -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <!-- 28.0: lectura de Health Connect (Mi Fitness escribe ahí los datos del reloj). Solo lectura. -->
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE_VARIABILITY" />
+    <uses-permission android:name="android.permission.health.READ_SLEEP" />
+    <uses-permission android:name="android.permission.health.READ_STEPS" />
+    <uses-permission android:name="android.permission.health.READ_EXERCISE" />
+    <uses-permission android:name="android.permission.health.READ_BLOOD_PRESSURE" />
+    <uses-permission android:name="android.permission.health.READ_OXYGEN_SATURATION" />
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:theme="@style/AppTheme"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- Health Connect muestra esta pantalla para explicar el uso de los datos de salud -->
+        <activity-alias
+            android:name=".HealthPermissionsRationale"
+            android:targetActivity=".MainActivity"
+            android:exported="true"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
+        <!-- Android 8–13: la app Health Connect abre esta pantalla (sin permiso de sistema) -->
+        <activity-alias
+            android:name=".HealthPermissionsRationaleLegacy"
+            android:targetActivity=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity-alias>
+        <service
+            android:name=".WatchService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+        <receiver android:name=".RestReceiver" android:exported="false" />
+        <receiver android:name=".ReminderReceiver" android:exported="false" />
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

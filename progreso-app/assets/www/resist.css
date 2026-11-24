@@ -1,0 +1,26 @@
+/* 33.0 · Resistencia */
+.res-sci { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 6px 0 10px; }
+.res-sci > div { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 12px; }
+.res-sci b { display: block; font-size: 15px; color: var(--accent); margin-bottom: 4px; }
+.res-sci small { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.res-sci small b { display: inline; color: var(--text); font-size: inherit; margin: 0; }
+.res-ses { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; margin-bottom: 8px; }
+.res-ses.now { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.res-ses b { display: block; font-size: 15px; }
+.res-ses small { display: block; color: var(--muted); font-size: 12.5px; }
+.res-ses button { min-height: 40px; padding: 0 16px; flex: none; }
+.res-ses ul { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 4px; }
+.res-ses li { font-size: 13px; display: flex; justify-content: space-between; gap: 8px; }
+.res-ses li span { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.res-tests { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px; }
+.res-test { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 16px; padding: 12px; min-height: 0; font-weight: 400; }
+.res-test b { font-size: 22px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.res-test span { font-size: 12px; color: var(--muted); }
+.res-test em { font-style: normal; font-size: 11px; font-weight: 700; color: var(--text-3); }
+.res-test em.up { color: var(--accent); } .res-test em.down { color: var(--warn); }
+.res-days { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.res-days .chip { min-height: 42px; padding: 0 14px; border-radius: 999px; background: var(--surface); color: var(--text); border: 1px solid var(--line); font-weight: 650; }
+.res-days .chip.on { background: var(--cta); color: var(--on-cta); border-color: transparent; }
+.res-card { display: block; width: 100%; text-align: left; color: var(--text); font-weight: 400; }
+.res-card b { display: block; font-size: 17px; letter-spacing: -.02em; margin: 4px 0 2px; }
+.res-card small { display: block; font-size: 12.5px; }

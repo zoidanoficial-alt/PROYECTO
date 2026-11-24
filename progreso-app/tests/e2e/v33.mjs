@@ -1,0 +1,74 @@
+import { chromium } from 'playwright';
+const D = './';
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 393, height: 851 }, deviceScaleFactor: 2 })).newPage(); await page.addInitScript(() => { window.MP_DEFAULT_PLAN = 'hyrox'; });
+const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+page.on('dialog', d => d.accept());
+const pause = ms => new Promise(r => setTimeout(r, ms));
+await page.clock.install({ time: new Date('2026-11-19T10:00:00') });
+await page.goto('http://127.0.0.1:8765/index.html');
+const R = {};
+await page.fill('#ob-name', 'Daniel'); for (let k = 0; k < 6; k++) await page.click('#ob-next');
+await page.click('[data-ch="level|avanzado"]'); await page.click('#ob-next');
+await page.clock.runFor(900); for (let i = 0; i < 4; i++) await page.click('#gd-next'); await page.clock.runFor(2600);
+// Explorar → HYROX Lab → perfil
+await page.click('#tabs [data-tab=more]'); await page.clock.runFor(300);
+await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300); await page.click('#hxp-setup'); await page.clock.runFor(300);
+await page.selectOption('#hs-cat', 'open'); await page.fill('#hs-date', '2027-01-28'); await page.fill('#hs-goal', '1:20:00');
+await page.click('#hs-s'); await page.clock.runFor(300);
+R.hubEmpty = await page.evaluate(() => document.querySelector('.status.info') && document.querySelector('.status.info').innerText.slice(0, 60));
+R.mission0 = await page.evaluate(() => hxMission().assess);
+await page.screenshot({ path: D + 'v33-hub-vacio.png' });
+// Registrar 1 km fresco por la interfaz
+await page.click('[data-hxp=test]'); await page.clock.runFor(200); await page.click('[data-t=run1k]'); await page.clock.runFor(200);
+await page.fill('#ht-t', '3:55'); await page.click('#ht-s'); await page.clock.runFor(200);
+R.res1 = await page.evaluate(() => [...document.querySelectorAll('.pg-rec b')].map(x => x.textContent));
+await page.click('#hr-ok'); await page.clock.runFor(200);
+// Sembrar estaciones y running bajo fatiga
+R.pred0 = await page.evaluate(() => hxPredict().ok);
+await page.evaluate(() => {
+  const add = (st, sec, date) => hx().results.push({ id: 'x' + st + date, kind: 'st', st, sec, date, t: Date.now(), rpe: 9, std: true });
+  [['ski', 255], ['push', 230], ['pull', 300], ['bbj', 320], ['row', 250], ['farm', 115], ['lunge', 400]].forEach(([s, t]) => add(s, t, '2026-11-10'));
+  add('wb', 330, '2026-11-12');
+  hx().results.push({ id: 'c1', kind: 'comp', sec: 290, date: '2026-11-15', t: Date.now(), rpe: 9, after: 'lunge' });
+  saveData();
+});
+R.rdi = await page.evaluate(() => Math.round(hxFatigue().rdi * 10) / 10);
+R.perf = await page.evaluate(() => { const p = hxPerformance(); return { hpi: p.hpi, conf: p.conf, cover: Math.round(p.cover * 100), missing: p.missing }; });
+R.bn = await page.evaluate(() => { const b = hxBottleneck(); return { main: b.main && b.main.k, second: b.second && b.second.k, med: b.med }; });
+R.pred = await page.evaluate(() => { const p = hxPredict(); return { ok: p.ok, total: hxT(p.total), lo: hxT(p.lo), hi: hxT(p.hi), flags: p.flags }; });
+R.whatif = await page.evaluate(() => hxT(hxPredict({ rdi: 10 }).total));
+R.rdiFormula = await page.evaluate(() => hxRDI(240, 264));   // 10 %
+R.noFakeHpi = await page.evaluate(() => { const s = JSON.stringify(hx().results); hx().results = hx().results.filter(r => r.kind === 'run1k'); const h = hxPerformance().hpi; hx().results = JSON.parse(s); return h; });
+if (await page.$('.modal-bg.open')) await page.evaluate(() => closeModal()); await page.click('#tabs [data-tab=train]'); await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300);
+R.card = await page.evaluate(() => document.querySelector('#view-train') && document.querySelector('.hx-card').innerText.replace(/\s+/g, ' ').slice(0, 260));
+await page.evaluate(() => window.scrollTo(0, 0)); await pause(300); await page.screenshot({ path: D + 'v33-plan.png' });
+await pause(300); await page.screenshot({ path: D + 'v33-hub.png' });
+await page.click('#tabs [data-tab=hyrox]'); await page.clock.runFor(300); await page.click('[data-hxp=race]'); await page.clock.runFor(300);
+await page.$eval('[data-w=rdi]', e => { e.value = 8; e.dispatchEvent(new Event('input')); });
+R.simUI = await page.textContent('#pp-sim'); await pause(300); await page.screenshot({ path: D + 'v33-predictor.png' });
+await page.click('#pp-x'); await page.clock.runFor(200);
+await page.click('[data-hxp=perf]'); await page.clock.runFor(200); await pause(300); await page.screenshot({ path: D + 'v33-hpi.png' });
+await page.click('#hp-x'); await page.clock.runFor(200);
+await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300); await page.click('[data-hxp=strat]'); await page.clock.runFor(200); R.strat = await page.evaluate(() => [...document.querySelectorAll('.pg-rec b')].map(x => x.textContent));
+await page.click('#sg-x'); await page.clock.runFor(200);
+// Sesión: empezar, marcar, recargar, continuar, terminar
+await page.click('#hx-start'); await page.clock.runFor(1200);
+await page.click('[data-done="0"]'); await page.clock.runFor(200);
+await page.screenshot({ path: D + 'v33-sesion.png' });
+await page.evaluate(() => flushSave());
+await page.reload(); await page.clock.runFor(800);
+await page.click('#tabs [data-tab=train]'); await page.clock.runFor(300);
+R.resumed = await page.evaluate(() => !!document.querySelector('#hx-resume') && hx().active.blocks[0].done);
+await page.click('#hx-resume'); await page.clock.runFor(300);
+for (const i of [1, 2]) await page.click(`[data-done="${i}"]`).catch(() => {});
+await page.click('#hx-end'); await page.clock.runFor(200);
+await page.$eval('#hf-rpe', e => { e.value = 6; e.dispatchEvent(new Event('input')); });
+await page.click('#hf-s'); await page.clock.runFor(300);
+R.summary = await page.evaluate(() => [...document.querySelectorAll('.pg-rec b')].map(x => x.textContent));
+await pause(300); await page.screenshot({ path: D + 'v33-resumen.png' });
+await page.click('#hsum-ok'); await page.clock.runFor(200);
+R.next = await page.evaluate(() => { const m = hxMission(); return { adj: m.adj, changes: m.changes }; });
+R.saved = await page.evaluate(() => JSON.parse(localStorage.getItem(KEY)).hyrox.sessions.length);
+console.log(JSON.stringify(R, null, 1));
+console.log('ERRORS', JSON.stringify(errors));
+await b.close();

@@ -1,0 +1,16 @@
+/* 34.0 · HYROX en Planet Fitness */
+.pf-card { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; width: 100%; text-align: left; color: var(--text); font-weight: 400; box-shadow: inset 3px 0 0 var(--accent); }
+.pf-card .hx-eyebrow, .pf-card b, .pf-card small { grid-column: 1; }
+.pf-card > svg { grid-column: 2; grid-row: 1 / span 3; align-self: center; color: var(--accent); }
+.pf-card b { font-size: 17px; letter-spacing: -.02em; }
+.pf-legend { font-size: 12px; color: var(--muted); margin: 4px 0 12px; line-height: 1.8; }
+.pf-st { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 14px; margin-bottom: 10px; }
+.pf-h { display: flex; align-items: flex-start; gap: 10px; }
+.pf-h small { display: block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); font-weight: 700; text-decoration: line-through; text-decoration-color: rgba(255, 92, 92, .6); }
+.pf-h b { display: block; font-size: 17px; letter-spacing: -.02em; margin: 2px 0; }
+.pf-h em { display: block; font-style: normal; font-size: 13px; color: var(--accent); font-weight: 650; }
+.pf-st .hx-n { padding-top: 2px; }
+.pf-st button { min-height: 38px; padding: 0 14px; }
+.pf-tag { flex: none; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; font-weight: 800; padding: 3px 8px; border-radius: 999px; background: var(--surface-3); color: var(--muted); }
+.pf-tag.ok { background: var(--accent-soft); color: var(--accent); }
+.pf-tag { white-space: nowrap; display: inline-block; }

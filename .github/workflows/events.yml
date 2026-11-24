@@ -1,0 +1,33 @@
+# Motor de competiciones: descubre, verifica y publica el catálogo una vez al día.
+# La app descarga progreso-app/assets/www/data/events.json desde este repositorio.
+name: events-catalog
+on:
+  schedule:
+    - cron: "17 9 * * *"   # diario, 09:17 UTC
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency: events-catalog
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Pruebas del motor
+        run: node --test progreso-app/events/test/*.test.mjs
+      - name: Descubrimiento (fuentes oficiales, re-verificación y búsqueda autorizada)
+        env:
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}   # opcional: sin clave no se hacen búsquedas web
+        run: node progreso-app/events/discover.mjs --max-pages 80 --max-queries 25
+      - name: Construir catálogo (dedup, verificación, cambios, control de calidad)
+        run: node progreso-app/events/build.mjs
+      - name: Publicar si cambió
+        run: |
+          git config user.name "events-bot"
+          git config user.email "events-bot@users.noreply.github.com"
+          git add progreso-app/assets/www/data/events.json progreso-app/events/review.md progreso-app/events/.state/discovered.json progreso-app/events/.state/seen.json
+          git diff --cached --quiet || git commit -m "Catálogo de competiciones: actualización automática" && git push
