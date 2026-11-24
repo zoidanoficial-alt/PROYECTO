@@ -23,6 +23,8 @@ function hxsList(k, pf) {
   if (pf && typeof hxResultsPF === 'function' && PF_SUB[k] && !PF_SUB[k].comparable) return hxResultsPF(k).slice().reverse();
   return hxResults('st', k).slice().reverse();
 }
+/** Intentos que no cuentan por imposibles (para mostrarlos y poder borrarlos). */
+function hxsBad(k) { return hx().results.filter(r => (k === 'run' ? r.kind === 'run1k' : r.kind === 'st' && r.st === k) && !r.pf && !hxResultOk(r)); }
 /** Nueva ficha de estación (reemplaza la anterior). */
 openHxStation = function (k, back) {
   const pf = hxsIsPF(), I = hxsInfo(k, pf), best = hxsBest(k, pf), rs = hxsList(k, pf), idx = HXS_ORDER.indexOf(k);
@@ -41,6 +43,7 @@ openHxStation = function (k, back) {
     <div class="pg-rec"><b>Errores frecuentes</b><small>${esc(I.err.join(' · '))}</small></div>
     ${pf && I.alt ? `<div class="pg-rec"><b>Si no hay la máquina</b><small>${esc(I.alt)}</small></div>` : ''}
     ${pf && I.comparable === false ? '<p class="small muted">Esta adaptación no es igual a la estación de competencia: su récord se guarda aparte y no entra a tu predicción.</p>' : ''}
+    ${hxsBad(k).length ? `<div class="hxs-bad">${ico('triangle-alert', 16)}<span><b>${hxsBad(k).length === 1 ? 'Un tiempo no cuenta' : hxsBad(k).length + ' tiempos no cuentan'}</b><small>${hxsBad(k).map(r => hxT(r.sec) + ' (' + shortDate(r.date) + ')').join(', ')} · parece un temporizador olvidado o un error al escribirlo.</small></span><button class="ghost" id="hxs-badx">Borrar</button></div>` : ''}
     ${rs.length ? `<div class="rir-label"><span>Historial</span></div><table class="small"><tbody>${rs.slice(0, 8).map(r => `<tr><td>${shortDate(r.date)}</td><td><b>${hxT(r.sec)}</b>${best && r.id === best.id ? ' 🏆' : ''}</td><td>${r.rpe ? 'RPE ' + r.rpe : ''}</td><td>${r.pf ? 'PF' : r.std === false ? 'no comparable' : r.load ? esc(r.load) : ''}</td></tr>`).join('')}</tbody></table>` : ''}
     <button class="ghost block" id="hs1-x">← Volver</button></div>`, m => {
     $$('[data-hxsm]', m).forEach(b => b.onclick = () => { hxsPF = b.dataset.hxsm === '1'; openHxStation(k, back); });
@@ -49,6 +52,7 @@ openHxStation = function (k, back) {
     const c = $('#hxs-comp', m); if (c) c.onclick = () => go('comp');
     $('#hxs-man', m).onclick = () => openHxTest(k === 'run' ? 'run1k' : k, null, () => openHxStation(k, back));
     $('#hs1-x', m).onclick = back || (() => closeModal());
+    const bx = $('#hxs-badx', m); if (bx) bx.onclick = () => { if (!confirm('¿Borrar ' + (hxsBad(k).length === 1 ? 'ese tiempo' : 'esos tiempos') + '?')) return; const bad = new Set(hxsBad(k).map(r => r.id)); hx().results = hx().results.filter(r => !bad.has(r.id)); saveData(); openHxStation(k, back); render(currentTab); };
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) $$('svg', m).forEach(s => s.pauseAnimations && s.pauseAnimations());
   });
 };

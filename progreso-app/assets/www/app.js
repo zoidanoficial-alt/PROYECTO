@@ -47,7 +47,7 @@ function snack(msg, action, fn, ms) {
   snack._t = setTimeout(hide, ms || 6000);
 }
 
-const APP_VERSION = '43.1';
+const APP_VERSION = '43.2';
 const bridge = window.AndroidBridge || null;
 function vibrate(ms) {
   try {

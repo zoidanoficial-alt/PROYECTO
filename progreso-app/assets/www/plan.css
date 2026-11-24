@@ -116,3 +116,18 @@
 .hxt-done summary { padding: 12px 0; font-weight: 800; font-size: 13.5px; cursor: pointer; } .hxt-done[open] { padding-bottom: 10px; }
 .hxt-foot { margin-top: 10px; } .hxt-foot .ghost { display: inline-flex; align-items: center; gap: 6px; }
 .hxt-del { color: var(--text-3) !important; font-weight: 600; }
+/* 43.2 · Secciones plegables de HYROX y selector de km */
+.cp-fold { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); margin: 12px 0; overflow: hidden; }
+.cp-fold > summary { display: flex; align-items: center; gap: 10px; padding: 14px; cursor: pointer; list-style: none; }
+.cp-fold > summary::-webkit-details-marker { display: none; }
+.cp-fold > summary span { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cp-fold > summary b { font-size: 15.5px; } .cp-fold > summary small { color: var(--text-3); font-size: 12.5px; } .cp-fold > summary small b { font-size: inherit; color: var(--warn); }
+.cp-fold > summary > svg { color: var(--text-3); flex: none; transition: transform var(--dur-2); }
+.cp-fold[open] > summary > svg { transform: rotate(180deg); }
+.cp-fold-b { padding: 0 10px 12px; } .cp-fold-b .cp-sec { margin: 0; } .cp-fold-b .cp-diag { margin: 0; }
+.hxk-ord { margin: 4px 0 6px; } .hxk-why { margin: 0 0 10px; }
+.hxk b i { font-style: normal; color: var(--accent); }
+.hxs-bad { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 10px 0; border-radius: var(--r-sm); background: var(--warn-soft, rgba(255, 194, 75, .12)); }
+.hxs-bad > svg { color: var(--warn); flex: none; } .hxs-bad span { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; } .hxs-bad small { color: var(--muted); font-size: 12px; }
+.hxs-bad .ghost { flex: none; min-height: 34px; padding: 6px 12px; }
+.cp-fold > summary::after { content: none; }

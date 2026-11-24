@@ -13,9 +13,10 @@ function hxtSegments(mode, st) {
   if (mode === 'station') return [{ k: st, n: pfStName(st), d: pfStDose(st) }];
   if (mode === 'run1k') return [{ k: 'run', n: '1 km fresco', d: 'a tope, bien calentado' }];
   if (mode === 'comp') return [{ k: st, n: pfStName(st), d: pfStDose(st) }, { k: 'run', n: '1 km bajo fatiga', d: 'sin descanso' }];
+  if (mode === 'blk') { const N = HX_STATIONS.findIndex(s => s.k === st) + 1; return [{ k: 'run', n: `Km ${N}`, d: '1 km a ritmo de carrera' }, { k: st, n: pfStName(st), d: pfStDose(st) }]; }
   return [];
 }
-const HXT_TITLE = { race: 'Simulación de carrera', station: 'Prueba de estación', run1k: '1 km fresco', comp: 'Running bajo fatiga' };
+const HXT_TITLE = { race: 'Simulación de carrera', station: 'Prueba de estación', run1k: '1 km fresco', comp: 'Running bajo fatiga', blk: 'Km + estación' };
 const hxt = () => (DB.hyrox && DB.hyrox.timer) || null;
 /** 37.0 · Tu fantasma: tu mejor versión anterior del mismo tramo, en tiempo acumulado por segmento (s). */
 function hxtGhost(mode, st) {
@@ -166,7 +167,7 @@ function hxtFinish() {
   // Registro automático en HYROX Lab (mismas reglas que las pruebas escritas a mano)
   const ladderPrev = typeof hxMyBest === 'function' ? (hxMyBest() || {}).sec : null;
   const base = { date, t: Date.now(), rpe: null, auto: true, timerId: t.id };
-  let prevBest = t.mode === 'station' || t.mode === 'comp' ? hxBest('st', t.st) : t.mode === 'run1k' ? hxBest('run1k') : null;
+  let prevBest = t.mode === 'station' || t.mode === 'comp' || t.mode === 'blk' ? hxBest('st', t.st) : t.mode === 'run1k' ? hxBest('run1k') : null;
   let first = null, hxtSim = null;
   const complete = segs.length === t.segs.length;
   if (t.mode === 'race') {
@@ -175,6 +176,11 @@ function hxtFinish() {
     segs.filter(s => s.k !== 'run').forEach(s => hx().results.push({ ...base, id: 'tm' + s.k + Date.now(), kind: 'st', st: s.k, sec: Math.round(s.sec / 1.08), std: true, note: 'Parcial de simulación (÷1.08)' }));
   } else if (t.mode === 'station') { first = { ...base, id: 'tm' + Date.now(), kind: 'st', st: t.st, sec: segs[0].sec, std: true }; hx().results.push(first); }
   else if (t.mode === 'run1k') { first = { ...base, id: 'tm' + Date.now(), kind: 'run1k', sec: segs[0].sec }; hx().results.push(first); }
+  else if (t.mode === 'blk') {
+    const N = HX_STATIONS.findIndex(s => s.k === t.st) + 1, kmSeg = segs.find(s => s.k === 'run'), stSeg = segs.find(s => s.k !== 'run');
+    if (kmSeg) hx().results.push({ ...base, id: 'tmk' + Date.now(), kind: 'km', blk: N, sec: kmSeg.sec });
+    if (stSeg) { first = { ...base, id: 'tm' + Date.now(), kind: 'st', st: t.st, sec: stSeg.sec, std: true, note: 'Después de su km (orden de carrera)' }; hx().results.push(first); }
+  }
   else if (t.mode === 'comp') {
     first = { ...base, id: 'tm' + Date.now(), kind: 'st', st: t.st, sec: segs[0].sec, std: true }; hx().results.push(first);
     if (segs[1]) hx().results.push({ ...base, id: 'tmc' + Date.now(), kind: 'comp', sec: segs[1].sec, after: t.st });
@@ -229,7 +235,7 @@ function openHxTimerPicker(back) {
       <button class="kit-item" data-tm="race">${ico('timer', 22)}<span class="grow"><b>Simulación de carrera</b><small>8 × (1 km + estación) · parcial de cada tramo</small></span>${ico('chevron-right', 16)}</button>
       <button class="kit-item" data-tm="run1k">${ico('footprints', 22)}<span class="grow"><b>1 km fresco</b><small>Tu ritmo base</small></span>${ico('chevron-right', 16)}</button>
       <button class="kit-item" data-tm="station">${ico('layers', 22)}<span class="grow"><b>Una estación</b><small>Prueba con distancia y carga de competencia</small></span>${ico('chevron-right', 16)}</button>
-      <button class="kit-item" data-tm="comp">${ico('activity', 22)}<span class="grow"><b>Estación + 1 km</b><small>Mide cuánto cae tu ritmo bajo fatiga</small></span>${ico('chevron-right', 16)}</button>
+      <button class="kit-item" data-tm="comp">${ico('activity', 22)}<span class="grow"><b>Km y estación</b><small>Los 8 km de la carrera, cada uno con su estación</small></span>${ico('chevron-right', 16)}</button>
     </div>
     <button class="secondary block" id="tm-watch">${ico('heart-pulse', 18, 'lead')}Mi reloj y pulso</button>
     <button class="ghost block" id="tm-x">${back ? '← Volver' : 'Cerrar'}</button>`, m => {
@@ -238,10 +244,35 @@ function openHxTimerPicker(back) {
     $('#tm-x', m).onclick = () => back ? back() : closeModal();
   });
 }
+/** 43.2 · Récord de cada km de carrera (Km 1 … Km 8): bloques "Km + estación" y parciales de simulaciones o carreras. */
+function hxKmBest(N) {
+  const v = hx().results.filter(r => r.kind === 'km' && r.blk === N && hxPlausible('km', r.sec)).map(r => r.sec);
+  (hx().runs || []).filter(r => r.mode === 'race' && r.segs).forEach(r => { const s = r.segs.find(x => x.n === `Run ${N}`); if (s && hxPlausible('km', s.sec)) v.push(s.sec); });
+  ((DB.ev && DB.ev.results) || []).filter(r => r.sport === 'hyrox' && r.splits && r.splits[(N - 1) * 2]).forEach(r => v.push(r.splits[(N - 1) * 2]));
+  return v.length ? Math.min(...v) : null;
+}
+function hxCompKmBest(st) { const v = hx().results.filter(r => r.kind === 'comp' && r.after === st && hxPlausible('km', r.sec)).map(r => r.sec); return v.length ? Math.min(...v) : null; }
+let hxtPickOrder = 'blk';
 function hxtPickStation(mode, back) {
-  const perf = hxPerformance();
-  openModal(`<h3>${mode === 'comp' ? 'Estación antes del km' : '¿Qué estación?'}</h3><div class="kit-list">${HX_STATIONS.map((s, i) => `<button class="kit-item" data-ps="${s.k}"><span class="hx-n">${String(i + 1).padStart(2, '0')}</span><span class="grow"><b>${pfStName(s.k)} · ${pfStDose(s.k)}</b><small>${perf.st[s.k] ? 'Récord ' + hxT(hxBest('st', s.k).sec) : 'Sin medir'}</small></span>${ico('chevron-right', 16)}</button>`).join('')}</div><button class="ghost block" id="ps-x">← Volver</button>`, m => {
-    $$('[data-ps]', m).forEach(b => b.onclick = () => hxtCreate(mode, b.dataset.ps));
+  if (mode === 'station') {
+    const perf = hxPerformance();
+    openModal(`<h3>¿Qué estación?</h3><div class="kit-list">${HX_STATIONS.map((s, i) => `<button class="kit-item" data-ps="${s.k}"><span class="hx-n">${String(i + 1).padStart(2, '0')}</span><span class="grow"><b>${pfStName(s.k)} · ${pfStDose(s.k)}</b><small>${perf.st[s.k] ? 'Récord ' + hxT(hxBest('st', s.k).sec) : 'Sin medir'}</small></span>${ico('chevron-right', 16)}</button>`).join('')}</div><button class="ghost block" id="ps-x">← Volver</button>`, m => {
+      $$('[data-ps]', m).forEach(b => b.onclick = () => hxtCreate('station', b.dataset.ps));
+      $('#ps-x', m).onclick = back;
+    });
+    return;
+  }
+  const race = hxtPickOrder === 'blk', fmtR = v => v ? hxT(v) : '—';
+  openModal(`<h3>Km y estación</h3>
+    <div class="seg hxk-ord"><button data-ord="blk" class="${race ? 'on' : ''}">Km → estación</button><button data-ord="comp" class="${race ? '' : 'on'}">Estación → km</button></div>
+    <p class="small muted hxk-why">${race ? 'Como en la carrera: cada km seguido de su estación.' : 'La estación primero y luego 1 km: mide cuánto cae tu ritmo con fatiga.'}</p>
+    <div class="kit-list">${HX_STATIONS.map((s, i) => {
+      const N = i + 1, stB = hxBest('st', s.k), km = race ? hxKmBest(N) : hxCompKmBest(s.k);
+      const a = race ? `Km ${N}` : pfStName(s.k), b2 = race ? pfStName(s.k) : '1 km';
+      return `<button class="kit-item hxk" data-ps="${s.k}"><span class="hx-n">${String(N).padStart(2, '0')}</span><span class="grow"><b>${a} <i>→</i> ${b2}</b><small>${race ? `Km ${N}: ${fmtR(km)} · ${esc(pfStName(s.k))} (${esc(pfStDose(s.k))}): ${fmtR(stB && stB.sec)}` : `${esc(pfStDose(s.k))}: ${fmtR(stB && stB.sec)} · km con fatiga: ${fmtR(km)}`}</small></span>${ico('chevron-right', 16)}</button>`;
+    }).join('')}</div><button class="ghost block" id="ps-x">← Volver</button>`, m => {
+    $$('[data-ord]', m).forEach(b => b.onclick = () => { hxtPickOrder = b.dataset.ord; hxtPickStation(mode, back); });
+    $$('[data-ps]', m).forEach(b => b.onclick = () => hxtCreate(race ? 'blk' : 'comp', b.dataset.ps));
     $('#ps-x', m).onclick = back;
   });
 }

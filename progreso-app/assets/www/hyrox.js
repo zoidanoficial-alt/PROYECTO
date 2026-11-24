@@ -55,7 +55,14 @@ function hxT(sec) {
 }
 
 /* ---------- Datos ---------- */
-function hxResults(kind, st) { return hx().results.filter(r => r.kind === kind && (!st || r.st === st) && !r.pf).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.t - b.t); }
+/** 43.2 · Un tiempo fuera de lo humanamente posible (temporizador olvidado, dedazo) no cuenta en récords ni diagnóstico. */
+function hxPlausible(k, sec) {
+  if (!sec) return false;
+  if (k === 'km' || k === 'run1k' || k === 'comp') return sec >= 140 && sec <= 900;
+  const a = HX_ANCHOR[k]; return !a || (sec >= a[1] * 0.55 && sec <= a[0] * 3);
+}
+function hxResultOk(r) { return r.kind === 'st' ? hxPlausible(r.st, r.sec) : r.kind === 'run1k' || r.kind === 'comp' || r.kind === 'km' ? hxPlausible('km', r.sec) : true; }
+function hxResults(kind, st) { return hx().results.filter(r => r.kind === kind && (!st || r.st === st) && !r.pf && hxResultOk(r)).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : a.t - b.t); }
 function hxLatest(kind, st) { const r = hxResults(kind, st); return r.length ? r[r.length - 1] : null; }
 function hxBest(kind, st) { return hxResults(kind, st).reduce((a, r) => !a || r.sec < a.sec ? r : a, null); }
 /** Mejor de las últimas 3 pruebas: el estado actual sin castigar un mal día aislado. */

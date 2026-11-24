@@ -1443,3 +1443,14 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
   - El resumen la marca como "parcial".
 - La sesión de HYROX también cambia "Minimizar" por "Guardar sesión".
 - Pruebas: e2e v49. Build versionCode 49.
+
+## 43.2 · Km y estación, secciones plegables y tiempos imposibles
+
+- **"Km y estación"** (antes "Estación antes del km") muestra los 8 km de la carrera, cada uno con su estación y sus récords. Hay dos órdenes:
+  - **Km → estación**, como en la carrera: temporizador de 2 tramos. El km se guarda como "Km N" y la estación como prueba normal.
+  - **Estación → km**: mide tu ritmo bajo fatiga, como antes.
+  - El récord de cada Km sale de estos bloques y de los parciales de simulaciones y carreras.
+- **Diagnóstico** y **Entrena por estación** (en Plan → HYROX), y **Diagnóstico** y **Tus tiempos** (en la pestaña HYROX), son secciones plegables. Empiezan cerradas, se recuerdan y muestran un resumen ("Por mejorar: …").
+- **Tiempos imposibles fuera de los cálculos:** una estación por debajo del 55 % del tiempo élite o por encima de 3 veces el de principiante, o un km fuera de 2:20–15:00 (temporizador olvidado o dedazo), no cuenta en récords, diagnóstico ni predicción.
+  - La ficha de la estación lo avisa y deja borrarlo.
+- Pruebas: e2e v50. Build versionCode 50.

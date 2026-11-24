@@ -87,8 +87,8 @@ function renderHyroxTab(root0, mode) {
       <button data-hxp="events">${ico('calendar', 22)}<span>Carreras</span></button>
       <button data-hxp="test">${ico('clipboard-list', 22)}<span>Resultado</span></button>
     </div>
-    ${diag}
-    <section class="cp-sec"><div class="ds-h">Entrena por estación <span class="ds-h-r">${tested}</span></div>${hxsGrid(perf, bn)}</section>
+    ${hxFold('hx-diag', 'Diagnóstico', hxDiagSub(bn), diag.replace('<div class="ds-h">Diagnóstico</div>', ''))}
+    ${hxFold('hx-sts', 'Entrena por estación', esc(tested), hxsGrid(perf, bn))}
     ${typeof pfHyroxCard === 'function' ? pfHyroxCard() : ''}
     ${champMethodCard()}
     <div class="ds-h">Herramientas</div>
@@ -107,10 +107,10 @@ function renderHyroxTab(root0, mode) {
       <button class="secondary block" data-hxp="toplan">${ico('timer', 18, 'lead')}Ir a entrenar</button></div>
     <div class="ds-h">Rankings México 2026 <span class="ds-h-r">CDMX y Guadalajara</span></div>${lab}
     <div class="ds-h">HYROX Lab</div>
-    ${diag}
+    ${hxFold('hx-diag-r', 'Diagnóstico', hxDiagSub(bn), diag.replace('<div class="ds-h">Diagnóstico</div>', ''))}
     ${pred}
     <div class="kit-list">${hxpItem('perf', 'trending-up', 'Perfil de rendimiento', perf.hpi != null ? `HPI ${perf.hpi}/100 · confianza ${perf.conf}` : 'Running, fuerza, fatiga y estaciones')}</div>
-    <section class="cp-sec"><div class="ds-h">Tus tiempos <span class="ds-h-r">${tested}</span></div>${hxsGrid(perf, bn)}</section>
+    ${hxFold('hx-times', 'Tus tiempos', esc(tested), hxsGrid(perf, bn))}
     <div class="ds-h">Resultados</div>
     <div class="kit-list">
       ${hxpItem('ranks', 'clipboard-list', 'Mis carreras', 'Resultados, parciales y comparaciones')}
@@ -123,6 +123,12 @@ function renderHyroxTab(root0, mode) {
   if (typeof liveCheck === 'function') liveToast(liveCheck());
   $$('[data-cpst]', root).forEach(b => b.onclick = () => openHxStation(b.dataset.cpst, () => closeModal()));
 }
+/** 43.2 · Sección plegable (se recuerda abierta o cerrada). */
+function hxFold(id, title, sub, inner) {
+  const open = (DB.profile.folds || {})[id] === true;
+  return `<details class="cp-fold" data-cpfold="${id}"${open ? ' open' : ''}><summary><span><b>${esc(title)}</b><small>${sub}</small></span>${ico('chevron-down', 18)}</summary><div class="cp-fold-b">${inner}</div></details>`;
+}
+function hxDiagSub(bn) { return bn && bn.main ? `Por mejorar: <b>${esc(bn.main.n)}</b>` : 'Aún sin diagnóstico'; }
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }
 function hxpBind(root) {
   const back = () => closeModal();
@@ -133,3 +139,4 @@ function hxpBind(root) {
   const s = $('#hxp-setup', root); if (s) s.onclick = () => openHxSetup(() => { closeModal(); render(currentTab); });
   const d = $('#hxp-date', root); if (d) d.onclick = () => openEvents();
 }
+document.addEventListener('toggle', e => { const d = e.target; if (!d.classList || !d.classList.contains('cp-fold')) return; DB.profile.folds = DB.profile.folds || {}; DB.profile.folds[d.dataset.cpfold] = !!d.open; saveData(); }, true);
