@@ -1,0 +1,13 @@
+/* VERSIÓN PERSONAL · logotipos (borrar la carpeta personal/ antes de distribuir) */
+.pz-mark { width: 26px; height: auto; display: block; }
+#tabs [data-tab=hyrox].on .tl { display: inline-flex; align-items: center; }
+.pz-word { height: 10px; width: auto; display: block; }
+#tabs button.on .pz-mark, #tabs button.on .pz-word { filter: brightness(0); }
+.pz-title .pz-word { height: 22px; margin: 10px 0 6px; }
+.pz-inline .pz-word { height: 14px; margin: 4px 0; }
+:root:not([data-theme="dark"]) .pz-mark, :root:not([data-theme="dark"]) .pz-word { filter: invert(1); }
+:root:not([data-theme="dark"]) #tabs button.on .pz-mark, :root:not([data-theme="dark"]) #tabs button.on .pz-word { filter: brightness(0); }
+.pz-head { width: 24px; filter: none; } .pz-inline .pz-word { height: 13px; }
+.pz-word { align-self: flex-start; flex: none; max-width: none; object-fit: contain; } .pz-inline { display: inline-flex; } .pz-title { display: inline-flex; }
+#tabs [data-tab=hyrox] .tl { max-width: none !important; overflow: visible !important; text-overflow: clip !important; } #tabs .pz-word { height: 8.5px; }
+#tabs button:not(.on) .pz-mark { opacity: .62; }

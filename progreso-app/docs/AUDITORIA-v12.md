@@ -1463,3 +1463,14 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
 - "Cómo llegar" usa columnas **Hoy / Meta** que no se parten (la meta va en limón). Si tu predicción ya alcanza la meta, lo dice en vez de "−1 % más rápido".
 - "Tus rivales" muestra en cada fila el nombre arriba y el tiempo con la diferencia abajo: roja si va adelante de ti, limón si va detrás. Tu fila va resaltada.
 - Revisado con la letra al 130 % (`tests/e2e/big.mjs`): sin desbordes ni números partidos. Build versionCode 51.
+
+## 43.4 · Versión personal con logotipos de HYROX
+
+- `assets/www/personal/` contiene `hyrox-mark.png`, `hyrox-word.png`, `personal.js` y `personal.css`. Los logos los aportó el dueño y se recortaron a blanco sobre transparente.
+- Dónde aparecen:
+  - **Barra de navegación:** el símbolo reemplaza al cronómetro de la pestaña HYROX. Seleccionada, muestra símbolo y palabra en negro sobre la píldora limón; sin seleccionar, solo el símbolo atenuado.
+  - **Título de la pestaña HYROX:** la palabra HYROX.
+  - **Encabezado de Plan → HYROX:** símbolo y palabra.
+- Tema claro: se invierten a negro.
+- **HYROX es una marca registrada de terceros: uso exclusivo del dueño. Antes de distribuir la app, borra la carpeta `personal/` y sus dos líneas en `index.html`** (el `<link>` de `personal.css` y el `<script>` de `personal.js`). La app vuelve al cronómetro y al texto.
+- Build versionCode 52.
