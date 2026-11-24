@@ -45,13 +45,13 @@ await page.click('[data-hxp=lab]'); await page.clock.runFor(300);
 R.hyrox = await page.evaluate(() => ({
   hero: document.querySelector('.pl-hero b').textContent, chips: [...document.querySelectorAll('.pl-chips span')].map(x => x.textContent),
   badge: document.querySelector('.pv-badge').textContent, sub: document.querySelector('.pv-head small').textContent,
-  next: (document.querySelector('.pl-goal.next') || {}).innerText, plan: !!document.querySelector('.pl-plan'), radar: !!document.querySelector('.pv-radar .pv-prev'), race: !!document.querySelector('.pv-race'),
+  next: (document.querySelector('.pl-step.next') || {}).innerText, plan: !!document.querySelector('.pl-plan'), radar: !!document.querySelector('.pv-radar .pv-prev'), race: !!document.querySelector('.pv-race'),
   cards: [...document.querySelectorAll('.pv-head > div > b')].map(x => x.textContent.trim())
 }));
 await shot('v47-hyrox.png');
 await shot('v47-hyrox-radar.png', '.pv-radar');
 await shot('v47-hyrox-carrera.png', '.pv-race');
-R.rivals = await page.evaluate(() => ({ rows: [...document.querySelectorAll('.pl-riv')[0].querySelectorAll('tr')].map(t => t.innerText.replace(/\s+/g, ' ').trim()), all: document.querySelectorAll('.pl-all tr').length }));
+R.rivals = await page.evaluate(() => ({ rows: [...document.querySelectorAll('.pl-riv')[0].querySelectorAll('.pl-rv')].map(t => t.innerText.replace(/\s+/g, ' ').trim()), all: document.querySelectorAll('.pl-all .pl-rv').length }));
 await page.evaluate(() => document.querySelector('.pl-riv').scrollIntoView({ block: 'center' })); await shot('v47-rivales.png');
 await page.click('.pl-riv [data-plriv]'); await page.clock.runFor(200);
 R.rivalAdded = await page.evaluate(() => hxRivals().map(r => r.name + ' ' + hxT(r.sec) + ' ' + r.cat));

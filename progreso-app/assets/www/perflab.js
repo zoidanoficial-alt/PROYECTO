@@ -29,14 +29,14 @@ function plRivalsHtml(f, sec) {
   const N = fieldNames(f); if (!N) return '';
   const faster = sec ? f.t.filter(x => x < sec).length : 0, from = sec ? Math.max(0, Math.min(faster - 3, f.t.length - 5)) : 0, idx = [];
   for (let i = from; i < Math.min(f.t.length, from + 5); i++) idx.push(i);
-  const row = (i, shift) => `<tr><td class="muted">${shift && sec && i >= faster ? i + 2 : i + 1}</td><td>${esc(N[i])}</td><td><b>${hxT(f.t[i])}</b></td><td class="${sec && f.t[i] < sec ? 'hx-lose' : 'hx-win'}">${sec ? (f.t[i] < sec ? '−' : '+') + hxT(Math.abs(sec - f.t[i])) : ''}</td><td>${plRivalBtn(f, i)}</td></tr>`;
-  const me = `<tr class="pl-me"><td>${faster < 100 ? faster + 1 : '—'}</td><td><b>${esc(DB.profile.name || 'Tú')}</b></td><td><b>${hxT(sec)}</b></td><td></td><td></td></tr>`;
+  const row = (i, shift) => `<div class="pl-rv"><span class="pl-rk">${shift && sec && i >= faster ? i + 2 : i + 1}</span><span class="pl-rn"><b>${esc(N[i])}</b><small>${hxT(f.t[i])}${sec ? ` · <em class="${f.t[i] < sec ? 'ahead' : 'behind'}">${f.t[i] < sec ? '−' : '+'}${hxT(Math.abs(sec - f.t[i]))}</em>` : ''}</small></span>${plRivalBtn(f, i)}</div>`;
+  const me = `<div class="pl-rv me"><span class="pl-rk">${faster < 100 ? faster + 1 : '—'}</span><span class="pl-rn"><b>${esc(DB.profile.name || 'Tú')}</b><small>${hxT(sec)} · tu marca</small></span><span></span></div>`;
   let body = '';
   idx.forEach(i => { if (sec && i === faster) body += me; body += row(i, true); });
   if (sec && faster >= idx[idx.length - 1] + 1) body += me;
   return `<div class="pv-card"><div class="pv-head"><div><b>${sec ? 'Tus rivales de referencia' : 'Los más rápidos'}</b><small>${sec ? 'Quién está justo arriba y abajo de tu marca' : 'Agrega tu marca para ver a quién tienes cerca'} · toca + para llevarlo a tu escalera</small></div></div>
-    <table class="small hx-tbl pl-riv"><tbody>${body}</tbody></table>
-    <details class="pl-all"><summary>Ver el top 100 de ${esc(fieldName(f))}</summary><table class="small hx-tbl pl-riv"><tbody>${f.t.map((t, i) => row(i)).join('')}</tbody></table></details></div>`;
+    <div class="pl-riv">${body}</div>
+    <details class="pl-all"><summary>Ver el top 100 de ${esc(fieldName(f))}</summary><div class="pl-riv">${f.t.map((t, i) => row(i)).join('')}</div></details></div>`;
 }
 function plAddRival(key) {
   const [k, i] = key.split('|'), f = fieldOf(k), N = fieldNames(f); if (!f || !N) return;
@@ -169,13 +169,16 @@ function plHyrox() {
     `Curva: los 100 más rápidos de ${f.n.toLocaleString('es-MX')} (${esc(f.ev)}, ${esc(f.div)} varonil). La línea marca el lugar 100.`);
   h += plRivalsHtml(f, sec);
   // Metas
-  h += `<div class="ds-h">Récords por romper <span class="ds-h-r">${esc(fieldName(f))}</span></div><div class="pl-goals">${T.map(x => `<div class="pl-goal${x.done ? ' done' : ''}${next && x.r === next.r ? ' next' : ''}"><span>${x.done ? ico('check', 16) : ''}${esc(x.n)}</span><b>${hxT(x.t)}</b><small>${sec ? x.done ? 'lo tienes' : '−' + hxT(x.gap) : ''}</small></div>`).join('')}</div>`;
+  h += `<div class="ds-h">Récords por romper <span class="ds-h-r">${esc(fieldName(f))}</span></div><div class="pl-ladder">${T.slice().reverse().map(x => {
+    const isNext = next && x.r === next.r;
+    return `<div class="pl-step${x.done ? ' done' : ''}${isNext ? ' next' : ''}"><i class="pl-dot">${x.done ? ico('check', 14) : ''}</i><span class="pl-lbl"><b>${esc(x.n)}</b><small>lugar ${x.r}</small></span><b class="pl-t">${hxT(x.t)}</b><em class="pl-gap">${!sec ? '' : x.done ? 'lo tienes' : isNext ? 'faltan ' + hxT(x.gap) : '−' + hxT(x.gap)}</em></div>`;
+  }).join('')}</div>`;
   if (next && sec) {
     const pr = typeof hxPredict === 'function' ? hxPredict() : null;
     if (pr && pr.ok) {
       const sc = next.t / pr.total, runK = pr.runT / 8;
-      h += `<div class="pv-card"><div class="pv-head"><div><b>Cómo llegar al ${esc(next.n)} <span>${hxT(next.t)}</span></b><small>Repartido como hoy repartes tu carrera (${Math.round((1 - sc) * 100)} % más rápido en cada parte)</small></div></div>
-        <table class="small hx-tbl pl-plan"><tbody><tr><td>Cada 1 km (×8)</td><td class="muted">${hxT(runK)}</td><td><b>${hxT(runK * sc)}</b></td></tr>${pr.parts.map(p => `<tr><td>${esc(p.n)}</td><td class="muted">${hxT(p.t)}</td><td><b>${hxT(p.t * sc)}</b></td></tr>`).join('')}<tr><td>Roxzone</td><td class="muted">${hxT(pr.rox)}</td><td><b>${hxT(pr.rox * sc)}</b></td></tr></tbody></table></div>`;
+      h += `<div class="pv-card"><div class="pv-head"><div><b>Cómo llegar al ${esc(next.n)} <span>${hxT(next.t)}</span></b><small>${sc < 0.995 ? `Repartido como hoy repartes tu carrera: ${Math.max(1, Math.round((1 - sc) * 100))} % más rápido en cada parte` : 'Tu predicción ya alcanza esta meta: estos son los tiempos para lograrla en carrera'}</small></div></div>
+        <div class="pl-plan"><div class="pl-ph"><span></span><small>Hoy</small><small>Meta</small></div>${[['Cada km (×8)', runK]].concat(pr.parts.map(p => [p.n.replace('Burpee broad jumps', 'Burpees').replace('Sandbag lunges', 'Lunges'), p.t]), [['Roxzone', pr.rox]]).map(([n, v]) => `<div class="pl-pr"><span>${esc(n)}</span><small>${hxT(v)}</small><b>${hxT(v * sc)}</b></div>`).join('')}</div></div>`;
     }
   }
   // Radar

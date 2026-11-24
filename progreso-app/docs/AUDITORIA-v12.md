@@ -1454,3 +1454,12 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
 - **Tiempos imposibles fuera de los cálculos:** una estación por debajo del 55 % del tiempo élite o por encima de 3 veces el de principiante, o un km fuera de 2:20–15:00 (temporizador olvidado o dedazo), no cuenta en récords, diagnóstico ni predicción.
   - La ficha de la estación lo avisa y deja borrarlo.
 - Pruebas: e2e v50. Build versionCode 50.
+
+## 43.3 · Laboratorio limpio con letra grande
+
+- "Récords por romper" pasa de 5 columnas apretadas a una escalera vertical: Top 100 → Podio.
+  - Cada fila tiene un círculo (palomita en limón si ya lo tienes), el nombre, el lugar, el tiempo y "lo tienes" o "faltan X".
+  - La siguiente meta va resaltada en limón.
+- "Cómo llegar" usa columnas **Hoy / Meta** que no se parten (la meta va en limón). Si tu predicción ya alcanza la meta, lo dice en vez de "−1 % más rápido".
+- "Tus rivales" muestra en cada fila el nombre arriba y el tiempo con la diferencia abajo: roja si va adelante de ti, limón si va detrás. Tu fila va resaltada.
+- Revisado con la letra al 130 % (`tests/e2e/big.mjs`): sin desbordes ni números partidos. Build versionCode 51.

@@ -16,8 +16,8 @@ android {
         applicationId = "com.zoidan.progreso"
         minSdk = 26
         targetSdk = 34
-        versionCode = 50
-        versionName = "43.2"
+        versionCode = 51
+        versionName = "43.3"
     }
 
     signingConfigs {
