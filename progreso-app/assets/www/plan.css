@@ -131,3 +131,34 @@
 .hxs-bad > svg { color: var(--warn); flex: none; } .hxs-bad span { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; } .hxs-bad small { color: var(--muted); font-size: 12px; }
 .hxs-bad .ghost { flex: none; min-height: 34px; padding: 6px 12px; }
 .cp-fold > summary::after { content: none; }
+/* 43.5 · Proyecto HYROX */
+.hp-q { font-size: 19px; line-height: 1.3; margin: 6px 44px 12px 0; letter-spacing: -.01em; }
+.hp-tg { margin-bottom: 8px; } .hp-tg button { font-variant-numeric: tabular-nums; }
+.hp-me { margin: 0 0 10px; } .hp-me b { color: var(--text); }
+.hp-bud { display: flex; gap: 4px; margin: 10px 0 4px; }
+.hp-b { min-width: 0; display: flex; flex-direction: column; gap: 3px; } .hp-b i { display: block; height: 8px; border-radius: 4px; background: var(--surface-3); }
+.hp-b.run i { background: var(--accent); } .hp-b.st i { background: var(--muted); }
+.hp-b small { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .hp-b b { font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hp-b.rox { flex: none !important; min-width: 74px; }
+.hp-kms { display: flex; flex-direction: column; margin-top: 6px; }
+.hp-km { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; align-items: center; column-gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.hp-km:first-child { border-top: 0; }
+.hp-kn { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-3); font-weight: 800; font-size: 12.5px; color: var(--text); }
+.hp-kt { display: flex; flex-direction: column; min-width: 0; } .hp-kt b { font-size: 14px; color: var(--text); } .hp-kt small { font-size: 12px; color: var(--text-3); }
+.hp-kp { font-size: 16px; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hp-km.last .hp-kn { background: var(--accent); color: #111; } .hp-km.last .hp-kp { color: var(--accent); }
+.pv-badge.bad { background: var(--bad, #ff5c5c); color: #fff; }
+.hp-dec { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+.hp-dec div { background: var(--surface-2, #1b1b1b); border-radius: var(--r-sm); padding: 8px; text-align: center; } .hp-dec small { display: block; font-size: 11px; color: var(--text-3); } .hp-dec b { font-size: 15px; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hp-week { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.hp-day { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); }
+.hp-day span { flex: 1; display: flex; flex-direction: column; min-width: 0; } .hp-day small { font-size: 11.5px; color: var(--text-3); font-weight: 700; } .hp-day b { font-size: 14px; color: var(--text); }
+.hp-day .secondary { flex: none; min-height: 34px; padding: 6px 12px; font-size: 13px; }
+.hp-day.today { border-color: var(--accent); } .hp-day.today small { color: var(--accent); }
+.hp-st { display: grid; gap: 8px; } .hp-st div { display: flex; flex-direction: column; } .hp-st b { font-size: 14px; } .hp-st small { color: var(--muted); font-size: 12.5px; }
+.hp-avoid { margin: 0 0 4px; padding-left: 18px; color: var(--muted); font-size: 13px; } .hp-avoid li { margin: 2px 0; }
+.hp-quote { margin: 14px 0 6px; padding: 14px 16px; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 var(--r-md) var(--r-md) 0; font-size: 15px; font-weight: 700; line-height: 1.4; }
+.hp-card > svg:first-child { color: var(--accent); }
+.hp-key small { color: var(--text) !important; }
+.hxt-brk { margin-top: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; } .hxt-brk[hidden] { display: none; } .hxt-brk b { min-width: 22px; height: 22px; border-radius: 11px; display: inline-grid; place-items: center; background: var(--surface-3); font-size: 12px; }
+.hp-gap { font-style: normal; font-size: 11.5px; font-weight: 800; color: var(--warn); margin-left: 4px; }

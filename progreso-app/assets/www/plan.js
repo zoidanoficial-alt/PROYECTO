@@ -168,6 +168,11 @@ const WODS = {
     { id: 'yg3', n: 'Equilibrio y fuerza', type: 'flow', b: [['Árbol (cada lado)', '90s'], ['Guerrero III (cada lado)', '60s'], ['Silla', '1min'], ['Plancha lateral (cada lado)', '60s'], ['Barco', 'max'], ['Cuervo (o preparación)', '30s'], ['Postura del niño', '1min']], why: 'Estabilidad de tobillo, cadera y core.' },
     { id: 'yg4', n: 'Recuperación profunda', type: 'flow', b: [['Mariposa', '3min'], ['Oruga (pliegue sentado)', '3min'], ['Esfinge', '3min'], ['Torsión acostado (cada lado)', '4min'], ['Relajación final', '5min']], why: 'Posturas largas y suaves para los días de descanso.' }
   ],
+  hyrox: [
+    { id: 'hx1', n: 'Intervalos 6 × 1 km', type: 'intervals', b: [['Calentamiento suave', '10min'], ['1 km a ritmo de carrera', '1 km'], ['Recupera', '90s'], ['1 km a ritmo de carrera', '1 km'], ['Recupera', '90s'], ['1 km a ritmo de carrera', '1 km'], ['Recupera', '90s'], ['1 km a ritmo de carrera', '1 km'], ['Recupera', '90s'], ['1 km a ritmo de carrera', '1 km'], ['Recupera', '90s'], ['1 km a ritmo de carrera', '1 km'], ['Vuelta a la calma', '5min']], why: 'Tu ritmo objetivo de carrera, repetido: el motor que multiplica todo lo demás.' },
+    { id: 'hx2', n: 'Umbral 3 × 2 km', type: 'intervals', b: [['Calentamiento suave', '10min'], ['2 km fuerte pero sostenible', '2 km'], ['Recupera', '2min'], ['2 km fuerte pero sostenible', '2 km'], ['Recupera', '2min'], ['2 km fuerte pero sostenible', '2 km'], ['Vuelta a la calma', '5min']], why: 'Sostener ritmos exigentes durante mucho tiempo.' },
+    { id: 'hx3', n: 'Compromised running', type: 'fortime', cap: 40, b: [['Carrera', '1 km'], ['Sled push', '50 m'], ['Carrera', '1 km'], ['Sled pull', '50 m'], ['Carrera', '1 km'], ['Burpee broad jumps', '80 m']], why: 'Correr con el cuerpo alterado por la estación anterior: el problema que HYROX te pone.' }
+  ],
   pilates: [
     { id: 'pl1', n: 'Core esencial', type: 'flow', b: [['El cien (hundred)', '1min'], ['Roll up', 10], ['Estiramiento de una pierna', 20], ['Estiramiento de dos piernas', 10], ['Criss-cross', 20], ['Plancha', 'max'], ['Natación (swimming)', '40s'], ['Estiramiento de columna', 8]], why: 'La base del método: control del centro.' },
     { id: 'pl2', n: 'Glúteo y cadera', type: 'flow', rounds: 2, b: [['Puente', 15], ['Almeja (cada lado)', 30], ['Patadas laterales (cada lado)', 24], ['Patada de glúteo en cuadrupedia (cada lado)', 30], ['Plancha lateral (cada lado)', '60s']], why: 'Glúteo medio y estabilidad de cadera.' },
@@ -297,7 +302,7 @@ function wpFinish(manual, capped) {
   if (manual && WP == null && R.i === 0) { closeModal(true); return; }
   wodSummary(w, x, R);
 }
-const ACT_OF = { crossfit: 'circuito', spartan: 'circuito', cardio: 'eliptica', yoga: 'yoga', pilates: 'pilates' };
+const ACT_OF = { hyrox: 'correr', crossfit: 'circuito', spartan: 'circuito', cardio: 'eliptica', yoga: 'yoga', pilates: 'pilates' };
 function wodSummary(w, x, R) {
   const prev = wodBest(w.id), D = wodDB(), prs = [];
   Object.keys(x.res).forEach(k => { const key = w.disc + '|' + k, b = D.best[key]; if (!b || x.res[k] > b.v) prs.push({ n: k, v: x.res[k], old: b ? b.v : null, u: x.unit[k] }); });

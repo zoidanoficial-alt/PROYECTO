@@ -13,10 +13,11 @@ function hxtSegments(mode, st) {
   if (mode === 'station') return [{ k: st, n: pfStName(st), d: pfStDose(st) }];
   if (mode === 'run1k') return [{ k: 'run', n: '1 km fresco', d: 'a tope, bien calentado' }];
   if (mode === 'comp') return [{ k: st, n: pfStName(st), d: pfStDose(st) }, { k: 'run', n: '1 km bajo fatiga', d: 'sin descanso' }];
+  if (mode === 'part') { const n = Number(st) || 2, out = []; HX_STATIONS.slice(0, n).forEach((s, i) => { out.push({ k: 'run', n: `Run ${i + 1}`, d: '1 km' }); out.push({ k: s.k, n: pfStName(s.k), d: pfStDose(s.k) }); }); return out; }
   if (mode === 'blk') { const N = HX_STATIONS.findIndex(s => s.k === st) + 1; return [{ k: 'run', n: `Km ${N}`, d: '1 km a ritmo de carrera' }, { k: st, n: pfStName(st), d: pfStDose(st) }]; }
   return [];
 }
-const HXT_TITLE = { race: 'Simulación de carrera', station: 'Prueba de estación', run1k: '1 km fresco', comp: 'Running bajo fatiga', blk: 'Km + estación' };
+const HXT_TITLE = { race: 'Simulación de carrera', station: 'Prueba de estación', run1k: '1 km fresco', comp: 'Running bajo fatiga', blk: 'Km + estación', part: 'Simulación parcial' };
 const hxt = () => (DB.hyrox && DB.hyrox.timer) || null;
 /** 37.0 · Tu fantasma: tu mejor versión anterior del mismo tramo, en tiempo acumulado por segmento (s). */
 function hxtGhost(mode, st) {
@@ -108,6 +109,7 @@ function openHxTimer() {
     <p class="wp-next" id="hxt-nexttxt"></p>
     <button class="block wp-go" id="hxt-next"></button>
     <div class="row wp-ctl"><button class="secondary" id="hxt-play"></button><button class="secondary" id="hxt-prev">${ico('rotate-ccw', 16, 'lead')}Deshacer</button></div>
+    <button class="ghost block hxt-brk" id="hxt-brk" hidden>Rompí la serie <b id="hxt-brkn">0</b></button>
     <details class="hxt-done" id="hxt-donebox" hidden><summary id="hxt-donesum"></summary><div id="hxt-splits"></div></details>
     <div class="row hxt-foot"><button class="ghost" id="hxt-save">${ico('check', 16, 'lead')}Guardar</button><span class="grow"></span><button class="ghost hxt-del" id="hxt-del">Descartar</button></div>
   </div>`, m => {
@@ -115,6 +117,7 @@ function openHxTimer() {
     $('#hxt-next', m).onclick = () => hxtCommand('next', Date.now());
     $('#hxt-prev', m).onclick = () => hxtCommand('prev', Date.now());
     $('#hxt-save', m).onclick = () => hxtSaveNow();
+    $('#hxt-brk', m).onclick = () => { const t = hxt(); if (!t || !t.t0) return; const s = t.segs[t.i]; s.breaks = (s.breaks || 0) + 1; saveData(); vibrate(30); hxtPaint(); };
     $('#hxt-del', m).onclick = () => { if (!confirm('¿Descartar este temporizador? No se guardará nada.')) return; clearInterval(hxtTick); hx().timer = null; saveData(); if (bridge && bridge.watchStop) bridge.watchStop(); closeModal(); if (typeof render === 'function') render(currentTab); };
     clearInterval(hxtTick);
     hxtTick = setInterval(() => { if (!document.getElementById('hxt-seg') || !hxt()) return clearInterval(hxtTick); hxtPaint(); hxtPush(false); }, 250);
@@ -143,6 +146,7 @@ function hxtPaint() {
   const play = el('hxt-play'); play.innerHTML = t.paused != null ? `${ico('play', 16, 'lead')}Seguir` : `${ico('pause', 16, 'lead')}Pausa`; play.disabled = !t.t0;
   el('hxt-prev').disabled = !t.t0;
   el('hxt-save').disabled = !t.t0;
+  el('hxt-brk').hidden = !run || seg.k === 'run'; el('hxt-brkn').textContent = seg.breaks || 0;
   el('hxt-nexttxt').innerHTML = t.paused != null ? '<b>En pausa</b>' : nx ? `Sigue: <b>${esc(nx.n)}</b>${nx.d ? ' · ' + esc(nx.d) : ''}` : t.t0 ? 'Último tramo' : '';
   document.querySelector('.hxt2') && document.querySelector('.hxt2').classList.toggle('paused', t.paused != null);
   const live = WATCH.hr && Date.now() - WATCH.hr.at < 10000;
@@ -159,7 +163,7 @@ function hxtPaint() {
 function hxtFinish() {
   clearInterval(hxtTick);
   const t = hxt(); if (!t) return;
-  const date = todayStr(), mk = s => ({ k: s.k, n: s.n, sec: Math.round(hxtActive(t, s.start, s.end) / 100) / 10, start: s.start, end: s.end, hrAvg: s.hrN ? Math.round(s.hrSum / s.hrN) : null, hrMax: s.hrMax || null, rmssd: hxtRmssd(s.rr) });
+  const date = todayStr(), mk = s => ({ k: s.k, n: s.n, sec: Math.round(hxtActive(t, s.start, s.end) / 100) / 10, start: s.start, end: s.end, hrAvg: s.hrN ? Math.round(s.hrSum / s.hrN) : null, hrMax: s.hrMax || null, rmssd: hxtRmssd(s.rr), breaks: s.breaks || 0 });
   const segs = t.segs.filter(s => s.start && s.end).map(mk), total = segs.reduce((a, s) => a + s.sec, 0);
   const run = { id: t.id, mode: t.mode, st: t.st, date, t0: t.t0, t1: segs.length ? segs[segs.length - 1].end : Date.now(), total, segs, hrLive: t.hrLive, hr: t.hr,
     hrAvg: t.hrLive ? Math.round(segs.filter(s => s.hrAvg).reduce((a, s) => a + s.hrAvg * s.sec, 0) / Math.max(1, segs.filter(s => s.hrAvg).reduce((a, s) => a + s.sec, 0))) : null, hrMax: t.hrLive ? Math.max(...segs.map(s => s.hrMax || 0)) : null };
@@ -176,6 +180,9 @@ function hxtFinish() {
     segs.filter(s => s.k !== 'run').forEach(s => hx().results.push({ ...base, id: 'tm' + s.k + Date.now(), kind: 'st', st: s.k, sec: Math.round(s.sec / 1.08), std: true, note: 'Parcial de simulación (÷1.08)' }));
   } else if (t.mode === 'station') { first = { ...base, id: 'tm' + Date.now(), kind: 'st', st: t.st, sec: segs[0].sec, std: true }; hx().results.push(first); }
   else if (t.mode === 'run1k') { first = { ...base, id: 'tm' + Date.now(), kind: 'run1k', sec: segs[0].sec }; hx().results.push(first); }
+  else if (t.mode === 'part') {
+    segs.forEach((s, j) => { const N = Math.floor(j / 2) + 1; if (s.k === 'run') hx().results.push({ ...base, id: 'tmk' + N + Date.now(), kind: 'km', blk: N, sec: s.sec }); else hx().results.push({ ...base, id: 'tm' + s.k + Date.now(), kind: 'st', st: s.k, sec: Math.round(s.sec / 1.08), std: true, note: 'Parcial de simulación (÷1.08)' }); });
+  }
   else if (t.mode === 'blk') {
     const N = HX_STATIONS.findIndex(s => s.k === t.st) + 1, kmSeg = segs.find(s => s.k === 'run'), stSeg = segs.find(s => s.k !== 'run');
     if (kmSeg) hx().results.push({ ...base, id: 'tmk' + Date.now(), kind: 'km', blk: N, sec: kmSeg.sec });
@@ -206,7 +213,7 @@ function hxtSummary(run, first, prevBest, beaten) {
     ${beaten && beaten.length ? hxLadderCelebrateHtml(beaten) : ''}
     ${z ? `<div class="hxt-zones">${[1, 2, 3, 4, 5].map(k => `<i data-z="${k}" style="flex:${z[k] || 0.0001}"></i>`).join('')}</div><p class="small muted">Tiempo en zonas (pulso máx ${maxHr()} lpm${DB.watch && DB.watch.maxHr ? '' : ', estimado por edad'}).</p>` : ''}
     ${L.map(([a, b]) => `<div class="pg-rec"><b>${a}</b><small>${esc(b)}</small></div>`).join('')}
-    ${run.segs.length > 1 ? `<table class="small hx-tbl"><tbody>${run.segs.map(s => `<tr><td>${esc(s.n)}</td><td>${s.hrAvg ? s.hrAvg + ' lpm' : ''}</td><td><b>${hxT(s.sec)}</b></td></tr>`).join('')}</tbody></table>` : ''}
+    ${run.segs.length > 1 ? `<table class="small hx-tbl"><tbody>${run.segs.map(s => `<tr><td>${esc(s.n)}${s.breaks ? ` <small class="muted">· ${s.breaks} ${s.breaks > 1 ? 'cortes' : 'corte'}</small>` : ''}</td><td>${s.hrAvg ? s.hrAvg + ' lpm' : ''}</td><td><b>${hxT(s.sec)}</b></td></tr>`).join('')}</tbody></table>` : ''}
     <p class="small muted">¿Qué tan duro fue? (opcional)</p><div class="hxt-rpe">${[6, 7, 8, 9, 10].map(r => `<button class="chip" data-rpe="${r}">${r}</button>`).join('')}</div>
     <button class="block" id="hts-ok">Listo</button>`, m => {
     if (beaten && beaten.length) hxLadderBurst(m);

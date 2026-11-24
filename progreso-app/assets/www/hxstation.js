@@ -39,6 +39,7 @@ openHxStation = function (k, back) {
     <button class="block" id="hxs-go">${ico('timer', 18, 'lead')}Entrenar ${k === 'run' ? 'el 1 km' : 'esta estación'} sola</button>
     <div class="row hxs-more">${k !== 'run' ? '<button class="secondary" id="hxs-comp">Estación + 1 km</button>' : ''}<button class="secondary" id="hxs-man">Escribir un tiempo</button></div>
     ${pf && I.why ? `<div class="pg-rec"><b>Por qué funciona</b><small>${esc(I.why)}</small></div>` : ''}
+    ${k !== 'run' && typeof HP_STATION === 'object' ? `<div class="pg-rec hp-key"><b>Lo que necesitas</b><small>${esc(HP_STATION[k])}. No intentes ganar la estación: no pierdas tiempo.</small></div>` : ''}
     <div class="pg-rec"><b>Técnica</b><small>${esc(I.tip)}</small></div>
     <div class="pg-rec"><b>Errores frecuentes</b><small>${esc(I.err.join(' · '))}</small></div>
     ${pf && I.alt ? `<div class="pg-rec"><b>Si no hay la máquina</b><small>${esc(I.alt)}</small></div>` : ''}

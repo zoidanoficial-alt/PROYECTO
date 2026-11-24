@@ -1474,3 +1474,26 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
 - Tema claro: se invierten a negro.
 - **HYROX es una marca registrada de terceros: uso exclusivo del dueño. Antes de distribuir la app, borra la carpeta `personal/` y sus dos líneas en `index.html`** (el `<link>` de `personal.css` y el `<script>` de `personal.js`). La app vuelve al cronómetro y al texto.
 - Build versionCode 52.
+
+## 43.5 · Proyecto HYROX (sub-47) con el método de un atleta
+
+Se integra el método que compartió un atleta con experiencia en HYROX: "sé el atleta que menos velocidad pierde cuando está fatigado" (`hxproject.js`). Se abre desde Plan → HYROX y desde HYROX Lab.
+
+- **Metas:** 46:59, 49:59, 54:59, 59:59, 1:09:59 y 1:19:59.
+- **Presupuesto:** reparto del método (29:45 de running, 16:30 de estaciones y 0:44 de transiciones para 46:59, escalado a cada meta).
+  - Se compara con tu predicción en columnas Hoy/Meta y dice dónde está tu mayor tiempo por ganar.
+  - Nota honesta: el Roxzone real suele ser mayor que el del ejemplo.
+- **Km por km:** la estrategia Control (km 1–2), Ritmo (3–4), Sostener (5–6), Resistir (7) y Vaciar (8). Los km suman exactamente el tiempo de running de la meta.
+- **Pérdida de velocidad:**
+  - Tus 8 km de la última simulación o carrera con parciales.
+  - Promedio de los km 1–2 contra los km 6–8 (≤ 5 % muy bien, 5–10 % hay tiempo por ganar, > 10 % la gran oportunidad).
+  - Primer contra octavo km, el km más lento, y tu running bajo fatiga (RDI).
+- **Semana tipo** con botones que arrancan cada sesión, y el día de hoy resaltado:
+  - Lunes: sled push. Martes: 6 × 1 km. Miércoles: zona 2. Jueves: estaciones. Viernes: umbral 3 × 2 km. Sábado: compromised running o simulaciones parciales de 2, 4 y 6 bloques (o completa). Domingo: descanso.
+- **Nuevas sesiones guiadas:** hx1 (6 × 1 km), hx2 (3 × 2 km) y hx3 (compromised running, por tiempo).
+- **Simulación parcial** (modo `part`): guarda cada km como "Km N" y las estaciones como parciales (÷1.08). Nunca cuenta como simulación completa.
+- **"Rompí la serie"** en el temporizador: solo aparece en estaciones, cuenta los cortes por tramo y se ve en el resumen.
+- **Ficha de estación:** agrega "Lo que necesitas" (la clave del método) y "no intentes ganar la estación: no pierdas tiempo".
+- **Secciones plegables** de estaciones (qué evitar) y de fuerza (4 capacidades), más la frase final del método.
+- No se miden todavía: el tiempo exacto de cada transición y la recuperación de la respiración. Requieren más toques o un sensor.
+- Pruebas: e2e v51. Build versionCode 53.

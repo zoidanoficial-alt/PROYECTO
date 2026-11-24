@@ -79,6 +79,7 @@ function renderHyroxTab(root0, mode) {
   const note = '<p class="small muted" style="margin-top:10px">El HPI y las predicciones son modelos internos de la app, no métricas oficiales. Sin afiliación con HYROX ni con los atletas.</p>';
   if (mode === 'train') {
     root.innerHTML = `${prep}
+    ${hpCard()}
     <div class="ds-h">Sesión de hoy</div>
     ${hyroxCard(true)}
     <div class="hxp-quick">
@@ -109,6 +110,7 @@ function renderHyroxTab(root0, mode) {
     <div class="ds-h">HYROX Lab</div>
     ${hxFold('hx-diag-r', 'Diagnóstico', hxDiagSub(bn), diag.replace('<div class="ds-h">Diagnóstico</div>', ''))}
     ${pred}
+    ${hpCard()}
     <div class="kit-list">${hxpItem('perf', 'trending-up', 'Perfil de rendimiento', perf.hpi != null ? `HPI ${perf.hpi}/100 · confianza ${perf.conf}` : 'Running, fuerza, fatiga y estaciones')}</div>
     ${hxFold('hx-times', 'Tus tiempos', esc(tested), hxsGrid(perf, bn))}
     <div class="ds-h">Resultados</div>
@@ -128,11 +130,16 @@ function hxFold(id, title, sub, inner) {
   const open = (DB.profile.folds || {})[id] === true;
   return `<details class="cp-fold" data-cpfold="${id}"${open ? ' open' : ''}><summary><span><b>${esc(title)}</b><small>${sub}</small></span>${ico('chevron-down', 18)}</summary><div class="cp-fold-b">${inner}</div></details>`;
 }
+function hpCard() {
+  if (typeof openHxProject !== 'function') return '';
+  const P = hpState(), D = hpDecay();
+  return `<button class="pl-card-btn hp-card" data-hxp="project">${ico('target', 24)}<span><b>Proyecto ${hxT(P.target)}</b><small>${D ? `Pierdes ${fmt(D.pct, 1)} % de velocidad del km 1–2 al 6–8` : 'Tu meta km por km y cuánta velocidad pierdes con fatiga'}</small></span>${ico('chevron-right', 16)}</button>`;
+}
 function hxDiagSub(bn) { return bn && bn.main ? `Por mejorar: <b>${esc(bn.main.n)}</b>` : 'Aún sin diagnóstico'; }
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }
 function hxpBind(root) {
   const back = () => closeModal();
-  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), lab: () => openPerfLab('hyrox', back), toplan: () => { if (typeof planSetDisc === 'function') planSetDisc('hyrox'); showTab('train'); }, results: () => showTab('hyrox'), ladder: () => openHxLadder(back), resist: () => openResist(back), athlete: () => openAthlete(), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); render(currentTab); }) };
+  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), lab: () => openPerfLab('hyrox', back), project: () => openHxProject(back), toplan: () => { if (typeof planSetDisc === 'function') planSetDisc('hyrox'); showTab('train'); }, results: () => showTab('hyrox'), ladder: () => openHxLadder(back), resist: () => openResist(back), athlete: () => openAthlete(), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); render(currentTab); }) };
   $$('[data-hxp]', root).forEach(b => b.onclick = () => act[b.dataset.hxp]());
   const ch = $('#ch-open', root); if (ch) ch.onclick = () => openChamps();
   const pfb = $('#pf-open', root); if (pfb) pfb.onclick = () => openPfHyrox();
