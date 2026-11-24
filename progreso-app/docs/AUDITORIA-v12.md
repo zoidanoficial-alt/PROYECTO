@@ -1430,3 +1430,16 @@ Detalle completo, fuentes y métodos en `docs/NUTRICION-v38.md`.
   - En el laboratorio aparecen "Tus rivales de referencia": los atletas justo arriba y abajo de tu marca, con su diferencia. También el top 100 completo y un botón + para agregar a cualquiera a "Mi escalera".
   - Los avisos dicen a quién superaste.
   - **Antes de distribuir la app a otras personas, borra `hxnames.js`** (y su `<script>` en `index.html`). Sin ese archivo la app solo muestra tiempos.
+
+## 43.1 · Temporizador HYROX rediseñado
+
+- Mismo diseño que el reproductor de sesiones:
+  - Arriba, la modalidad, "Tramo X de 16" y el tiempo total; debajo, una barra de avance.
+  - Una tarjeta con el tramo actual (nombre, distancia y reloj grande en limón, gris en pausa).
+  - Un botón grande "Empezar", "Siguiente tramo" o "Terminar y guardar", y debajo Pausa/Seguir y Deshacer.
+- Fuera los textos de instrucciones y las etiquetas de reloj y pulso. El pulso solo aparece cuando llega en vivo.
+- "Minimizar" se reemplaza por **Guardar**: cierra el tramo en curso y guarda lo que llevas.
+  - Una simulación a medias no se registra como simulación completa; solo cuentan las estaciones terminadas.
+  - El resumen la marca como "parcial".
+- La sesión de HYROX también cambia "Minimizar" por "Guardar sesión".
+- Pruebas: e2e v49. Build versionCode 49.

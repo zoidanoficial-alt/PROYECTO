@@ -103,3 +103,16 @@
   .zl-bg, .zl-chest, .zl-lid, .zl-rays, .zl-medal, .zl-spark, .zl-box, .zl-next, .pn-ai-orb, .pn-ai-steps li { animation: none !important; }
   .zl-medal { opacity: 1; transform: translate(-50%, -150px); } .zl-rays { opacity: .6; } .zl-lid { transform: translateY(-14px) rotate(-14deg) scaleY(.55); } .zl-txt i, .zl-sub i, .pn-ai-steps li { opacity: 1; }
 }
+/* 43.1 · Temporizador HYROX con el diseño del reproductor */
+.hxt2 .wp-step { padding-top: 22px; }
+.hxt2 .wp-step > small { display: block; margin-top: 4px; }
+.hxt2 .wp-amt { font-size: 72px; margin: 14px 0 2px; }
+.hxt2.paused .wp-amt { color: var(--text-3); }
+.hxt-hr { display: inline-flex !important; align-items: center; gap: 4px; color: var(--muted) !important; } .hxt-hr[hidden] { display: none !important; } .hxt-hr svg { color: var(--bad, #ff5c5c); }
+.hxt-hr b { color: var(--text); font-size: 15px; }
+.hxt2 .wp-ctl button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.hxt2 .wp-ctl button:disabled, .hxt-foot button:disabled { opacity: .4; }
+.hxt-done { margin-top: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: 0 12px; }
+.hxt-done summary { padding: 12px 0; font-weight: 800; font-size: 13.5px; cursor: pointer; } .hxt-done[open] { padding-bottom: 10px; }
+.hxt-foot { margin-top: 10px; } .hxt-foot .ghost { display: inline-flex; align-items: center; gap: 6px; }
+.hxt-del { color: var(--text-3) !important; font-weight: 600; }

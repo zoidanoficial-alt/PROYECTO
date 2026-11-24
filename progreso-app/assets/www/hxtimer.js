@@ -1,4 +1,5 @@
 'use strict';
+if (typeof ICONS_L === 'object' && !ICONS_L.pause) ICONS_L.pause = '<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>';
 /* =====================================================================
  *  28.0 · Temporizador HYROX integrado (sin escribir tiempos a mano)
  *  Modos: carrera completa (8 km + 8 estaciones), una estación, 1 km fresco, estación + 1 km.
@@ -92,50 +93,65 @@ function hxtPush(force) {
 function openHxTimer() {
   const t = hxt(); if (!t) return;
   watchDrain && watchDrain();
-  const seg = t.segs[t.i], nextSeg = t.segs[t.i + 1];
-  openModal(`<div class="hxt">
-    <div class="row spread"><div class="hx-eyebrow">${esc(HXT_TITLE[t.mode].toUpperCase())}</div><span class="hxt-chips">${bridge && WatchService_running() ? '<span class="ev-ver ok"><i></i>Reloj</span>' : ''}<span class="ev-ver ${WATCH.hr ? 'ok' : ''}" id="hxt-hrchip"><i></i>${WATCH.hr ? 'Pulso en vivo' : 'Sin pulso en vivo'}</span></span></div>
-    <div class="hxt-seg"><small id="hxt-idx"></small><b id="hxt-name">${esc(seg.n)}</b><span>${esc(seg.d)}</span></div>
-    <div class="hxt-clock t-display-l" id="hxt-seg">0:00</div>
-    <div class="hxt-row"><div><small>TOTAL</small><b id="hxt-total">0:00</b></div><div><small>PULSO</small><b class="live-hr" data-z="0">—</b><small class="live-zone"></small></div><div><small>MEDIA TRAMO</small><b id="hxt-avg">—</b></div></div>
-    <div class="hxt-ctl">
-      <button class="icon-btn hxt-b" id="hxt-prev" aria-label="Deshacer">⏮</button>
-      <button class="hxt-play" id="hxt-play" aria-label="Iniciar o pausar"></button>
-      <button class="icon-btn hxt-b" id="hxt-next" aria-label="Siguiente">⏭</button>
+  const seg = t.segs[t.i];
+  openModal(`<div class="wp hxt2">
+    <div class="wp-top"><div><small>HYROX · ${esc(HXT_TITLE[t.mode].toUpperCase())}</small><b id="hxt-idx"></b></div><span class="wp-clock" id="hxt-total">0:00</span></div>
+    <div class="wp-bar"><i id="hxt-bar" style="width:0%"></i></div>
+    <div class="wp-step">
+      <b class="wp-name" id="hxt-name">${esc(seg.n)}</b>
+      <small id="hxt-dose">${esc(seg.d || '')}</small>
+      <div class="wp-amt" id="hxt-seg">0:00</div>
+      <small class="hxt-hr" id="hxt-hr" hidden>${ico('heart-pulse', 14)} <b class="live-hr" data-z="0">—</b> lpm</small>
     </div>
-    <p class="small muted hxt-next" id="hxt-nexttxt"></p>
     <div class="hxt-ghost" id="hxt-ghost" hidden></div>
-    <div id="hxt-splits"></div>
-    <p class="small muted">Desde el reloj: control de música ▶/⏸ inicia o pausa, ⏭ siguiente, ⏮ deshace. Puedes bloquear el teléfono: los tiempos usan la hora real de cada toque.</p>
-    <div class="row" style="gap:8px"><button class="ghost" id="hxt-min">Minimizar</button><span class="grow"></span><button class="ghost" id="hxt-del" style="color:var(--bad)">Descartar</button></div>
+    <p class="wp-next" id="hxt-nexttxt"></p>
+    <button class="block wp-go" id="hxt-next"></button>
+    <div class="row wp-ctl"><button class="secondary" id="hxt-play"></button><button class="secondary" id="hxt-prev">${ico('rotate-ccw', 16, 'lead')}Deshacer</button></div>
+    <details class="hxt-done" id="hxt-donebox" hidden><summary id="hxt-donesum"></summary><div id="hxt-splits"></div></details>
+    <div class="row hxt-foot"><button class="ghost" id="hxt-save">${ico('check', 16, 'lead')}Guardar</button><span class="grow"></span><button class="ghost hxt-del" id="hxt-del">Descartar</button></div>
   </div>`, m => {
     $('#hxt-play', m).onclick = () => hxtCommand('toggle', Date.now());
     $('#hxt-next', m).onclick = () => hxtCommand('next', Date.now());
     $('#hxt-prev', m).onclick = () => hxtCommand('prev', Date.now());
-    $('#hxt-min', m).onclick = () => { clearInterval(hxtTick); closeModal(); if (typeof render === 'function') render(currentTab); };
+    $('#hxt-save', m).onclick = () => hxtSaveNow();
     $('#hxt-del', m).onclick = () => { if (!confirm('¿Descartar este temporizador? No se guardará nada.')) return; clearInterval(hxtTick); hx().timer = null; saveData(); if (bridge && bridge.watchStop) bridge.watchStop(); closeModal(); if (typeof render === 'function') render(currentTab); };
     clearInterval(hxtTick);
     hxtTick = setInterval(() => { if (!document.getElementById('hxt-seg') || !hxt()) return clearInterval(hxtTick); hxtPaint(); hxtPush(false); }, 250);
     hxtPaint(); hxtPush(true);
   });
 }
+/** Guardar ahora: cierra el tramo en curso y registra lo que llevas (los tramos sin empezar no cuentan). */
+function hxtSaveNow() {
+  const t = hxt(); if (!t) return;
+  if (!t.t0) { toast('Empieza el temporizador para tener algo que guardar'); return; }
+  const at = Date.now();
+  if (t.paused != null) { t.pauses.push([t.paused, at]); t.paused = null; }
+  const seg = t.segs[t.i]; if (seg.start && !seg.end) seg.end = at;
+  saveData(); hxtFinish();
+}
 function WatchService_running() { try { return bridge && typeof bridge.watchRunning === 'function' && bridge.watchRunning(); } catch (e) { return false; } }
 function hxtPaint() {
   const t = hxt(), el = id => document.getElementById(id); if (!t || !el('hxt-seg')) return;
-  const n = hxtNow(t), seg = t.segs[t.i], nx = t.segs[t.i + 1];
+  const n = hxtNow(t), seg = t.segs[t.i], nx = t.segs[t.i + 1], last = t.i >= t.segs.length - 1;
   el('hxt-seg').textContent = hxT(n.seg / 1000); el('hxt-total').textContent = hxT(n.total / 1000);
-  el('hxt-name').textContent = seg.n;
-  el('hxt-idx').textContent = t.segs.length > 1 ? `${t.i + 1} / ${t.segs.length}` : '';
-  el('hxt-avg').textContent = seg.hrN ? Math.round(seg.hrSum / seg.hrN) : '—';
-  const play = el('hxt-play'); play.className = 'hxt-play' + (t.t0 && t.paused == null ? ' on' : ''); play.textContent = !t.t0 ? '▶' : t.paused != null ? '▶' : '⏸';
-  el('hxt-nexttxt').textContent = !t.t0 ? 'Toca ▶ (o play en tu reloj) para empezar' : t.paused != null ? 'En pausa' : nx ? `Siguiente: ${nx.n}` : 'Toca ⏭ al terminar para guardar';
-  const chip = el('hxt-hrchip'), live = WATCH.hr && Date.now() - WATCH.hr.at < 10000;
-  if (chip) { chip.className = 'ev-ver ' + (live ? 'ok' : ''); chip.lastChild.textContent = live ? 'Pulso en vivo' : (DB.watch && DB.watch.hcOn ? 'Pulso: llega de Mi Fitness al terminar' : 'Sin pulso en vivo'); }
-  if (!live) $$('.live-hr').forEach(e => { e.textContent = '—'; });
+  el('hxt-name').textContent = seg.n; el('hxt-dose').textContent = seg.d || '';
+  el('hxt-idx').textContent = t.segs.length > 1 ? `Tramo ${t.i + 1} de ${t.segs.length}` : seg.n;
+  el('hxt-bar').style.width = (t.segs.length > 1 ? t.i / t.segs.length * 100 : t.t0 ? 50 : 0) + '%';
+  const run = t.t0 && t.paused == null;
+  el('hxt-next').innerHTML = !t.t0 ? `${ico('play', 18, 'lead')}Empezar` : last ? `${ico('check', 18, 'lead')}Terminar y guardar` : `Siguiente tramo ${ico('chevron-right', 18)}`;
+  const play = el('hxt-play'); play.innerHTML = t.paused != null ? `${ico('play', 16, 'lead')}Seguir` : `${ico('pause', 16, 'lead')}Pausa`; play.disabled = !t.t0;
+  el('hxt-prev').disabled = !t.t0;
+  el('hxt-save').disabled = !t.t0;
+  el('hxt-nexttxt').innerHTML = t.paused != null ? '<b>En pausa</b>' : nx ? `Sigue: <b>${esc(nx.n)}</b>${nx.d ? ' · ' + esc(nx.d) : ''}` : t.t0 ? 'Último tramo' : '';
+  document.querySelector('.hxt2') && document.querySelector('.hxt2').classList.toggle('paused', t.paused != null);
+  const live = WATCH.hr && Date.now() - WATCH.hr.at < 10000;
+  el('hxt-hr').hidden = !live || !run;
   const gh = el('hxt-ghost');
-  if (gh) { const tx = hxtGhostTxt(t); gh.hidden = !t.ghost; gh.className = 'hxt-ghost' + (tx.includes('+') ? ' behind' : ''); gh.innerHTML = t.ghost ? `<small>👻 CONTRA ${esc(t.ghost.src.toUpperCase())}</small><span>${tx || 'Empieza y compites contra tu mejor versión'}</span>` : ''; }
-  const done = t.segs.filter(s => s.end);
-  el('hxt-splits').innerHTML = done.length ? `<table class="small hx-tbl"><tbody>${done.slice().reverse().map(s => `<tr><td>${esc(s.n)}</td><td>${s.hrN ? Math.round(s.hrSum / s.hrN) + ' lpm' : ''}</td><td><b>${hxT(hxtActive(t, s.start, s.end) / 1000)}</b></td></tr>`).join('')}</tbody></table>` : '';
+  if (gh) { const tx = hxtGhostTxt(t); gh.hidden = !t.ghost || !t.t0; gh.className = 'hxt-ghost' + (tx.includes('+') ? ' behind' : ''); gh.innerHTML = t.ghost ? `<small>CONTRA ${esc(t.ghost.src.toUpperCase())}</small><span>${tx || ''}</span>` : ''; }
+  const done = t.segs.filter(s => s.end), box = el('hxt-donebox');
+  box.hidden = !done.length;
+  el('hxt-donesum').textContent = `Tramos terminados · ${done.length}`;
+  el('hxt-splits').innerHTML = done.length ? `<table class="small hx-tbl"><tbody>${done.slice().reverse().map(s => `<tr><td>${esc(s.n)}</td><td><b>${hxT(hxtActive(t, s.start, s.end) / 1000)}</b></td></tr>`).join('')}</tbody></table>` : '';
 }
 
 /* ---------- Al terminar: registrar solo ---------- */
@@ -152,8 +168,10 @@ function hxtFinish() {
   const base = { date, t: Date.now(), rpe: null, auto: true, timerId: t.id };
   let prevBest = t.mode === 'station' || t.mode === 'comp' ? hxBest('st', t.st) : t.mode === 'run1k' ? hxBest('run1k') : null;
   let first = null, hxtSim = null;
+  const complete = segs.length === t.segs.length;
   if (t.mode === 'race') {
-    first = null; hx().results.push(hxtSim = { ...base, id: 'tm' + Date.now(), kind: 'sim', sec: total, note: 'Simulación cronometrada' });
+    first = null;
+    if (complete) hx().results.push(hxtSim = { ...base, id: 'tm' + Date.now(), kind: 'sim', sec: total, note: 'Simulación cronometrada' });   // 43.1: a medias no cuenta como simulación
     segs.filter(s => s.k !== 'run').forEach(s => hx().results.push({ ...base, id: 'tm' + s.k + Date.now(), kind: 'st', st: s.k, sec: Math.round(s.sec / 1.08), std: true, note: 'Parcial de simulación (÷1.08)' }));
   } else if (t.mode === 'station') { first = { ...base, id: 'tm' + Date.now(), kind: 'st', st: t.st, sec: segs[0].sec, std: true }; hx().results.push(first); }
   else if (t.mode === 'run1k') { first = { ...base, id: 'tm' + Date.now(), kind: 'run1k', sec: segs[0].sec }; hx().results.push(first); }
@@ -167,18 +185,18 @@ function hxtFinish() {
   if (t.pf && first && first.pf) prevBest = hxBestPF(t.st) && hxResultsPF(t.st).length > 1 ? hxResultsPF(t.st).filter(r => r !== first).reduce((a, r) => !a || r.sec < a.sec ? r : a, null) : null;
   saveData();
   if (typeof hxRecReact === 'function') { const rr = hxtSim || first; setTimeout(() => hxRecReact(rr), 700); }
-  hxtSummary(run, first, prevBest, t.mode === 'race' && !t.pf && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, total) : []);
+  hxtSummary(run, first, prevBest, t.mode === 'race' && complete && !t.pf && typeof hxLadderBeaten === 'function' ? hxLadderBeaten(ladderPrev, total) : []);
 }
 /** RMSSD de los intervalos R-R del tramo (solo con sensor que los envía). */
 function hxtRmssd(rr) { if (!rr || rr.length < 10) return null; let s = 0, n = 0; for (let i = 1; i < rr.length; i++) { const d = rr[i] - rr[i - 1]; if (Math.abs(d) < 300) { s += d * d; n++; } } return n ? Math.round(Math.sqrt(s / n)) : null; }
 function hxtSummary(run, first, prevBest, beaten) {
   const z = run.hrLive && run.hr.length ? (() => { const c = [0, 0, 0, 0, 0, 0]; run.hr.forEach(([, b]) => c[hrZone(b)]++); return c; })() : null;
-  const L = [['Qué hiciste', `${HXT_TITLE[run.mode]} · ${hxT(run.total)}${run.hrAvg ? ` · pulso medio ${run.hrAvg} lpm (máx ${run.hrMax})` : ''}.`]];
+  const part = run.mode === 'race' && run.segs.length < 16;
+  const L = [['Qué hiciste', `${HXT_TITLE[run.mode]}${part ? ` parcial (${run.segs.length} de 16 tramos; no cuenta como simulación completa)` : ''} · ${hxT(run.total)}${run.hrAvg ? ` · pulso medio ${run.hrAvg} lpm (máx ${run.hrMax})` : ''}.`]];
   if (first && prevBest) L.push(['Qué mejoraste', first.sec < prevBest.sec ? `${hxT(prevBest.sec - first.sec)} más rápido que tu mejor marca (${hxT(prevBest.sec)}). Nuevo récord.` : `Tu mejor marca sigue siendo ${hxT(prevBest.sec)}. Cuenta el mejor de tus últimas 3 pruebas.`]);
   if (run.mode === 'comp' && run.segs[1]) { const fr = hxCurrent('run1k'); if (fr) L.push(['Qué aprendimos', `Tu km después de ${HX_ST[run.st].n} fue ${fmt(hxRDI(fr.sec, run.segs[1].sec), 1)} % más lento que tu 1 km fresco.`]); }
   if (run.mode === 'race') { const runs = run.segs.filter(s => s.k === 'run'); if (runs.length >= 4) { const a = runs[0].sec, b = runs.slice(-3).reduce((x, s) => x + s.sec, 0) / 3; L.push(['Qué aprendimos', `Tus últimos km fueron ${fmt((b / a - 1) * 100, 1)} % más lentos que el primero. Ya cuenta para tu predicción y tu cuello de botella.`]); } }
-  if (!run.hrLive) L.push(['Pulso', DB.watch && DB.watch.hcOn ? 'Se agregará cuando tu reloj sincronice con Mi Fitness (abre la app en unos minutos).' : 'Conecta tu reloj o una banda en Mi reloj para medir el pulso de cada tramo.']);
-  openModal(`<div class="hx-eyebrow">GUARDADO EN HYROX LAB</div><h3 style="margin-top:4px">${hxT(run.total)}</h3>
+  openModal(`<div class="hx-eyebrow">GUARDADO</div><h3 style="margin-top:4px">${hxT(run.total)}</h3>
     ${beaten && beaten.length ? hxLadderCelebrateHtml(beaten) : ''}
     ${z ? `<div class="hxt-zones">${[1, 2, 3, 4, 5].map(k => `<i data-z="${k}" style="flex:${z[k] || 0.0001}"></i>`).join('')}</div><p class="small muted">Tiempo en zonas (pulso máx ${maxHr()} lpm${DB.watch && DB.watch.maxHr ? '' : ', estimado por edad'}).</p>` : ''}
     ${L.map(([a, b]) => `<div class="pg-rec"><b>${a}</b><small>${esc(b)}</small></div>`).join('')}

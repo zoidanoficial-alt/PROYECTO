@@ -561,14 +561,13 @@ function openHxSession() {
     ${a.changes && a.changes.length ? `<div class="adapt-note">${ico('refresh-cw', 16, 'lead')}<span><b>Por qué cambió:</b> ${esc(a.changes.join(' '))}</span></div>` : ''}
     ${a.blocks.map((b, i) => `<div class="hx-block${b.done ? ' done' : ''}${b.skip ? ' skip' : ''}"><div class="grow"><b>${esc(b.t)}</b><small>${esc(b.d)}</small></div><button class="ghost" data-skip="${i}">${b.skip ? 'Retomar' : 'Omitir'}</button><button class="${b.done ? '' : 'secondary'}" data-done="${i}">${b.done ? '✓' : 'Hecho'}</button></div>`).join('')}
     <p class="small muted">${esc(a.measure)}</p>
-    <button class="block" id="hx-end">Terminar sesión</button><button class="ghost block" id="hx-min">Minimizar</button>
-    <button class="ghost block" id="hx-del" style="color:var(--bad)">Descartar sesión</button>`, m => {
+    <button class="block" id="hx-end">${ico('check', 18, 'lead')}Guardar sesión</button>
+    <button class="ghost block hxt-del" id="hx-del">Descartar</button>`, m => {
     clearInterval(hxTick);
     hxTick = setInterval(() => { const c = document.getElementById('hx-clk'); if (!c || !hx().active) return clearInterval(hxTick); c.textContent = hxT(hxElapsed(hx().active)); }, 1000);
     $$('[data-done]', m).forEach(b => b.onclick = () => { const x = a.blocks[b.dataset.done]; x.done = !x.done; if (x.done) x.skip = false; saveData(); openHxSession(); });
     $$('[data-skip]', m).forEach(b => b.onclick = () => { const x = a.blocks[b.dataset.skip]; x.skip = !x.skip; if (x.skip) x.done = false; saveData(); openHxSession(); });
     $('#hx-pause', m).onclick = () => { if (a.paused) { a.pausedMs += Date.now() - a.paused; a.paused = null; } else a.paused = Date.now(); saveData(); openHxSession(); };
-    $('#hx-min', m).onclick = () => { clearInterval(hxTick); closeModal(); rerenderHx(); };
     $('#hx-del', m).onclick = () => { if (!confirm('¿Descartar esta sesión? No se guardará.')) return; clearInterval(hxTick); hx().active = null; saveData(); closeModal(); rerenderHx(); };
     $('#hx-end', m).onclick = () => hxFinish();
   });
