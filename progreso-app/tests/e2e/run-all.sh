@@ -11,7 +11,7 @@ sleep 1
 cd out
 fail=0
 node ../../unit/nutri.test.mjs | tail -1 || fail=1
-for t in ${TESTS:-v9 v10 v11 v12 v13 v14 v15 v15b v16 v17 v18 v19 v20 v21 v22 v23 v24 v25 v26 v27 v27b v27c v28 v28r v29 v30 v31 v32 v33 v34 v35 v36 v37 v38 v39 v40 v41 v42 v43 v44 v45 v46 v47 v48 v49 v50 v51 persist}; do
+for t in ${TESTS:-v9 v10 v11 v12 v13 v14 v15 v15b v16 v17 v18 v19 v20 v21 v22 v23 v24 v25 v26 v27 v27b v27c v28 v28r v29 v30 v31 v32 v33 v34 v35 v36 v37 v38 v39 v40 v41 v42 v43 v44 v45 v46 v47 v48 v49 v50 v51 v52 persist}; do
   res=$(timeout 240 node ../$t.mjs 2>&1)
   last=$(echo "$res" | grep -oE '(ERRORS|errors) \[.*\]|[]}] \[.*\]$' | tail -1)
   if echo "$res" | grep -qE '^\S*Error|TypeError|Timeout' || [ -z "$last" ]; then echo "FALLA $t"; echo "$res" | tail -5; fail=1; else echo "ok    $t  $last" | cut -c1-160; fi

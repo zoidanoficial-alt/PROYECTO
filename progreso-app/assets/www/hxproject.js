@@ -49,8 +49,8 @@ function openHxProject(back) {
   const pace = v => hxT(Math.round(v)) + '/km';
   const decayTxt = D ? (D.pct <= 5 ? 'Pierdes muy poca velocidad: así se corre un sub-47.' : D.pct <= 10 ? 'Pierdes algo de velocidad al final: ahí hay tiempo por ganar.' : 'Aquí está tu mayor oportunidad: tus últimos km se caen mucho.') : '';
   const week = [
-    ['Lunes', 'Fuerza de piernas + sled', 'Entrenar sled push', 'push'], ['Martes', 'Intervalos 6 × 1 km', 'Empezar', 'hx1'], ['Miércoles', 'Aeróbico zona 2 + recuperación', 'Empezar', 'cd1'],
-    ['Jueves', 'Fuerza de torso + estaciones', 'Elegir estación', 'st'], ['Viernes', 'Umbral 3 × 2 km', 'Empezar', 'hx2'], ['Sábado', 'Compromised running o simulación parcial', 'Elegir', 'sat'], ['Domingo', 'Descanso', '', '']
+    ['Lunes', 'Fuerza de piernas + sled', 'Ver rutina', 'rta'], ['Martes', 'Intervalos 6 × 1 km', 'Empezar', 'hx1'], ['Miércoles', 'Aeróbico zona 2 + recuperación', 'Empezar', 'cd1'],
+    ['Jueves', 'Fuerza de torso + estaciones', 'Ver rutina', 'rtb'], ['Viernes', 'Umbral 3 × 2 km', 'Empezar', 'hx2'], ['Sábado', 'Compromised running o simulación parcial', 'Elegir', 'sat'], ['Domingo', 'Descanso', '', '']
   ];
   openModal(`<div class="hp">
     <div class="hx-eyebrow">PROYECTO HYROX ${esc(hxT(T))}</div>
@@ -89,6 +89,7 @@ function openHxProject(back) {
     $$('[data-hpgo]', m).forEach(b => b.onclick = () => {
       const k = b.dataset.hpgo, again = () => openHxProject(back);
       if (k === 'push') openHxStation('push', again);
+      else if (k === 'rta' || k === 'rtb') openHxRoutine(again);
       else if (k === 'st') hxtPickStation('station', again);
       else if (k === 'sat') hpSaturday(again);
       else { closeModal(true); startWod(k); }

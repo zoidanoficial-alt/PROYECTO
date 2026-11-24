@@ -1497,3 +1497,25 @@ Se integra el método que compartió un atleta con experiencia en HYROX: "sé el
 - **Secciones plegables** de estaciones (qué evitar) y de fuerza (4 capacidades), más la frase final del método.
 - No se miden todavía: el tiempo exacto de cada transición y la recuperación de la respiración. Requieren más toques o un sensor.
 - Pruebas: e2e v51. Build versionCode 53.
+
+## 43.6 · Rutina HYROX por pesos (Gimnasio y Planet Fitness)
+
+- **Pesos oficiales por categoría** (`hxroutine.js`); los trineos incluyen su peso:
+  - Men Open: 152, 103, 2 × 24, 20 y 6. Men Pro: 202, 153, 2 × 32, 30 y 9.
+  - Women Open: 102, 78, 2 × 16, 10 y 4. Women Pro: 152, 103, 2 × 24, 20 y 6.
+- **Bloque de 8 semanas:**
+  - Base al 80, 85 y 90 %.
+  - Sobrecarga al 100, 110 y 120 % (en sobrecarga sube el balón al siguiente tamaño).
+  - Específica al 100 %, con distancias de carrera.
+  - Descarga al 70 %, con 2 series menos.
+  - Arranca hoy y se puede reiniciar.
+- **Lunes, pierna + trineos:** sentadilla 5 × 5, sled push y sled pull 6 × 25 m, sandbag lunges 3 × 25 m y peso muerto rumano.
+- **Jueves, torso + estaciones:** SkiErg 5 × 250 m, press militar, dominadas, farmers 4 × 50 m, wall balls 5 × 20 y remo 4 × 250 m.
+- **Planet Fitness:**
+  - Caminadora a 15 % para empuje y jalón (más velocidad en sobrecarga).
+  - Mancuernas en libras reales del club (pasos de 5 lb, tope de 75 lb) con su equivalencia en kg.
+  - Zancadas goblet, thrusters con mancuernas en lugar de wall balls, y ski en polea.
+- **Reproductor guiado:** cada sesión se hace ahí. "Por ejercicio" pide los kilos usados en cada ejercicio (también en series o metros) y guarda el récord de peso con "LOGRO DESBLOQUEADO".
+- **Accesos:** Plan → HYROX ("Rutina por pesos", con semana, fase y versión) y los botones de lunes y jueves de la semana tipo del Proyecto.
+- **Corrección:** una constante `LB` repetida rompía la carga de la app; se renombró a `HR_LB`.
+- Pruebas: e2e v52. Build versionCode 54.

@@ -233,7 +233,7 @@ function wpNextStep() { const s = WP.steps; return WP.w.type === 'amrap' ? s[(WP
 function wpDraw() {
   if (!WP) return;
   const w = WP.w, s = wpCur(), nx = wpNextStep(), cap = wodCap(w, WP.level), tot = WP.steps.length;
-  const ask = s && (s.max || (WP.comp === 'ex' && s.r));
+  const ask = s && (s.max || (WP.comp === 'ex' && (s.r || s.load)));
   const pct = w.type === 'amrap' ? (WP.i % tot) / tot * 100 : WP.i / tot * 100;
   openModal(`<div class="wp">
     <div class="wp-top"><div><small>${esc(DISC[w.disc].n.toUpperCase())} · ${esc(WOD_TYPE[w.type])}${cap ? ' · ' + (w.type === 'fortime' ? 'tope ' : '') + cap + ' min' : ''}</small><b>${esc(w.n)}</b></div><span class="wp-clock" id="wp-clock">0:00</span></div>
@@ -282,7 +282,7 @@ function wpDone(auto) {
   const s = wpCur(); if (!s || WP.pauseAt) return;
   const inp = document.getElementById('wp-val');
   if (s.max) { const v = Math.round(wpStepEl()); WP.hold += v; WP.res[s.n] = Math.max(WP.res[s.n] || 0, v); }
-  else if (WP.comp === 'ex' && s.r && inp && inp.value !== '') { const v = Number(inp.value); if (v > 0) WP.res[s.n] = Math.max(WP.res[s.n] || 0, v); WP.unit = WP.unit || {}; WP.unit[s.n] = s.load ? 'kg' : 'reps'; }
+  else if (WP.comp === 'ex' && (s.r || s.load) && inp && inp.value !== '') { const v = Number(inp.value); if (v > 0) WP.res[s.n] = Math.max(WP.res[s.n] || 0, v); WP.unit = WP.unit || {}; WP.unit[s.n] = s.load ? 'kg' : 'reps'; }
   if (s.max) { WP.unit = WP.unit || {}; WP.unit[s.n] = 's'; }
   if (WP.w.type === 'emom' && !auto) { WP.rest = true; const g = document.getElementById('wp-go'); if (g) g.disabled = true; wpBeep(true); return; }
   wpBeep(true); vibrate(40);

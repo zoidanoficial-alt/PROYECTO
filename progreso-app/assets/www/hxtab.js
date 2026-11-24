@@ -80,6 +80,7 @@ function renderHyroxTab(root0, mode) {
   if (mode === 'train') {
     root.innerHTML = `${prep}
     ${hpCard()}
+    ${typeof openHxRoutine === 'function' ? `<button class="pl-card-btn hp-card" data-hxp="routine">${ico('dumbbell', 24)}<span><b>Rutina por pesos</b><small>${(() => { const c = hrCfg(), w = hrWeekNow(c.R); return `Semana ${w + 1} de 8 · ${HR_WEEKS[w].n} ${Math.round(HR_WEEKS[w].f * 100)} % · ${c.R.pf ? 'Planet Fitness' : 'Gimnasio HYROX'}`; })()}</small></span>${ico('chevron-right', 16)}</button>` : ''}
     <div class="ds-h">Sesión de hoy</div>
     ${hyroxCard(true)}
     <div class="hxp-quick">
@@ -139,7 +140,7 @@ function hxDiagSub(bn) { return bn && bn.main ? `Por mejorar: <b>${esc(bn.main.n
 function hxpItem(k, i, t, s) { return `<button class="kit-item" data-hxp="${k}">${ico(i, 22)}<span class="grow"><b>${t}</b><small>${esc(s)}</small></span>${ico('chevron-right', 16)}</button>`; }
 function hxpBind(root) {
   const back = () => closeModal();
-  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), lab: () => openPerfLab('hyrox', back), project: () => openHxProject(back), toplan: () => { if (typeof planSetDisc === 'function') planSetDisc('hyrox'); showTab('train'); }, results: () => showTab('hyrox'), ladder: () => openHxLadder(back), resist: () => openResist(back), athlete: () => openAthlete(), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); render(currentTab); }) };
+  const act = { timer: () => openHxTimerPicker(back), watch: () => openWatch(), events: () => openEvents(), test: () => openHxTestPicker(back), st: () => openHxStations(back), perf: () => openHxPerf(back), race: () => openHxPredict(back), strat: () => openHxStrategy(back), ranks: () => openHxRanks(back), lab: () => openPerfLab('hyrox', back), project: () => openHxProject(back), routine: () => openHxRoutine(back), toplan: () => { if (typeof planSetDisc === 'function') planSetDisc('hyrox'); showTab('train'); }, results: () => showTab('hyrox'), ladder: () => openHxLadder(back), resist: () => openResist(back), athlete: () => openAthlete(), method: () => openHxMethod(back), setup: () => openHxSetup(() => { closeModal(); render(currentTab); }) };
   $$('[data-hxp]', root).forEach(b => b.onclick = () => act[b.dataset.hxp]());
   const ch = $('#ch-open', root); if (ch) ch.onclick = () => openChamps();
   const pfb = $('#pf-open', root); if (pfb) pfb.onclick = () => openPfHyrox();
